@@ -2,10 +2,11 @@ do
     local P = {}
     template_tools = P
 
-    P.instanciates = function(template, instance_params)
+    P.instanciates = function(id, template, instance_params)
         local result
         --The result is a copy of the template
         result = {}
+        result.id = id
         result.components = {}
         result.components = array_tools.deep_copy(template.components)
 
