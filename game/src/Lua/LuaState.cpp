@@ -4,6 +4,8 @@
 
 #include <boost/filesystem.hpp>
 
+#include "Lua/EntityHandle.hpp"
+
 namespace fs = boost::filesystem;
 
 namespace game
@@ -14,6 +16,9 @@ namespace lua
 LuaState::LuaState() :
     m_luaState(true)
 {
+    //Declare main C++ classes
+    EntityHandle::RegisterClass(*this);
+
     //Load yapg core libraries
     m_luaState.Load("scripts/core/array_tools.lua");
     m_luaState.Load("scripts/game/template_tools.lua");
@@ -22,7 +27,6 @@ LuaState::LuaState() :
     //Load templates
     loadTemplates(std::string("templates"));
 
-    //Declare main C++ classes
     //TODO
 }
 

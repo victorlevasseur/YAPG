@@ -1,6 +1,7 @@
 #include "Level/Level.hpp"
 
 #include "Components/Component.hpp"
+#include "Lua/EntityHandle.hpp"
 
 namespace game
 {
@@ -33,7 +34,7 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
     }
 
     //Now that all entities are created and registered, iterate all of them to
-    //assign the Components
+    //assign the components
     unsigned int i = 1;
     for(auto it = createdEntities.begin(); it != createdEntities.end(); ++it)
     {
