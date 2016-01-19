@@ -1,0 +1,1 @@
+/usr/bin/c++    -pedantic -Werror -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-variable -Wno-error=sign-compare -std=c++11 -g -O2 -DNDEBUG   CMakeFiles/event_test.dir/entityx/Event_test.cc.o  -o event_test -rdynamic libentityx.a 
