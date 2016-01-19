@@ -13,19 +13,12 @@ namespace game
 
 int main(int argc, char** argv)
 {
-    lua::LuaState luaState;
-    luaState.getState().Load("level.lua");
-    std::string aa = luaState.getState()["level"][1]["parameters"]["width"];
-    std::cout << "x = " << (int)(luaState.getState()["level"][1]["components"]["Position"]["x"]) << std::endl;
-    std::cout << "height = " << (int)(luaState.getState()["level"][1]["components"]["Position"]["height"]) << std::endl;
-    std::cout << "parameters.width = " << aa << std::endl;
-
-    /*state::StateEngine stateEngine;
+    state::StateEngine stateEngine;
     window::WindowManager windowManager(stateEngine, "Yet Another Platformer Game");
 
-    stateEngine.stopAndStartState<state::LevelState, std::string>("test.level");
+    stateEngine.stopAndStartState<state::LevelState, std::string>("level.lua");
 
-    windowManager.run();*/
+    windowManager.run();
 
     return 0;
 }

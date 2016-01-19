@@ -7,6 +7,8 @@
 #include "entityx/entityx.h"
 #include "selene.h"
 
+#include "Level/SerializedEntityGetter.hpp"
+
 namespace game
 {
 namespace components
@@ -18,11 +20,23 @@ public:
     Component();
     virtual ~Component();
 
+    /**
+     * Return the name of the component
+     */
     virtual std::string getName() const = 0;
 
-    virtual void loadFromLua(sel::Selector& luaSelector) = 0;
+    /**
+     * Load the component from its lua table.
+     */
+    virtual void loadFromLua(sel::Selector& luaSelector, const level::SerializedEntityGetter& entityGetter) = 0;
 
-    static void assignComponent(entityx::Entity entity, const std::string &component, sel::Selector& luaSelector);
+    /**
+     * Assign a component of type "component" loaded with "luaSelector" to "entity".
+     * \param entity the entity to assign the component to
+     * \param component the name of the component to add
+     * \param luaSelector the lua table to load the component properties from
+     */
+    static void assignComponent(entityx::Entity entity, const std::string &component, sel::Selector& luaSelector, const level::SerializedEntityGetter& entityGetter);
 
 private:
 };

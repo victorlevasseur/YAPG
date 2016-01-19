@@ -16,7 +16,7 @@ public:
 
     virtual std::string getName() const;
 
-    virtual void loadFromLua(sel::Selector& luaSelector);
+    virtual void loadFromLua(sel::Selector& luaSelector, const level::SerializedEntityGetter& entityGetter);
 
     int x;
     int y;

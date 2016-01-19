@@ -36,6 +36,35 @@ const sel::State& LuaState::getState() const
     return m_luaState;
 }
 
+int LuaState::getTableSize(const std::string& tableName)
+{
+    std::string command("temp = array_tools.table_size(" + tableName + ")");
+    m_luaState(command.c_str());
+
+    return (int)m_luaState["temp"];
+}
+
+std::vector<std::string> LuaState::getTableKeys(const std::string& tableName)
+{
+    std::string command("temp = array_tools.get_keys(" + tableName + ")");
+    m_luaState(command.c_str());
+
+    std::string s = m_luaState["temp"];
+
+    char c = '|';
+    std::string buff{""};
+	std::vector<std::string> v;
+
+	for(auto n:s)
+	{
+		if(n != c) buff+=n; else
+		if(n == c && buff != "") { v.push_back(buff); buff = ""; }
+	}
+	if(buff != "") v.push_back(buff);
+
+	return v;
+}
+
 void LuaState::loadTemplates(const std::string& path)
 {
     loadTemplates(fs::path(path));

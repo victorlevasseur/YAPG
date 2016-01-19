@@ -24,7 +24,7 @@ std::string PositionComponent::getName() const
     return "Position";
 }
 
-void PositionComponent::loadFromLua(sel::Selector& luaSelector)
+void PositionComponent::loadFromLua(sel::Selector& luaSelector, const level::SerializedEntityGetter& entityGetter)
 {
     x = (int)luaSelector["x"];
     y = (int)luaSelector["y"];

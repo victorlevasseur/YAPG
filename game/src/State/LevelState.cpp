@@ -7,37 +7,36 @@ namespace state
 
 LevelState::LevelState(const std::string& path) :
     State(),
-    m_eventMgr(),
-    m_entityMgr(m_eventMgr),
-    m_systemMgr(m_entityMgr, m_eventMgr),
-    m_luaState()
+    m_luaState(),
+    m_level(path, m_luaState),
+    m_systemMgr(m_level.getEntityManager(), m_level.getEventManager())
 {
-    m_luaState.getState().Load(path);
+
 }
 
 void LevelState::onStart()
 {
-    
+
 }
 
 void LevelState::onStop()
 {
-    
+
 }
 
 void LevelState::onPause()
 {
-    
+
 }
 
 void LevelState::onUnpause()
 {
-    
+
 }
 
 void LevelState::processEvent(sf::Event event)
 {
-    
+
 }
 
 void LevelState::update(sf::Time dt)
