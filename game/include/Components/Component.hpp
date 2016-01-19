@@ -4,6 +4,9 @@
 #include <map>
 #include <string>
 
+#include "entityx/entityx.h"
+#include "selene.h"
+
 namespace game
 {
 namespace components
@@ -12,14 +15,19 @@ namespace components
 class Component
 {
 public:
-    Component(const std::string &name);
+    Component();
     virtual ~Component();
 
-    virtual const std::string& getName() = 0;
+    virtual std::string getName() const = 0;
+
+    virtual void loadFromLua(sel::Selector& luaSelector) = 0;
+
+    static void assignComponent(entityx::Entity entity, const std::string &component, sel::Selector& luaSelector);
 
 private:
-
 };
+
+std::ostream& operator<<(std::ostream& stream, const Component& component);
 
 }
 }

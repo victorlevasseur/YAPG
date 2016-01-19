@@ -6,8 +6,8 @@ do
         local result
         --The result is a copy of the template
         result = {}
-        result.id = id
-        result.components = {}
+        result["id"] = id
+        result["components"] = {}
         result.components = array_tools.deep_copy(template.components)
 
         --Merge components with instance params
