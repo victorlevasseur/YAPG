@@ -38,8 +38,6 @@ private:
 
     level::Level m_level;
     entityx::SystemManager m_systemMgr;
-
-    sf::Time m_previousDt;
 };
 
 }

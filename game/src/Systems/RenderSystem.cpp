@@ -13,32 +13,29 @@ namespace systems
 
 RenderSystem::RenderSystem() :
     entityx::System<RenderSystem>(),
-    m_target(nullptr)
+    m_renderingQueue()
 {
 
-}
-
-sf::RenderTarget* RenderSystem::getRenderTarget() const
-{
-    return m_target;
-}
-
-void RenderSystem::setRenderTarget(sf::RenderTarget* target)
-{
-    m_target = target;
 }
 
 void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
 {
-    if(m_target == nullptr)
-        return;
+    m_renderingQueue.clear();
 
     es.each<c::PositionComponent>([&](entityx::Entity entity, c::PositionComponent& position) {
-        sf::RectangleShape shape(sf::Vector2f(position.width, position.height));
-        shape.setPosition(position.x, position.y);
+        auto shape = std::make_shared<sf::RectangleShape>(sf::Vector2f(position.width, position.height));
+        shape->setPosition(position.x, position.y);
 
-        m_target->draw(shape);
+        m_renderingQueue.push_back(std::make_pair(shape, sf::RenderStates::Default));
     });
+}
+
+void RenderSystem::render(sf::RenderTarget& target)
+{
+    for(auto it = m_renderingQueue.begin(); it != m_renderingQueue.end(); ++it)
+    {
+        target.draw(*(it->first), it->second);
+    }
 }
 
 }
