@@ -35,9 +35,11 @@ public:
 
 private:
     lua::LuaState m_luaState;
-    
+
     level::Level m_level;
     entityx::SystemManager m_systemMgr;
+
+    sf::Time m_previousDt;
 };
 
 }
