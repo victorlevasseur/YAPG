@@ -30,10 +30,6 @@ if(LUA_FOUND)
     target_include_directories(yapg-game PUBLIC ${LUA_INCLUDE_DIR})
 endif()
 
-#Selene
-set(SELENE_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/libs/Selene/include")
-target_include_directories(yapg-game PUBLIC ${SELENE_INCLUDE_DIR})
-
 #Boost filesystem
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 target_include_directories(yapg-game PUBLIC ${BOOST_INCLUDE_DIR})
