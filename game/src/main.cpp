@@ -1,7 +1,5 @@
 #include <iostream>
 
-#include "selene.h"
-
 #include "Lua/LuaState.hpp"
 #include "State/State.hpp"
 #include "State/StateEngine.hpp"

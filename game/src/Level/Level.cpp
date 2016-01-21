@@ -2,7 +2,6 @@
 
 #include "Components/Component.hpp"
 #include "Lua/EntityHandle.hpp"
-#include "Lua/LuaTools.hpp"
 
 namespace game
 {
