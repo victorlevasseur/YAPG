@@ -24,12 +24,12 @@ std::string PositionComponent::getName() const
     return "Position";
 }
 
-void PositionComponent::loadFromLua(sel::Selector& luaSelector, const level::SerializedEntityGetter& entityGetter)
+void PositionComponent::loadFromLua(const sol::table& luaTable, const level::SerializedEntityGetter& entityGetter)
 {
-    x = (int)luaSelector["x"];
-    y = (int)luaSelector["y"];
-    width = (int)luaSelector["width"];
-    height = (int)luaSelector["height"];
+    x = luaTable.get<int>("x");
+    y = luaTable.get<int>("y");
+    width = luaTable.get<int>("width");
+    height = luaTable.get<int>("height");
 }
 
 std::ostream& operator<<(std::ostream& stream, const PositionComponent& component)

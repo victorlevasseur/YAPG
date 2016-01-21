@@ -14,14 +14,27 @@ namespace lua
 {
 
 LuaState::LuaState() :
-    m_luaState(true)
+    m_luaState()
 {
+    //Loading lua libraries
+    m_luaState.open_libraries(
+        sol::lib::base,
+        sol::lib::package,
+        sol::lib::coroutine,
+        sol::lib::string,
+        sol::lib::table,
+        sol::lib::math,
+        sol::lib::bit32,
+        sol::lib::io,
+        sol::lib::os
+    );
+
     //Declare main C++ classes
     EntityHandle::RegisterClass(*this);
 
     //Load yapg core libraries
-    m_luaState.Load("scripts/core/array_tools.lua");
-    m_luaState.Load("scripts/game/template_tools.lua");
+    m_luaState.open_file("scripts/core/array_tools.lua");
+    m_luaState.open_file("scripts/game/template_tools.lua");
     std::cout << "Loaded core and game lua libraries." << std::endl;
 
     //Load templates
@@ -30,12 +43,12 @@ LuaState::LuaState() :
     //TODO
 }
 
-sel::State& LuaState::getState()
+sol::state& LuaState::getState()
 {
     return m_luaState;
 }
 
-const sel::State& LuaState::getState() const
+const sol::state& LuaState::getState() const
 {
     return m_luaState;
 }
@@ -43,17 +56,17 @@ const sel::State& LuaState::getState() const
 int LuaState::getTableSize(const std::string& tableName)
 {
     std::string command("temp = array_tools.table_size(" + tableName + ")");
-    m_luaState(command.c_str());
+    m_luaState.script(command);
 
-    return (int)m_luaState["temp"];
+    return m_luaState.get<int>("temp");
 }
 
 std::vector<std::string> LuaState::getTableKeys(const std::string& tableName)
 {
     std::string command("temp = array_tools.get_keys(" + tableName + ")");
-    m_luaState(command.c_str());
+    m_luaState.script(command);
 
-    std::string s = m_luaState["temp"];
+    std::string s = m_luaState.get<std::string>("temp");
 
     char c = '|';
     std::string buff{""};
@@ -90,7 +103,7 @@ void LuaState::loadTemplates(const fs::path& path)
                 else if(fs::is_regular_file(e.path()))
                 {
                     std::string filePath = fs::canonical(e.path()).string();
-                    m_luaState.Load(filePath);
+                    m_luaState.open_file(filePath);
                     std::cout << "Loaded " << e.path() << std::endl;
                 }
             }

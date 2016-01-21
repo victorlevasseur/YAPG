@@ -26,7 +26,7 @@ void EntityHandle::removeEntity()
 
 void EntityHandle::RegisterClass(LuaState &state)
 {
-    state.getState()["EntityHandle"].SetClass<EntityHandle, entityx::Entity>(
+    state.getState().new_usertype<EntityHandle>("entity_handle",
         "remove_entity", &EntityHandle::removeEntity
     );
 }

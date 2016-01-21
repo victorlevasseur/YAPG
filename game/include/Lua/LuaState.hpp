@@ -1,7 +1,7 @@
 #ifndef YAPG_GAME_LUA_LUASTATE_H
 #define YAPG_GAME_LUA_LUASTATE_H
 
-#include "selene.h"
+#include "Lua/sol.hpp"
 
 namespace boost{ namespace filesystem{ class path; } }
 
@@ -15,8 +15,8 @@ class LuaState
 public:
     LuaState();
 
-    sel::State& getState();
-    const sel::State& getState() const;
+    sol::state& getState();
+    const sol::state& getState() const;
 
     int getTableSize(const std::string& tableName);
     std::vector<std::string> getTableKeys(const std::string& tableName);
@@ -26,7 +26,7 @@ private:
 
     void loadTemplates(const boost::filesystem::path& path);
 
-    sel::State m_luaState;
+    sol::state m_luaState;
 };
 
 }
