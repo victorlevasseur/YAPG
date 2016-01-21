@@ -47,3 +47,4 @@ target_link_libraries(yapg-game PUBLIC
 install(TARGETS yapg-game DESTINATION "${CMAKE_SOURCE_DIR}/release")
 
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/game/luasrc/" DESTINATION "${CMAKE_SOURCE_DIR}/release/scripts/" PATTERN "*.lua")
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/game/resources/" DESTINATION "${CMAKE_SOURCE_DIR}/release/")

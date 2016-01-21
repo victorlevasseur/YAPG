@@ -14,9 +14,9 @@ namespace level
  * \brief stores a map between serialized entities id and Entity (handles).
  *
  * When an entity store the id of another one in a serialized lua level file,
- * the link needs to be established when the entity are instanciated in the
+ * the link needs to be established when the entities are instanciated in the
  * game. This class allow an entity's component to get a Entity (handle) from
- * the id the entity had an the lua level file.
+ * the id the entity had in the lua level file.
  */
 class SerializedEntityGetter
 {

@@ -2,6 +2,7 @@
 
 #include "Components/Component.hpp"
 #include "Lua/EntityHandle.hpp"
+#include "Lua/LuaTools.hpp"
 
 namespace game
 {
@@ -21,17 +22,14 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
     //First, load all the entity and register them to the SerializedEntityGetter
     SerializedEntityGetter entityGetter;
     std::vector<entityx::Entity> createdEntities;
-    for(unsigned int i = 1; i <= objectsCount; ++i)
-    {
-        sel::Selector entitySel = m_luaState.getState()["level"]["objects"][i];
-
+    lua::iterateOnArrayTable(m_luaState.getState()["level"]["objects"], [&](int, sel::Selector entitySel) {
         //Create the entity
         entityx::Entity newEntity = m_entityMgr.create();
         createdEntities.push_back(newEntity);
 
         //Register it with its id
         entityGetter.registerEntity(newEntity, entitySel["id"]);
-    }
+    });
 
     //Now that all entities are created and registered, iterate all of them to
     //assign the components
