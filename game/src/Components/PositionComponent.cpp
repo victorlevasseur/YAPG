@@ -6,10 +6,11 @@ namespace components
 {
 
 PositionComponent::PositionComponent() :
-    x(0),
-    y(0),
-    width(0),
-    height(0)
+    Component(),
+    x(0.0),
+    y(0.0),
+    width(0.0),
+    height(0.0)
 {
 
 }
@@ -26,10 +27,20 @@ std::string PositionComponent::getName() const
 
 void PositionComponent::loadFromLua(const sol::table& luaTable, const level::SerializedEntityGetter& entityGetter)
 {
-    x = luaTable.get<int>("x");
-    y = luaTable.get<int>("y");
-    width = luaTable.get<int>("width");
-    height = luaTable.get<int>("height");
+    x = luaTable.get<float>("x");
+    y = luaTable.get<float>("y");
+    width = luaTable.get<float>("width");
+    height = luaTable.get<float>("height");
+}
+
+void PositionComponent::registerComponent(lua::LuaState& state)
+{
+    state.getState().new_usertype<PositionComponent>("position_component",
+        "x", &PositionComponent::x,
+        "y", &PositionComponent::y,
+        "width", &PositionComponent::width,
+        "height", &PositionComponent::height
+    );
 }
 
 std::ostream& operator<<(std::ostream& stream, const PositionComponent& component)

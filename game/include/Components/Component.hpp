@@ -37,8 +37,9 @@ public:
      * \param luaSelector the lua table to load the component properties from
      */
     static void assignComponent(entityx::Entity entity, const std::string &component, const sol::table& luaTable, const level::SerializedEntityGetter& entityGetter);
-
+    
 private:
+
 };
 
 std::ostream& operator<<(std::ostream& stream, const Component& component);

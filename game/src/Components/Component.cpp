@@ -1,5 +1,6 @@
 #include "Components/Component.hpp"
 
+#include "Components/CustomBehaviorComponent.hpp"
 #include "Components/PositionComponent.hpp"
 
 namespace game
@@ -22,6 +23,10 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
     if(component == "Position")
     {
         entity.assign<PositionComponent>().get()->loadFromLua(luaTable, entityGetter);
+    }
+    else if(component == "CustomBehavior")
+    {
+        entity.assign<CustomBehaviorComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
     else
     {

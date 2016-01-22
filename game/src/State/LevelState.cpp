@@ -1,5 +1,6 @@
 #include "State/LevelState.hpp"
 
+#include "Systems/CustomBehaviorSystem.hpp"
 #include "Systems/RenderSystem.hpp"
 
 namespace game
@@ -14,6 +15,7 @@ LevelState::LevelState(const std::string& path) :
     m_systemMgr(m_level.getEntityManager(), m_level.getEventManager())
 {
     m_systemMgr.add<systems::RenderSystem>();
+    m_systemMgr.add<systems::CustomBehaviorSystem>();
 
     m_systemMgr.configure();
 }

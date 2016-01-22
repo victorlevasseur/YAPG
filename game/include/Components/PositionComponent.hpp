@@ -2,13 +2,14 @@
 #define YAPG_GAME_COMPONENTS_POSITIONCOMPONENT_H
 
 #include "Components/Component.hpp"
+#include "Lua/LuaState.hpp"
 
 namespace game
 {
 namespace components
 {
 
-class PositionComponent
+class PositionComponent : public Component
 {
 public:
     PositionComponent();
@@ -18,10 +19,12 @@ public:
 
     virtual void loadFromLua(const sol::table& luaTable, const level::SerializedEntityGetter& entityGetter);
 
-    int x;
-    int y;
-    int width;
-    int height;
+    float x;
+    float y;
+    float width;
+    float height;
+
+    static void registerComponent(lua::LuaState& state);
 };
 
 std::ostream& operator<<(std::ostream& stream, const PositionComponent& component);
