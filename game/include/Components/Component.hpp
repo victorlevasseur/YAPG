@@ -29,7 +29,7 @@ public:
     /**
      * Load the component from its lua table.
      */
-    virtual void loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter) = 0;
+    void loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter);
 
     /**
      * Assign a component of type "component" loaded with "luaSelector" to "entity".

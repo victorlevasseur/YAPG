@@ -120,6 +120,10 @@ public:
 
     static LoaderMetadata& getMetadata(std::type_index typeindex)
     {
+        if(metadatas.count(typeindex) == 0)
+        {
+            throw std::runtime_error(std::string("Trying to load ") + typeindex.name() + std::string(", which is not declared to MetadataStore !"));
+        }
         return *metadatas[typeindex];
     }
 

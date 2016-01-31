@@ -21,13 +21,10 @@ std::string PlatformComponent::getName() const
     return "Platform";
 }
 
-void PlatformComponent::loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)
-{
-    //TODO: Load from lua table
-}
-
 void PlatformComponent::registerComponent(lua::LuaState& state)
 {
+    lua::MetadataStore::registerType<PlatformComponent>();
+
     state.getState().new_usertype<PlatformComponent>("platform_component" //TODO: Replace the name here
         //TODO: Register the properties here
     );

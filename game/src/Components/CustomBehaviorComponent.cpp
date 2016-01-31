@@ -24,11 +24,6 @@ std::string CustomBehaviorComponent::getName() const
     return "CustomBehavior";
 }
 
-void CustomBehaviorComponent::loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)
-{
-    lua::MetadataStore::getMetadata<CustomBehaviorComponent>().load(this, luaTable);
-}
-
 void CustomBehaviorComponent::registerComponent(lua::LuaState& state)
 {
     lua::MetadataStore::registerType<CustomBehaviorComponent>()

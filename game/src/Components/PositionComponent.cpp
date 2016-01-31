@@ -27,11 +27,6 @@ std::string PositionComponent::getName() const
     return "Position";
 }
 
-void PositionComponent::loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)
-{
-    lua::MetadataStore::getMetadata<PositionComponent>().load(this, luaTable);
-}
-
 void PositionComponent::registerComponent(lua::LuaState& state)
 {
     //Register loading infos

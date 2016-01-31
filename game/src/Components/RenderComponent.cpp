@@ -21,13 +21,10 @@ std::string RenderComponent::getName() const
     return "Render";
 }
 
-void RenderComponent::loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)
-{
-    //TODO: Load from lua table
-}
-
 void RenderComponent::registerComponent(lua::LuaState& state)
 {
+    lua::MetadataStore::registerType<RenderComponent>();
+
     state.getState().new_usertype<RenderComponent>("render_component" //TODO: Replace the name here
         //TODO: Register the properties here
     );
