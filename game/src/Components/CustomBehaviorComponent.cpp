@@ -31,7 +31,7 @@ void CustomBehaviorComponent::loadFromLua(const sol::object& luaTable, const lev
 
 void CustomBehaviorComponent::registerComponent(lua::LuaState& state)
 {
-    lua::MetadataStore::registerClass<CustomBehaviorComponent>()
+    lua::MetadataStore::registerType<CustomBehaviorComponent>()
         .declareLoadableAttribute<sol::function>("on_update", &CustomBehaviorComponent::updateFunction);
 
     state.getState().new_usertype<CustomBehaviorComponent>("custom_behavior_component");

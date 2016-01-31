@@ -1,7 +1,10 @@
 #ifndef YAPG_GAME_LUA_LOADER
 #define YAPG_GAME_LUA_LOADER
 
+#include <cassert>
+#include <exception>
 #include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
@@ -34,10 +37,10 @@ template<class C, typename T>
 class AttributeLoader;
 
 template<class C>
-class ClassLoaderMetadata : public LoaderMetadata
+class TypeLoaderMetadata : public LoaderMetadata
 {
 public:
-    ClassLoaderMetadata() :
+    TypeLoaderMetadata() :
         LoaderMetadata(),
         m_properties(),
         m_extraFunction()
@@ -50,14 +53,14 @@ public:
         loadImpl(reinterpret_cast<C*>(object), luaObject);
     }
 
-    template<typename T>
-    ClassLoaderMetadata<C>& declareLoadableAttribute(const std::string& name, T C::*member)
+    template<typename T, typename D = std::enable_if<std::is_class<C>::value, C>>
+    TypeLoaderMetadata<C>& declareLoadableAttribute(const std::string& name, T D::*member)
     {
-        m_properties.emplace(name, std::unique_ptr<LoaderMetadata>(new AttributeLoader<C, T>(member)));
+        m_properties.emplace(name, std::unique_ptr<LoaderMetadata>(new AttributeLoader<D, T>(member)));
         return *this;
     }
 
-    ClassLoaderMetadata<C>& setExtraLoadFunction(std::function<void(C*, const sol::object&)> extraFunction)
+    TypeLoaderMetadata<C>& setExtraLoadFunction(std::function<void(C*, const sol::object&)> extraFunction)
     {
         m_extraFunction = extraFunction;
         return *this;
@@ -66,14 +69,20 @@ public:
 private:
     void loadImpl(C* object, const sol::object& luaObject) const
     {
-        const sol::table& luaTable = luaObject.as<sol::table>();
-        for(auto it = m_properties.cbegin(); it != m_properties.cend(); ++it)
+        if(luaObject.is<sol::table>())
         {
-            it->second->load(object, luaTable.get<sol::object>(it->first));
+            const sol::table& luaTable = luaObject.as<sol::table>();
+            for(auto it = m_properties.cbegin(); it != m_properties.cend(); ++it)
+            {
+                it->second->load(object, luaTable.get<sol::object>(it->first));
+            }
         }
 
         if(m_extraFunction)
+        {
             m_extraFunction(object, luaObject);
+        }
+
     }
 
     std::map<std::string, std::unique_ptr<LoaderMetadata>> m_properties;
@@ -84,16 +93,20 @@ class MetadataStore
 {
 public:
     template<class C>
-    static ClassLoaderMetadata<C>& registerClass()
+    static TypeLoaderMetadata<C>& registerType()
     {
-        metadatas.emplace(std::type_index(typeid(C)), std::unique_ptr<LoaderMetadata>(new ClassLoaderMetadata<C>()));
+        metadatas.emplace(std::type_index(typeid(C)), std::unique_ptr<LoaderMetadata>(new TypeLoaderMetadata<C>()));
         LoaderMetadata& to_return = *metadatas[std::type_index(typeid(C))];
-        return dynamic_cast<ClassLoaderMetadata<C>&>(to_return);
+        return dynamic_cast<TypeLoaderMetadata<C>&>(to_return);
     }
 
     template<class C>
     static LoaderMetadata& getMetadata()
     {
+        if(metadatas.count(std::type_index(typeid(C))) == 0)
+        {
+            throw std::runtime_error(std::string("Trying to load ") + std::type_index(typeid(C)).name() + std::string(", which is not declared to MetadataStore !"));
+        }
         return *metadatas[std::type_index(typeid(C))];
     }
 
@@ -119,40 +132,12 @@ public:
 
     virtual void load(void* object, const sol::object& luaObject) const
     {
-        loadImpl<T>(reinterpret_cast<C*>(object), luaObject);
+        //Get the metadata of the class/type to be able to load the attribute
+        C* typedObject = reinterpret_cast<C*>(object);
+        MetadataStore::getMetadata<T>().load(&((*typedObject).*m_member), luaObject);
     }
 
 private:
-    /**
-     * Version from arithmetic types
-     */
-    template<typename U>
-    void loadImpl(
-        typename std::enable_if<
-            std::is_arithmetic<U>::value ||
-            std::is_same<U, sol::function>::value,
-        C*>::type object,
-        const sol::object& luaObject
-        ) const
-    {
-        (*object).*m_member = luaObject.as<U>();
-    }
-
-    /**
-     * Version for classes, get the class metadata and load it !
-     */
-    template<typename U>
-    void loadImpl(
-        typename std::enable_if<
-            !(std::is_arithmetic<U>::value ||
-            std::is_same<U, sol::function>::value),
-        C*>::type object,
-        const sol::object& luaObject
-        ) const
-    {
-        MetadataStore::getMetadata<U>()->load((*object).*m_member, luaObject);
-    }
-
     T C::*m_member;
 };
 

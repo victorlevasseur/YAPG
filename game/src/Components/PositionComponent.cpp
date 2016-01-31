@@ -35,7 +35,7 @@ void PositionComponent::loadFromLua(const sol::object& luaTable, const level::Se
 void PositionComponent::registerComponent(lua::LuaState& state)
 {
     //Register loading infos
-    lua::MetadataStore::registerClass<PositionComponent>()
+    lua::MetadataStore::registerType<PositionComponent>()
         .declareLoadableAttribute<float>("x", &PositionComponent::x)
         .declareLoadableAttribute<float>("y", &PositionComponent::y)
         .declareLoadableAttribute<float>("width", &PositionComponent::width)

@@ -31,7 +31,25 @@ LuaState::LuaState() :
         sol::lib::os
     );
 
-    //Declare main C++ classes
+    //Declare the metadatas of some basic types
+    MetadataStore::registerType<int>().setExtraLoadFunction(
+        [](int* value, const sol::object& luaObject) { *value = luaObject.as<int>(); }
+    );
+    MetadataStore::registerType<unsigned int>().setExtraLoadFunction(
+        [](unsigned int* value, const sol::object& luaObject) { *value = luaObject.as<unsigned int>(); }
+    );
+    MetadataStore::registerType<float>().setExtraLoadFunction(
+        [](float* value, const sol::object& luaObject) { *value = luaObject.as<float>(); }
+    );
+    MetadataStore::registerType<double>().setExtraLoadFunction(
+        [](double* value, const sol::object& luaObject) { *value = luaObject.as<double>(); }
+    );
+
+    MetadataStore::registerType<sol::function>().setExtraLoadFunction(
+        [](sol::function* value, const sol::object& luaObject) { *value = luaObject.as<sol::function>(); }
+    );
+
+    //Declare main C++ classes and declare their metadatas
     EntityHandle::registerClass(*this);
     components::PositionComponent::registerComponent(*this);
     components::CustomBehaviorComponent::registerComponent(*this);
