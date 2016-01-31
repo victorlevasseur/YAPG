@@ -37,6 +37,7 @@ LuaState::LuaState() :
     //Declare the metadatas of some basic types
     MetadataStore::registerLuaAssignableType<int>();
     MetadataStore::registerLuaAssignableType<unsigned int>();
+    MetadataStore::registerLuaAssignableType<bool>();
     MetadataStore::registerLuaAssignableType<float>();
     MetadataStore::registerLuaAssignableType<double>();
     MetadataStore::registerLuaAssignableType<sol::function>();

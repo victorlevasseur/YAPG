@@ -4,6 +4,7 @@ headerContent = """#ifndef YAPG_GAME_COMPONENTS_{1}COMPONENT_H
 #define YAPG_GAME_COMPONENTS_{1}COMPONENT_H
 
 #include "Components/Component.hpp"
+#include "Lua/Loader.hpp"
 #include "Lua/LuaState.hpp"
 
 namespace game
@@ -18,8 +19,6 @@ public:
     virtual ~{0}Component();
 
     virtual std::string getName() const;
-
-    virtual void loadFromLua(const sol::table& luaTable, const level::SerializedEntityGetter& entityGetter);
 
     static void registerComponent(lua::LuaState& state);
 }};
@@ -55,13 +54,10 @@ std::string {0}Component::getName() const
     return "{0}";
 }}
 
-void {0}Component::loadFromLua(const sol::table& luaTable, const level::SerializedEntityGetter& entityGetter)
-{{
-    //TODO: Load from lua table
-}}
-
 void {0}Component::registerComponent(lua::LuaState& state)
 {{
+    lua::MetadataStore::registerType<{0}Component>();
+
     state.getState().new_usertype<{0}Component>("{1}_component" //TODO: Replace the name here
         //TODO: Register the properties here
     );
