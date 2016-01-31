@@ -1,5 +1,7 @@
 #include "Components/PositionComponent.hpp"
 
+#include "Lua/Loader.hpp"
+
 namespace game
 {
 namespace components
@@ -25,16 +27,21 @@ std::string PositionComponent::getName() const
     return "Position";
 }
 
-void PositionComponent::loadFromLua(const sol::table& luaTable, const level::SerializedEntityGetter& entityGetter)
+void PositionComponent::loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)
 {
-    x = luaTable.get<float>("x");
-    y = luaTable.get<float>("y");
-    width = luaTable.get<float>("width");
-    height = luaTable.get<float>("height");
+    lua::MetadataStore::getMetadata<PositionComponent>().load(this, luaTable);
 }
 
 void PositionComponent::registerComponent(lua::LuaState& state)
 {
+    //Register loading infos
+    lua::MetadataStore::registerClass<PositionComponent>()
+        .declareAttribute<float>("x", &PositionComponent::x)
+        .declareAttribute<float>("y", &PositionComponent::y)
+        .declareAttribute<float>("width", &PositionComponent::width)
+        .declareAttribute<float>("height", &PositionComponent::height);
+
+    //Register to lua
     state.getState().new_usertype<PositionComponent>("position_component",
         "x", &PositionComponent::x,
         "y", &PositionComponent::y,

@@ -1,7 +1,10 @@
 #include "Components/Component.hpp"
 
 #include "Components/CustomBehaviorComponent.hpp"
+#include "Components/PlatformComponent.hpp"
+#include "Components/PlatformerComponent.hpp"
 #include "Components/PositionComponent.hpp"
+#include "Components/RenderComponent.hpp"
 
 namespace game
 {
@@ -18,7 +21,7 @@ Component::~Component()
 
 }
 
-void Component::assignComponent(entityx::Entity entity, const std::string &component, const sol::table& luaTable, const level::SerializedEntityGetter& entityGetter)
+void Component::assignComponent(entityx::Entity entity, const std::string &component, const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)
 {
     if(component == "Position")
     {
@@ -27,6 +30,18 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
     else if(component == "CustomBehavior")
     {
         entity.assign<CustomBehaviorComponent>().get()->loadFromLua(luaTable, entityGetter);
+    }
+    else if(component == "Platform")
+    {
+        entity.assign<PlatformComponent>().get()->loadFromLua(luaTable, entityGetter);
+    }
+    else if(component == "Platformer")
+    {
+        entity.assign<PlatformerComponent>().get()->loadFromLua(luaTable, entityGetter);
+    }
+    else if(component == "Render")
+    {
+        entity.assign<RenderComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
     else
     {

@@ -17,7 +17,7 @@ public:
 
     virtual std::string getName() const;
 
-    virtual void loadFromLua(const sol::table& luaTable, const level::SerializedEntityGetter& entityGetter);
+    virtual void loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter);
 
     sol::function updateFunction;
 

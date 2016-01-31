@@ -22,9 +22,9 @@ std::string CustomBehaviorComponent::getName() const
     return "CustomBehavior";
 }
 
-void CustomBehaviorComponent::loadFromLua(const sol::table& luaTable, const level::SerializedEntityGetter& entityGetter)
+void CustomBehaviorComponent::loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)
 {
-    updateFunction = luaTable.get<sol::function>("on_update");
+    updateFunction = luaTable.as<sol::table>().get<sol::function>("on_update");
 }
 
 void CustomBehaviorComponent::registerComponent(lua::LuaState& state)

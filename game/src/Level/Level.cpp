@@ -48,9 +48,8 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
         //Add each components
         entityComponentsTable.for_each([&](const sol::object& key, const sol::object& value) {
             std::string componentType = key.as<std::string>();
-            sol::table componentTable = value.as<sol::table>();
 
-            components::Component::assignComponent(*it, componentType, componentTable, entityGetter);
+            components::Component::assignComponent(*it, componentType, value, entityGetter);
         });
 
         ++i;
