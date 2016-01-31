@@ -119,24 +119,38 @@ public:
 
     virtual void load(void* object, const sol::object& luaObject) const
     {
-        loadImpl(reinterpret_cast<C*>(object), luaObject, std::integral_constant<bool, std::is_arithmetic<T>::value || std::is_same<T, sol::function>::value>());
+        loadImpl<T>(reinterpret_cast<C*>(object), luaObject);
     }
 
 private:
     /**
      * Version from arithmetic types
      */
-    void loadImpl(C* object, const sol::object& luaObject, std::true_type) const
+    template<typename U>
+    void loadImpl(
+        typename std::enable_if<
+            std::is_arithmetic<U>::value ||
+            std::is_same<U, sol::function>::value,
+        C*>::type object,
+        const sol::object& luaObject
+        ) const
     {
-        (*object).*m_member = luaObject.as<T>();
+        (*object).*m_member = luaObject.as<U>();
     }
 
     /**
      * Version for classes, get the class metadata and load it !
      */
-    void loadImpl(C* object, const sol::object& luaObject, std::false_type) const
+    template<typename U>
+    void loadImpl(
+        typename std::enable_if<
+            !(std::is_arithmetic<U>::value ||
+            std::is_same<U, sol::function>::value),
+        C*>::type object,
+        const sol::object& luaObject
+        ) const
     {
-        MetadataStore::getMetadata<T>()->load((*object).*m_member, luaObject);
+        MetadataStore::getMetadata<U>()->load((*object).*m_member, luaObject);
     }
 
     T C::*m_member;
