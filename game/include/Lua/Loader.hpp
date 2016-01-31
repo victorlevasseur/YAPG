@@ -39,34 +39,45 @@ class ClassLoaderMetadata : public LoaderMetadata
 public:
     ClassLoaderMetadata() :
         LoaderMetadata(),
-        m_properties()
+        m_properties(),
+        m_extraFunction()
     {
 
     }
 
     virtual void load(void* object, const sol::object& luaObject) const
     {
-        load_impl(reinterpret_cast<C*>(object), luaObject);
+        loadImpl(reinterpret_cast<C*>(object), luaObject);
     }
 
     template<typename T>
-    ClassLoaderMetadata<C>& declareAttribute(const std::string& name, T C::*member)
+    ClassLoaderMetadata<C>& declareLoadableAttribute(const std::string& name, T C::*member)
     {
         m_properties.emplace(name, std::unique_ptr<LoaderMetadata>(new AttributeLoader<C, T>(member)));
         return *this;
     }
 
+    ClassLoaderMetadata<C>& setExtraLoadFunction(std::function<void(C*, const sol::object&)> extraFunction)
+    {
+        m_extraFunction = extraFunction;
+        return *this;
+    }
+
 private:
-    void load_impl(C* object, const sol::object& luaObject) const
+    void loadImpl(C* object, const sol::object& luaObject) const
     {
         const sol::table& luaTable = luaObject.as<sol::table>();
         for(auto it = m_properties.cbegin(); it != m_properties.cend(); ++it)
         {
             it->second->load(object, luaTable.get<sol::object>(it->first));
         }
+
+        if(m_extraFunction)
+            m_extraFunction(object, luaObject);
     }
 
     std::map<std::string, std::unique_ptr<LoaderMetadata>> m_properties;
+    std::function<void(C*, const sol::object&)> m_extraFunction;
 };
 
 class MetadataStore
@@ -81,10 +92,9 @@ public:
     }
 
     template<class C>
-    static ClassLoaderMetadata<C>& getMetadata()
+    static LoaderMetadata& getMetadata()
     {
-        LoaderMetadata& to_return = *metadatas[std::type_index(typeid(C))];
-        return dynamic_cast<ClassLoaderMetadata<C>&>(to_return);
+        return *metadatas[std::type_index(typeid(C))];
     }
 
     static LoaderMetadata& getMetadata(std::type_index typeindex)
@@ -109,14 +119,14 @@ public:
 
     virtual void load(void* object, const sol::object& luaObject) const
     {
-        load_impl(reinterpret_cast<C*>(object), luaObject, std::is_arithmetic<T>());
+        loadImpl(reinterpret_cast<C*>(object), luaObject, std::integral_constant<bool, std::is_arithmetic<T>::value || std::is_same<T, sol::function>::value>());
     }
 
 private:
     /**
      * Version from arithmetic types
      */
-    void load_impl(C* object, const sol::object& luaObject, std::true_type) const
+    void loadImpl(C* object, const sol::object& luaObject, std::true_type) const
     {
         (*object).*m_member = luaObject.as<T>();
     }
@@ -124,7 +134,7 @@ private:
     /**
      * Version for classes, get the class metadata and load it !
      */
-    void load_impl(C* object, const sol::object& luaObject, std::false_type) const
+    void loadImpl(C* object, const sol::object& luaObject, std::false_type) const
     {
         MetadataStore::getMetadata<T>()->load((*object).*m_member, luaObject);
     }

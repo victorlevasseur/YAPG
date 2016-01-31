@@ -5,6 +5,7 @@
 #include <boost/filesystem.hpp>
 
 #include "Components/PositionComponent.hpp"
+#include "Components/CustomBehaviorComponent.hpp"
 #include "Lua/EntityHandle.hpp"
 
 namespace fs = boost::filesystem;
@@ -33,6 +34,7 @@ LuaState::LuaState() :
     //Declare main C++ classes
     EntityHandle::registerClass(*this);
     components::PositionComponent::registerComponent(*this);
+    components::CustomBehaviorComponent::registerComponent(*this);
 
     //Load yapg core libraries
     m_luaState.open_file("scripts/core/array_tools.lua");

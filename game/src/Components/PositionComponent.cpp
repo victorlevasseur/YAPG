@@ -36,10 +36,10 @@ void PositionComponent::registerComponent(lua::LuaState& state)
 {
     //Register loading infos
     lua::MetadataStore::registerClass<PositionComponent>()
-        .declareAttribute<float>("x", &PositionComponent::x)
-        .declareAttribute<float>("y", &PositionComponent::y)
-        .declareAttribute<float>("width", &PositionComponent::width)
-        .declareAttribute<float>("height", &PositionComponent::height);
+        .declareLoadableAttribute<float>("x", &PositionComponent::x)
+        .declareLoadableAttribute<float>("y", &PositionComponent::y)
+        .declareLoadableAttribute<float>("width", &PositionComponent::width)
+        .declareLoadableAttribute<float>("height", &PositionComponent::height);
 
     //Register to lua
     state.getState().new_usertype<PositionComponent>("position_component",

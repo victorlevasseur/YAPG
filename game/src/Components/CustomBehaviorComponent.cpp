@@ -1,5 +1,7 @@
 #include "Components/CustomBehaviorComponent.hpp"
 
+#include "Lua/Loader.hpp"
+
 namespace game
 {
 namespace components
@@ -24,11 +26,14 @@ std::string CustomBehaviorComponent::getName() const
 
 void CustomBehaviorComponent::loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)
 {
-    updateFunction = luaTable.as<sol::table>().get<sol::function>("on_update");
+    lua::MetadataStore::getMetadata<CustomBehaviorComponent>().load(this, luaTable);
 }
 
 void CustomBehaviorComponent::registerComponent(lua::LuaState& state)
 {
+    lua::MetadataStore::registerClass<CustomBehaviorComponent>()
+        .declareLoadableAttribute<sol::function>("on_update", &CustomBehaviorComponent::updateFunction);
+
     state.getState().new_usertype<CustomBehaviorComponent>("custom_behavior_component");
 }
 
