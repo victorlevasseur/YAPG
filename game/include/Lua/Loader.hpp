@@ -101,6 +101,14 @@ public:
     }
 
     template<class C>
+    static TypeLoaderMetadata<C>& registerLuaAssignableType()
+    {
+        return registerType<C>().setExtraLoadFunction(
+            [](C* value, const sol::object& luaObject) { *value = luaObject.as<C>(); }
+        );
+    }
+
+    template<class C>
     static LoaderMetadata& getMetadata()
     {
         if(metadatas.count(std::type_index(typeid(C))) == 0)
