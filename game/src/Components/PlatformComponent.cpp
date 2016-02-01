@@ -23,7 +23,7 @@ std::string PlatformComponent::getName() const
 
 void PlatformComponent::registerComponent(lua::LuaState& state)
 {
-    lua::MetadataStore::registerType<PlatformComponent>();
+    meta::MetadataStore::registerType<PlatformComponent>();
 
     state.getState().new_usertype<PlatformComponent>("platform_component" //TODO: Replace the name here
         //TODO: Register the properties here

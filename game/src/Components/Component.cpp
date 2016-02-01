@@ -5,7 +5,7 @@
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PositionComponent.hpp"
 #include "Components/RenderComponent.hpp"
-#include "Lua/Loader.hpp"
+#include "Meta/Metadata.hpp"
 
 namespace game
 {
@@ -24,7 +24,7 @@ Component::~Component()
 
 void Component::loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)
 {
-    lua::MetadataStore::getMetadata(std::type_index(typeid(*this))).load(this, luaTable);
+    meta::MetadataStore::getMetadata(std::type_index(typeid(*this))).load(this, luaTable);
 }
 
 void Component::assignComponent(entityx::Entity entity, const std::string &component, const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)

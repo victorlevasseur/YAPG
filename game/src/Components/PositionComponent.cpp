@@ -1,7 +1,5 @@
 #include "Components/PositionComponent.hpp"
 
-#include "Lua/Loader.hpp"
-
 namespace game
 {
 namespace components
@@ -9,10 +7,10 @@ namespace components
 
 PositionComponent::PositionComponent() :
     Component(),
-    x(0.0),
-    y(0.0),
-    width(0.0),
-    height(0.0)
+    x(0.f),
+    y(0.f),
+    width(0.f),
+    height(0.f)
 {
 
 }
@@ -30,11 +28,11 @@ std::string PositionComponent::getName() const
 void PositionComponent::registerComponent(lua::LuaState& state)
 {
     //Register loading infos
-    lua::MetadataStore::registerType<PositionComponent>()
-        .declareLoadableAttribute<float>("x", &PositionComponent::x)
-        .declareLoadableAttribute<float>("y", &PositionComponent::y)
-        .declareLoadableAttribute<float>("width", &PositionComponent::width)
-        .declareLoadableAttribute<float>("height", &PositionComponent::height);
+    meta::MetadataStore::registerType<PositionComponent>()
+        .declareAttribute<float>("x", &PositionComponent::x)
+        .declareAttribute<float>("y", &PositionComponent::y)
+        .declareAttribute<float>("width", &PositionComponent::width)
+        .declareAttribute<float>("height", &PositionComponent::height);
 
     //Register to lua
     state.getState().new_usertype<PositionComponent>("position_component",

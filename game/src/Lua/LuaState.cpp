@@ -10,6 +10,7 @@
 #include "Components/PositionComponent.hpp"
 #include "Components/RenderComponent.hpp"
 #include "Lua/EntityHandle.hpp"
+#include "Meta/Metadata.hpp"
 
 namespace fs = boost::filesystem;
 
@@ -35,12 +36,13 @@ LuaState::LuaState() :
     );
 
     //Declare the metadatas of some basic types
-    MetadataStore::registerLuaAssignableType<int>();
-    MetadataStore::registerLuaAssignableType<unsigned int>();
-    MetadataStore::registerLuaAssignableType<bool>();
-    MetadataStore::registerLuaAssignableType<float>();
-    MetadataStore::registerLuaAssignableType<double>();
-    MetadataStore::registerLuaAssignableType<sol::function>();
+    meta::MetadataStore::registerLuaAssignableType<int>();
+    meta::MetadataStore::registerLuaAssignableType<unsigned int>();
+    meta::MetadataStore::registerLuaAssignableType<bool>();
+    meta::MetadataStore::registerLuaAssignableType<float>();
+    meta::MetadataStore::registerLuaAssignableType<double>();
+    meta::MetadataStore::registerLuaAssignableType<std::string>();
+    meta::MetadataStore::registerLuaAssignableType<sol::function>();
 
     //Declare main C++ classes and declare their metadatas
     EntityHandle::registerClass(*this);

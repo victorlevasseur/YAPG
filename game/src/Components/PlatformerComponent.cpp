@@ -23,7 +23,7 @@ std::string PlatformerComponent::getName() const
 
 void PlatformerComponent::registerComponent(lua::LuaState& state)
 {
-    lua::MetadataStore::registerType<PlatformerComponent>();
+    meta::MetadataStore::registerType<PlatformerComponent>();
 
     state.getState().new_usertype<PlatformerComponent>("platformer_component" //TODO: Replace the name here
         //TODO: Register the properties here

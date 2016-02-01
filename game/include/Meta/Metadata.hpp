@@ -15,18 +15,18 @@
 
 namespace game
 {
-namespace lua
+namespace meta
 {
 
-class LoaderMetadata
+class Metadata
 {
 public:
-    LoaderMetadata()
+    Metadata()
     {
 
     };
 
-    virtual ~LoaderMetadata() {};
+    virtual ~Metadata() {};
 
     virtual void load(void* object, const sol::object& luaObject) const = 0;
 
@@ -34,14 +34,14 @@ private:
 };
 
 template<class C, typename T>
-class AttributeLoader;
+class AttributeMetadata;
 
 template<class C>
-class TypeLoaderMetadata : public LoaderMetadata
+class TypeMetadata : public Metadata
 {
 public:
-    TypeLoaderMetadata() :
-        LoaderMetadata(),
+    TypeMetadata() :
+        Metadata(),
         m_properties(),
         m_extraFunction()
     {
@@ -54,13 +54,13 @@ public:
     }
 
     template<typename T, typename D = std::enable_if<std::is_class<C>::value, C>>
-    TypeLoaderMetadata<C>& declareLoadableAttribute(const std::string& name, T D::*member)
+    TypeMetadata<C>& declareAttribute(const std::string& name, T D::*member)
     {
-        m_properties.emplace(name, std::unique_ptr<LoaderMetadata>(new AttributeLoader<D, T>(member)));
+        m_properties.emplace(name, std::unique_ptr<Metadata>(new AttributeMetadata<D, T>(member)));
         return *this;
     }
 
-    TypeLoaderMetadata<C>& setExtraLoadFunction(std::function<void(C*, const sol::object&)> extraFunction)
+    TypeMetadata<C>& setExtraLoadFunction(std::function<void(C*, const sol::object&)> extraFunction)
     {
         m_extraFunction = extraFunction;
         return *this;
@@ -85,7 +85,7 @@ private:
 
     }
 
-    std::map<std::string, std::unique_ptr<LoaderMetadata>> m_properties;
+    std::map<std::string, std::unique_ptr<Metadata>> m_properties;
     std::function<void(C*, const sol::object&)> m_extraFunction;
 };
 
@@ -93,15 +93,15 @@ class MetadataStore
 {
 public:
     template<class C>
-    static TypeLoaderMetadata<C>& registerType()
+    static TypeMetadata<C>& registerType()
     {
-        metadatas.emplace(std::type_index(typeid(C)), std::unique_ptr<LoaderMetadata>(new TypeLoaderMetadata<C>()));
-        LoaderMetadata& to_return = *metadatas[std::type_index(typeid(C))];
-        return dynamic_cast<TypeLoaderMetadata<C>&>(to_return);
+        metadatas.emplace(std::type_index(typeid(C)), std::unique_ptr<Metadata>(new TypeMetadata<C>()));
+        Metadata& to_return = *metadatas[std::type_index(typeid(C))];
+        return dynamic_cast<TypeMetadata<C>&>(to_return);
     }
 
     template<class C>
-    static TypeLoaderMetadata<C>& registerLuaAssignableType()
+    static TypeMetadata<C>& registerLuaAssignableType()
     {
         return registerType<C>().setExtraLoadFunction(
             [](C* value, const sol::object& luaObject) { *value = luaObject.as<C>(); }
@@ -109,7 +109,7 @@ public:
     }
 
     template<class C>
-    static LoaderMetadata& getMetadata()
+    static Metadata& getMetadata()
     {
         if(metadatas.count(std::type_index(typeid(C))) == 0)
         {
@@ -118,7 +118,7 @@ public:
         return *metadatas[std::type_index(typeid(C))];
     }
 
-    static LoaderMetadata& getMetadata(std::type_index typeindex)
+    static Metadata& getMetadata(std::type_index typeindex)
     {
         if(metadatas.count(typeindex) == 0)
         {
@@ -128,15 +128,15 @@ public:
     }
 
 private:
-    static std::map<std::type_index, std::unique_ptr<LoaderMetadata>> metadatas;
+    static std::map<std::type_index, std::unique_ptr<Metadata>> metadatas;
 };
 
 template<class C, typename T>
-class AttributeLoader : public LoaderMetadata
+class AttributeMetadata : public Metadata
 {
 public:
-    AttributeLoader(T C::*member) :
-        LoaderMetadata(),
+    AttributeMetadata(T C::*member) :
+        Metadata(),
         m_member(member)
     {
 

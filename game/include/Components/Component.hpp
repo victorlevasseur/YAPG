@@ -7,8 +7,8 @@
 #include "entityx/entityx.h"
 
 #include "Level/SerializedEntityGetter.hpp"
-#include "Lua/Loader.hpp"
 #include "Lua/sol.hpp"
+#include "Meta/Metadata.hpp"
 
 namespace game
 {
