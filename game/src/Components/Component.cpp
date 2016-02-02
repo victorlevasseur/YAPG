@@ -1,6 +1,7 @@
 #include "Components/Component.hpp"
 
 #include "Components/CustomBehaviorComponent.hpp"
+#include "Components/HitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PositionComponent.hpp"
@@ -36,6 +37,10 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
     else if(component == "CustomBehavior")
     {
         entity.assign<CustomBehaviorComponent>().get()->loadFromLua(luaTable, entityGetter);
+    }
+    else if(component == "Hitbox")
+    {
+        entity.assign<HitboxComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "Platform")
     {

@@ -4,8 +4,8 @@ headerContent = """#ifndef YAPG_GAME_COMPONENTS_{1}COMPONENT_H
 #define YAPG_GAME_COMPONENTS_{1}COMPONENT_H
 
 #include "Components/Component.hpp"
-#include "Lua/Loader.hpp"
 #include "Lua/LuaState.hpp"
+#include "Meta/Metadata.hpp"
 
 namespace game
 {{

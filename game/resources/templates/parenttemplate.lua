@@ -18,14 +18,6 @@ parenttemplate = {
         ["Render"] = {
             picturefilename = "image.png",
             zorder = 0
-        },
-        ["CustomBehavior"] = {
-            on_update = function(entity, dt)
-                local pos = entity:position_component()
-                if pos then
-                    pos.x = pos.x + dt*100
-                end
-            end
         }
     }
 }
