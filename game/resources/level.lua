@@ -18,5 +18,17 @@ level = {
                 y = 350
             }
         }),
+        template_tools.instanciates(4, slope45, {
+            ["Position"] = {
+                x = 280,
+                y = 250
+            }
+        }),
+        template_tools.instanciates(5, block, {
+            ["Position"] = {
+                x = 380,
+                y = 250
+            }
+        }),
     }
 }
