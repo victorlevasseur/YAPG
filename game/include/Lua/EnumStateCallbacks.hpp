@@ -9,23 +9,23 @@ namespace game
 namespace lua
 {
 
-template<unsigned int StatesCount, typename StateEnum, typename... Args>
+template<unsigned int StatesCount, typename StatesEnum, typename... Args>
 class EnumStateCallbacks
 {
 public:
-    EnumStateCallbacks(StateEnum initialState) :
+    EnumStateCallbacks(StatesEnum initialState) :
         m_currentState(initialState),
         m_needCall(true)
     {
 
     }
 
-    StateEnum getState() const
+    StatesEnum getState() const
     {
         return m_currentState;
     }
 
-    void setState(StateEnum state)
+    void setState(StatesEnum state)
     {
         if(state != m_currentState)
             m_needCall = true;
@@ -42,13 +42,13 @@ public:
         m_needCall = false;
     }
 
-    void registerCallback(StateEnum forState, sol::function& callback)
+    void registerCallback(StatesEnum forState, sol::function& callback)
     {
         m_callbacks[static_cast<int>(forState)] = callback;
     }
 
 private:
-    StateEnum m_currentState;
+    StatesEnum m_currentState;
     bool m_needCall;
 
     std::array<sol::function, StatesCount> m_callbacks;
