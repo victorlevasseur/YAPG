@@ -10,10 +10,10 @@ namespace lua
 {
 
 template<unsigned int StatesCount, typename StateEnum, typename... Args>
-class MultipleStateCallbacks
+class EnumStateCallbacks
 {
 public:
-    MultipleStateCallbacks(StateEnum initialState) :
+    EnumStateCallbacks(StateEnum initialState) :
         m_currentState(initialState),
         m_needCall(true)
     {

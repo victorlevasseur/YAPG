@@ -4,7 +4,7 @@
 #include "Components/Component.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Lua/LuaState.hpp"
-#include "Lua/MultipleStateCallbacks.hpp"
+#include "Lua/EnumStateCallbacks.hpp"
 
 namespace game
 {
@@ -49,7 +49,7 @@ public:
     float oldFloorPosX;
     float oldFloorPosY;
 
-    lua::MultipleStateCallbacks<4, State, lua::EntityHandle> movementStateCallbacks;
+    lua::EnumStateCallbacks<4, State, lua::EntityHandle> movementStateCallbacks;
 
     sol::function onIdleFunc;
     sol::function onWalkingFunc;
