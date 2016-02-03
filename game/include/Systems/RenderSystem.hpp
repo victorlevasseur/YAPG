@@ -18,7 +18,7 @@ namespace systems
 class RenderSystem : public entityx::System<RenderSystem>
 {
 public:
-    RenderSystem();
+    RenderSystem(bool debugHitboxDraw = false);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
@@ -26,6 +26,8 @@ public:
 
 private:
     std::list<std::pair<std::shared_ptr<sf::Drawable>, sf::RenderStates>> m_renderingQueue;
+
+    bool m_debugHitboxDraw;
 };
 
 }

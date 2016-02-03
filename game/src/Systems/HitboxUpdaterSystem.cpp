@@ -24,12 +24,12 @@ void HitboxUpdaterSystem::update(entityx::EntityManager &es, entityx::EventManag
         c::PositionComponent& position,
         c::HitboxComponent& hitbox)
     {
-        if(hitbox.getHitbox().GetOrigin() == sf::Vector2f(position.x + position.width/2.f, position.y + position.height/2.f))
+        if(hitbox.getHitbox().GetOrigin() == sf::Vector2f(position.x, position.y))
         {
             return;
         }
 
-        hitbox.getHitbox().SetOrigin(sf::Vector2f(position.x + position.width/2.f, position.y + position.height/2.f));
+        hitbox.getHitbox().SetOrigin(sf::Vector2f(position.x, position.y));
         hitbox.getHitbox().ComputeGlobalVertices();
         hitbox.getHitbox().ComputeGlobalEdges();
         hitbox.getHitbox().ComputeGlobalCenter();
