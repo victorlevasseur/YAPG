@@ -21,6 +21,8 @@ public:
 
     components::PositionComponent* getPositionComponent();
 
+    void writeToConsole(const std::string& str);
+
     void removeEntity();
 
     static void registerClass(LuaState &state);

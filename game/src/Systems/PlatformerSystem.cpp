@@ -387,24 +387,22 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         position.y += requestedYMove;
 
         //TODO: Rework how messages are handled --> LUA functions calls ? (with function like onWalking, onJumping, onFalling, ...)
-        /*if(IsOnFloor(polygon, potentialObstacles, overlappingJumpthrus))
+        if(IsOnFloor(polygon, potentialObstacles, overlappingJumpthrus))
         {
-            if(abs(objCBox->x - oldX - requestedXFloorMove) > 0.1f)
-            {
-                events->emit<SoundEvent>(entity, "walking", SoundEvent::PlayIfNot);
-                events->emit<PhysicEvent>(entity, PhysicEvent::Walking);
-            }
+            if(abs(position.x - oldX - requestedXFloorMove) > 0.1f)
+                platformer.movementStateCallbacks.setState(c::PlatformerComponent::Walking);
             else
-            {
-                events->emit<SoundEvent>(entity, "walking", SoundEvent::Stop);
-                events->emit<PhysicEvent>(entity, PhysicEvent::Idle);
-            }
+                platformer.movementStateCallbacks.setState(c::PlatformerComponent::Idle);
         }
         else
         {
-            events->emit<SoundEvent>(entity, "walking", SoundEvent::Stop);
-            events->emit<PhysicEvent>(entity, PhysicEvent::Jump);
+            if(position.y - oldY < 0)
+                platformer.movementStateCallbacks.setState(c::PlatformerComponent::Jumping);
+            else
+                platformer.movementStateCallbacks.setState(c::PlatformerComponent::Falling);
         }
+        platformer.movementStateCallbacks.callIfNeeded(lua::EntityHandle(entity));
+        /*
         if(objCBox->x - oldX > requestedXFloorMove + 0.01f)
         {
             events->emit<PhysicEvent>(entity, PhysicEvent::WatchingRight);

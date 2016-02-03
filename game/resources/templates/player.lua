@@ -9,7 +9,18 @@ player = {
             height = 100
         },
         ["Platformer"] = {
-
+            onIdle = function(entity)
+                entity:write_to_console("Idle !")
+            end,
+            onStartWalking = function(entity)
+                entity:write_to_console("Start walking !")
+            end,
+            onStartJumping = function(entity)
+                entity:write_to_console("Jump !")
+            end,
+            onStartFalling = function(entity)
+                entity:write_to_console("Start falling !")
+            end,
         },
         ["Hitbox"] = {
             polygon = {
