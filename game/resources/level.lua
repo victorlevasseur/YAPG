@@ -30,5 +30,11 @@ level = {
                 y = 250
             }
         }),
+        template_tools.instanciates(5, block, {
+            ["Position"] = {
+                x = 480,
+                y = 150
+            }
+        }),
     }
 }

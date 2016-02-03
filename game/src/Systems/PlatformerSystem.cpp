@@ -169,8 +169,8 @@ void ResetPolygonPosition(e::Entity entity, tools::Polygon &poly)
     if(!entity.component<c::PositionComponent>())
         return;
 
-    poly.SetOrigin(sf::Vector2f(entity.component<c::PositionComponent>()->x + entity.component<c::PositionComponent>()->width/2.f,
-                                entity.component<c::PositionComponent>()->y + entity.component<c::PositionComponent>()->height/2.f));
+    poly.SetOrigin(sf::Vector2f(entity.component<c::PositionComponent>()->x,
+                                entity.component<c::PositionComponent>()->y));
 
     poly.ComputeGlobalVertices();
     poly.ComputeGlobalEdges();
