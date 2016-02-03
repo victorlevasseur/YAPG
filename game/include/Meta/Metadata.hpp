@@ -13,8 +13,7 @@
 
 #include "Lua/sol.hpp"
 
-namespace game
-{
+
 namespace meta
 {
 
@@ -153,7 +152,6 @@ private:
     T C::*m_member;
 };
 
-}
 }
 
 #endif

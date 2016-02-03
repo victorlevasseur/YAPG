@@ -6,10 +6,9 @@
 #include "Components/HitboxComponent.hpp"
 #include "Components/PositionComponent.hpp"
 
-namespace c = game::components;
+namespace c = components;
 
-namespace game
-{
+
 namespace systems
 {
 
@@ -60,5 +59,4 @@ void RenderSystem::render(sf::RenderTarget& target)
     }
 }
 
-}
 }

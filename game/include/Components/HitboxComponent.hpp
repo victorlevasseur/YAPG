@@ -6,8 +6,6 @@
 #include "Meta/Metadata.hpp"
 #include "Tools/Polygon.hpp"
 
-namespace game
-{
 namespace components
 {
 
@@ -30,7 +28,6 @@ private:
 
 std::ostream& operator<<(std::ostream& stream, const HitboxComponent& component);
 
-}
 }
 
 #endif

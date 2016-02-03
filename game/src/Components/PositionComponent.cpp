@@ -1,7 +1,6 @@
 #include "Components/PositionComponent.hpp"
 
-namespace game
-{
+
 namespace components
 {
 
@@ -51,5 +50,4 @@ std::ostream& operator<<(std::ostream& stream, const PositionComponent& componen
     return stream;
 }
 
-}
 }

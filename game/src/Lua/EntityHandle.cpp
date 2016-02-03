@@ -5,8 +5,7 @@
 #include "Components/PositionComponent.hpp"
 #include "Lua/LuaState.hpp"
 
-namespace game
-{
+
 namespace lua
 {
 
@@ -49,5 +48,4 @@ void EntityHandle::registerClass(LuaState &state)
     );
 }
 
-}
 }

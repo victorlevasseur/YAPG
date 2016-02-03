@@ -5,10 +5,8 @@
 #include "Components/HitboxComponent.hpp"
 #include "Components/PositionComponent.hpp"
 
-namespace c = game::components;
+namespace c = components;
 
-namespace game
-{
 namespace systems
 {
 
@@ -36,5 +34,4 @@ void HitboxUpdaterSystem::update(entityx::EntityManager &es, entityx::EventManag
     });
 }
 
-}
 }

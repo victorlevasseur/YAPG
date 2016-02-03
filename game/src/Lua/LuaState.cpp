@@ -15,8 +15,7 @@
 
 namespace fs = boost::filesystem;
 
-namespace game
-{
+
 namespace lua
 {
 
@@ -141,5 +140,4 @@ void LuaState::loadTemplates(const fs::path& path)
     }
 }
 
-}
 }

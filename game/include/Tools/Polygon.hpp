@@ -11,8 +11,6 @@ namespace sf
     class RenderTarget;
 }
 
-namespace game
-{
 namespace tools
 {
 
@@ -67,7 +65,6 @@ float IntervalDistance(sf::Vector2f i1, sf::Vector2f i2);
 
 bool PolygonCollision(Polygon &p1, Polygon &p2);
 
-}
 }
 
 #endif

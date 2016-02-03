@@ -11,13 +11,12 @@
 #include "Components/PositionComponent.hpp"
 #include "Tools/Polygon.hpp"
 
-namespace c = game::components;
+namespace c = components;
 namespace e = entityx;
 
 #define NO_EXCEPTIONS std::vector<entityx::Entity>()
 
-namespace game
-{
+
 namespace systems
 {
 
@@ -414,5 +413,4 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
     });
 }
 
-}
 }

@@ -3,8 +3,7 @@
 
 #include "entityx/entityx.h"
 
-namespace game
-{
+
 namespace systems
 {
 
@@ -18,7 +17,6 @@ public:
 private:
 };
 
-}
 }
 
 #endif

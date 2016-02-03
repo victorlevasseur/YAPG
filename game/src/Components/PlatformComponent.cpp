@@ -1,7 +1,6 @@
 #include "Components/PlatformComponent.hpp"
 
-namespace game
-{
+
 namespace components
 {
 
@@ -39,5 +38,4 @@ std::ostream& operator<<(std::ostream& stream, const PlatformComponent& componen
     return stream;
 }
 
-}
 }

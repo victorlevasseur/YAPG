@@ -8,8 +8,7 @@
 
 #define M_PI       3.14159265358979323846
 
-namespace game
-{
+
 namespace tools
 {
 
@@ -182,5 +181,4 @@ bool PolygonCollision(Polygon &p1, Polygon &p2)
     return intersect;
 }
 
-}
 }

@@ -7,10 +7,8 @@
 #include "Tools/Observable.hpp"
 #include "Tools/Observer.hpp"
 
-namespace game { namespace state { class StateEngine; } }
+namespace state { class StateEngine; }
 
-namespace game
-{
 namespace window
 {
 
@@ -28,7 +26,6 @@ private:
     state::StateEngine& m_engine;
 };
 
-}
 }
 
 #endif

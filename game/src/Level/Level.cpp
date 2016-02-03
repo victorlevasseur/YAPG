@@ -3,8 +3,7 @@
 #include "Components/Component.hpp"
 #include "Lua/EntityHandle.hpp"
 
-namespace game
-{
+
 namespace level
 {
 
@@ -56,5 +55,4 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
     }
 }
 
-}
 }

@@ -6,8 +6,7 @@
 #include "Level/SerializedEntityGetter.hpp"
 #include "Lua/LuaState.hpp"
 
-namespace game
-{
+
 namespace level
 {
 
@@ -29,7 +28,6 @@ private:
     entityx::EntityManager m_entityMgr;
 };
 
-}
 }
 
 #endif

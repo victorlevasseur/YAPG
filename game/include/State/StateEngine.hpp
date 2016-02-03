@@ -6,8 +6,7 @@
 #include "State/State.hpp"
 #include "Tools/Observable.hpp"
 
-namespace game
-{
+
 namespace state
 {
 
@@ -30,7 +29,6 @@ private:
     std::stack<State::Ptr> m_states;
 };
 
-}
 }
 
 #include "StateEngine.inl"

@@ -1,7 +1,6 @@
 #include "Components/CustomBehaviorComponent.hpp"
 
-namespace game
-{
+
 namespace components
 {
 
@@ -36,5 +35,4 @@ std::ostream& operator<<(std::ostream& stream, const CustomBehaviorComponent& co
     return stream;
 }
 
-}
 }

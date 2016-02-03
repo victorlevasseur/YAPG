@@ -2,8 +2,7 @@
 
 #include "Tools/Observer.hpp"
 
-namespace game
-{
+
 namespace tools
 {
 
@@ -29,5 +28,4 @@ void Observable::notify(void* value)
         o->update(*this, value);
 }
 
-}
 }

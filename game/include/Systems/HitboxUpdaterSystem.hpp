@@ -3,8 +3,6 @@
 
 #include "entityx/entityx.h"
 
-namespace game
-{
 namespace systems
 {
 
@@ -16,10 +14,9 @@ public:
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
 private:
-    
+
 };
 
-}
 }
 
 #endif

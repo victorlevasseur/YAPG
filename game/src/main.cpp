@@ -6,9 +6,6 @@
 #include "State/LevelState.hpp"
 #include "Window/WindowManager.hpp"
 
-namespace game
-{
-
 int main(int argc, char** argv)
 {
     state::StateEngine stateEngine;
@@ -19,11 +16,4 @@ int main(int argc, char** argv)
     windowManager.run();
 
     return 0;
-}
-
-}
-
-int main(int argc, char** argv)
-{
-    return game::main(argc, argv);
 }

@@ -6,8 +6,7 @@
 #include "Lua/LuaState.hpp"
 #include "Lua/EnumStateCallbacks.hpp"
 
-namespace game
-{
+
 namespace components
 {
 
@@ -59,7 +58,6 @@ public:
 
 std::ostream& operator<<(std::ostream& stream, const PlatformerComponent& component);
 
-}
 }
 
 #endif

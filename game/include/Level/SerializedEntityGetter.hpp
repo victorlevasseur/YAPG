@@ -5,8 +5,7 @@
 
 #include "entityx/entityx.h"
 
-namespace game
-{
+
 namespace level
 {
 
@@ -31,7 +30,6 @@ private:
     std::map<int, entityx::Entity> m_unserializedEntities;
 };
 
-}
 }
 
 #endif

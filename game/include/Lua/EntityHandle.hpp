@@ -5,11 +5,10 @@
 
 #include "Lua/sol.hpp"
 
-namespace game{ namespace components{ class PositionComponent; } }
-namespace game{ namespace lua{ class LuaState; } }
+namespace components{ class PositionComponent; }
+namespace lua{ class LuaState; }
 
-namespace game
-{
+
 namespace lua
 {
 
@@ -31,7 +30,6 @@ private:
     entityx::Entity m_entity;
 };
 
-}
 }
 
 #endif

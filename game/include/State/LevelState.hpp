@@ -9,8 +9,7 @@
 #include "Lua/LuaState.hpp"
 #include "State/State.hpp"
 
-namespace game
-{
+
 namespace state
 {
 
@@ -40,7 +39,6 @@ private:
     entityx::SystemManager m_systemMgr;
 };
 
-}
 }
 
 #endif

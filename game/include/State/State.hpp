@@ -7,8 +7,7 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
 
-namespace game
-{
+
 namespace state
 {
 
@@ -35,7 +34,6 @@ public:
     virtual void render(sf::RenderTarget &target) {};
 };
 
-}
 }
 
 #endif

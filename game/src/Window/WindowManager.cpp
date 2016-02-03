@@ -7,8 +7,7 @@
 #include "State/State.hpp"
 #include "State/StateEngine.hpp"
 
-namespace game
-{
+
 namespace window
 {
 
@@ -63,5 +62,4 @@ void WindowManager::update(tools::Observable& observable, void* value)
 
 }
 
-}
 }

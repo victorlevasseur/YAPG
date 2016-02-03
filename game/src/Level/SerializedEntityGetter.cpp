@@ -1,7 +1,6 @@
 #include "Level/SerializedEntityGetter.hpp"
 
-namespace game
-{
+
 namespace level
 {
 
@@ -21,5 +20,4 @@ entityx::Entity SerializedEntityGetter::getEntityFromSerializationId(int id) con
     return m_unserializedEntities.at(id);
 }
 
-}
 }

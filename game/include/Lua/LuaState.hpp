@@ -5,8 +5,7 @@
 
 namespace boost{ namespace filesystem{ class path; } }
 
-namespace game
-{
+
 namespace lua
 {
 
@@ -29,7 +28,6 @@ private:
     sol::state m_luaState;
 };
 
-}
 }
 
 #endif

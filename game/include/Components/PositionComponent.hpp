@@ -4,8 +4,7 @@
 #include "Components/Component.hpp"
 #include "Lua/LuaState.hpp"
 
-namespace game
-{
+
 namespace components
 {
 
@@ -27,7 +26,6 @@ public:
 
 std::ostream& operator<<(std::ostream& stream, const PositionComponent& component);
 
-}
 }
 
 #endif

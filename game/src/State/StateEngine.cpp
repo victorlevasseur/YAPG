@@ -1,7 +1,6 @@
 #include "State/StateEngine.hpp"
 
-namespace game
-{
+
 namespace state
 {
 
@@ -37,5 +36,4 @@ State::NonOwningPtr StateEngine::getRunningState()
         return nullptr;
 }
 
-}
 }

@@ -7,8 +7,6 @@ headerContent = """#ifndef YAPG_GAME_COMPONENTS_{1}COMPONENT_H
 #include "Lua/LuaState.hpp"
 #include "Meta/Metadata.hpp"
 
-namespace game
-{{
 namespace components
 {{
 
@@ -25,7 +23,6 @@ public:
 
 std::ostream& operator<<(std::ostream& stream, const {0}Component& component);
 
-}}
 }}
 
 #endif

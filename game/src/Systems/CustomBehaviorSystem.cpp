@@ -3,10 +3,9 @@
 #include "Components/CustomBehaviorComponent.hpp"
 #include "Lua/EntityHandle.hpp"
 
-namespace c = game::components;
+namespace c = components;
 
-namespace game
-{
+
 namespace systems
 {
 
@@ -22,5 +21,4 @@ void CustomBehaviorSystem::update(entityx::EntityManager &es, entityx::EventMana
     });
 }
 
-}
 }

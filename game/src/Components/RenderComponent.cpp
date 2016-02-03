@@ -1,7 +1,6 @@
 #include "Components/RenderComponent.hpp"
 
-namespace game
-{
+
 namespace components
 {
 
@@ -37,5 +36,4 @@ std::ostream& operator<<(std::ostream& stream, const RenderComponent& component)
     return stream;
 }
 
-}
 }

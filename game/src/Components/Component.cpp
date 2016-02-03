@@ -8,8 +8,7 @@
 #include "Components/RenderComponent.hpp"
 #include "Meta/Metadata.hpp"
 
-namespace game
-{
+
 namespace components
 {
 
@@ -66,5 +65,4 @@ std::ostream& operator<<(std::ostream& stream, const Component& component)
     return stream;
 }
 
-}
 }

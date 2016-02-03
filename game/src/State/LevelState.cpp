@@ -5,8 +5,7 @@
 #include "Systems/PlatformerSystem.hpp"
 #include "Systems/RenderSystem.hpp"
 
-namespace game
-{
+
 namespace state
 {
 
@@ -63,5 +62,4 @@ void LevelState::render(sf::RenderTarget& target)
     m_systemMgr.system<systems::RenderSystem>()->render(target);
 }
 
-}
 }

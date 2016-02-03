@@ -3,10 +3,9 @@
 
 #include <set>
 
-namespace game{ namespace tools{ class Observer; } }
+namespace tools{ class Observer; }
 
-namespace game
-{
+
 namespace tools
 {
 
@@ -25,7 +24,6 @@ private:
     std::set<Observer*> m_observers;
 };
 
-}
 }
 
 #endif

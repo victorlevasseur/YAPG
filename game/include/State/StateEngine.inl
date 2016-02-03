@@ -1,5 +1,4 @@
-namespace game
-{
+
 namespace state
 {
 
@@ -44,5 +43,4 @@ State::NonOwningPtr StateEngine::pauseAndStartState(Args&&... args)
     return m_states.top().get();
 }
 
-}
 }

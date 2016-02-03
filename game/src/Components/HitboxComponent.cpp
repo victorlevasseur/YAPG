@@ -1,7 +1,6 @@
 #include "Components/HitboxComponent.hpp"
 
-namespace game
-{
+
 namespace components
 {
 
@@ -53,5 +52,4 @@ std::ostream& operator<<(std::ostream& stream, const HitboxComponent& component)
     return stream;
 }
 
-}
 }

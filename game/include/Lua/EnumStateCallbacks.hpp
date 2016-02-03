@@ -4,8 +4,7 @@
 #include <array>
 #include "Lua/sol.hpp"
 
-namespace game
-{
+
 namespace lua
 {
 
@@ -54,7 +53,6 @@ private:
     std::array<sol::function, StatesCount> m_callbacks;
 };
 
-}
 }
 
 #endif

@@ -10,8 +10,7 @@
 
 #include "entityx/entityx.h"
 
-namespace game
-{
+
 namespace systems
 {
 
@@ -30,7 +29,6 @@ private:
     bool m_debugHitboxDraw;
 };
 
-}
 }
 
 #endif
