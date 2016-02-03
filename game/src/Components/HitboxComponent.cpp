@@ -36,6 +36,9 @@ void HitboxComponent::registerComponent(lua::LuaState& state)
             });
 
             c->getHitbox() = tools::Polygon(polygonVertices);
+            c->getHitbox().ComputeGlobalVertices();
+            c->getHitbox().ComputeGlobalEdges();
+            c->getHitbox().ComputeGlobalCenter();
         });
 
     state.getState().new_usertype<HitboxComponent>("hitbox_component" //TODO: Replace the name here

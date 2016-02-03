@@ -6,7 +6,9 @@ namespace components
 {
 
 PlatformComponent::PlatformComponent() :
-    Component()
+    Component(),
+    platformType(Platform),
+    layer(0)
 {
 
 }

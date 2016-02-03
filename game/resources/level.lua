@@ -1,24 +1,21 @@
 level = {
     objects = {
-        template_tools.instanciates(1, full_path_to_template, {
+        template_tools.instanciates(1, player, {
             ["Position"] = {
                 x = 120,
                 y = 80
             }
         }),
-        template_tools.instanciates(1, full_path_to_template, {
+        template_tools.instanciates(2, block, {
             ["Position"] = {
-                x = 400,
-                y = 80
+                x = 80,
+                y = 350
             }
         }),
-        template_tools.instanciates(1, full_path_to_template, {
+        template_tools.instanciates(3, block, {
             ["Position"] = {
-                x = 140,
-                y = 100,
-            },
-            ["Render"] = {
-                z = 10
+                x = 180,
+                y = 350
             }
         }),
     }

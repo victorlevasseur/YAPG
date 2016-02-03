@@ -18,6 +18,26 @@ public:
     virtual std::string getName() const;
 
     static void registerComponent(lua::LuaState& state);
+
+    int layer;
+
+    float maxFallingSpeed;
+    float maxJumpingSpeed;
+
+    float currentSpeed;
+    float fallingSpeed;
+    float jumpingSpeed;
+
+    float acceleration;
+    float deceleration;
+    float maxSpeed;
+
+    float gravity;
+    bool canJumpAgain;
+
+    entityx::Entity groundEntity;
+    float oldFloorPosX;
+    float oldFloorPosY;
 };
 
 std::ostream& operator<<(std::ostream& stream, const PlatformerComponent& component);

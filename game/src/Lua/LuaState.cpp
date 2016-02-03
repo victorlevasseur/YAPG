@@ -5,6 +5,7 @@
 #include <boost/filesystem.hpp>
 
 #include "Components/CustomBehaviorComponent.hpp"
+#include "Components/HitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PositionComponent.hpp"
@@ -47,6 +48,7 @@ LuaState::LuaState() :
     //Declare main C++ classes and declare their metadatas
     EntityHandle::registerClass(*this);
     components::CustomBehaviorComponent::registerComponent(*this);
+    components::HitboxComponent::registerComponent(*this);
     components::PlatformComponent::registerComponent(*this);
     components::PlatformerComponent::registerComponent(*this);
     components::PositionComponent::registerComponent(*this);

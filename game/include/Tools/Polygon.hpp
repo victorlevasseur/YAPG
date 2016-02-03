@@ -20,7 +20,6 @@ class Polygon
 {
 public:
     Polygon();
-    Polygon(const Polygon &p);
     Polygon(std::initializer_list<sf::Vector2f> vertices);
     Polygon(std::vector<sf::Vector2f> vertices);
 

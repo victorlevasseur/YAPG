@@ -6,7 +6,21 @@ namespace components
 {
 
 PlatformerComponent::PlatformerComponent() :
-    Component()
+    Component(),
+    layer(0),
+    maxFallingSpeed(700.f),
+    maxJumpingSpeed(900.f),
+    currentSpeed(0),
+    fallingSpeed(0),
+    jumpingSpeed(0),
+    acceleration(1500.f),
+    deceleration(1500.f),
+    maxSpeed(250.f),
+    gravity(1000.f),
+    canJumpAgain(false),
+    groundEntity(),
+    oldFloorPosX(0),
+    oldFloorPosY(0)
 {
 
 }

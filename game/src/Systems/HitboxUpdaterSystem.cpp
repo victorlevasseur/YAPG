@@ -1,0 +1,40 @@
+#include "Systems/HitboxUpdaterSystem.hpp"
+
+#include <SFML/System/Vector2.hpp>
+
+#include "Components/HitboxComponent.hpp"
+#include "Components/PositionComponent.hpp"
+
+namespace c = game::components;
+
+namespace game
+{
+namespace systems
+{
+
+HitboxUpdaterSystem::HitboxUpdaterSystem()
+{
+
+}
+
+void HitboxUpdaterSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
+{
+    es.each<c::PositionComponent, c::HitboxComponent>([&](
+        entityx::Entity entity,
+        c::PositionComponent& position,
+        c::HitboxComponent& hitbox)
+    {
+        if(hitbox.getHitbox().GetOrigin() == sf::Vector2f(position.x + position.width/2.f, position.y + position.height/2.f))
+        {
+            return;
+        }
+
+        hitbox.getHitbox().SetOrigin(sf::Vector2f(position.x + position.width/2.f, position.y + position.height/2.f));
+        hitbox.getHitbox().ComputeGlobalVertices();
+        hitbox.getHitbox().ComputeGlobalEdges();
+        hitbox.getHitbox().ComputeGlobalCenter();
+    });
+}
+
+}
+}

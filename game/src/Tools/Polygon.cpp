@@ -1,6 +1,7 @@
 #include "Tools/Polygon.hpp"
 
 #include <cmath>
+#include <iostream>
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
@@ -13,11 +14,6 @@ namespace tools
 {
 
 Polygon::Polygon() : m_vertices(), m_origin(), m_angle(0), m_globalVertices(), m_globalEdges(), m_globalCenter()
-{
-
-}
-
-Polygon::Polygon(const Polygon &p) : m_vertices(p.m_vertices), m_origin(p.m_origin), m_angle(p.m_angle), m_globalVertices(p.m_globalVertices), m_globalEdges(p.m_globalEdges), m_globalCenter(p.m_globalCenter)
 {
 
 }
