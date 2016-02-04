@@ -8,6 +8,10 @@
 namespace lua
 {
 
+/**
+ * This class allows the game to register one callback per enum value and call it
+ * when the enum changes its value.
+ */
 template<unsigned int StatesCount, typename StatesEnum, typename... Args>
 class EnumStateCallbacks
 {
@@ -31,6 +35,9 @@ public:
         m_currentState = state;
     }
 
+    /**
+     * Call the callback for the current value only if the value has changed.
+     */
     void callIfNeeded(Args... args)
     {
         if(!m_needCall)
@@ -41,6 +48,9 @@ public:
         m_needCall = false;
     }
 
+    /**
+     * Register a callback for one enum value.
+     */
     void registerCallback(StatesEnum forState, sol::function& callback)
     {
         m_callbacks[static_cast<int>(forState)] = callback;
