@@ -31,10 +31,10 @@ public:
         loadImpl(reinterpret_cast<C*>(object), luaObject);
     }
 
-    template<typename T, typename D = std::enable_if<std::is_class<C>::value, C>>
-    ClassMetadata<C>& declareAttribute(const std::string& name, T D::*member)
+    template<typename T>
+    ClassMetadata<C>& declareAttribute(const std::string& name, T C::*member)
     {
-        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<D>>(new AttributeMetadata<D, T>(member)));
+        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<C>>(new AttributeMetadata<C, T>(member)));
         return *this;
     }
 

@@ -5,6 +5,7 @@
 #include "Meta/Details/AttributeMetadata.hpp"
 #include "Meta/Details/AttributeMetadataBase.hpp"
 #include "Meta/Details/ClassMetadata.hpp"
+#include "Meta/Details/TypeMetadata.hpp"
 #include "Meta/Details/Metadata.hpp"
 
 #endif

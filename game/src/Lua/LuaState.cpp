@@ -36,13 +36,13 @@ LuaState::LuaState() :
     );
 
     //Declare the metadatas of some basic types
-    meta::MetadataStore::registerLuaAssignableType<int>();
-    meta::MetadataStore::registerLuaAssignableType<unsigned int>();
-    meta::MetadataStore::registerLuaAssignableType<bool>();
-    meta::MetadataStore::registerLuaAssignableType<float>();
-    meta::MetadataStore::registerLuaAssignableType<double>();
-    meta::MetadataStore::registerLuaAssignableType<std::string>();
-    meta::MetadataStore::registerLuaAssignableType<sol::function>();
+    meta::MetadataStore::registerType<int>();
+    meta::MetadataStore::registerType<unsigned int>();
+    meta::MetadataStore::registerType<bool>();
+    meta::MetadataStore::registerType<float>();
+    meta::MetadataStore::registerType<double>();
+    meta::MetadataStore::registerType<std::string>();
+    meta::MetadataStore::registerType<sol::function>();
 
     //Declare main C++ classes and declare their metadatas
     EntityHandle::registerClass(*this);

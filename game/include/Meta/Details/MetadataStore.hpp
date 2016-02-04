@@ -8,6 +8,7 @@
 
 #include "Meta/Details/ClassMetadata.hpp"
 #include "Meta/Details/Metadata.hpp"
+#include "Meta/Details/TypeMetadata.hpp"
 
 namespace meta
 {
@@ -23,12 +24,12 @@ public:
         return dynamic_cast<ClassMetadata<C>&>(to_return);
     }
 
-    template<class C>
-    static ClassMetadata<C>& registerLuaAssignableType()
+    template<typename T>
+    static TypeMetadata<T>& registerType()
     {
-        return registerClass<C>().setExtraLoadFunction(
-            [](C* value, const sol::object& luaObject) { *value = luaObject.as<C>(); }
-        );
+        metadatas.emplace(std::type_index(typeid(T)), std::unique_ptr<Metadata>(new TypeMetadata<T>()));
+        Metadata& to_return = *metadatas[std::type_index(typeid(T))];
+        return dynamic_cast<TypeMetadata<T>&>(to_return);
     }
 
     template<class C>
