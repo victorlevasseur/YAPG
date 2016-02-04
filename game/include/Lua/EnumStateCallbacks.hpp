@@ -43,7 +43,7 @@ public:
         if(!m_needCall)
             return;
 
-        m_callbacks[static_cast<int>(m_currentState)].call(args...);
+        m_callbacks[m_currentState].call(args...);
 
         m_needCall = false;
     }
@@ -53,14 +53,14 @@ public:
      */
     void registerCallback(StatesEnum forState, sol::function& callback)
     {
-        m_callbacks[static_cast<int>(forState)] = callback;
+        m_callbacks[forState] = callback;
     }
 
 private:
     StatesEnum m_currentState;
     bool m_needCall;
 
-    std::array<sol::function, StatesCount> m_callbacks;
+    std::map<StatesEnum, sol::function> m_callbacks;
 };
 
 }
