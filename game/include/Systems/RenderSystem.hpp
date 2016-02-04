@@ -10,6 +10,7 @@
 
 #include "entityx/entityx.h"
 
+#include "Resources/ResourcesManager.hpp"
 
 namespace systems
 {
@@ -17,7 +18,7 @@ namespace systems
 class RenderSystem : public entityx::System<RenderSystem>
 {
 public:
-    RenderSystem(bool debugHitboxDraw = false);
+    RenderSystem(resources::TexturesManager& texturesManager, bool debugHitboxDraw = false);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
@@ -26,6 +27,7 @@ public:
 private:
     std::list<std::pair<std::shared_ptr<sf::Drawable>, sf::RenderStates>> m_renderingQueue;
 
+    resources::TexturesManager& m_texturesManager;
     bool m_debugHitboxDraw;
 };
 

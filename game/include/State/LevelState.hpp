@@ -7,8 +7,8 @@
 
 #include "Level/Level.hpp"
 #include "Lua/LuaState.hpp"
+#include "Resources/ResourcesManager.hpp"
 #include "State/State.hpp"
-
 
 namespace state
 {
@@ -16,7 +16,7 @@ namespace state
 class LevelState : public State
 {
 public:
-    LevelState(const std::string& path);
+    LevelState(const std::string& path, resources::TexturesManager& texturesManager);
 
     virtual void onStart();
 

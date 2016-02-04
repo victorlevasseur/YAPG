@@ -12,9 +12,10 @@ namespace c = components;
 namespace systems
 {
 
-RenderSystem::RenderSystem(bool debugHitboxDraw) :
+RenderSystem::RenderSystem(resources::TexturesManager& texturesManager, bool debugHitboxDraw) :
     entityx::System<RenderSystem>(),
     m_renderingQueue(),
+    m_texturesManager(texturesManager),
     m_debugHitboxDraw(debugHitboxDraw)
 {
 
