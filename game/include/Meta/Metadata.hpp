@@ -3,6 +3,7 @@
 
 #include "Meta/Details/MetadataStore.hpp"
 #include "Meta/Details/AttributeMetadata.hpp"
+#include "Meta/Details/MapAttributeMetadata.hpp"
 #include "Meta/Details/VectorAttributeMetadata.hpp"
 #include "Meta/Details/AttributeMetadataBase.hpp"
 #include "Meta/Details/ClassMetadata.hpp"
