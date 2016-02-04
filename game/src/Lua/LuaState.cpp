@@ -4,6 +4,8 @@
 
 #include <boost/filesystem.hpp>
 
+#include <SFML/System/Vector2.hpp>
+
 #include "Components/CustomBehaviorComponent.hpp"
 #include "Components/HitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
@@ -12,6 +14,7 @@
 #include "Components/RenderComponent.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Meta/Metadata.hpp"
+#include "Tools/Polygon.hpp"
 
 namespace fs = boost::filesystem;
 
@@ -43,6 +46,12 @@ LuaState::LuaState() :
     meta::MetadataStore::registerType<double>();
     meta::MetadataStore::registerType<std::string>();
     meta::MetadataStore::registerType<sol::function>();
+    meta::MetadataStore::registerClass<sf::Vector2f>()
+        .declareAttribute("x", &sf::Vector2f::x)
+        .declareAttribute("y", &sf::Vector2f::y);
+
+    //Declare class metadatas
+    tools::Polygon::registerClass();
 
     //Declare main C++ classes and declare their metadatas
     EntityHandle::registerClass(*this);

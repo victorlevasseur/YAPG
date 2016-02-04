@@ -44,6 +44,8 @@ public:
 
     static Polygon Rectangle(float width, float height);
 
+    static void registerClass();
+
 private:
     //Relative vertices positions
     std::vector<sf::Vector2f> m_vertices;

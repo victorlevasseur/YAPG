@@ -1,6 +1,8 @@
 #ifndef YAPG_GAME_META_DETAILS_CLASSMETADATA_H
 #define YAPG_GAME_META_DETAILS_CLASSMETADATA_H
 
+#include <iostream>
+
 #include "Lua/sol.hpp"
 #include "Meta/Details/Metadata.hpp"
 #include "Meta/Details/MetadataStore.hpp"
@@ -13,6 +15,9 @@ class AttributeMetadataBase;
 
 template<class C, typename T>
 class AttributeMetadata;
+
+template<class C, typename T>
+class VectorAttributeMetadata;
 
 template<class C>
 class ClassMetadata : public Metadata
@@ -35,6 +40,13 @@ public:
     ClassMetadata<C>& declareAttribute(const std::string& name, T C::*member)
     {
         m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<C>>(new AttributeMetadata<C, T>(member)));
+        return *this;
+    }
+
+    template<typename T>
+    ClassMetadata<C>& declareAttribute(const std::string& name, std::vector<T> C::*vectorMember)
+    {
+        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<C>>(new VectorAttributeMetadata<C, T>(vectorMember)));
         return *this;
     }
 

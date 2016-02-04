@@ -6,6 +6,8 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 
+#include "Meta/Metadata.hpp"
+
 #define M_PI       3.14159265358979323846
 
 
@@ -61,6 +63,12 @@ sf::Vector2f Polygon::RotatePoint(sf::Vector2f point, float angle)
 Polygon Polygon::Rectangle(float width, float height)
 {
     return Polygon({sf::Vector2f(-width/2, -height/2), sf::Vector2f(+width/2, -height/2), sf::Vector2f(+width/2, +height/2), sf::Vector2f(-width/2, +height/2)});
+}
+
+void Polygon::registerClass()
+{
+    meta::MetadataStore::registerClass<Polygon>()
+        .declareAttribute("points", &Polygon::m_vertices);
 }
 
 void Polygon::ComputeGlobalVertices()
