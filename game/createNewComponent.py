@@ -53,7 +53,7 @@ std::string {0}Component::getName() const
 
 void {0}Component::registerComponent(lua::LuaState& state)
 {{
-    meta::MetadataStore::registerType<{0}Component>();
+    meta::MetadataStore::registerClass<{0}Component>();
 
     state.getState().new_usertype<{0}Component>("{1}_component" //TODO: Replace the name here
         //TODO: Register the properties here

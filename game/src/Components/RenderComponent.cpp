@@ -22,7 +22,7 @@ std::string RenderComponent::getName() const
 
 void RenderComponent::registerComponent(lua::LuaState& state)
 {
-    meta::MetadataStore::registerType<RenderComponent>();
+    meta::MetadataStore::registerClass<RenderComponent>();
 
     state.getState().new_usertype<RenderComponent>("render_component" //TODO: Replace the name here
         //TODO: Register the properties here

@@ -27,7 +27,7 @@ std::string PositionComponent::getName() const
 void PositionComponent::registerComponent(lua::LuaState& state)
 {
     //Register loading infos
-    meta::MetadataStore::registerType<PositionComponent>()
+    meta::MetadataStore::registerClass<PositionComponent>()
         .declareAttribute<float>("x", &PositionComponent::x)
         .declareAttribute<float>("y", &PositionComponent::y)
         .declareAttribute<float>("width", &PositionComponent::width)

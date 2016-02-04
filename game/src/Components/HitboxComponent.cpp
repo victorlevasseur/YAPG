@@ -22,7 +22,7 @@ std::string HitboxComponent::getName() const
 
 void HitboxComponent::registerComponent(lua::LuaState& state)
 {
-    meta::MetadataStore::registerType<HitboxComponent>()
+    meta::MetadataStore::registerClass<HitboxComponent>()
         .setExtraLoadFunction([](HitboxComponent* c, const sol::object& luaObject) {
             const sol::table& polygonTable = luaObject.as<sol::table>().get<sol::table>("polygon");
             std::vector<sf::Vector2f> polygonVertices{};
