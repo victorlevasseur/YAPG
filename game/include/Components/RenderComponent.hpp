@@ -24,6 +24,7 @@ public:
     std::string textureName;
     std::string currentAnimation;
     std::map<std::string, animation::Animation> animations;
+    bool flipped;
 
     DECLARE_COMPONENT(RenderComponent)
 };

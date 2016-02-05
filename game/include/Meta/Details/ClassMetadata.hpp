@@ -92,7 +92,6 @@ private:
         {
             m_extraFunction(object, luaObject);
         }
-
     }
 
     std::map<std::string, std::unique_ptr<AttributeMetadataBase<C>>> m_attributes;

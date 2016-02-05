@@ -28,7 +28,8 @@ void RenderComponent::registerComponent(lua::LuaState& state)
     meta::MetadataStore::registerClass<RenderComponent>()
         .declareAttribute("texture", &RenderComponent::textureName)
         .declareAttribute("current_animation", &RenderComponent::currentAnimation)
-        .declareAttribute("animations", &RenderComponent::animations);
+        .declareAttribute("animations", &RenderComponent::animations)
+        .declareAttribute("flipped", &RenderComponent::flipped);
 
     state.getState().new_usertype<RenderComponent>("render_component" //TODO: Replace the name here
         //TODO: Register the properties here
