@@ -41,7 +41,7 @@ block = {
                     total_duration = 1,
                     frames = {
                         {
-                            rect = { left = 1690, top = 780, width = 128, height = 128},
+                            rect = { left = 1560, top = 390, width = 128, height = 128},
                             relative_duration = 1,
                         },
                     },

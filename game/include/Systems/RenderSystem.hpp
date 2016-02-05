@@ -10,6 +10,7 @@
 
 #include "entityx/entityx.h"
 
+#include "Animation/AnimatedSprite.hpp"
 #include "Resources/ResourcesManager.hpp"
 
 namespace systems
@@ -26,6 +27,8 @@ public:
 
 private:
     std::list<std::pair<std::shared_ptr<sf::Drawable>, sf::RenderStates>> m_renderingQueue;
+
+    std::map<entityx::Entity, std::shared_ptr<animation::AnimatedSprite>> m_animatedSprites;
 
     resources::TexturesManager& m_texturesManager;
     bool m_debugHitboxDraw;

@@ -5,7 +5,7 @@
 namespace animation
 {
 
-AnimatedSprite::AnimatedSprite(std::shared_ptr<sf::Texture>& texture, const std::map<std::string, Animation>& animations) :
+AnimatedSprite::AnimatedSprite(std::shared_ptr<sf::Texture> texture, const std::map<std::string, Animation>& animations) :
     sf::Drawable(),
     sf::Transformable(),
     m_texture(texture),

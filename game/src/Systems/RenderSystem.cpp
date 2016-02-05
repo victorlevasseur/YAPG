@@ -5,6 +5,7 @@
 
 #include "Components/HitboxComponent.hpp"
 #include "Components/PositionComponent.hpp"
+#include "Components/RenderComponent.hpp"
 
 namespace c = components;
 
@@ -15,6 +16,7 @@ namespace systems
 RenderSystem::RenderSystem(resources::TexturesManager& texturesManager, bool debugHitboxDraw) :
     entityx::System<RenderSystem>(),
     m_renderingQueue(),
+    m_animatedSprites(),
     m_texturesManager(texturesManager),
     m_debugHitboxDraw(debugHitboxDraw)
 {
@@ -24,13 +26,6 @@ RenderSystem::RenderSystem(resources::TexturesManager& texturesManager, bool deb
 void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
 {
     m_renderingQueue.clear();
-
-    /*es.each<c::PositionComponent>([&](entityx::Entity entity, c::PositionComponent& position) {
-        auto shape = std::make_shared<sf::RectangleShape>(sf::Vector2f(position.width, position.height));
-        shape->setPosition(position.x, position.y);
-
-        m_renderingQueue.push_back(std::make_pair(shape, sf::RenderStates::Default));
-    });*/
 
     if(m_debugHitboxDraw)
     {
@@ -50,6 +45,27 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
             m_renderingQueue.push_back(std::make_pair(shape, sf::RenderStates::Default));
         });
     }
+
+    es.each<c::PositionComponent, c::RenderComponent>([&](entityx::Entity entity, c::PositionComponent& position, c::RenderComponent& render) {
+        if(m_animatedSprites.count(entity) == 0)
+        {
+            //Create the animated sprite if it doesn't exist
+            auto animatedSprite = std::make_shared<animation::AnimatedSprite>(
+                m_texturesManager.requestResource(render.textureName),
+                render.animations
+            );
+            animatedSprite->setCurrentAnimation(render.currentAnimation);
+            m_animatedSprites[entity] = animatedSprite;
+        }
+
+        //Update the animated sprite and put it in the render queue
+        auto animatedSprite = m_animatedSprites[entity];
+        animatedSprite->update(dt);
+        animatedSprite->setPosition(position.x, position.y);
+        animatedSprite->setScale(position.width, position.height);
+
+        m_renderingQueue.push_back(std::make_pair(animatedSprite, sf::RenderStates::Default));
+    });
 }
 
 void RenderSystem::render(sf::RenderTarget& target)

@@ -15,7 +15,7 @@ LevelState::LevelState(const std::string& path, resources::TexturesManager& text
     m_level(path, m_luaState),
     m_systemMgr(m_level.getEntityManager(), m_level.getEventManager())
 {
-    m_systemMgr.add<systems::RenderSystem>(texturesManager, true);
+    m_systemMgr.add<systems::RenderSystem>(texturesManager);
     m_systemMgr.add<systems::CustomBehaviorSystem>();
     m_systemMgr.add<systems::PlatformerSystem>();
     m_systemMgr.add<systems::HitboxUpdaterSystem>();

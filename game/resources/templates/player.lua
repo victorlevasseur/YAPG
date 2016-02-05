@@ -6,7 +6,7 @@ player = {
             x = 0,
             y = 0,
             width = 100,
-            height = 100
+            height = 200
         },
         ["Platformer"] = {
             onIdle = function(entity)
@@ -35,14 +35,29 @@ player = {
                     },
                     {
                         x = 100,
-                        y = 100
+                        y = 200
                     },
                     {
                         x = 0,
-                        y = 100
+                        y = 200
                     },
                 }
             }
         },
+        ["Render"] = {
+            texture = "spritesheet_complete.png",
+            default_animation = "default",
+            animations = {
+                ["default"] = {
+                    total_duration = 1,
+                    frames = {
+                        {
+                            rect = { left = 390, top = 1290, width = 128, height = 256},
+                            relative_duration = 1,
+                        },
+                    },
+                },
+            },
+        }
     }
 }
