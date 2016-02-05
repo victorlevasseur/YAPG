@@ -5,7 +5,10 @@ namespace components
 {
 
 RenderComponent::RenderComponent() :
-    Component()
+    Component(),
+    textureName(),
+    currentAnimation(),
+    animations()
 {
 
 }
@@ -22,7 +25,10 @@ std::string RenderComponent::getName() const
 
 void RenderComponent::registerComponent(lua::LuaState& state)
 {
-    meta::MetadataStore::registerClass<RenderComponent>();
+    meta::MetadataStore::registerClass<RenderComponent>()
+        .declareAttribute("texture", &RenderComponent::textureName)
+        .declareAttribute("default_animation", &RenderComponent::currentAnimation)
+        .declareAttribute("animations", &RenderComponent::animations);
 
     state.getState().new_usertype<RenderComponent>("render_component" //TODO: Replace the name here
         //TODO: Register the properties here

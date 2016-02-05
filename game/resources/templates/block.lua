@@ -33,5 +33,20 @@ block = {
                 }
             }
         },
+        ["Render"] = {
+            texture = "spritesheet_complete.png",
+            default_animation = "default",
+            animations = {
+                ["default"] = {
+                    total_duration = 1,
+                    frames = {
+                        {
+                            rect = { left = 1690, top = 780, width = 128, height = 128},
+                            relative_duration = 1,
+                        },
+                    },
+                },
+            },
+        }
     }
 }

@@ -4,8 +4,11 @@
 
 #include <boost/filesystem.hpp>
 
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
 
+#include "Animation/Animation.hpp"
+#include "Animation/Frame.hpp"
 #include "Components/CustomBehaviorComponent.hpp"
 #include "Components/HitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
@@ -49,8 +52,15 @@ LuaState::LuaState() :
     meta::MetadataStore::registerClass<sf::Vector2f>()
         .declareAttribute("x", &sf::Vector2f::x)
         .declareAttribute("y", &sf::Vector2f::y);
+    meta::MetadataStore::registerClass<sf::IntRect>()
+        .declareAttribute("left", &sf::IntRect::left)
+        .declareAttribute("top", &sf::IntRect::top)
+        .declareAttribute("width", &sf::IntRect::width)
+        .declareAttribute("height", &sf::IntRect::height);
 
     //Declare class metadatas
+    animation::Animation::registerClass();
+    animation::Frame::registerClass();
     tools::Polygon::registerClass();
 
     //Declare main C++ classes and declare their metadatas
