@@ -13,7 +13,7 @@ player = {
                 entity:get_component("Render"):set_attribute_string("current_animation", "idle")
             end,
             onStartWalking = function(entity)
-
+                entity:get_component("Render"):set_attribute_string("current_animation", "walking")
             end,
             onStartJumping = function(entity)
                 entity:get_component("Render"):set_attribute_string("current_animation", "jump")
@@ -53,6 +53,19 @@ player = {
                     frames = {
                         {
                             rect = { left = 390, top = 1290, width = 128, height = 256},
+                            relative_duration = 1,
+                        },
+                    },
+                },
+                ["walking"] = {
+                    total_duration = 0.2,
+                    frames = {
+                        {
+                            rect = { left = 390, top = 516, width = 128, height = 256},
+                            relative_duration = 1,
+                        },
+                        {
+                            rect = { left = 390, top = 258, width = 128, height = 256},
                             relative_duration = 1,
                         },
                     },
