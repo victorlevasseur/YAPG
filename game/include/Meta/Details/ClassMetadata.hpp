@@ -19,6 +19,9 @@ class AttributeMetadata;
 template<class C, typename T>
 class VectorAttributeMetadata;
 
+template<class C, typename T, typename U>
+class MapAttributeMetadata;
+
 template<class C>
 class ClassMetadata : public Metadata
 {
@@ -47,6 +50,13 @@ public:
     ClassMetadata<C>& declareAttribute(const std::string& name, std::vector<T> C::*vectorMember)
     {
         m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<C>>(new VectorAttributeMetadata<C, T>(vectorMember)));
+        return *this;
+    }
+
+    template<typename T, typename U>
+    ClassMetadata<C>& declareAttribute(const std::string& name, std::map<T, U> C::*mapMember)
+    {
+        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<C>>(new MapAttributeMetadata<C, T, U>(mapMember)));
         return *this;
     }
 
