@@ -27,12 +27,12 @@ public:
         MetadataStore::getMetadata<T>().load(&((*object).*m_member), luaObject);
     }
 
-    virtual std::string getAsString(C* object) const
+    virtual std::string getAsString(const C* object) const
     {
         return getAsStringImpl(object);
     }
 
-    virtual void setAsString(C* object, const std::string& value)
+    virtual void setAsString(C* object, const std::string& value) const
     {
         std::cout << "Not implemented !" << std::endl;
         //TODO: Implement this !
@@ -40,19 +40,19 @@ public:
 
 private:
     template<typename U = T>
-    typename std::enable_if<std::is_arithmetic<U>::value, std::string>::type getAsStringImpl(C* object) const
+    typename std::enable_if<std::is_arithmetic<U>::value, std::string>::type getAsStringImpl(const C* object) const
     {
         return std::to_string(object->*m_member);
     }
 
     template<typename U = T>
-    typename std::enable_if<std::is_same<U, std::string>::value, std::string>::type getAsStringImpl(C* object) const
+    typename std::enable_if<std::is_same<U, std::string>::value, std::string>::type getAsStringImpl(const C* object) const
     {
         return object->*m_member;
     }
 
     template<typename U = T>
-    typename std::enable_if<!std::is_arithmetic<U>::value && !std::is_same<U, std::string>::value, std::string>::type getAsStringImpl(C* object) const
+    typename std::enable_if<!std::is_arithmetic<U>::value && !std::is_same<U, std::string>::value, std::string>::type getAsStringImpl(const C* object) const
     {
         std::cout << "Script trying to get a value not convertible to std::string !" << std::endl;
         return "";

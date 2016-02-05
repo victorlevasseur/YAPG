@@ -10,8 +10,7 @@ player = {
         },
         ["Platformer"] = {
             onIdle = function(entity)
-
-                entity:write_to_console("Idle ! in anim " .. entity:get_component("Render"):get_string("default_animation"))
+                entity:write_to_console("Idle ! at (" .. entity:get_component("Position"):get_string("x") .. ";" .. entity:get_component("Position"):get_string("y") .. ")")
             end,
             onStartWalking = function(entity)
                 entity:write_to_console("Start walking !")

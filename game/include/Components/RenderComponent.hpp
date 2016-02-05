@@ -26,7 +26,7 @@ public:
     std::map<std::string, animation::Animation> animations;
 
 protected:
-    virtual std::string doGetAttributeAsString(const std::string& attributeName);
+    virtual std::string doGetAttributeAsString(const std::string& attributeName) const;
 };
 
 std::ostream& operator<<(std::ostream& stream, const RenderComponent& component);

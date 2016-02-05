@@ -41,10 +41,10 @@ public:
 
     static void registerComponent(lua::LuaState& state);
 
-    std::string getAttributeAsString(const std::string& attributeName);
+    std::string getAttributeAsString(const std::string& attributeName) const;
 
 protected:
-    virtual std::string doGetAttributeAsString(const std::string& attributeName)
+    virtual std::string doGetAttributeAsString(const std::string& attributeName) const
     {
         std::cout << "The component doesn't implement this way of getting a string attribute !" << std::endl;
         return "";

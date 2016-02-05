@@ -66,9 +66,8 @@ void Component::registerComponent(lua::LuaState& state)
     );
 }
 
-std::string Component::getAttributeAsString(const std::string& attributeName)
+std::string Component::getAttributeAsString(const std::string& attributeName) const
 {
-    std::cout << "Get attribute " << attributeName << " as string ! " << std::endl;
     return doGetAttributeAsString(attributeName);
 }
 

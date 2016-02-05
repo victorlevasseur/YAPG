@@ -42,6 +42,14 @@ void PositionComponent::registerComponent(lua::LuaState& state)
     );
 }
 
+std::string PositionComponent::doGetAttributeAsString(const std::string& attributeName) const
+{
+    auto& metadata = dynamic_cast<meta::ClassMetadata<PositionComponent>&>(
+        meta::MetadataStore::getMetadata<PositionComponent>()
+    );
+    return metadata.getAttribute(attributeName).getAsString(this);
+}
+
 std::ostream& operator<<(std::ostream& stream, const PositionComponent& component)
 {
     operator<<(stream, dynamic_cast<const Component&>(component));

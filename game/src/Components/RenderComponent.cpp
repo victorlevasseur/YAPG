@@ -35,7 +35,7 @@ void RenderComponent::registerComponent(lua::LuaState& state)
     );
 }
 
-std::string RenderComponent::doGetAttributeAsString(const std::string& attributeName)
+std::string RenderComponent::doGetAttributeAsString(const std::string& attributeName) const
 {
     auto& metadata = dynamic_cast<meta::ClassMetadata<RenderComponent>&>(
         meta::MetadataStore::getMetadata<RenderComponent>()
