@@ -10,16 +10,16 @@ player = {
         },
         ["Platformer"] = {
             onIdle = function(entity)
-                entity:write_to_console("Idle ! at (" .. entity:get_component("Position"):get_string("x") .. ";" .. entity:get_component("Position"):get_string("y") .. ")")
+                entity:get_component("Render"):set_attribute_string("current_animation", "idle")
             end,
             onStartWalking = function(entity)
-                entity:write_to_console("Start walking !")
+
             end,
             onStartJumping = function(entity)
-                entity:write_to_console("Jump !")
+                entity:get_component("Render"):set_attribute_string("current_animation", "jump")
             end,
             onStartFalling = function(entity)
-                entity:write_to_console("Start falling !")
+                entity:get_component("Render"):set_attribute_string("current_animation", "jump")
             end,
         },
         ["Hitbox"] = {
@@ -46,13 +46,22 @@ player = {
         },
         ["Render"] = {
             texture = "spritesheet_complete.png",
-            default_animation = "default",
+            current_animation = "idle",
             animations = {
-                ["default"] = {
+                ["idle"] = {
                     total_duration = 1,
                     frames = {
                         {
                             rect = { left = 390, top = 1290, width = 128, height = 256},
+                            relative_duration = 1,
+                        },
+                    },
+                },
+                ["jump"] = {
+                    total_duration = 1,
+                    frames = {
+                        {
+                            rect = { left = 390, top = 1548, width = 128, height = 256},
                             relative_duration = 1,
                         },
                     },

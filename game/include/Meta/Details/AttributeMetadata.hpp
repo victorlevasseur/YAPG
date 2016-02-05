@@ -34,8 +34,7 @@ public:
 
     virtual void setAsString(C* object, const std::string& value) const
     {
-        std::cout << "Not implemented !" << std::endl;
-        //TODO: Implement this !
+        setAsStringImpl(object, value);
     }
 
 private:
@@ -56,6 +55,18 @@ private:
     {
         std::cout << "Script trying to get a value not convertible to std::string !" << std::endl;
         return "";
+    }
+
+    template<typename U = T>
+    typename std::enable_if<std::is_same<U, std::string>::value, void>::type setAsStringImpl(C* object, const std::string& value) const
+    {
+        object->*m_member = value;
+    }
+
+    template<typename U = T>
+    typename std::enable_if<!std::is_same<U, std::string>::value, void>::type setAsStringImpl(C* object, const std::string& value) const
+    {
+        std::cout << "Script trying to set a value as std::string but the value is not a std::string !" << std::endl;
     }
 
     T C::*m_member;

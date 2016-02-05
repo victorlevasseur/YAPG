@@ -31,7 +31,7 @@ slope45 = {
         },
         ["Render"] = {
             texture = "spritesheet_complete.png",
-            default_animation = "default",
+            current_animation = "default",
             animations = {
                 ["default"] = {
                     total_duration = 1,
