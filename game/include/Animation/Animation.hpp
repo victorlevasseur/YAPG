@@ -16,6 +16,8 @@ public:
     const Frame& getFrameAt(float t) const;
     Frame& getFrameAt(float t);
 
+    float getDuration() const { return m_totalDuration; }
+
     static void registerClass();
 
 private:
