@@ -60,6 +60,9 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
 
         //Update the animated sprite and put it in the render queue
         auto animatedSprite = m_animatedSprites[entity];
+        if(render.currentAnimation != animatedSprite->getCurrentAnimation())
+            animatedSprite->setCurrentAnimation(render.currentAnimation);
+
         animatedSprite->update(dt);
         animatedSprite->setPosition(position.x, position.y);
         animatedSprite->setScale(position.width, position.height);
