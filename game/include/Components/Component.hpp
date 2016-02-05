@@ -10,20 +10,6 @@
 #include "Lua/sol.hpp"
 #include "Meta/Metadata.hpp"
 
-/**
- * Macro that has to be added to the end of component class declaration.
- * It declares some useful methods to get/set attributes from Lua.
- */
-#define DECLARE_COMPONENT(T) \
-    protected: \
-    virtual std::string doGetAttributeAsString(const std::string& attributeName) const \
-    {\
-        auto& metadata = dynamic_cast<meta::ClassMetadata<T>&>(\
-            meta::MetadataStore::getMetadata<T>()\
-        );\
-        return metadata.getAttribute(attributeName).getAsString(this);\
-    }\
-
 namespace lua{ class LuaState; }
 
 namespace components
@@ -71,5 +57,20 @@ private:
 std::ostream& operator<<(std::ostream& stream, const Component& component);
 
 }
+
+/**
+ * Macro that has to be added to the end of component class declaration.
+ * It declares some useful methods to get/set attributes from Lua.
+ */
+#define DECLARE_COMPONENT(T) \
+    protected: \
+        virtual std::string doGetAttributeAsString(const std::string& attributeName) const \
+        {\
+            auto& metadata = dynamic_cast<meta::ClassMetadata<T>&>(\
+                meta::MetadataStore::getMetadata<T>()\
+            );\
+            return metadata.getAttribute(attributeName).getAsString(this);\
+        }\
+///////////////////////////////////////////////////////////////////////////
 
 #endif
