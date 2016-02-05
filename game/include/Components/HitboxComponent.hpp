@@ -22,6 +22,8 @@ public:
     tools::Polygon& getHitbox() { return m_polygon; }
     const tools::Polygon& getHitbox() const { return m_polygon; }
 
+    DECLARE_COMPONENT(HitboxComponent)
+
 private:
     tools::Polygon m_polygon;
 };

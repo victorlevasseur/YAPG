@@ -22,9 +22,8 @@ public:
     float height;
 
     static void registerComponent(lua::LuaState& state);
-    
-protected:
-    virtual std::string doGetAttributeAsString(const std::string& attributeName) const;
+
+    DECLARE_COMPONENT(PositionComponent)
 };
 
 std::ostream& operator<<(std::ostream& stream, const PositionComponent& component);

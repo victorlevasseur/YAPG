@@ -4,7 +4,6 @@
 #include "Components/Component.hpp"
 #include "Lua/LuaState.hpp"
 
-
 namespace components
 {
 
@@ -19,6 +18,8 @@ public:
     sol::function updateFunction;
 
     static void registerComponent(lua::LuaState& state);
+
+    DECLARE_COMPONENT(CustomBehaviorComponent)
 };
 
 std::ostream& operator<<(std::ostream& stream, const CustomBehaviorComponent& component);
