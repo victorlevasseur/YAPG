@@ -5,8 +5,8 @@ player = {
         ["Position"] = {
             x = 0,
             y = 0,
-            width = 100,
-            height = 200
+            width = 64,
+            height = 128
         },
         ["Platformer"] = {
             onIdle = function(entity)
@@ -30,16 +30,16 @@ player = {
                         y = 0
                     },
                     {
-                        x = 100,
+                        x = 64,
                         y = 0
                     },
                     {
-                        x = 100,
-                        y = 200
+                        x = 64,
+                        y = 128
                     },
                     {
                         x = 0,
-                        y = 200
+                        y = 128
                     },
                 }
             }

@@ -5,8 +5,8 @@ slope45 = {
         ["Position"] = {
             x = 0,
             y = 0,
-            width = 100,
-            height = 100
+            width = 64,
+            height = 64
         },
         ["Platform"] = {
 
@@ -15,16 +15,16 @@ slope45 = {
             polygon = {
                 points = {
                     {
-                        x = 100,
+                        x = 64,
                         y = 0
                     },
                     {
-                        x = 100,
-                        y = 100
+                        x = 64,
+                        y = 64
                     },
                     {
                         x = 0,
-                        y = 100
+                        y = 64
                     },
                 }
             }
