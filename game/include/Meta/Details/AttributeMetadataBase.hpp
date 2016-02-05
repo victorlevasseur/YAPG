@@ -14,6 +14,17 @@ public:
     virtual ~AttributeMetadataBase() {};
 
     virtual void load(C* object, const sol::object& luaObject) const = 0;
+
+    virtual std::string getAsString(C* object) const
+    {
+        std::cout << "Script trying to get a value not convertible to std::string !" << std::endl;
+        return "";
+    }
+
+    virtual void setAsString(C* object, const std::string& value)
+    {
+        std::cout << "Script trying to set a value not convertible from std::string !" << std::endl;
+    }
 };
 
 }

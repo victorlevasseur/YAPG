@@ -66,6 +66,16 @@ public:
         return *this;
     }
 
+    const AttributeMetadataBase<C>& getAttribute(const std::string& name) const
+    {
+        return *(m_attributes.at(name));
+    }
+
+    AttributeMetadataBase<C>& getAttribute(const std::string& name)
+    {
+        return *(m_attributes.at(name));
+    }
+
 private:
     void loadImpl(C* object, const sol::object& luaObject) const
     {
