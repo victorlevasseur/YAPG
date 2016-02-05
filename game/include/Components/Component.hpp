@@ -46,7 +46,7 @@ public:
 protected:
     virtual std::string doGetAttributeAsString(const std::string& attributeName) const
     {
-        std::cout << "Invalid component ! Did you put the DECLARE_COMPONENT(MyComponent) before the end of the component class declaration ?" << std::endl;
+        std::cout << "Invalid component: " << getName() << " ! Did you put the DECLARE_COMPONENT(MyComponent) before the end of the component class declaration ?" << std::endl;
         return "";
     }
 
