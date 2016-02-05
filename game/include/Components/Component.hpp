@@ -10,6 +10,8 @@
 #include "Lua/sol.hpp"
 #include "Meta/Metadata.hpp"
 
+namespace lua{ class LuaState; }
+
 namespace components
 {
 
@@ -22,7 +24,7 @@ public:
     /**
      * Return the name of the component
      */
-    virtual std::string getName() const = 0;
+    virtual std::string getName() const { return ""; }
 
     /**
      * Load the component from its lua table.
@@ -36,6 +38,17 @@ public:
      * \param luaSelector the lua table to load the component properties from
      */
     static void assignComponent(entityx::Entity entity, const std::string &component, const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter);
+
+    static void registerComponent(lua::LuaState& state);
+
+    std::string getAttributeAsString(const std::string& attributeName);
+
+protected:
+    virtual std::string doGetAttributeAsString(const std::string& attributeName)
+    {
+        std::cout << "The component doesn't implement this way of getting a string attribute !" << std::endl;
+        return "";
+    }
 
 private:
 

@@ -2,9 +2,10 @@
 
 #include <iostream>
 
+#include "Components/Component.hpp"
 #include "Components/PositionComponent.hpp"
+#include "Components/RenderComponent.hpp"
 #include "Lua/LuaState.hpp"
-
 
 namespace lua
 {
@@ -21,12 +22,12 @@ EntityHandle::EntityHandle(entityx::Entity entity) :
 
 }
 
-components::PositionComponent* EntityHandle::getPositionComponent()
+components::Component* EntityHandle::getComponent(const std::string& componentName)
 {
-    if(m_entity.has_component<components::PositionComponent>())
+    if(componentName == "Position")
         return m_entity.component<components::PositionComponent>().get();
-
-    return nullptr;
+    else if(componentName == "Render")
+        return m_entity.component<components::RenderComponent>().get();
 }
 
 void EntityHandle::writeToConsole(const std::string& str)
@@ -43,7 +44,7 @@ void EntityHandle::registerClass(LuaState &state)
 {
     state.getState().new_usertype<EntityHandle>("entity_handle",
         "remove_entity", &EntityHandle::removeEntity,
-        "position_component", &EntityHandle::getPositionComponent,
+        "get_component", &EntityHandle::getComponent,
         "write_to_console", &EntityHandle::writeToConsole
     );
 }

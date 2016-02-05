@@ -24,6 +24,9 @@ public:
     std::string textureName;
     std::string currentAnimation;
     std::map<std::string, animation::Animation> animations;
+
+protected:
+    virtual std::string doGetAttributeAsString(const std::string& attributeName);
 };
 
 std::ostream& operator<<(std::ostream& stream, const RenderComponent& component);

@@ -7,7 +7,7 @@
 #include "Components/PositionComponent.hpp"
 #include "Components/RenderComponent.hpp"
 #include "Meta/Metadata.hpp"
-
+#include "Lua/LuaState.hpp"
 
 namespace components
 {
@@ -57,6 +57,19 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
     {
         std::cout << "Unknown component of type \"" << component << "\" !" << std::endl;
     }
+}
+
+void Component::registerComponent(lua::LuaState& state)
+{
+    state.getState().new_usertype<Component>("component",
+        "get_string", &Component::getAttributeAsString
+    );
+}
+
+std::string Component::getAttributeAsString(const std::string& attributeName)
+{
+    std::cout << "Get attribute " << attributeName << " as string ! " << std::endl;
+    return doGetAttributeAsString(attributeName);
 }
 
 std::ostream& operator<<(std::ostream& stream, const Component& component)

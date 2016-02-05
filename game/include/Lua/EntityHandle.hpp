@@ -5,7 +5,7 @@
 
 #include "Lua/sol.hpp"
 
-namespace components{ class PositionComponent; }
+namespace components{ class Component; }
 namespace lua{ class LuaState; }
 
 
@@ -18,7 +18,7 @@ public:
     EntityHandle();
     EntityHandle(entityx::Entity entity);
 
-    components::PositionComponent* getPositionComponent();
+    components::Component* getComponent(const std::string& componentName);
 
     void writeToConsole(const std::string& str);
 

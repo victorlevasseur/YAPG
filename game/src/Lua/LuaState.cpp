@@ -65,6 +65,7 @@ LuaState::LuaState() :
 
     //Declare main C++ classes and declare their metadatas
     EntityHandle::registerClass(*this);
+    components::Component::registerComponent(*this);
     components::CustomBehaviorComponent::registerComponent(*this);
     components::HitboxComponent::registerComponent(*this);
     components::PlatformComponent::registerComponent(*this);
