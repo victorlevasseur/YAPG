@@ -43,7 +43,8 @@ public:
         if(!m_needCall)
             return;
 
-        m_callbacks[m_currentState].call(args...);
+        if(m_callbacks.count(m_currentState) > 0)
+            m_callbacks[m_currentState].call(args...);
 
         m_needCall = false;
     }
@@ -53,7 +54,8 @@ public:
      */
     void registerCallback(StatesEnum forState, sol::function& callback)
     {
-        m_callbacks[forState] = callback;
+        if(callback.state())
+            m_callbacks[forState] = callback;
     }
 
 private:
