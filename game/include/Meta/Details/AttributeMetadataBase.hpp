@@ -29,12 +29,23 @@ public:
     virtual bool getAsBool(const C* object) const
     {
         std::cout << "Script trying to get a value not convertible to bool !" << std::endl;
-        return "";
+        return false;
     }
 
     virtual void setAsBool(C* object, bool value) const
     {
         std::cout << "Script trying to set a value not convertible from bool !" << std::endl;
+    }
+
+    virtual double getAsDouble(const C* object) const
+    {
+        std::cout << "Script trying to get a value not convertible to double !" << std::endl;
+        return 0.0;
+    }
+
+    virtual void setAsDouble(C* object, double value) const
+    {
+        std::cout << "Script trying to set a value not convertible from double !" << std::endl;
     }
 };
 

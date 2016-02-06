@@ -47,6 +47,16 @@ public:
         setAsBoolImpl(object, value);
     }
 
+    virtual double getAsDouble(const C* object) const
+    {
+        return getAsDoubleImpl(object);
+    }
+
+    virtual void setAsDouble(C* object, double value) const
+    {
+        setAsDoubleImpl(object, value);
+    }
+
 private:
     /////////////////////// getAsStringImpl /////////////////////////////////////////////////////////////////////////////////
     template<typename U = T>
@@ -106,6 +116,33 @@ private:
     typename std::enable_if<!std::is_constructible<U, bool>::value, void>::type setAsBoolImpl(C* object, bool value) const
     {
         std::cout << "Script trying to set a value as bool but the value is not assignable from bool !" << std::endl;
+    }
+
+    ///////////////////// getAsDoubleImpl ///////////////////////////////////////////////////////////////////////////////////////
+    template<typename U = T>
+    typename std::enable_if<std::is_convertible<U, double>::value, double>::type getAsDoubleImpl(const C* object) const
+    {
+        return object->*m_member;
+    }
+
+    template<typename U = T>
+    typename std::enable_if<!std::is_convertible<U, double>::value, double>::type getAsDoubleImpl(const C* object) const
+    {
+        std::cout << "Script trying to get a value not convertible to double !" << std::endl;
+        return 0.0;
+    }
+
+    ///////////////////// setAsDoubleImpl ///////////////////////////////////////////////////////////////////////////////////////
+    template<typename U = T>
+    typename std::enable_if<std::is_constructible<U, double>::value, void>::type setAsDoubleImpl(C* object, double value) const
+    {
+        object->*m_member = value;
+    }
+
+    template<typename U = T>
+    typename std::enable_if<!std::is_constructible<U, double>::value, void>::type setAsDoubleImpl(C* object, double value) const
+    {
+        std::cout << "Script trying to set a value as bool but the value is not assignable from double !" << std::endl;
     }
 
     /**

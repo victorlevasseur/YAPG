@@ -76,6 +76,31 @@ void EntityHandle::setAttributeAsBool(const std::string& componentName, const st
     }
 }
 
+double EntityHandle::getAttributeAsDouble(const std::string& componentName, const std::string& attributeName) const
+{
+    if(attributesCallbacks.count(componentName) > 0)
+    {
+        return (this->*(attributesCallbacks.at(componentName).getDoubleCallback))(attributeName);
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
+        return false;
+    }
+}
+
+void EntityHandle::setAttributeAsDouble(const std::string& componentName, const std::string& attributeName, double value)
+{
+    if(attributesCallbacks.count(componentName) > 0)
+    {
+        (this->*(attributesCallbacks.at(componentName).setDoubleCallback))(attributeName, value);
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
+    }
+}
+
 void EntityHandle::writeToConsole(const std::string& str)
 {
     std::cout << str << std::endl;
@@ -94,6 +119,8 @@ void EntityHandle::registerClass(LuaState &state)
         "set_string_attribute", &EntityHandle::setAttributeAsString,
         "get_bool_attribute", &EntityHandle::getAttributeAsBool,
         "set_bool_attribute", &EntityHandle::setAttributeAsBool,
+        "get_number_attribute", &EntityHandle::getAttributeAsDouble,
+        "set_number_attribute", &EntityHandle::setAttributeAsDouble,
         "write_to_console", &EntityHandle::writeToConsole
     );
 }
