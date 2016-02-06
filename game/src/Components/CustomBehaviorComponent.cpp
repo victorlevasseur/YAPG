@@ -1,5 +1,6 @@
 #include "Components/CustomBehaviorComponent.hpp"
 
+#include "Lua/EntityHandle.hpp"
 
 namespace components
 {
@@ -25,6 +26,8 @@ void CustomBehaviorComponent::registerComponent(lua::LuaState& state)
 {
     meta::MetadataStore::registerClass<CustomBehaviorComponent>()
         .declareAttribute<sol::function>("on_update", &CustomBehaviorComponent::updateFunction);
+
+    lua::EntityHandle::declareComponent<CustomBehaviorComponent>("CustomBehavior");
 
     state.getState().new_usertype<CustomBehaviorComponent>("custom_behavior_component");
 }

@@ -1,5 +1,6 @@
 #include "Components/HitboxComponent.hpp"
 
+#include "Lua/EntityHandle.hpp"
 
 namespace components
 {
@@ -24,6 +25,8 @@ void HitboxComponent::registerComponent(lua::LuaState& state)
 {
     meta::MetadataStore::registerClass<HitboxComponent>()
         .declareAttribute("polygon", &HitboxComponent::m_polygon);
+
+    lua::EntityHandle::declareComponent<HitboxComponent>("Hitbox");
 
     state.getState().new_usertype<HitboxComponent>("hitbox_component" //TODO: Replace the name here
         //TODO: Register the properties here

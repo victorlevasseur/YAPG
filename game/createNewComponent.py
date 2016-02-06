@@ -30,6 +30,8 @@ std::ostream& operator<<(std::ostream& stream, const {0}Component& component);
 
 srcContent = """#include "Components/{0}Component.hpp"
 
+#include "Lua/EntityHandle.hpp"
+
 namespace game
 {{
 namespace components
@@ -54,6 +56,8 @@ std::string {0}Component::getName() const
 void {0}Component::registerComponent(lua::LuaState& state)
 {{
     meta::MetadataStore::registerClass<{0}Component>();
+
+    lua::EntityHandle::declareComponent<{0}Component>("{0}");
 
     state.getState().new_usertype<{0}Component>("{1}_component" //TODO: Replace the name here
         //TODO: Register the properties here

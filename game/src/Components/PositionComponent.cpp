@@ -1,5 +1,6 @@
 #include "Components/PositionComponent.hpp"
 
+#include "Lua/EntityHandle.hpp"
 
 namespace components
 {
@@ -32,6 +33,8 @@ void PositionComponent::registerComponent(lua::LuaState& state)
         .declareAttribute<float>("y", &PositionComponent::y)
         .declareAttribute<float>("width", &PositionComponent::width)
         .declareAttribute<float>("height", &PositionComponent::height);
+
+    lua::EntityHandle::declareComponent<PositionComponent>("Position");
 
     //Register to lua
     state.getState().new_usertype<PositionComponent>("position_component",

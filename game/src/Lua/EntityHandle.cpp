@@ -10,6 +10,10 @@
 namespace lua
 {
 
+std::map<std::string, EntityHandle::ComponentAttributesCallbacks>
+    EntityHandle::attributesCallbacks =
+        std::map<std::string, EntityHandle::ComponentAttributesCallbacks>();
+
 EntityHandle::EntityHandle() :
     m_entity()
 {
@@ -32,20 +36,27 @@ components::Component* EntityHandle::getComponent(const std::string& componentNa
 
 std::string EntityHandle::getAttributeAsString(const std::string& componentName, const std::string& attributeName) const
 {
-    if(componentName == "Position")
-        return doGetAttributeAsString<components::PositionComponent>(attributeName);
-    else if(componentName == "Render")
-        return doGetAttributeAsString<components::RenderComponent>(attributeName);
+    if(attributesCallbacks.count(componentName) > 0)
+    {
+        return (this->*(attributesCallbacks.at(componentName).getStringCallback))(attributeName);
+    }
     else
+    {
+        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
         return "";
+    }
 }
 
 void EntityHandle::setAttributeAsString(const std::string& componentName, const std::string& attributeName, const std::string& value)
 {
-    if(componentName == "Position")
-        doSetAttributeAsString<components::PositionComponent>(attributeName, value);
-    else if(componentName == "Render")
-        doSetAttributeAsString<components::RenderComponent>(attributeName, value);
+    if(attributesCallbacks.count(componentName) > 0)
+    {
+        (this->*(attributesCallbacks.at(componentName).setStringCallback))(attributeName, value);
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
+    }
 }
 
 void EntityHandle::writeToConsole(const std::string& str)

@@ -1,5 +1,6 @@
 #include "Components/PlatformerComponent.hpp"
 
+#include "Lua/EntityHandle.hpp"
 
 namespace components
 {
@@ -48,6 +49,8 @@ void PlatformerComponent::registerComponent(lua::LuaState& state)
             c->movementStateCallbacks.registerCallback(State::Jumping, c->onJumpingFunc);
             c->movementStateCallbacks.registerCallback(State::Falling, c->onFallingFunc);
         });
+
+    lua::EntityHandle::declareComponent<PlatformerComponent>("Platformer");
 
     state.getState().new_usertype<PlatformerComponent>("platformer_component" //TODO: Replace the name here
         //TODO: Register the properties here

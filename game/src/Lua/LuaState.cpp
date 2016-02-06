@@ -28,6 +28,7 @@ namespace lua
 LuaState::LuaState() :
     m_luaState()
 {
+    std::cout << "[Lua/Note] Starting lua state initialization process..." << std::endl;
     //Loading lua libraries
     m_luaState.open_libraries(
         sol::lib::base,
@@ -57,11 +58,13 @@ LuaState::LuaState() :
         .declareAttribute("top", &sf::IntRect::top)
         .declareAttribute("width", &sf::IntRect::width)
         .declareAttribute("height", &sf::IntRect::height);
+    std::cout << "[Lua/Note] Primitive types registered." << std::endl;
 
     //Declare class metadatas
     animation::Animation::registerClass();
     animation::Frame::registerClass();
     tools::Polygon::registerClass();
+    std::cout << "[Lua/Note] Classes registered." << std::endl;
 
     //Declare main C++ classes and declare their metadatas
     EntityHandle::registerClass(*this);
@@ -72,11 +75,14 @@ LuaState::LuaState() :
     components::PlatformerComponent::registerComponent(*this);
     components::PositionComponent::registerComponent(*this);
     components::RenderComponent::registerComponent(*this);
+    std::cout << "[Lua/Note] All components registered." << std::endl;
 
     //Load yapg core libraries
     m_luaState.open_file("scripts/core/array_tools.lua");
     m_luaState.open_file("scripts/game/template_tools.lua");
-    std::cout << "Loaded core and game lua libraries." << std::endl;
+    std::cout << "[Lua/Note] Scripting tools loaded." << std::endl;
+
+    std::cout << "[Lua/Note] --> Lua state initialization completed." << std::endl;
 
     //Load templates
     loadTemplates(std::string("templates"));

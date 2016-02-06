@@ -18,6 +18,20 @@ namespace lua
 class EntityHandle
 {
 public:
+
+    /**
+     * Store the callbacks for getting/setting an attribute in a specific
+     * component as string, number, bool...
+     *
+     * Note: the callbacks are specializations of doGet/SetAttributeAsXXX(...)
+     * set when EntityHandle::declareComponent<MyComponent> is called
+     */
+    struct ComponentAttributesCallbacks
+    {
+        std::string (EntityHandle::*getStringCallback)(const std::string&) const;
+        void (EntityHandle::*setStringCallback)(const std::string&, const std::string&);
+    };
+
     EntityHandle();
     EntityHandle(entityx::Entity entity);
 
@@ -32,43 +46,23 @@ public:
 
     static void registerClass(LuaState &state);
 
+    template<class C>
+    static void declareComponent(const std::string& componentName);
+
 private:
     template<class C>
-    std::string doGetAttributeAsString(const std::string& attributeName) const
-    {
-        if(m_entity.has_component<C>())
-        {
-            auto& metadata = dynamic_cast<meta::ClassMetadata<C>&>(
-                meta::MetadataStore::getMetadata<C>()
-            );
-            return metadata.getAttribute(attributeName).getAsString(m_entity.component<const C>().get());
-        }
-        else
-        {
-            std::cout << "[Lua/Warning] Trying to access a component from an entity that doesn't have it !" << std::endl;
-            return "";
-        }
-    }
+    std::string doGetAttributeAsString(const std::string& attributeName) const;
 
     template<class C>
-    void doSetAttributeAsString(const std::string& attributeName, const std::string& value)
-    {
-        if(m_entity.has_component<C>())
-        {
-            auto& metadata = dynamic_cast<meta::ClassMetadata<C>&>(
-                meta::MetadataStore::getMetadata<C>()
-            );
-            metadata.getAttribute(attributeName).setAsString(m_entity.component<C>().get(), value);
-        }
-        else
-        {
-            std::cout << "[Lua/Warning] Trying to access a component from an entity that doesn't have it !" << std::endl;
-        }
-    }
+    void doSetAttributeAsString(const std::string& attributeName, const std::string& value);
 
     entityx::Entity m_entity;
+
+    static std::map<std::string, ComponentAttributesCallbacks> attributesCallbacks;
 };
 
 }
+
+#include "Lua/EntityHandle.inl"
 
 #endif

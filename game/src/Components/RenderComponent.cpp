@@ -1,5 +1,6 @@
 #include "Components/RenderComponent.hpp"
 
+#include "Lua/EntityHandle.hpp"
 
 namespace components
 {
@@ -30,6 +31,8 @@ void RenderComponent::registerComponent(lua::LuaState& state)
         .declareAttribute("current_animation", &RenderComponent::currentAnimation)
         .declareAttribute("animations", &RenderComponent::animations)
         .declareAttribute("flipped", &RenderComponent::flipped);
+
+    lua::EntityHandle::declareComponent<RenderComponent>("Render");
 
     state.getState().new_usertype<RenderComponent>("render_component" //TODO: Replace the name here
         //TODO: Register the properties here

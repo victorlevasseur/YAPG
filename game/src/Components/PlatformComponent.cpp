@@ -1,5 +1,6 @@
 #include "Components/PlatformComponent.hpp"
 
+#include "Lua/EntityHandle.hpp"
 
 namespace components
 {
@@ -25,6 +26,8 @@ std::string PlatformComponent::getName() const
 void PlatformComponent::registerComponent(lua::LuaState& state)
 {
     meta::MetadataStore::registerClass<PlatformComponent>();
+
+    lua::EntityHandle::declareComponent<PlatformComponent>("Platform");
 
     state.getState().new_usertype<PlatformComponent>("platform_component" //TODO: Replace the name here
         //TODO: Register the properties here
