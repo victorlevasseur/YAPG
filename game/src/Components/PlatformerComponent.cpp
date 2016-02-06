@@ -21,7 +21,8 @@ PlatformerComponent::PlatformerComponent() :
     groundEntity(),
     oldFloorPosX(0),
     oldFloorPosY(0),
-    movementStateCallbacks(Idle)
+    movementStateCallbacks(Idle),
+    directionStateCallbacks(Right)
 {
 
 }
@@ -43,11 +44,16 @@ void PlatformerComponent::registerComponent(lua::LuaState& state)
         .declareAttribute("onStartWalking", &PlatformerComponent::onWalkingFunc)
         .declareAttribute("onStartJumping", &PlatformerComponent::onJumpingFunc)
         .declareAttribute("onStartFalling", &PlatformerComponent::onFallingFunc)
+        .declareAttribute("onTurnRight", &PlatformerComponent::onTurnRightFunc)
+        .declareAttribute("onTurnLeft", &PlatformerComponent::onTurnLeftFunc)
         .setExtraLoadFunction([](PlatformerComponent* c, const sol::object& luaObject) {
             c->movementStateCallbacks.registerCallback(State::Idle, c->onIdleFunc);
             c->movementStateCallbacks.registerCallback(State::Walking, c->onWalkingFunc);
             c->movementStateCallbacks.registerCallback(State::Jumping, c->onJumpingFunc);
             c->movementStateCallbacks.registerCallback(State::Falling, c->onFallingFunc);
+
+            c->directionStateCallbacks.registerCallback(Direction::Right, c->onTurnRightFunc);
+            c->directionStateCallbacks.registerCallback(Direction::Left, c->onTurnLeftFunc);
         });
 
     lua::EntityHandle::declareComponent<PlatformerComponent>("Platformer");

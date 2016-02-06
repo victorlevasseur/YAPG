@@ -21,6 +21,12 @@ player = {
             onStartFalling = function(entity)
                 entity:set_string_attribute("Render", "current_animation", "jump")
             end,
+            onTurnRight = function(entity)
+                entity:set_bool_attribute("Render", "flipped", false)
+            end,
+            onTurnLeft = function(entity)
+                entity:set_bool_attribute("Render", "flipped", true)
+            end,
         },
         ["Hitbox"] = {
             polygon = {

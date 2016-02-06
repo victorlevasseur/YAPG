@@ -21,6 +21,12 @@ public:
         Falling
     };
 
+    enum Direction
+    {
+        Right,
+        Left
+    };
+
     PlatformerComponent();
     virtual ~PlatformerComponent();
 
@@ -49,11 +55,14 @@ public:
     float oldFloorPosY;
 
     lua::EnumStateCallbacks<4, State, lua::EntityHandle> movementStateCallbacks;
-
     sol::function onIdleFunc;
     sol::function onWalkingFunc;
     sol::function onJumpingFunc;
     sol::function onFallingFunc;
+
+    lua::EnumStateCallbacks<2, Direction, lua::EntityHandle> directionStateCallbacks;
+    sol::function onTurnRightFunc;
+    sol::function onTurnLeftFunc;
 };
 
 std::ostream& operator<<(std::ostream& stream, const PlatformerComponent& component);

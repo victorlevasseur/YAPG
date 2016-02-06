@@ -401,15 +401,16 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
                 platformer.movementStateCallbacks.setState(c::PlatformerComponent::Falling);
         }
         platformer.movementStateCallbacks.callIfNeeded(lua::EntityHandle(entity));
-        /*
-        if(objCBox->x - oldX > requestedXFloorMove + 0.01f)
+
+        if(position.x - oldX > requestedXFloorMove + 0.01f)
         {
-            events->emit<PhysicEvent>(entity, PhysicEvent::WatchingRight);
+            platformer.directionStateCallbacks.setState(c::PlatformerComponent::Right);
         }
-        else if(objCBox->x - oldX < requestedXFloorMove - 0.01f)
+        else if(position.x - oldX < requestedXFloorMove - 0.01f)
         {
-            events->emit<PhysicEvent>(entity, PhysicEvent::WatchingLeft);
-        }*/
+            platformer.directionStateCallbacks.setState(c::PlatformerComponent::Left);
+        }
+        platformer.directionStateCallbacks.callIfNeeded(lua::EntityHandle(entity));
     });
 }
 
