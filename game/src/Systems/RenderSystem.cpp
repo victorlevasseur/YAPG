@@ -6,6 +6,7 @@
 #include "Components/HitboxComponent.hpp"
 #include "Components/PositionComponent.hpp"
 #include "Components/RenderComponent.hpp"
+#include "Lua/EntityHandle.hpp"
 
 namespace c = components;
 
@@ -61,12 +62,22 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
         //Update the animated sprite and put it in the render queue
         auto animatedSprite = m_animatedSprites[entity];
         if(render.currentAnimation != animatedSprite->getCurrentAnimation())
+        {
+            std::string oldAnimation = animatedSprite->getCurrentAnimation();
             animatedSprite->setCurrentAnimation(render.currentAnimation);
+
+            if(render.onAnimationChangedFunc.state())
+                render.onAnimationChangedFunc.call(lua::EntityHandle(entity), oldAnimation, render.currentAnimation);
+        }
 
         animatedSprite->update(dt);
         animatedSprite->setOrigin(sf::Vector2f(0.5f, 0.5f));
         animatedSprite->setPosition(position.x + position.width/2.f, position.y + position.height/2.f);
         animatedSprite->setScale((render.flipped ? (-1) : (1)) * position.width, position.height);
+
+        //Call the lua callback if the animation has just been restarted
+        if(animatedSprite->hadRestartedAnimation() && render.onAnimationEndFunc.state())
+            render.onAnimationEndFunc.call(lua::EntityHandle(entity), render.currentAnimation);
 
         m_renderingQueue.push_back(std::make_pair(animatedSprite, sf::RenderStates::Default));
     });

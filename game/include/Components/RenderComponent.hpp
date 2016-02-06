@@ -7,6 +7,7 @@
 #include "Animation/Animation.hpp"
 #include "Components/Component.hpp"
 #include "Lua/LuaState.hpp"
+#include "Lua/sol.hpp"
 
 namespace components
 {
@@ -25,6 +26,9 @@ public:
     std::string currentAnimation;
     std::map<std::string, animation::Animation> animations;
     bool flipped;
+
+    sol::function onAnimationChangedFunc;
+    sol::function onAnimationEndFunc;
 };
 
 std::ostream& operator<<(std::ostream& stream, const RenderComponent& component);

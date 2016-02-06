@@ -30,7 +30,9 @@ void RenderComponent::registerComponent(lua::LuaState& state)
         .declareAttribute("texture", &RenderComponent::textureName)
         .declareAttribute("current_animation", &RenderComponent::currentAnimation)
         .declareAttribute("animations", &RenderComponent::animations)
-        .declareAttribute("flipped", &RenderComponent::flipped);
+        .declareAttribute("flipped", &RenderComponent::flipped)
+        .declareAttribute("on_animation_changed", &RenderComponent::onAnimationChangedFunc)
+        .declareAttribute("on_animation_end", &RenderComponent::onAnimationEndFunc);
 
     lua::EntityHandle::declareComponent<RenderComponent>("Render");
 

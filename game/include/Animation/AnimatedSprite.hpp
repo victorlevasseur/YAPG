@@ -24,6 +24,8 @@ public:
 
     void update(float dt);
 
+    bool hadRestartedAnimation() const { return m_hasRestartedAnimation; }
+
 protected:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
@@ -33,6 +35,8 @@ private:
     const std::map<std::string, Animation>& m_animations;
     std::string m_currentAnimation;
     float m_currentTime;
+
+    bool m_hasRestartedAnimation;
 
     sf::VertexArray m_vertices;
 };

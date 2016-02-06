@@ -12,6 +12,7 @@ AnimatedSprite::AnimatedSprite(std::shared_ptr<sf::Texture> texture, const std::
     m_animations(animations),
     m_currentAnimation(),
     m_currentTime(0.f),
+    m_hasRestartedAnimation(false),
     m_vertices(sf::Quads, 4)
 {
     m_vertices[0].position = sf::Vector2f(0.f, 0.f);
@@ -33,9 +34,14 @@ void AnimatedSprite::setCurrentAnimation(const std::string& name)
 
 void AnimatedSprite::update(float dt)
 {
+    m_hasRestartedAnimation = false;
+    
     m_currentTime += dt;
     while(m_currentTime >= m_animations.at(m_currentAnimation).getDuration())
+    {
         m_currentTime -= m_animations.at(m_currentAnimation).getDuration();
+        m_hasRestartedAnimation = true;
+    }
 
     //Update the picture according to the animation
     const sf::IntRect& frameRect =
