@@ -10,16 +10,16 @@ player = {
         },
         ["Platformer"] = {
             onIdle = function(entity)
-                entity:get_component("Render"):set_attribute_string("current_animation", "idle")
+                entity:set_string_attribute("Render", "current_animation", "idle")
             end,
             onStartWalking = function(entity)
-                entity:get_component("Render"):set_attribute_string("current_animation", "walking")
+                entity:set_string_attribute("Render", "current_animation", "walking")
             end,
             onStartJumping = function(entity)
-                entity:get_component("Render"):set_attribute_string("current_animation", "jump")
+                entity:set_string_attribute("Render", "current_animation", "jump")
             end,
             onStartFalling = function(entity)
-                entity:get_component("Render"):set_attribute_string("current_animation", "jump")
+                entity:set_string_attribute("Render", "current_animation", "jump")
             end,
         },
         ["Hitbox"] = {

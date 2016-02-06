@@ -26,8 +26,6 @@ public:
 
     PlatformType platformType;
     int layer;
-
-    DECLARE_COMPONENT(PlatformComponent)
 };
 
 std::ostream& operator<<(std::ostream& stream, const PlatformComponent& component);

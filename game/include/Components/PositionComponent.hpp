@@ -22,8 +22,6 @@ public:
     float height;
 
     static void registerComponent(lua::LuaState& state);
-
-    DECLARE_COMPONENT(PositionComponent)
 };
 
 std::ostream& operator<<(std::ostream& stream, const PositionComponent& component);

@@ -25,8 +25,6 @@ public:
     std::string currentAnimation;
     std::map<std::string, animation::Animation> animations;
     bool flipped;
-
-    DECLARE_COMPONENT(RenderComponent)
 };
 
 std::ostream& operator<<(std::ostream& stream, const RenderComponent& component);

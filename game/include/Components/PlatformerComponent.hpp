@@ -54,8 +54,6 @@ public:
     sol::function onWalkingFunc;
     sol::function onJumpingFunc;
     sol::function onFallingFunc;
-
-    DECLARE_COMPONENT(PlatformerComponent)
 };
 
 std::ostream& operator<<(std::ostream& stream, const PlatformerComponent& component);

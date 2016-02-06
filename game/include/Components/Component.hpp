@@ -41,22 +41,6 @@ public:
 
     static void registerComponent(lua::LuaState& state);
 
-    std::string getAttributeAsString(const std::string& attributeName) const;
-
-    void setAttributeAsString(const std::string& attributeName, const std::string& value);
-
-protected:
-    virtual std::string doGetAttributeAsString(const std::string& attributeName) const
-    {
-        std::cout << "Invalid component: " << getName() << " ! Did you put the DECLARE_COMPONENT(MyComponent) before the end of the component class declaration ?" << std::endl;
-        return "";
-    }
-
-    virtual void doSetAttributeAsString(const std::string& attributeName, const std::string& value)
-    {
-        std::cout << "Invalid component: " << getName() << " ! Did you put the DECLARE_COMPONENT(MyComponent) before the end of the component class declaration ?" << std::endl;
-    }
-
 private:
 
 };
@@ -64,28 +48,5 @@ private:
 std::ostream& operator<<(std::ostream& stream, const Component& component);
 
 }
-
-/**
- * Macro that has to be added to the end of component class declaration.
- * It declares some useful methods to get/set attributes from Lua.
- */
-#define DECLARE_COMPONENT(T) \
-    protected: \
-        virtual std::string doGetAttributeAsString(const std::string& attributeName) const \
-        {\
-            auto& metadata = dynamic_cast<meta::ClassMetadata<T>&>(\
-                meta::MetadataStore::getMetadata<T>()\
-            );\
-            return metadata.getAttribute(attributeName).getAsString(this);\
-        }\
-        \
-        virtual void doSetAttributeAsString(const std::string& attributeName, const std::string& value)\
-        {\
-            auto& metadata = dynamic_cast<meta::ClassMetadata<T>&>(\
-                meta::MetadataStore::getMetadata<T>()\
-            );\
-            metadata.getAttribute(attributeName).setAsString(this, value);\
-        }\
-///////////////////////////////////////////////////////////////////////////
 
 #endif

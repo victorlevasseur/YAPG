@@ -61,20 +61,8 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
 
 void Component::registerComponent(lua::LuaState& state)
 {
-    state.getState().new_usertype<Component>("component",
-        "get_attribute_string", &Component::getAttributeAsString,
-        "set_attribute_string", &Component::setAttributeAsString
+    state.getState().new_usertype<Component>("component"
     );
-}
-
-std::string Component::getAttributeAsString(const std::string& attributeName) const
-{
-    return doGetAttributeAsString(attributeName);
-}
-
-void Component::setAttributeAsString(const std::string& attributeName, const std::string& value)
-{
-    doSetAttributeAsString(attributeName, value);
 }
 
 std::ostream& operator<<(std::ostream& stream, const Component& component)
