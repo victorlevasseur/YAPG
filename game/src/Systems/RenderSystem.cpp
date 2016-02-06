@@ -64,8 +64,9 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
             animatedSprite->setCurrentAnimation(render.currentAnimation);
 
         animatedSprite->update(dt);
-        animatedSprite->setPosition(position.x, position.y);
-        animatedSprite->setScale(position.width, position.height);
+        animatedSprite->setOrigin(sf::Vector2f(0.5f, 0.5f));
+        animatedSprite->setPosition(position.x + position.width/2.f, position.y + position.height/2.f);
+        animatedSprite->setScale((render.flipped ? (-1) : (1)) * position.width, position.height);
 
         m_renderingQueue.push_back(std::make_pair(animatedSprite, sf::RenderStates::Default));
     });

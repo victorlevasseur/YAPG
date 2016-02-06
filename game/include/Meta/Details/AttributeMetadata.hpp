@@ -97,13 +97,13 @@ private:
 
     ///////////////////// setAsBoolImpl ///////////////////////////////////////////////////////////////////////////////////////
     template<typename U = T>
-    typename std::enable_if<std::is_assignable<U, bool>::value, void>::type setAsBoolImpl(C* object, bool value) const
+    typename std::enable_if<std::is_constructible<U, bool>::value, void>::type setAsBoolImpl(C* object, bool value) const
     {
         object->*m_member = value;
     }
 
     template<typename U = T>
-    typename std::enable_if<!std::is_assignable<U, bool>::value, void>::type setAsBoolImpl(C* object, bool value) const
+    typename std::enable_if<!std::is_constructible<U, bool>::value, void>::type setAsBoolImpl(C* object, bool value) const
     {
         std::cout << "Script trying to set a value as bool but the value is not assignable from bool !" << std::endl;
     }
