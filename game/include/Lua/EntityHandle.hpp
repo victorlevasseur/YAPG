@@ -30,15 +30,19 @@ public:
     {
         std::string (EntityHandle::*getStringCallback)(const std::string&) const;
         void (EntityHandle::*setStringCallback)(const std::string&, const std::string&);
+
+        bool (EntityHandle::*getBoolCallback)(const std::string&) const;
+        void (EntityHandle::*setBoolCallback)(const std::string&, bool);
     };
 
     EntityHandle();
     EntityHandle(entityx::Entity entity);
 
-    components::Component* getComponent(const std::string& componentName);
-
     std::string getAttributeAsString(const std::string& componentName, const std::string& attributeName) const;
     void setAttributeAsString(const std::string& componentName, const std::string& attributeName, const std::string& value);
+
+    bool getAttributeAsBool(const std::string& componentName, const std::string& attributeName) const;
+    void setAttributeAsBool(const std::string& componentName, const std::string& attributeName, bool value);
 
     void writeToConsole(const std::string& str);
 
@@ -55,6 +59,12 @@ private:
 
     template<class C>
     void doSetAttributeAsString(const std::string& attributeName, const std::string& value);
+
+    template<class C>
+    bool doGetAttributeAsBool(const std::string& attributeName) const;
+
+    template<class C>
+    void doSetAttributeAsBool(const std::string& attributeName, bool value);
 
     entityx::Entity m_entity;
 

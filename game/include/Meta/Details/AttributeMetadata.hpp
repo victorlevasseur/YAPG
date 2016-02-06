@@ -37,7 +37,18 @@ public:
         setAsStringImpl(object, value);
     }
 
+    virtual bool getAsBool(const C* object) const
+    {
+        return getAsBoolImpl(object);
+    }
+
+    virtual void setAsBool(C* object, bool value) const
+    {
+        setAsBoolImpl(object, value);
+    }
+
 private:
+    /////////////////////// getAsStringImpl /////////////////////////////////////////////////////////////////////////////////
     template<typename U = T>
     typename std::enable_if<std::is_arithmetic<U>::value, std::string>::type getAsStringImpl(const C* object) const
     {
@@ -57,6 +68,7 @@ private:
         return "";
     }
 
+    ///////////////////// setAsStringImpl /////////////////////////////////////////////////////////////////////////////////////
     template<typename U = T>
     typename std::enable_if<std::is_same<U, std::string>::value, void>::type setAsStringImpl(C* object, const std::string& value) const
     {
@@ -69,6 +81,36 @@ private:
         std::cout << "Script trying to set a value as std::string but the value is not a std::string !" << std::endl;
     }
 
+    ///////////////////// getAsBoolImpl ///////////////////////////////////////////////////////////////////////////////////////
+    template<typename U = T>
+    typename std::enable_if<std::is_convertible<U, bool>::value, bool>::type getAsBoolImpl(const C* object) const
+    {
+        return object->*m_member;
+    }
+
+    template<typename U = T>
+    typename std::enable_if<!std::is_convertible<U, bool>::value, bool>::type getAsBoolImpl(const C* object) const
+    {
+        std::cout << "Script trying to get a value not convertible to bool !" << std::endl;
+        return false;
+    }
+
+    ///////////////////// setAsBoolImpl ///////////////////////////////////////////////////////////////////////////////////////
+    template<typename U = T>
+    typename std::enable_if<std::is_assignable<U, bool>::value, void>::type setAsBoolImpl(C* object, bool value) const
+    {
+        object->*m_member = value;
+    }
+
+    template<typename U = T>
+    typename std::enable_if<!std::is_assignable<U, bool>::value, void>::type setAsBoolImpl(C* object, bool value) const
+    {
+        std::cout << "Script trying to set a value as bool but the value is not assignable from bool !" << std::endl;
+    }
+
+    /**
+     * Pointer to the class attribute
+     */
     T C::*m_member;
 };
 

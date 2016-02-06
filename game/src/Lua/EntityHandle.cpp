@@ -26,14 +26,6 @@ EntityHandle::EntityHandle(entityx::Entity entity) :
 
 }
 
-components::Component* EntityHandle::getComponent(const std::string& componentName)
-{
-    if(componentName == "Position")
-        return m_entity.component<components::PositionComponent>().get();
-    else if(componentName == "Render")
-        return m_entity.component<components::RenderComponent>().get();
-}
-
 std::string EntityHandle::getAttributeAsString(const std::string& componentName, const std::string& attributeName) const
 {
     if(attributesCallbacks.count(componentName) > 0)
@@ -59,6 +51,31 @@ void EntityHandle::setAttributeAsString(const std::string& componentName, const 
     }
 }
 
+bool EntityHandle::getAttributeAsBool(const std::string& componentName, const std::string& attributeName) const
+{
+    if(attributesCallbacks.count(componentName) > 0)
+    {
+        return (this->*(attributesCallbacks.at(componentName).getBoolCallback))(attributeName);
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
+        return false;
+    }
+}
+
+void EntityHandle::setAttributeAsBool(const std::string& componentName, const std::string& attributeName, bool value)
+{
+    if(attributesCallbacks.count(componentName) > 0)
+    {
+        (this->*(attributesCallbacks.at(componentName).setBoolCallback))(attributeName, value);
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
+    }
+}
+
 void EntityHandle::writeToConsole(const std::string& str)
 {
     std::cout << str << std::endl;
@@ -73,9 +90,10 @@ void EntityHandle::registerClass(LuaState &state)
 {
     state.getState().new_usertype<EntityHandle>("entity_handle",
         "remove_entity", &EntityHandle::removeEntity,
-        "get_component", &EntityHandle::getComponent,
         "get_string_attribute", &EntityHandle::getAttributeAsString,
         "set_string_attribute", &EntityHandle::setAttributeAsString,
+        "get_bool_attribute", &EntityHandle::getAttributeAsBool,
+        "set_bool_attribute", &EntityHandle::setAttributeAsBool,
         "write_to_console", &EntityHandle::writeToConsole
     );
 }

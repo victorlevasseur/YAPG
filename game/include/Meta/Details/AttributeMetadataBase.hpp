@@ -25,6 +25,17 @@ public:
     {
         std::cout << "Script trying to set a value not convertible from std::string !" << std::endl;
     }
+
+    virtual bool getAsBool(const C* object) const
+    {
+        std::cout << "Script trying to get a value not convertible to bool !" << std::endl;
+        return "";
+    }
+
+    virtual void setAsBool(C* object, bool value) const
+    {
+        std::cout << "Script trying to set a value not convertible from bool !" << std::endl;
+    }
 };
 
 }
