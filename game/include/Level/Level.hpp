@@ -4,8 +4,8 @@
 #include "entityx/entityx.h"
 
 #include "Level/SerializedEntityGetter.hpp"
+#include "Lua/EntityHandle.hpp"
 #include "Lua/LuaState.hpp"
-
 
 namespace level
 {
@@ -20,6 +20,10 @@ public:
 
     const entityx::EntityManager& getEntityManager() const { return m_entityMgr; }
     entityx::EntityManager& getEntityManager() { return m_entityMgr; }
+
+    lua::EntityHandle createNewEntity(const std::string& templateName);
+
+    static void registerClass(lua::LuaState& luaState);
 
 private:
     lua::LuaState& m_luaState;

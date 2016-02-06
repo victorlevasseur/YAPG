@@ -1,8 +1,6 @@
 #include "Level/Level.hpp"
 
 #include "Components/Component.hpp"
-#include "Lua/EntityHandle.hpp"
-
 
 namespace level
 {
@@ -53,6 +51,38 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
 
         ++i;
     }
+
+    //Put the current level instance into "current_level" lua global variable
+    luaState.getState().set("current_level", this);
+}
+
+lua::EntityHandle Level::createNewEntity(const std::string& templateName)
+{
+    if(m_luaState.getState().get<sol::object>(templateName).is<sol::table>())
+    {
+        entityx::Entity newEntity = m_entityMgr.create();
+
+        sol::table templateTable = m_luaState.getState().get<sol::table>(templateName);
+        templateTable.get<sol::table>("components").for_each([&](const sol::object& key, const sol::object& value) {
+            std::string componentType = key.as<std::string>();
+
+            components::Component::assignComponent(newEntity, componentType, value, SerializedEntityGetter());
+        });
+
+        return lua::EntityHandle(newEntity);
+    }
+
+    std::cout << "[Lua/Warning] Can't create an entity from template \"" << templateName << "\"" << std::endl;
+    return lua::EntityHandle();
+}
+
+void Level::registerClass(lua::LuaState& luaState)
+{
+    sol::constructors<> ctor;
+    sol::usertype<Level> levelLuaClass(ctor,
+        "create_new_entity", &Level::createNewEntity
+    );
+    luaState.getState().set_usertype("level", levelLuaClass);
 }
 
 }

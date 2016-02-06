@@ -15,6 +15,7 @@
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PositionComponent.hpp"
 #include "Components/RenderComponent.hpp"
+#include "Level/Level.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Meta/Metadata.hpp"
 #include "Tools/Polygon.hpp"
@@ -68,6 +69,7 @@ LuaState::LuaState() :
 
     //Declare main C++ classes and declare their metadatas
     EntityHandle::registerClass(*this);
+    level::Level::registerClass(*this);
     components::Component::registerComponent(*this);
     components::CustomBehaviorComponent::registerComponent(*this);
     components::HitboxComponent::registerComponent(*this);
