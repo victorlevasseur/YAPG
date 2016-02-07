@@ -32,7 +32,9 @@ endif()
 
 #Boost filesystem
 find_package(Boost COMPONENTS system filesystem REQUIRED)
-target_include_directories(yapg-game PUBLIC ${BOOST_INCLUDE_DIR})
+if(Boost_FOUND)
+    target_include_directories(yapg-game PUBLIC ${Boost_INCLUDE_DIR})
+endif()
 
 #Linking
 target_link_libraries(yapg-game PUBLIC
