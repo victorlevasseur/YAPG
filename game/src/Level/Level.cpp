@@ -52,7 +52,8 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
             components::Component::assignComponent(*it, componentType, value, entityGetter);
         });
 
-        //Then, affect the X and Y position (TODO: Support all types of parameters declared in the template's "parameters" section)
+        //Then, affect the X and Y position
+        //(TODO: Support all types of parameters declared in the template's "parameters" section)
         sol::table valuesForParameters =
             m_luaState.getState()
                 .get<sol::table>("level")

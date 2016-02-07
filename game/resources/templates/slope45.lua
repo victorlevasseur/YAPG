@@ -5,12 +5,14 @@ slope45 = {
         x = {
             name = "X position",
             component = "Position",
-            value = "x"
+            type = "number",
+            value = "x",
         },
         y = {
             name = "Y position",
             component = "Position",
-            value = "y"
+            type = "number",
+            value = "y",
         },
     },
 
