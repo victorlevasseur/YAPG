@@ -10,6 +10,8 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
     m_eventMgr(),
     m_entityMgr(m_eventMgr)
 {
+    std::cout << "Loading level \"" << path << "\"..." << std::endl;
+
     m_luaState.getState().open_file(path);
 
     //First, load all the entity and register them to the SerializedEntityGetter
@@ -39,35 +41,22 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
                 .get<sol::table>(i)
                 .get<std::string>("template");
 
-        //Get the components of the template
-        sol::table entityComponentsTable =
-            m_luaState.getState()
-                .get<sol::table>(entityTemplateName)
-                .get<sol::table>("components");
-
-        //Add each components
-        entityComponentsTable.for_each([&](const sol::object& key, const sol::object& value) {
-            std::string componentType = key.as<std::string>();
-
-            components::Component::assignComponent(*it, componentType, value, entityGetter);
-        });
-
-        //Then, affect the X and Y position
-        //(TODO: Support all types of parameters declared in the template's "parameters" section)
-        sol::table valuesForParameters =
+        const sol::table& entityParameters =
             m_luaState.getState()
                 .get<sol::table>("level")
                 .get<sol::table>("objects")
                 .get<sol::table>(i)
                 .get<sol::table>("values");
-        lua::EntityHandle(*it).setAttributeAsDouble("Position", "x", valuesForParameters.get<double>("x"));
-        lua::EntityHandle(*it).setAttributeAsDouble("Position", "y", valuesForParameters.get<double>("y"));
+
+        m_luaState.getTemplate(entityTemplateName).initializeEntity(*it, entityGetter, entityParameters);
 
         ++i;
     }
 
     //Put the current level instance into "current_level" lua global variable
     luaState.getState().set("current_level", this);
+
+    std::cout << "Level successfully loaded (" << createdEntities.size() << " entities)." << std::endl;
 }
 
 lua::EntityHandle Level::createNewEntity(const std::string& templateName)

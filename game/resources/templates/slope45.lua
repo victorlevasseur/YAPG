@@ -1,4 +1,5 @@
 slope45 = {
+    name = "slope45",
     friendlyname = "Friendly name of template",
 
     parameters = {
@@ -6,13 +7,13 @@ slope45 = {
             name = "X position",
             component = "Position",
             type = "number",
-            value = "x",
+            attribute = "x",
         },
         y = {
             name = "Y position",
             component = "Position",
             type = "number",
-            value = "y",
+            attribute = "y",
         },
     },
 

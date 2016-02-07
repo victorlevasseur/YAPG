@@ -1,4 +1,5 @@
 player = {
+    name = "player",
     friendlyname = "Friendly name of template",
 
     parameters = {
@@ -6,13 +7,13 @@ player = {
             name = "X position",
             component = "Position",
             type = "number",
-            value = "x",
+            attribute = "x",
         },
         y = {
             name = "Y position",
             component = "Position",
             type = "number",
-            value = "y",
+            attribute = "y",
         },
     },
 

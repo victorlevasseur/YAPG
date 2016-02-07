@@ -27,7 +27,8 @@ namespace lua
 {
 
 LuaState::LuaState() :
-    m_luaState()
+    m_luaState(),
+    m_templates()
 {
     std::cout << "[Lua/Note] Starting lua state initialization process..." << std::endl;
     //Loading lua libraries
@@ -84,12 +85,11 @@ LuaState::LuaState() :
     m_luaState.open_file("scripts/game/template_tools.lua");
     std::cout << "[Lua/Note] Scripting tools loaded." << std::endl;
 
-    std::cout << "[Lua/Note] --> Lua state initialization completed." << std::endl;
-
     //Load templates
     loadTemplates(std::string("templates"));
+    std::cout << "[Lua/Note] Entities templates loaded." << std::endl;
 
-    //TODO
+    std::cout << "[Lua/Note] --> Lua state initialization completed." << std::endl;
 }
 
 sol::state& LuaState::getState()
@@ -131,6 +131,11 @@ std::vector<std::string> LuaState::getTableKeys(const std::string& tableName)
 	return v;
 }
 
+const EntityTemplate& LuaState::getTemplate(const std::string& name) const
+{
+    return m_templates.at(name);
+}
+
 void LuaState::loadTemplates(const std::string& path)
 {
     loadTemplates(fs::path(path));
@@ -153,13 +158,14 @@ void LuaState::loadTemplates(const fs::path& path)
                 {
                     std::string filePath = fs::canonical(e.path()).string();
                     m_luaState.open_file(filePath);
-                    std::cout << "Loaded " << e.path() << std::endl;
+                    m_templates.emplace(e.path().stem().string(), EntityTemplate(m_luaState.get<sol::table>(e.path().stem().string())));
+                    std::cout << "[Lua/Note] Loaded template from " << e.path() << "." << std::endl;
                 }
             }
         }
         else
         {
-            std::cout << "Can't find templates in " << path << " ! (not exists or not a directory)" << std::endl;
+            std::cout << "[Lua/Warning] Can't find templates in " << path << " ! (not exists or not a directory)" << std::endl;
         }
     }
     catch(const fs::filesystem_error &exc)

@@ -1,4 +1,5 @@
 block = {
+    name = "block",
     friendlyname = "Friendly name of template",
 
     parameters = {
@@ -6,13 +7,13 @@ block = {
             name = "X position",
             component = "Position",
             type = "number",
-            value = "x",
+            attribute = "x",
         },
         y = {
             name = "Y position",
             component = "Position",
             type = "number",
-            value = "y",
+            attribute = "y",
         },
     },
 
