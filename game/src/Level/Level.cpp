@@ -12,9 +12,6 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
 {
     m_luaState.getState().open_file(path);
 
-    //Calculate the level objects table length
-    unsigned int objectsCount = m_luaState.getTableSize("level.objects");
-
     //First, load all the entity and register them to the SerializedEntityGetter
     SerializedEntityGetter entityGetter;
     std::vector<entityx::Entity> createdEntities;
@@ -31,15 +28,21 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
         });
 
     //Now that all entities are created and registered, iterate all of them to
-    //assign the components
+    //assign the components according to their template !
     unsigned int i = 1;
     for(auto it = createdEntities.begin(); it != createdEntities.end(); ++it)
     {
-        sol::table entityComponentsTable =
+        std::string entityTemplateName =
             m_luaState.getState()
                 .get<sol::table>("level")
                 .get<sol::table>("objects")
                 .get<sol::table>(i)
+                .get<std::string>("template");
+
+        //Get the components of the template
+        sol::table entityComponentsTable =
+            m_luaState.getState()
+                .get<sol::table>(entityTemplateName)
                 .get<sol::table>("components");
 
         //Add each components
@@ -48,6 +51,16 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
 
             components::Component::assignComponent(*it, componentType, value, entityGetter);
         });
+
+        //Then, affect the X and Y position (TODO: Support all types of parameters declared in the template's "parameters" section)
+        sol::table valuesForParameters =
+            m_luaState.getState()
+                .get<sol::table>("level")
+                .get<sol::table>("objects")
+                .get<sol::table>(i)
+                .get<sol::table>("values");
+        lua::EntityHandle(*it).setAttributeAsDouble("Position", "x", valuesForParameters.get<double>("x"));
+        lua::EntityHandle(*it).setAttributeAsDouble("Position", "y", valuesForParameters.get<double>("y"));
 
         ++i;
     }

@@ -1,40 +1,52 @@
 level = {
     objects = {
-        template_tools.instanciates(1, player, {
-            ["Position"] = {
+        {
+            id = 1,
+            template = "player",
+            values = {
                 x = 120,
-                y = 80
+                y = 80,
             }
-        }),
-        template_tools.instanciates(2, block, {
-            ["Position"] = {
+        },
+        {
+            id = 2,
+            template = "block",
+            values = {
                 x = 80,
-                y = 350
+                y = 350,
             }
-        }),
-        template_tools.instanciates(3, block, {
-            ["Position"] = {
+        },
+        {
+            id = 3,
+            template = "block",
+            values = {
                 x = 144,
-                y = 350
+                y = 350,
             }
-        }),
-        template_tools.instanciates(4, slope45, {
-            ["Position"] = {
+        },
+        {
+            id = 4,
+            template = "slope45",
+            values = {
                 x = 208,
-                y = 286
+                y = 286,
             }
-        }),
-        template_tools.instanciates(5, block, {
-            ["Position"] = {
+        },
+        {
+            id = 5,
+            template = "block",
+            values = {
                 x = 272,
-                y = 286
+                y = 286,
             }
-        }),
-        template_tools.instanciates(5, block, {
-            ["Position"] = {
+        },
+        {
+            id = 6,
+            template = "block",
+            values = {
                 x = 336,
-                y = 222
+                y = 222,
             }
-        }),
+        },
     }
 }

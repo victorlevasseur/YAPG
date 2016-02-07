@@ -1,6 +1,19 @@
 block = {
     friendlyname = "Friendly name of template",
 
+    parameters = {
+        x = {
+            name = "X position",
+            component = "Position",
+            value = "x"
+        },
+        y = {
+            name = "Y position",
+            component = "Position",
+            value = "y"
+        },
+    },
+
     components = {
         ["Position"] = {
             x = 0,

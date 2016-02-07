@@ -68,7 +68,12 @@ Polygon Polygon::Rectangle(float width, float height)
 void Polygon::registerClass()
 {
     meta::MetadataStore::registerClass<Polygon>()
-        .declareAttribute("points", &Polygon::m_vertices);
+        .declareAttribute("points", &Polygon::m_vertices)
+        .setExtraLoadFunction([](Polygon* c, const sol::object& luaObject) {
+            c->ComputeGlobalVertices();
+            c->ComputeGlobalEdges();
+            c->ComputeGlobalCenter();
+        });
 }
 
 void Polygon::ComputeGlobalVertices()
@@ -160,6 +165,8 @@ bool PolygonCollision(Polygon &p1, Polygon &p2)
 
     unsigned int p1EdgesCount = p1.GetGlobalEdges().size();
     unsigned int p2EdgesCount = p2.GetGlobalEdges().size();
+    if(p1EdgesCount == 0 || p2EdgesCount == 0)
+        return false;
 
     for(unsigned int i = 0; i < p1EdgesCount + p2EdgesCount; i++)
     {
