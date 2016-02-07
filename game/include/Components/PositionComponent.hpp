@@ -18,6 +18,7 @@ public:
 
     float x;
     float y;
+    float z;
     float width;
     float height;
 

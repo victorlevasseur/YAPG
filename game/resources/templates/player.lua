@@ -5,6 +5,7 @@ player = {
         ["Position"] = {
             x = 0,
             y = 0,
+            z = 100,
             width = 64,
             height = 128
         },

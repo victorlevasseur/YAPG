@@ -1,5 +1,7 @@
 #include "Systems/RenderSystem.hpp"
 
+#include <algorithm>
+
 #include <SFML/Graphics/ConvexShape.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 
@@ -43,7 +45,7 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
                 ));
             }
 
-            m_renderingQueue.push_back(std::make_pair(shape, sf::RenderStates::Default));
+            addToRenderingQueue(shape, sf::RenderStates::Default, 100000.f);
         });
     }
 
@@ -79,16 +81,22 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
         if(animatedSprite->hadRestartedAnimation() && render.onAnimationEndFunc.state())
             render.onAnimationEndFunc.call(lua::EntityHandle(entity), render.currentAnimation);
 
-        m_renderingQueue.push_back(std::make_pair(animatedSprite, sf::RenderStates::Default));
+        addToRenderingQueue(animatedSprite, sf::RenderStates::Default, position.z); //TODO: Get z position from RenderComponent
     });
 }
 
 void RenderSystem::render(sf::RenderTarget& target)
 {
-    for(auto it = m_renderingQueue.begin(); it != m_renderingQueue.end(); ++it)
+    for(auto it = m_renderingQueue.cbegin(); it != m_renderingQueue.cend(); ++it)
     {
-        target.draw(*(it->first), it->second);
+        target.draw(*(it->drawable), it->states);
     }
+}
+
+void RenderSystem::addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, sf::RenderStates states, float z)
+{
+    auto insertionIt = std::lower_bound(m_renderingQueue.begin(), m_renderingQueue.end(), z, [](Renderable& renderable, float z) { return renderable.z < z; });
+    m_renderingQueue.insert(insertionIt, Renderable{drawable, states, z});
 }
 
 }

@@ -9,6 +9,7 @@ PositionComponent::PositionComponent() :
     Component(),
     x(0.f),
     y(0.f),
+    z(0.f),
     width(0.f),
     height(0.f)
 {
@@ -31,18 +32,14 @@ void PositionComponent::registerComponent(lua::LuaState& state)
     meta::MetadataStore::registerClass<PositionComponent>()
         .declareAttribute<float>("x", &PositionComponent::x)
         .declareAttribute<float>("y", &PositionComponent::y)
+        .declareAttribute<float>("z", &PositionComponent::z)
         .declareAttribute<float>("width", &PositionComponent::width)
         .declareAttribute<float>("height", &PositionComponent::height);
 
     lua::EntityHandle::declareComponent<PositionComponent>("Position");
 
     //Register to lua
-    state.getState().new_usertype<PositionComponent>("position_component",
-        "x", &PositionComponent::x,
-        "y", &PositionComponent::y,
-        "width", &PositionComponent::width,
-        "height", &PositionComponent::height
-    );
+    state.getState().new_usertype<PositionComponent>("position_component");
 }
 
 std::ostream& operator<<(std::ostream& stream, const PositionComponent& component)

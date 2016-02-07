@@ -19,6 +19,13 @@ namespace systems
 class RenderSystem : public entityx::System<RenderSystem>
 {
 public:
+    struct Renderable
+    {
+        std::shared_ptr<sf::Drawable> drawable;
+        sf::RenderStates states;
+        float z;
+    };
+
     RenderSystem(resources::TexturesManager& texturesManager, bool debugHitboxDraw = false);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
@@ -26,7 +33,9 @@ public:
     void render(sf::RenderTarget& target);
 
 private:
-    std::list<std::pair<std::shared_ptr<sf::Drawable>, sf::RenderStates>> m_renderingQueue;
+    void addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, sf::RenderStates states, float z);
+
+    std::list<Renderable> m_renderingQueue;
 
     std::map<entityx::Entity, std::shared_ptr<animation::AnimatedSprite>> m_animatedSprites;
 
