@@ -50,11 +50,11 @@ entity_template = {
                 points = {
                     {
                         x = 12,
-                        y = 0
+                        y = 50
                     },
                     {
                         x = 52,
-                        y = 0
+                        y = 50
                     },
                     {
                         x = 52,

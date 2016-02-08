@@ -25,7 +25,18 @@ std::string PlatformComponent::getName() const
 
 void PlatformComponent::registerComponent(lua::LuaState& state)
 {
-    meta::MetadataStore::registerClass<PlatformComponent>();
+    meta::MetadataStore::registerClass<PlatformComponent>()
+        .setExtraLoadFunction([](PlatformComponent* platform, const sol::object& luaObject)
+        {
+            const sol::object& platformTypeLua = luaObject.as<sol::table>().get<sol::object>("platform_type");
+            if(platformTypeLua.is<std::string>())
+            {
+                if(platformTypeLua.as<std::string>() == "Platform")
+                    platform->platformType = PlatformComponent::Platform;
+                else if(platformTypeLua.as<std::string>() == "Jumpthru")
+                    platform->platformType = PlatformComponent::Jumpthru;
+            }
+        });
 
     lua::EntityHandle::declareComponent<PlatformComponent>("Platform");
 

@@ -1,5 +1,5 @@
 entity_template = {
-    name = "kenney_block",
+    name = "kenney_block_wood_platform",
     friendlyname = "Friendly name of template",
 
     parameters = {
@@ -25,7 +25,7 @@ entity_template = {
             height = 64
         },
         ["Platform"] = {
-
+            platform_type = "Jumpthru",
         },
         ["Hitbox"] = {
             polygon = {
@@ -40,11 +40,11 @@ entity_template = {
                     },
                     {
                         x = 64,
-                        y = 64
+                        y = 16
                     },
                     {
                         x = 0,
-                        y = 64
+                        y = 16
                     },
                 }
             }
@@ -57,7 +57,7 @@ entity_template = {
                     total_duration = 1,
                     frames = {
                         {
-                            rect = { left = 1560, top = 390, width = 128, height = 128},
+                            rect = { left = 2340, top = 0, width = 128, height = 128},
                             relative_duration = 1,
                         },
                     },

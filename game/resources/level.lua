@@ -9,43 +9,83 @@ level = {
     },
     objects = { --The entities template instances with their parameter fulfilled
         {
-            id = 2,
-            template = "kenney_block",
+            id = 1,
+            template = "kenney_block_grass",
             values = {
                 x = 80,
                 y = 350,
             }
         },
         {
-            id = 3,
-            template = "kenney_block",
+            id = 2,
+            template = "kenney_block_grass",
             values = {
                 x = 144,
                 y = 350,
             }
         },
         {
-            id = 4,
-            template = "kenney_slope45",
+            id = 3,
+            template = "kenney_block_grass",
             values = {
                 x = 208,
-                y = 286,
+                y = 350,
+            }
+        },
+        {
+            id = 4,
+            template = "kenney_block_grass",
+            values = {
+                x = 272,
+                y = 350,
             }
         },
         {
             id = 5,
-            template = "kenney_block",
+            template = "kenney_block_grass_center",
             values = {
-                x = 272,
-                y = 286,
+                x = 80,
+                y = 414,
             }
         },
         {
             id = 6,
-            template = "kenney_block",
+            template = "kenney_block_grass_center",
             values = {
-                x = 336,
-                y = 222,
+                x = 144,
+                y = 414,
+            }
+        },
+        {
+            id = 7,
+            template = "kenney_block_grass_center",
+            values = {
+                x = 208,
+                y = 414,
+            }
+        },
+        {
+            id = 8,
+            template = "kenney_block_grass_center",
+            values = {
+                x = 272,
+                y = 414,
+            }
+        },
+        {
+            id = 9,
+            template = "kenney_block_wood_platform",
+            values = {
+                x = 144,
+                y = 230,
+            }
+        },
+        {
+            id = 10,
+            template = "kenney_block_wood_platform",
+            values = {
+                x = 208,
+                y = 230,
             }
         },
     }
