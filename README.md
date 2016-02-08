@@ -105,7 +105,7 @@ not copy the game to the system paths, it just copies the game executable and
 the ressources (lua scripts, example levels, examples entities templates) in
 the ```release``` directory inside the YAPG root directory.
 
-#### Play the game
+### Play the game
 Copy if needed the ```.dll```/```.so``` file into the ```release``` directory.
 
 On Windows, just launch the ```yapg-game.exe``` file and on Linux, launch
