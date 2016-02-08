@@ -1,5 +1,5 @@
 entity_template = {
-    name = "kenney_slope45",
+    name = "kenney_block_grass_slope_left",
     friendlyname = "Friendly name of template",
 
     parameters = {
@@ -31,7 +31,7 @@ entity_template = {
             polygon = {
                 points = {
                     {
-                        x = 64,
+                        x = 0,
                         y = 0
                     },
                     {
@@ -53,7 +53,7 @@ entity_template = {
                     total_duration = 1,
                     frames = {
                         {
-                            rect = { left = 1560, top = 650, width = 128, height = 128},
+                            rect = { left = 1560, top = 780, width = 128, height = 128},
                             relative_duration = 1,
                         },
                     },
