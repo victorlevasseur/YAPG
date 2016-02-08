@@ -40,23 +40,23 @@ public:
     }
 
     template<typename T>
-    ClassMetadata<C>& declareAttribute(const std::string& name, T C::*member)
+    ClassMetadata<C>& declareAttribute(const std::string& name, T C::*member, bool loadableFromLua = true, bool gettableFromLua = true, bool settableFromLua = true)
     {
-        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<C>>(new AttributeMetadata<C, T>(member)));
+        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<C>>(new AttributeMetadata<C, T>(member, loadableFromLua, gettableFromLua, settableFromLua)));
         return *this;
     }
 
     template<typename T>
-    ClassMetadata<C>& declareAttribute(const std::string& name, std::vector<T> C::*vectorMember)
+    ClassMetadata<C>& declareAttribute(const std::string& name, std::vector<T> C::*vectorMember, bool loadableFromLua = true, bool gettableFromLua = true, bool settableFromLua = true)
     {
-        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<C>>(new VectorAttributeMetadata<C, T>(vectorMember)));
+        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<C>>(new VectorAttributeMetadata<C, T>(vectorMember, loadableFromLua, gettableFromLua, settableFromLua)));
         return *this;
     }
 
     template<typename T, typename U>
-    ClassMetadata<C>& declareAttribute(const std::string& name, std::map<T, U> C::*mapMember)
+    ClassMetadata<C>& declareAttribute(const std::string& name, std::map<T, U> C::*mapMember, bool loadableFromLua = true, bool gettableFromLua = true, bool settableFromLua = true)
     {
-        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<C>>(new MapAttributeMetadata<C, T, U>(mapMember)));
+        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<C>>(new MapAttributeMetadata<C, T, U>(mapMember, loadableFromLua, gettableFromLua, settableFromLua)));
         return *this;
     }
 

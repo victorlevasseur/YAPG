@@ -14,8 +14,13 @@ template<class C, typename T>
 class AttributeMetadata : public AttributeMetadataBase<C>
 {
 public:
-    AttributeMetadata(T C::*member) :
-        AttributeMetadataBase<C>(),
+    AttributeMetadata(
+        T C::*member,
+        bool loadableFromLua = true,
+        bool gettableFromLua = true,
+        bool settableFromLua = true
+        ) :
+        AttributeMetadataBase<C>(loadableFromLua, gettableFromLua, settableFromLua),
         m_member(member)
     {
 
@@ -23,37 +28,75 @@ public:
 
     virtual void load(C* object, const sol::object& luaObject) const
     {
+        if(!AttributeMetadataBase<C>::m_loadableFromLua)
+            return;
         //Get the metadata of the class/type to be able to load the attribute
         MetadataStore::getMetadata<T>().load(&((*object).*m_member), luaObject);
     }
 
     virtual std::string getAsString(const C* object) const
     {
+        if(!AttributeMetadataBase<C>::m_gettableFromLua)
+        {
+            std::cout << "Script trying to get a value not visible from lua !" << std::endl;
+            return "";
+        }
+
         return getAsStringImpl(object);
     }
 
     virtual void setAsString(C* object, const std::string& value) const
     {
+        if(!AttributeMetadataBase<C>::m_settableFromLua)
+        {
+            std::cout << "Script trying to set a value not changeable from lua !" << std::endl;
+            return;
+        }
+
         setAsStringImpl(object, value);
     }
 
     virtual bool getAsBool(const C* object) const
     {
+        if(!AttributeMetadataBase<C>::m_gettableFromLua)
+        {
+            std::cout << "Script trying to get a value not visible from lua !" << std::endl;
+            return false;
+        }
+
         return getAsBoolImpl(object);
     }
 
     virtual void setAsBool(C* object, bool value) const
     {
+        if(!AttributeMetadataBase<C>::m_settableFromLua)
+        {
+            std::cout << "Script trying to set a value not changeable from lua !" << std::endl;
+            return;
+        }
+
         setAsBoolImpl(object, value);
     }
 
     virtual double getAsDouble(const C* object) const
     {
+        if(!AttributeMetadataBase<C>::m_gettableFromLua)
+        {
+            std::cout << "Script trying to get a value not visible from lua !" << std::endl;
+            return 0.0;
+        }
+
         return getAsDoubleImpl(object);
     }
 
     virtual void setAsDouble(C* object, double value) const
     {
+        if(!AttributeMetadataBase<C>::m_settableFromLua)
+        {
+            std::cout << "Script trying to set a value not changeable from lua !" << std::endl;
+            return;
+        }
+
         setAsDoubleImpl(object, value);
     }
 

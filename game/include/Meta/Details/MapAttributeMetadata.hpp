@@ -18,8 +18,13 @@ template<class C, typename T, typename U>
 class MapAttributeMetadata : public AttributeMetadataBase<C>
 {
 public:
-    MapAttributeMetadata(std::map<T, U> C::*mapMember) :
-        AttributeMetadataBase<C>(),
+    MapAttributeMetadata(
+        std::map<T, U> C::*mapMember,
+        bool loadableFromLua = true,
+        bool gettableFromLua = true,
+        bool settableFromLua = true
+        ) :
+        AttributeMetadataBase<C>(loadableFromLua, gettableFromLua, settableFromLua),
         m_mapMember(mapMember)
 
     {
@@ -30,6 +35,9 @@ public:
 
     virtual void load(C* object, const sol::object& luaObject) const
     {
+        if(!AttributeMetadataBase<C>::m_loadableFromLua)
+            return;
+
         if(!luaObject.is<sol::table>())
             return;
 

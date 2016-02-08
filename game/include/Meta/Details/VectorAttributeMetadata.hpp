@@ -18,8 +18,13 @@ template<class C, typename T>
 class VectorAttributeMetadata : public AttributeMetadataBase<C>
 {
 public:
-    VectorAttributeMetadata(std::vector<T> C::*vectorMember) :
-        AttributeMetadataBase<C>(),
+    VectorAttributeMetadata(
+        std::vector<T> C::*vectorMember,
+        bool loadableFromLua = true,
+        bool gettableFromLua = true,
+        bool settableFromLua = true
+        ) :
+        AttributeMetadataBase<C>(loadableFromLua, gettableFromLua, settableFromLua),
         m_vectorMember(vectorMember)
 
     {
@@ -30,6 +35,9 @@ public:
 
     virtual void load(C* object, const sol::object& luaObject) const
     {
+        if(!AttributeMetadataBase<C>::m_loadableFromLua)
+            return;
+
         if(!luaObject.is<sol::table>())
             return;
 

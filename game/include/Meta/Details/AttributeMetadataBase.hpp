@@ -10,7 +10,18 @@ template<class C>
 class AttributeMetadataBase
 {
 public:
-    AttributeMetadataBase() {};
+    AttributeMetadataBase(
+        bool loadableFromLua = true,
+        bool gettableFromLua = true,
+        bool settableFromLua = true
+        ) :
+        m_loadableFromLua(loadableFromLua),
+        m_gettableFromLua(gettableFromLua),
+        m_settableFromLua(settableFromLua)
+    {
+
+    }
+
     virtual ~AttributeMetadataBase() {};
 
     virtual void load(C* object, const sol::object& luaObject) const = 0;
@@ -47,6 +58,11 @@ public:
     {
         std::cout << "Script trying to set a value not convertible from double !" << std::endl;
     }
+
+protected:
+    bool m_loadableFromLua;
+    bool m_gettableFromLua;
+    bool m_settableFromLua;
 };
 
 }
