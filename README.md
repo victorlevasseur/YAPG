@@ -64,7 +64,7 @@ Windows if you're building the game with TDM-GCC/MinGW on Windows.
 As Lua is a C API, there are no compatibility problems between compiler
 versions. That's why you can download the prebuilt packages on the
 [Lua binaries website](http://lua-users.org/wiki/LuaBinaries). Just make sure
-that the version you download is built for your OS and architecture (x86 or
+that the version you've downloaded is built for your OS and architecture (x86 or
 x86_64) and contains the lua header and the lua library (```.dll```/```.so```).
 Extract it in the ```libs/Lua``` folder.
 
