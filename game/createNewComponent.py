@@ -32,8 +32,6 @@ srcContent = """#include "Components/{0}Component.hpp"
 
 #include "Lua/EntityHandle.hpp"
 
-namespace game
-{{
 namespace components
 {{
 
@@ -71,7 +69,6 @@ std::ostream& operator<<(std::ostream& stream, const {0}Component& component)
     return stream;
 }}
 
-}}
 }}
 """
 
