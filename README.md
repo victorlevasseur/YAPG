@@ -1,8 +1,7 @@
 # YAPG
 YAPG - Yet Another Platformer Game
 
-## Building
-### Dependencies
+## Dependencies
 YAPG currently requires those libraries :
 
  - SFML (>= 2.3 and < 3.x)
@@ -13,12 +12,12 @@ YAPG currently requires those libraries :
 It also requires a C++14-compliant compiler. Note that the game is officially
 built with **GCC 5.3 on Linux** and **TDM-GCC (MinGW) 5.1** on Windows.
 
-### How to build ?
+## How to build ?
 *This guide considers you're using GCC on Linux.*
 In the next sections, ```"YourGenerator"``` can be replaced by ```"Makefiles"```
 on Linux with GCC and ```"MinGW Makefiles"``` on Windows with TDM-GCC/MinGW.
 
-#### Build entityx
+### Build entityx
 Entityx is provided in this repository in the ```libs/entityx``` folder.
 
 ```sh
@@ -29,14 +28,14 @@ cmake .. -G "YourGenerator" BUILD_SHARED=0
 make
 ```
 
-#### Install the dev packages of SFML, boost and Lua
+### Install the dev packages of SFML, boost and Lua
 Then, you need to install the dev packages of SFML, boost and lua. If your
 distribution doesn't provides these packages (or not supported versions of them)
 or you want to build YAPG on Windows, you have to build/download these libraries
 yourself, see the next section. If your distribution provides them, you can skip
 the next section and go to the **Build the game** section.
 
-#### Build/download the others libraries yourself
+### Build/download the others libraries yourself
 
 **SFML**
 
@@ -69,7 +68,7 @@ that the version you download is built for your OS and architecture (x86 or
 x86_64) and contains the lua header and the lua library (```.dll```/```.so```).
 Extract it in the ```libs/Lua``` folder.
 
-#### Build the game
+### Build the game
 Now, return to the project root directory and do:
 
 ```sh
