@@ -191,9 +191,12 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         float requestedXMove(0.f), requestedYMove(0.f);
 
         //Watch received events to see the requested moves
-        bool wantsToJump(sf::Keyboard::isKeyPressed(sf::Keyboard::Z)); //TODO: Use config to get the keys !
-        bool wantsToGoLeft(sf::Keyboard::isKeyPressed(sf::Keyboard::Q));
-        bool wantsToGoRight(sf::Keyboard::isKeyPressed(sf::Keyboard::D));
+        bool wantsToJump(sf::Keyboard::isKeyPressed(sf::Keyboard::Up));
+        bool wantsToGoLeft(sf::Keyboard::isKeyPressed(sf::Keyboard::Left));
+        bool wantsToGoRight(sf::Keyboard::isKeyPressed(sf::Keyboard::Right));
+        //TODO: Put the previous variables as attributes of PlatformerComponent
+        //and the future PlayerSystem will set them to true or false depending
+        //of the pressed keys (according to the config)
 
         tools::Polygon polygon = hitbox.getHitbox();
         polygon.ComputeGlobalVertices();

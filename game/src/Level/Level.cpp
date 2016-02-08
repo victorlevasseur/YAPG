@@ -67,7 +67,8 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
         playerEntity,
         entityGetter,
         m_luaState.getState().get<sol::table>("level").get<sol::table>("spawn_position")
-        //Directly use the "spawn_position" table as parameter ==> it implies that players templates must only have x and y positions as parameters
+        //Directly use the "spawn_position" table as parameter ==> it implies that players
+        //templates must only have x and y positions as parameters
     );
 
     std::cout << "Players created." << std::endl;
