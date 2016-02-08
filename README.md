@@ -77,7 +77,7 @@ cd build
 cmake .. -G "YourGenerator"
 ```
 
-If you manually build the libraries, it will show some errors as the script
+If you manually built the libraries, it will show some errors as the script
 can't find the libraries in the system. You'll need to enter the path to the
 libraries yourself before continuing. You can do it in CMake GUI or rewrite the
 last command line with all the paths to configure the project properly.
