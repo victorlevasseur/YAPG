@@ -158,7 +158,11 @@ void LuaState::loadTemplates(const fs::path& path)
                 {
                     std::string filePath = fs::canonical(e.path()).string();
                     m_luaState.open_file(filePath);
-                    m_templates.emplace(e.path().stem().string(), EntityTemplate(m_luaState.get<sol::table>(e.path().stem().string())));
+
+                    m_templates.emplace(
+                        m_luaState.get<sol::table>("entity_template").get<std::string>("name"),
+                        EntityTemplate(m_luaState.get<sol::table>("entity_template"))
+                    );
                     std::cout << "[Lua/Note] Loaded template from " << e.path() << "." << std::endl;
                 }
             }

@@ -1,16 +1,16 @@
 level = {
-    objects = {
-        {
-            id = 1,
-            template = "player",
-            values = {
-                x = 120,
-                y = 80,
-            }
-        },
+    spawn_position = { -- The position of the spawn.
+        x = 120,
+        y = 80,
+    },
+    max_player = 1, --The maximum number of players of the level
+    players = { --The player entities of the level (the first one will be the player 1, ...), need at least as many as the max_player count.
+        "kenney_player1",
+    },
+    objects = { --The entities template instances with their parameter fulfilled
         {
             id = 2,
-            template = "block",
+            template = "kenney_block",
             values = {
                 x = 80,
                 y = 350,
@@ -18,7 +18,7 @@ level = {
         },
         {
             id = 3,
-            template = "block",
+            template = "kenney_block",
             values = {
                 x = 144,
                 y = 350,
@@ -26,7 +26,7 @@ level = {
         },
         {
             id = 4,
-            template = "slope45",
+            template = "kenney_slope45",
             values = {
                 x = 208,
                 y = 286,
@@ -34,7 +34,7 @@ level = {
         },
         {
             id = 5,
-            template = "block",
+            template = "kenney_block",
             values = {
                 x = 272,
                 y = 286,
@@ -42,7 +42,7 @@ level = {
         },
         {
             id = 6,
-            template = "block",
+            template = "kenney_block",
             values = {
                 x = 336,
                 y = 222,

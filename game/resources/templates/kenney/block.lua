@@ -1,5 +1,5 @@
-slope45 = {
-    name = "slope45",
+entity_template = {
+    name = "kenney_block",
     friendlyname = "Friendly name of template",
 
     parameters = {
@@ -31,6 +31,10 @@ slope45 = {
             polygon = {
                 points = {
                     {
+                        x = 0,
+                        y = 0
+                    },
+                    {
                         x = 64,
                         y = 0
                     },
@@ -53,7 +57,7 @@ slope45 = {
                     total_duration = 1,
                     frames = {
                         {
-                            rect = { left = 1560, top = 650, width = 128, height = 128},
+                            rect = { left = 1560, top = 390, width = 128, height = 128},
                             relative_duration = 1,
                         },
                     },

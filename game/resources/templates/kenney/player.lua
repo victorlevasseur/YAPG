@@ -1,5 +1,5 @@
-player = {
-    name = "player",
+entity_template = {
+    name = "kenney_player1",
     friendlyname = "Friendly name of template",
 
     parameters = {

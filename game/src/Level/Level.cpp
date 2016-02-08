@@ -57,6 +57,20 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
     luaState.getState().set("current_level", this);
 
     std::cout << "Level successfully loaded (" << createdEntities.size() << " entities)." << std::endl;
+
+    std::cout << "Creating players..." << std::endl;
+
+    //TODO: Support multiple players creation
+    std::vector<std::string> playersTemplates{ m_luaState.getState().get<sol::table>("level").get<sol::table>("players").get<std::string>(1) };
+    entityx::Entity playerEntity = m_entityMgr.create();
+    m_luaState.getTemplate(playersTemplates[0]).initializeEntity(
+        playerEntity,
+        entityGetter,
+        m_luaState.getState().get<sol::table>("level").get<sol::table>("spawn_position")
+        //Directly use the "spawn_position" table as parameter ==> it implies that players templates must only have x and y positions as parameters
+    );
+
+    std::cout << "Players created." << std::endl;
 }
 
 lua::EntityHandle Level::createNewEntity(const std::string& templateName)
