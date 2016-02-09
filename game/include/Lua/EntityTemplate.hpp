@@ -9,6 +9,8 @@
 #include "Level/SerializedEntityGetter.hpp"
 #include "Lua/sol.hpp"
 
+namespace lua{ class LuaState; }
+
 namespace lua
 {
 
@@ -36,6 +38,8 @@ public:
 
     EntityTemplate(const sol::table& templateTable);
 
+    void applyInheritance(LuaState& luaState);
+
     void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter) const;
 
     void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const sol::table& parametersTable) const;
@@ -43,6 +47,8 @@ public:
 private:
     std::string m_name;
     std::string m_friendlyName;
+
+    std::string m_inheritedTemplate;
 
     std::map<std::string, Parameter> m_parameters; ///< The parameters of the template
 

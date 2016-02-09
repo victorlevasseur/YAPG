@@ -87,6 +87,9 @@ LuaState::LuaState() :
 
     //Load templates
     loadTemplates(std::string("templates"));
+    std::cout << "[Lua/Note] Applying block inheritance..." << std::endl;
+    for(auto& pair : m_templates)
+        pair.second.applyInheritance(*this);
     std::cout << "[Lua/Note] Entities templates loaded." << std::endl;
 
     std::cout << "[Lua/Note] --> Lua state initialization completed." << std::endl;
@@ -134,6 +137,17 @@ std::vector<std::string> LuaState::getTableKeys(const std::string& tableName)
 const EntityTemplate& LuaState::getTemplate(const std::string& name) const
 {
     return m_templates.at(name);
+}
+
+sol::table LuaState::mergeTables(sol::table first, sol::table second)
+{
+    sol::function deepCopyFunc = m_luaState.get<sol::table>("array_tools").get<sol::function>("deep_copy");
+    sol::function mergeTablesFunc = m_luaState.get<sol::table>("array_tools").get<sol::function>("merge_tables");
+
+    sol::table result = deepCopyFunc.call<sol::table>(first);
+    result = mergeTablesFunc.call<sol::table>(result, second);
+
+    return result;
 }
 
 void LuaState::loadTemplates(const std::string& path)

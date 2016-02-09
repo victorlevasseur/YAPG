@@ -2,6 +2,7 @@
 
 #include "Components/Component.hpp"
 #include "Lua/EntityHandle.hpp"
+#include "Lua/LuaState.hpp"
 
 namespace lua
 {
@@ -9,37 +10,59 @@ namespace lua
 EntityTemplate::EntityTemplate(const sol::table& templateTable) :
     m_name(),
     m_friendlyName(),
+    m_inheritedTemplate(),
     m_parameters(),
     m_componentsTable()
 {
     m_name = templateTable.get<std::string>("name");
     m_friendlyName = templateTable.get<std::string>("friendlyname");
 
+    if(templateTable.get<sol::object>("inherits").is<std::string>())
+        m_inheritedTemplate = templateTable.get<std::string>("inherits");
+
     m_componentsTable = templateTable.get<sol::table>("components");
 
     //Load the parameters
-    templateTable.get<sol::table>("parameters").for_each([&](const sol::object &key, const sol::object &value)
+    if(templateTable.get<sol::object>("parameters").is<sol::table>())
     {
-        sol::table valueTable = value.as<sol::table>();
-        std::string type = valueTable.get<std::string>("type");
+        templateTable.get<sol::table>("parameters").for_each([&](const sol::object &key, const sol::object &value)
+        {
+            sol::table valueTable = value.as<sol::table>();
+            std::string type = valueTable.get<std::string>("type");
 
-        m_parameters.emplace(
-            key.as<std::string>(),
-            Parameter{
+            m_parameters.emplace(
                 key.as<std::string>(),
-                valueTable.get<std::string>("name"),
-                valueTable.get<std::string>("component"),
-                valueTable.get<std::string>("attribute"),
-                (type == "string" ? Parameter::String :
-                    (type == "number" ? Parameter::Number :
-                    (type == "boolean" ? Parameter::Boolean :
-                    (type == "entity" ? Parameter::Entity :
-                    (type == "function" ? Parameter::Function :
-                    Parameter::Unknown
-                )))))
-            }
+                Parameter{
+                    key.as<std::string>(),
+                    valueTable.get<std::string>("name"),
+                    valueTable.get<std::string>("component"),
+                    valueTable.get<std::string>("attribute"),
+                    (type == "string" ? Parameter::String :
+                        (type == "number" ? Parameter::Number :
+                        (type == "boolean" ? Parameter::Boolean :
+                        (type == "entity" ? Parameter::Entity :
+                        (type == "function" ? Parameter::Function :
+                        Parameter::Unknown
+                    )))))
+                }
+            );
+        });
+    }
+}
+
+void EntityTemplate::applyInheritance(LuaState& luaState)
+{
+    if(!m_inheritedTemplate.empty())
+    {
+        //Merge the parameters
+        m_parameters.insert(
+            luaState.getTemplate(m_inheritedTemplate).m_parameters.begin(),
+            luaState.getTemplate(m_inheritedTemplate).m_parameters.end()
         );
-    });
+
+        //Merge the component lua table
+        m_componentsTable = luaState.mergeTables(luaState.getTemplate(m_inheritedTemplate).m_componentsTable, m_componentsTable);
+    }
 }
 
 void EntityTemplate::initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter) const

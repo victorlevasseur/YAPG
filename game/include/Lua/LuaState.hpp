@@ -25,6 +25,12 @@ public:
 
     const EntityTemplate& getTemplate(const std::string& name) const;
 
+    /**
+     * Merge the two tables into a single one.
+     * None of the two table are overriden.
+     */
+    sol::table mergeTables(sol::table first, sol::table second);
+
 private:
     void loadTemplates(const std::string& path);
 
