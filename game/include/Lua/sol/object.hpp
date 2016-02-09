@@ -36,6 +36,7 @@ public:
     auto as() const -> decltype(stack::get<T>(state())) const {
         push();
         type actual = stack::get<type>(state());
+        (void)actual;
         // This code is actually present
         // in almost all of the type-getters,
         // and it thus insanely redundant
