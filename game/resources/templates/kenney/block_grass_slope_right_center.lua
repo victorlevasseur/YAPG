@@ -57,7 +57,7 @@ entity_template = {
                     total_duration = 1,
                     frames = {
                         {
-                            rect = { left = 1560, top = 1560, width = 128, height = 128},
+                            rect = { left = 1560, top = 1430, width = 128, height = 128},
                             relative_duration = 1,
                         },
                     },
