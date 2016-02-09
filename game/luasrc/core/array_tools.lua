@@ -2,33 +2,6 @@ do
     local P = {}
     array_tools = P
 
-    P.table_size = function(table)
-        local count = 0
-        for k, v in pairs(table) do
-            count = count + 1
-        end
-
-        return count
-    end
-
-    P.get_keys = function(table)
-        local keys = ""
-        for k, v in pairs(table) do
-            keys = keys..k.."|"
-        end
-
-        return keys
-    end
-
-    P.array_contains = function(table, key)
-        for k, v in pairs(table) do
-            if k == key then
-                return true
-            end
-        end
-        return false
-    end
-
     P.deep_copy = function(orig)
         local orig_type = type(orig)
         local copy
