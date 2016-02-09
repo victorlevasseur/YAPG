@@ -13,7 +13,9 @@ void EntityHandle::declareComponent(const std::string& componentName)
             &EntityHandle::doGetAttributeAsBool<C>,
             &EntityHandle::doSetAttributeAsBool<C>,
             &EntityHandle::doGetAttributeAsDouble<C>,
-            &EntityHandle::doSetAttributeAsDouble<C>
+            &EntityHandle::doSetAttributeAsDouble<C>,
+            &EntityHandle::doGetAttributeAsLuaTable<C>,
+            &EntityHandle::doSetAttributeAsLuaTable<C>
         }
     );
 
@@ -112,6 +114,38 @@ void EntityHandle::doSetAttributeAsDouble(const std::string& attributeName, doub
             meta::MetadataStore::getMetadata<C>()
         );
         metadata.getAttribute(attributeName).setAsDouble(m_entity.component<C>().get(), value);
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a component from an entity that doesn't have it !" << std::endl;
+    }
+}
+
+template<class C>
+void EntityHandle::doGetAttributeAsLuaTable(const std::string& attributeName, sol::table result) const
+{
+    if(m_entity.has_component<C>())
+    {
+        auto& metadata = dynamic_cast<meta::ClassMetadata<C>&>(
+            meta::MetadataStore::getMetadata<C>()
+        );
+        metadata.getAttribute(attributeName).getAsLuaTable(m_entity.component<const C>().get(), result);
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a component from an entity that doesn't have it !" << std::endl;
+    }
+}
+
+template<class C>
+void EntityHandle::doSetAttributeAsLuaTable(const std::string& attributeName, sol::table value)
+{
+    if(m_entity.has_component<C>())
+    {
+        auto& metadata = dynamic_cast<meta::ClassMetadata<C>&>(
+            meta::MetadataStore::getMetadata<C>()
+        );
+        metadata.getAttribute(attributeName).setAsLuaTable(m_entity.component<C>().get(), value);
     }
     else
     {

@@ -101,6 +101,30 @@ void EntityHandle::setAttributeAsDouble(const std::string& componentName, const 
     }
 }
 
+void EntityHandle::getAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table result) const
+{
+    if(attributesCallbacks.count(componentName) > 0)
+    {
+        (this->*(attributesCallbacks.at(componentName).getLuaTableCallback))(attributeName, result);
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
+    }
+}
+
+void EntityHandle::setAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table value)
+{
+    if(attributesCallbacks.count(componentName) > 0)
+    {
+        (this->*(attributesCallbacks.at(componentName).setLuaTableCallback))(attributeName, value);
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
+    }
+}
+
 void EntityHandle::writeToConsole(const std::string& str)
 {
     std::cout << str << std::endl;
@@ -121,6 +145,8 @@ void EntityHandle::registerClass(LuaState &state)
         "set_bool_attribute", &EntityHandle::setAttributeAsBool,
         "get_number_attribute", &EntityHandle::getAttributeAsDouble,
         "set_number_attribute", &EntityHandle::setAttributeAsDouble,
+        "get_table_attribute", &EntityHandle::getAttributeAsLuaTable,
+        "set_table_attribute", &EntityHandle::setAttributeAsLuaTable,
         "write_to_console", &EntityHandle::writeToConsole
     );
 }

@@ -59,6 +59,23 @@ public:
         std::cout << "Script trying to set a value not convertible from double !" << std::endl;
     }
 
+    /**
+     * This is a special one: the table is given as parameter instead of being returned
+     * (so that the Metadata don't have to create the table itself,as it would require
+     * to depend on a single lua state).
+     * Note: sol::table is just a ref to the real lua table, so no need to pass it by
+     * reference.
+     */
+    virtual void getAsLuaTable(const C* object, sol::table result) const
+    {
+        std::cout << "Script trying to get a value not convertible to a lua table !" << std::endl;
+    }
+
+    virtual void setAsLuaTable(C* object, sol::table value) const
+    {
+        std::cout << "Script trying to set a value not convertible from a lua table !" << std::endl;
+    }
+
 protected:
     bool m_loadableFromLua;
     bool m_gettableFromLua;

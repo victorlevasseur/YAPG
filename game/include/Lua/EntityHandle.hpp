@@ -36,6 +36,9 @@ public:
 
         double (EntityHandle::*getDoubleCallback)(const std::string&) const;
         void (EntityHandle::*setDoubleCallback)(const std::string&, double);
+
+        void (EntityHandle::*getLuaTableCallback)(const std::string&, sol::table) const;
+        void (EntityHandle::*setLuaTableCallback)(const std::string&, sol::table);
     };
 
     EntityHandle();
@@ -49,6 +52,9 @@ public:
 
     double getAttributeAsDouble(const std::string& componentName, const std::string& attributeName) const;
     void setAttributeAsDouble(const std::string& componentName, const std::string& attributeName, double value);
+
+    void getAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table result) const;
+    void setAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table value);
 
     void writeToConsole(const std::string& str);
 
@@ -77,6 +83,12 @@ private:
 
     template<class C>
     void doSetAttributeAsDouble(const std::string& attributeName, double value);
+
+    template<class C>
+    void doGetAttributeAsLuaTable(const std::string& attributeName, sol::table result) const;
+
+    template<class C>
+    void doSetAttributeAsLuaTable(const std::string& attributeName, sol::table value);
 
     entityx::Entity m_entity;
 
