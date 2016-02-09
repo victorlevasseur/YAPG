@@ -58,6 +58,8 @@ public:
         });
     }
 
+    //TODO: Implement get/setAsLuaTable
+
 private:
     std::map<T, U> C::*m_mapMember;
 };

@@ -83,23 +83,11 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
 
 lua::EntityHandle Level::createNewEntity(const std::string& templateName)
 {
-    //TODO: Rework this method to use EntityTemplate !
-    if(m_luaState.getState().get<sol::object>(templateName).is<sol::table>())
-    {
-        entityx::Entity newEntity = m_entityMgr.create();
+    entityx::Entity newEntity = m_entityMgr.create();
 
-        sol::table templateTable = m_luaState.getState().get<sol::table>(templateName);
-        templateTable.get<sol::table>("components").for_each([&](const sol::object& key, const sol::object& value) {
-            std::string componentType = key.as<std::string>();
+    m_luaState.getTemplate(templateName).initializeEntity(newEntity, SerializedEntityGetter());
 
-            components::Component::assignComponent(newEntity, componentType, value, SerializedEntityGetter());
-        });
-
-        return lua::EntityHandle(newEntity);
-    }
-
-    std::cout << "[Lua/Warning] Can't create an entity from template \"" << templateName << "\"" << std::endl;
-    return lua::EntityHandle();
+    return lua::EntityHandle(newEntity);
 }
 
 void Level::registerClass(lua::LuaState& luaState)
