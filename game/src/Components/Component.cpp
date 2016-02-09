@@ -4,6 +4,7 @@
 #include "Components/HitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
+#include "Components/PlayerComponent.hpp"
 #include "Components/PositionComponent.hpp"
 #include "Components/RenderComponent.hpp"
 #include "Meta/Metadata.hpp"
@@ -48,6 +49,10 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
     else if(component == "Platformer")
     {
         entity.assign<PlatformerComponent>().get()->loadFromLua(luaTable, entityGetter);
+    }
+    else if(component == "Player")
+    {
+        entity.assign<PlayerComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "Render")
     {

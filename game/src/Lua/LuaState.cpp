@@ -13,6 +13,7 @@
 #include "Components/HitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
+#include "Components/PlayerComponent.hpp"
 #include "Components/PositionComponent.hpp"
 #include "Components/RenderComponent.hpp"
 #include "Level/Level.hpp"
@@ -76,6 +77,7 @@ LuaState::LuaState() :
     components::HitboxComponent::registerComponent(*this);
     components::PlatformComponent::registerComponent(*this);
     components::PlatformerComponent::registerComponent(*this);
+    components::PlayerComponent::registerComponent(*this);
     components::PositionComponent::registerComponent(*this);
     components::RenderComponent::registerComponent(*this);
     std::cout << "[Lua/Note] All components registered." << std::endl;

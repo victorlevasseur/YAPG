@@ -1,6 +1,9 @@
 #include "Level/Level.hpp"
 
+#include <exception>
+
 #include "Components/Component.hpp"
+#include "Components/PlayerComponent.hpp"
 
 namespace level
 {
@@ -70,12 +73,17 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
         //Directly use the "spawn_position" table as parameter ==> it implies that players
         //templates must only have x and y positions as parameters
     );
+    if(!playerEntity.has_component<components::PlayerComponent>())
+        throw std::runtime_error(std::string("[Lua/Error] Player entities must have the \"Player\" component declared in their template ! Not the case with \"") + playersTemplates[0] + std::string("\""));
+    playerEntity.component<components::PlayerComponent>()->playerNumber = 0;
+    /////////////////////////////////////////
 
     std::cout << "Players created." << std::endl;
 }
 
 lua::EntityHandle Level::createNewEntity(const std::string& templateName)
 {
+    //TODO: Rework this method to use EntityTemplate !
     if(m_luaState.getState().get<sol::object>(templateName).is<sol::table>())
     {
         entityx::Entity newEntity = m_entityMgr.create();

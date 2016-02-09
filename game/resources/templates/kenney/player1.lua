@@ -45,6 +45,9 @@ entity_template = {
                 entity:set_bool_attribute("Render", "flipped", true)
             end,
         },
+        ["Player"] = {
+
+        },
         ["Hitbox"] = {
             polygon = {
                 points = {
