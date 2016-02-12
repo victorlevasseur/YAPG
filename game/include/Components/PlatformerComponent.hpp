@@ -34,6 +34,10 @@ public:
 
     static void registerComponent(lua::LuaState& state);
 
+    bool wantsToJump;
+    bool wantsToGoLeft;
+    bool wantsToGoRight;
+
     int layer;
 
     float maxFallingSpeed;

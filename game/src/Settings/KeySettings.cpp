@@ -45,9 +45,12 @@ KeySettings::PlayerKeys& KeySettings::getPlayerKeys(int player)
     return m_playerKeys[player];
 }
 
-const KeySettings::PlayerKeys& KeySettings::getPlayerKeys(int player) const
+KeySettings::PlayerKeys KeySettings::getPlayerKeys(int player) const
 {
-    return m_playerKeys.at(player);
+    if(m_playerKeys.count(player))
+        return m_playerKeys.at(player);
+    else
+        return PlayerKeys();
 }
 
 }

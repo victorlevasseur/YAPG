@@ -7,6 +7,9 @@ namespace components
 
 PlatformerComponent::PlatformerComponent() :
     Component(),
+    wantsToJump(false),
+    wantsToGoLeft(false),
+    wantsToGoRight(false),
     layer(0),
     maxFallingSpeed(400.f),
     maxJumpingSpeed(600.f),

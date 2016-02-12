@@ -3,8 +3,8 @@
 #include "Systems/CustomBehaviorSystem.hpp"
 #include "Systems/HitboxUpdaterSystem.hpp"
 #include "Systems/PlatformerSystem.hpp"
+#include "Systems/PlayerSystem.hpp"
 #include "Systems/RenderSystem.hpp"
-
 
 namespace state
 {
@@ -19,6 +19,7 @@ LevelState::LevelState(const std::string& path, resources::TexturesManager& text
     m_systemMgr.add<systems::CustomBehaviorSystem>();
     m_systemMgr.add<systems::PlatformerSystem>();
     m_systemMgr.add<systems::HitboxUpdaterSystem>();
+    m_systemMgr.add<systems::PlayerSystem>(settingsManager);
 
     m_systemMgr.configure();
 }
@@ -50,6 +51,7 @@ void LevelState::processEvent(sf::Event event)
 
 void LevelState::update(sf::Time dt)
 {
+    m_systemMgr.update<systems::PlayerSystem>(dt.asSeconds());
     m_systemMgr.update<systems::HitboxUpdaterSystem>(dt.asSeconds());
     m_systemMgr.update<systems::PlatformerSystem>(dt.asSeconds());
     m_systemMgr.update<systems::CustomBehaviorSystem>(dt.asSeconds());

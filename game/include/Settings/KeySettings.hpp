@@ -26,7 +26,7 @@ public:
     void loadFromXml(const tinyxml2::XMLElement* elem);
 
     PlayerKeys& getPlayerKeys(int player);
-    const PlayerKeys& getPlayerKeys(int player) const;
+    PlayerKeys getPlayerKeys(int player) const;
 
 private:
     std::map<int, PlayerKeys> m_playerKeys;

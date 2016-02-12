@@ -191,9 +191,9 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         float requestedXMove(0.f), requestedYMove(0.f);
 
         //Watch received events to see the requested moves
-        bool wantsToJump(sf::Keyboard::isKeyPressed(sf::Keyboard::Up));
-        bool wantsToGoLeft(sf::Keyboard::isKeyPressed(sf::Keyboard::Left));
-        bool wantsToGoRight(sf::Keyboard::isKeyPressed(sf::Keyboard::Right));
+        bool wantsToJump(platformer.wantsToJump);
+        bool wantsToGoLeft(platformer.wantsToGoLeft);
+        bool wantsToGoRight(platformer.wantsToGoRight);
         //TODO: Put the previous variables as attributes of PlatformerComponent
         //and the future PlayerSystem will set them to true or false depending
         //of the pressed keys (according to the config)
