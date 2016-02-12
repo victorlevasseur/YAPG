@@ -9,7 +9,7 @@
 namespace state
 {
 
-LevelState::LevelState(const std::string& path, resources::TexturesManager& texturesManager) :
+LevelState::LevelState(const std::string& path, resources::TexturesManager& texturesManager, settings::SettingsManager& settingsManager) :
     State(),
     m_luaState(),
     m_level(path, m_luaState),
