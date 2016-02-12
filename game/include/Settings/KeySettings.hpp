@@ -22,7 +22,7 @@ public:
         sf::Keyboard::Key jumpKey = sf::Keyboard::Unknown;
     };
 
-    KeySettings() = default;
+    KeySettings();
 
     void loadFromXml(const tinyxml2::XMLElement* elem);
     void saveToXml(tinyxml2::XMLDocument* doc, tinyxml2::XMLElement* elem) const;

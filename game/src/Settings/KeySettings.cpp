@@ -8,6 +8,18 @@ namespace tx2 = tinyxml2;
 namespace settings
 {
 
+KeySettings::KeySettings() :
+    m_playerKeys{
+        {
+            0,
+            PlayerKeys{ sf::Keyboard::A, sf::Keyboard::D, sf::Keyboard::W }
+        }
+        //TODO: Add other players defaults there
+    }
+{
+
+}
+
 namespace
 {
     void queryKeyAttribute(const tx2::XMLElement* element, const char* attribute, sf::Keyboard::Key* key)

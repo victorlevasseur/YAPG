@@ -1,5 +1,5 @@
 <yapg_settings>
     <keys_settings>
-        <player id="0" left_key="Q" right_key="D" jump_key="Z"/>
+        <player id="0" left_key="A" right_key="D" jump_key="W"/>
     </keys_settings>
 </yapg_settings>
