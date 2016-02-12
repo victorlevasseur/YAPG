@@ -35,7 +35,7 @@ void KeySettings::loadFromXml(const tx2::XMLElement* elem)
             queryKeyAttribute(playerElem, "right_key", &playerKeys.rightKey);
             queryKeyAttribute(playerElem, "jump_key", &playerKeys.jumpKey);
 
-            m_playerKeys.emplace(playerId, playerKeys);
+            m_playerKeys[playerId] = playerKeys;
         }
     }
 }

@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <boost/filesystem.hpp>
+
 #include "Lua/LuaState.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
@@ -8,12 +10,25 @@
 #include "State/LevelState.hpp"
 #include "Window/WindowManager.hpp"
 
+namespace fs = boost::filesystem;
+
 int main(int argc, char** argv)
 {
     //State manager
     state::StateEngine stateEngine;
 
     //Settings manager
+
+    //If the settings file doesn't exists, use the default_config.xml file to
+    //create it
+    if(!fs::exists(fs::path("config.xml")))
+    {
+        std::cout << "First time launch, copying default_config.xml as config.xml...";
+        fs::copy_file(fs::path("default_config.xml"), fs::path("config.xml"));
+        std::cout << " [OK]" << std::endl;
+    }
+
+    //Load the settings
     settings::SettingsManager settingsManager("config.xml");
 
     //Texture manager

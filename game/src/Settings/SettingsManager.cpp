@@ -24,7 +24,6 @@ SettingsManager::SettingsManager(const std::string& configFileName) :
         throw std::runtime_error("[SettingsManager/Error] Ill-formed configuration file (parsing error) !");
 
     tx2::XMLElement* rootElem = configXML.RootElement();
-    std::cout << rootElem->Name() << std::endl;
     if(strcmp(rootElem->Name(), "yapg_settings") != 0)
         throw std::runtime_error("[SettingsManager/Error] Ill-formed configuration file (not a yapg config file) !");
 
