@@ -5,6 +5,7 @@
 
 #include <SFML/Window/Keyboard.hpp>
 
+namespace tinyxml2{ class XMLDocument; }
 namespace tinyxml2{ class XMLElement; }
 
 namespace settings
@@ -24,6 +25,7 @@ public:
     KeySettings() = default;
 
     void loadFromXml(const tinyxml2::XMLElement* elem);
+    void saveToXml(tinyxml2::XMLDocument* doc, tinyxml2::XMLElement* elem) const;
 
     PlayerKeys& getPlayerKeys(int player);
     PlayerKeys getPlayerKeys(int player) const;

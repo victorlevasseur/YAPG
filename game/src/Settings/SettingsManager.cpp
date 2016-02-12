@@ -1,5 +1,7 @@
 #include "Settings/SettingsManager.hpp"
 
+#include <cstring>
+#include <exception>
 #include <iostream>
 
 #include "Settings/KeySettings.hpp"
@@ -18,9 +20,13 @@ SettingsManager::SettingsManager(const std::string& configFileName) :
 
     //Load the settings
     tx2::XMLDocument configXML;
-    configXML.LoadFile(m_configFileName.data());
+    if(configXML.LoadFile(m_configFileName.data()) != tx2::XML_NO_ERROR)
+        throw std::runtime_error("[SettingsManager/Error] Ill-formed configuration file (parsing error) !");
 
     tx2::XMLElement* rootElem = configXML.RootElement();
+    std::cout << rootElem->Name() << std::endl;
+    if(strcmp(rootElem->Name(), "yapg_settings") != 0)
+        throw std::runtime_error("[SettingsManager/Error] Ill-formed configuration file (not a yapg config file) !");
 
     //Load the key settings
     tx2::XMLElement* keySettingsElem = rootElem->FirstChildElement("keys_settings");
@@ -38,10 +44,19 @@ SettingsManager::SettingsManager(const std::string& configFileName) :
 
 SettingsManager::~SettingsManager()
 {
+    std::cout << "[Settings/Note] Saving settings..." << std::endl;
+
     //Save the settings
     tx2::XMLDocument configXML;
-    //TODO: Save the settings
+    configXML.InsertEndChild(configXML.NewElement("yapg_settings"));
+
+    tx2::XMLElement* keySettingsElem = configXML.NewElement("keys_settings");
+    configXML.RootElement()->InsertEndChild(keySettingsElem);
+    m_keySettings->saveToXml(&configXML, keySettingsElem);
+
     configXML.SaveFile(m_configFileName.data());
+
+    std::cout << "[Settings/Note] Settings saved." << std::endl;
 }
 
 KeySettings& SettingsManager::getKeySettings()

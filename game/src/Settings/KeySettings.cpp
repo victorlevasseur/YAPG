@@ -40,6 +40,20 @@ void KeySettings::loadFromXml(const tx2::XMLElement* elem)
     }
 }
 
+void KeySettings::saveToXml(tx2::XMLDocument* doc, tx2::XMLElement* elem) const
+{
+    for(auto it = m_playerKeys.cbegin(); it != m_playerKeys.cend(); ++it)
+    {
+        tx2::XMLElement* playerElem = doc->NewElement("player");
+        playerElem->SetAttribute("id", it->first);
+        playerElem->SetAttribute("left_key", tools::keyToString(it->second.leftKey).data());
+        playerElem->SetAttribute("right_key", tools::keyToString(it->second.rightKey).data());
+        playerElem->SetAttribute("jump_key", tools::keyToString(it->second.jumpKey).data());
+
+        elem->InsertEndChild(playerElem);
+    }
+}
+
 KeySettings::PlayerKeys& KeySettings::getPlayerKeys(int player)
 {
     return m_playerKeys[player];
