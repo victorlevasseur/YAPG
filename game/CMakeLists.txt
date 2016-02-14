@@ -18,6 +18,11 @@ set(ENTITYX_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/libs/entityx")
 set(ENTITYX_STATIC_LIBRARY "${CMAKE_SOURCE_DIR}/libs/entityx/bin/libentityx.a")
 target_include_directories(yapg-game PUBLIC ${ENTITYX_INCLUDE_DIR})
 
+#SimplGUI library
+set(SIMPLGUI_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/libs/SimplGUI/include")
+set(SIMPLGUI_STATIC_LIBRARY "${CMAKE_SOURCE_DIR}/libs/SimplGUI/bin/libsimplgui.a")
+target_include_directories(yapg-game PUBLIC ${SIMPLGUI_INCLUDE_DIR})
+
 #SFML lib
 find_package(SFML 2.3 REQUIRED system window graphics audio)
 if(SFML_FOUND)
@@ -38,7 +43,7 @@ endif()
 
 #Linking
 target_link_libraries(yapg-game PUBLIC
-    ${ENTITYX_STATIC_LIBRARY} ${SFML_LIBRARIES} ${LUA_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY}
+    ${ENTITYX_STATIC_LIBRARY} ${SIMPLGUI_STATIC_LIBRARY} ${SFML_LIBRARIES} ${LUA_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY}
 )
 
 #Install the app
