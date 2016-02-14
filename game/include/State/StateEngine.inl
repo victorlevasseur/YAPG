@@ -5,6 +5,8 @@ namespace state
 template<class T, typename... Args>
 State::NonOwningPtr StateEngine::stopAndStartState(Args&&... args, bool stopAll)
 {
+    std::unique_ptr<T> newState = std::make_unique<T>(*this, std::forward<Args>(args)...);
+
     //If there is another state in the stack, stop it and pop it
     //(or clear the whole stack if stopAll==true)
     while(m_states.size() > 0)
@@ -17,7 +19,7 @@ State::NonOwningPtr StateEngine::stopAndStartState(Args&&... args, bool stopAll)
     }
 
     //Create the new state on top of the stack
-    m_states.push(std::make_unique<T>(*this, std::forward<Args>(args)...));
+    m_states.push(std::move(newState));
     m_states.top()->onStart();
 
     notify();

@@ -43,7 +43,9 @@ private:
     //GUI Widgets
     simplgui::TextBox::Ptr m_levelPathTextBox;
     simplgui::Button::Ptr m_playLevelButton;
+
     simplgui::Button::Ptr m_settingsButton;
+    simplgui::Button::Ptr m_quitButton;
 };
 
 }
