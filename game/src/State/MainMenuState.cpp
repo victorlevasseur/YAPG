@@ -1,6 +1,7 @@
 #include "State/MainMenuState.hpp"
 
 #include "simplgui/Theme.h"
+#include "simplgui/Tools.h"
 
 #include "State/LevelState.hpp"
 #include "State/StateEngine.hpp"
@@ -40,7 +41,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManage
     {
         getStateEngine().stopAndStartState
         <state::LevelState, std::string, resources::TexturesManager&, settings::SettingsManager&>(
-            "level.lua", m_texturesManager, m_settingsManager
+            simplgui::tools::getSfString(m_levelPathTextBox->getText()).toAnsiString(), m_texturesManager, m_settingsManager
         );
     });
 
