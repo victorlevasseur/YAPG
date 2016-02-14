@@ -7,7 +7,7 @@
 #include "Settings/SettingsManager.hpp"
 #include "State/State.hpp"
 #include "State/StateEngine.hpp"
-#include "State/LevelState.hpp"
+#include "State/MainMenuState.hpp"
 #include "Window/WindowManager.hpp"
 
 namespace fs = boost::filesystem;
@@ -31,16 +31,21 @@ int main(int argc, char** argv)
     //Load the settings
     settings::SettingsManager settingsManager("config.xml");
 
-    //Texture manager
+    //Texture manager and font manager
     resources::TexturesManager texturesManager("assets");
+    resources::FontManager fontManager("assets");
 
     //Window manager
     window::WindowManager windowManager(stateEngine, "Yet Another Platformer Game");
 
     stateEngine.stopAndStartState
+    <state::MainMenuState, resources::TexturesManager&, resources::FontManager&, settings::SettingsManager&>(
+        texturesManager, fontManager, settingsManager
+    );
+    /*stateEngine.stopAndStartState
     <state::LevelState, std::string, resources::TexturesManager&, settings::SettingsManager&>(
         "level.lua", texturesManager, settingsManager
-    );
+    );*/
 
     windowManager.run();
 

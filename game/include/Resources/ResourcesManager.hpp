@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
 namespace resources
@@ -51,6 +52,7 @@ private:
 };
 
 using TexturesManager = ResourcesManager<sf::Texture>;
+using FontManager = ResourcesManager<sf::Font>;
 
 }
 
