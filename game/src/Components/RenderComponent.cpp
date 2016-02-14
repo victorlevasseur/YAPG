@@ -9,7 +9,8 @@ RenderComponent::RenderComponent() :
     Component(),
     textureName(),
     currentAnimation(),
-    animations()
+    animations(),
+    flipped(false)
 {
 
 }
