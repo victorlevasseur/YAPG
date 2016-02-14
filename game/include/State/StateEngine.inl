@@ -3,46 +3,52 @@ namespace state
 {
 
 template<class T, typename... Args>
-State::NonOwningPtr StateEngine::stopAndStartState(Args&&... args, bool stopAll)
+void StateEngine::stopAndStartState(Args&&... args, bool stopAll)
 {
-    std::unique_ptr<T> newState = std::make_unique<T>(*this, std::forward<Args>(args)...);
+    m_todoNextFrameState.release();
+    m_todoNextFrameState.reset(new T(*this, args...));
 
-    //If there is another state in the stack, stop it and pop it
-    //(or clear the whole stack if stopAll==true)
-    while(m_states.size() > 0)
+    m_todoNextFrame = [&]()
     {
-        m_states.top()->onStop();
-        m_states.pop();
+        //If there is another state in the stack, stop it and pop it
+        //(or clear the whole stack if stopAll==true)
+        while(m_states.size() > 0)
+        {
+            m_states.top()->onStop();
+            m_states.pop();
 
-        if(!stopAll)
-            break;
-    }
+            if(!stopAll)
+                break;
+        }
 
-    //Create the new state on top of the stack
-    m_states.push(std::move(newState));
-    m_states.top()->onStart();
+        //Create the new state on top of the stack
+        m_states.push(std::move(m_todoNextFrameState));
+        m_states.top()->onStart();
 
-    notify();
-
-    return m_states.top().get();
+        notify();
+    };
 }
 
 template <class T, typename... Args>
-State::NonOwningPtr StateEngine::pauseAndStartState(Args&&... args)
+void StateEngine::pauseAndStartState(Args&&... args)
 {
-    //If there is at least a state in the stack, pause it
-    if(m_states.size() > 0)
+    m_todoNextFrameState.release();
+    m_todoNextFrameState.reset(new T(*this, args...));
+
+    m_todoNextFrame = [&]()
     {
-        m_states.top()->onPause();
-    }
+        //If there is at least a state in the stack, pause it
+        if(m_states.size() > 0)
+        {
+            m_states.top()->onPause();
+        }
 
-    //Create the new state on top of the stack
-    m_states.push(std::make_unique<T>(*this, std::forward<Args>(args)...));
-    m_states.top()->onUnpause();
+        //Create the new state on top of the stack
+        m_states.push(m_todoNextFrameState);
+        m_states.top()->onStart();
 
-    notify();
-
-    return m_states.top().get();
+        notify();
+    };
 }
 
 }

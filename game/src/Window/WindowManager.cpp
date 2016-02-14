@@ -26,6 +26,8 @@ void WindowManager::run()
 
     while (m_window.isOpen())
     {
+        m_engine.nextFrameInit();
+
         sf::Event event;
         while (m_window.pollEvent(event))
         {

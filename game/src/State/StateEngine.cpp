@@ -5,27 +5,35 @@ namespace state
 {
 
 StateEngine::StateEngine() :
-    tools::Observable()
+    tools::Observable(),
+    m_states(),
+    m_todoNextFrame(),
+    m_todoNextFrameState(nullptr)
 {
 
 }
 
 void StateEngine::stopStateAndUnpause()
 {
-    //If there is a top state, stop it
-    if(m_states.size() > 1)
-    {
-        m_states.top()->onStop();
-        m_states.pop();
-    }
+    m_todoNextFrameState.release();
 
-    //If there's still a state remaining, unpause it
-    if(m_states.size() > 1)
+    m_todoNextFrame = [&]()
     {
-        m_states.top()->onUnpause();
-    }
+        //If there is a top state, stop it
+        if(m_states.size() > 1)
+        {
+            m_states.top()->onStop();
+            m_states.pop();
+        }
 
-    notify();
+        //If there's still a state remaining, unpause it
+        if(m_states.size() > 1)
+        {
+            m_states.top()->onUnpause();
+        }
+
+        notify();
+    };
 }
 
 State::NonOwningPtr StateEngine::getRunningState()
@@ -34,6 +42,14 @@ State::NonOwningPtr StateEngine::getRunningState()
         return m_states.top().get();
     else
         return nullptr;
+}
+
+void StateEngine::nextFrameInit()
+{
+    if(m_todoNextFrame)
+        m_todoNextFrame();
+
+    m_todoNextFrame = nullptr;
 }
 
 }

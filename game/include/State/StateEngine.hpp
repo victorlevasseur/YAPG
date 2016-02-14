@@ -16,17 +16,27 @@ public:
     StateEngine();
 
     template <class T, typename... Args>
-    State::NonOwningPtr stopAndStartState(Args&&... args, bool stopAll = false);
+    void stopAndStartState(Args&&... args, bool stopAll = false);
 
     template <class T, typename... Args>
-    State::NonOwningPtr pauseAndStartState(Args&&... args);
+    void pauseAndStartState(Args&&... args);
 
     void stopStateAndUnpause();
 
     State::NonOwningPtr getRunningState();
 
+    /**
+     * Must be called at the beginning of each frame.
+     * Stops and starts states if requested by states themselves in the previous
+     * frame.
+     */
+    void nextFrameInit();
+
 private:
     std::stack<State::Ptr> m_states;
+
+    std::function<void()> m_todoNextFrame;
+    std::unique_ptr<State> m_todoNextFrameState;
 };
 
 }
