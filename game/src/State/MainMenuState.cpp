@@ -1,9 +1,12 @@
 #include "State/MainMenuState.hpp"
 
+#include "State/StateEngine.hpp"
+
 namespace state
 {
 
-MainMenuState::MainMenuState(resources::TexturesManager& texturesManager, resources::FontManager& fontManager, settings::SettingsManager& settingsManager) :
+MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManager& texturesManager, resources::FontManager& fontManager, settings::SettingsManager& settingsManager) :
+    State(stateEngine),
     m_texturesManager(texturesManager),
     m_fontManager(fontManager),
     m_settingsManager(settingsManager),

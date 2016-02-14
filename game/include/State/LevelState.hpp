@@ -11,13 +11,15 @@
 #include "Settings/SettingsManager.hpp"
 #include "State/State.hpp"
 
+namespace state{ class StateEngine; }
+
 namespace state
 {
 
 class LevelState : public State
 {
 public:
-    LevelState(const std::string& path, resources::TexturesManager& texturesManager, settings::SettingsManager& settingsManager);
+    LevelState(StateEngine& stateEngine, const std::string& path, resources::TexturesManager& texturesManager, settings::SettingsManager& settingsManager);
 
     virtual void onStart();
 

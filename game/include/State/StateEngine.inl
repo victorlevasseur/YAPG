@@ -17,7 +17,7 @@ State::NonOwningPtr StateEngine::stopAndStartState(Args&&... args, bool stopAll)
     }
 
     //Create the new state on top of the stack
-    m_states.push(std::make_unique<T>(std::forward<Args>(args)...));
+    m_states.push(std::make_unique<T>(*this, std::forward<Args>(args)...));
     m_states.top()->onStart();
 
     notify();
@@ -35,7 +35,7 @@ State::NonOwningPtr StateEngine::pauseAndStartState(Args&&... args)
     }
 
     //Create the new state on top of the stack
-    m_states.push(std::make_unique<T>(std::forward<Args>(args)...));
+    m_states.push(std::make_unique<T>(*this, std::forward<Args>(args)...));
     m_states.top()->onUnpause();
 
     notify();

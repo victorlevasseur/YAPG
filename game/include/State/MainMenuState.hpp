@@ -6,13 +6,15 @@
 #include "Settings/SettingsManager.hpp"
 #include "State/State.hpp"
 
+namespace state{ class StateEngine; }
+
 namespace state
 {
 
 class MainMenuState : public State
 {
 public:
-    MainMenuState(resources::TexturesManager& texturesManager, resources::FontManager& fontManager, settings::SettingsManager& settingsManager);
+    MainMenuState(StateEngine& stateEngine, resources::TexturesManager& texturesManager, resources::FontManager& fontManager, settings::SettingsManager& settingsManager);
 
     virtual void onStart();
 

@@ -1,5 +1,7 @@
 #include "State/LevelState.hpp"
 
+#include "State/StateEngine.hpp"
+
 #include "Systems/CustomBehaviorSystem.hpp"
 #include "Systems/HitboxUpdaterSystem.hpp"
 #include "Systems/PlatformerSystem.hpp"
@@ -9,8 +11,8 @@
 namespace state
 {
 
-LevelState::LevelState(const std::string& path, resources::TexturesManager& texturesManager, settings::SettingsManager& settingsManager) :
-    State(),
+LevelState::LevelState(StateEngine& stateEngine, const std::string& path, resources::TexturesManager& texturesManager, settings::SettingsManager& settingsManager) :
+    State(stateEngine),
     m_luaState(),
     m_level(path, m_luaState),
     m_systemMgr(m_level.getEntityManager(), m_level.getEventManager())
