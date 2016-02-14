@@ -46,7 +46,7 @@ void LevelState::onUnpause()
 
 }
 
-void LevelState::processEvent(sf::Event event)
+void LevelState::processEvent(sf::Event event, sf::RenderTarget &target)
 {
 
 }

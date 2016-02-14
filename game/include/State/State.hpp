@@ -31,7 +31,7 @@ public:
 
     virtual void onUnpause() {};
 
-    virtual void processEvent(sf::Event event) {};
+    virtual void processEvent(sf::Event event, sf::RenderTarget &target) {};
 
     virtual void update(sf::Time dt) {};
 

@@ -31,7 +31,7 @@ void WindowManager::run()
         {
             //Let the state process the event
             if(m_engine.getRunningState())
-                m_engine.getRunningState()->processEvent(event);
+                m_engine.getRunningState()->processEvent(event, m_window);
 
             if (event.type == sf::Event::Closed)
                 m_window.close();

@@ -1,6 +1,9 @@
 #ifndef YAPG_GAME_STATE_MAINMENUSTATE_H
 #define YAPG_GAME_STATE_MAINMENUSTATE_H
 
+#include "simplgui/Button.h"
+#include "simplgui/TextBox.h"
+
 #include "Resources/GuiResourcesGetter.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
@@ -24,7 +27,7 @@ public:
 
     virtual void onUnpause();
 
-    virtual void processEvent(sf::Event event);
+    virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
     virtual void update(sf::Time dt);
 
@@ -36,6 +39,11 @@ private:
     settings::SettingsManager& m_settingsManager;
 
     resources::GuiResourcesGetter::Ptr m_guiResGetter;
+
+    //GUI Widgets
+    simplgui::TextBox::Ptr m_levelPathTextBox;
+    simplgui::Button::Ptr m_playLevelButton;
+    simplgui::Button::Ptr m_settingsButton;
 };
 
 }
