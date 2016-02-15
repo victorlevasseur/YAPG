@@ -34,18 +34,15 @@ int main(int argc, char** argv)
     //Texture manager and font manager
     resources::TexturesManager texturesManager("assets");
     resources::FontManager fontManager("assets");
+    resources::SoundManager soundManager("assets");
 
     //Window manager
     window::WindowManager windowManager(stateEngine, "Yet Another Platformer Game");
 
     stateEngine.stopAndStartState
-    <state::MainMenuState, resources::TexturesManager&, resources::FontManager&, settings::SettingsManager&>(
-        texturesManager, fontManager, settingsManager
+    <state::MainMenuState, resources::TexturesManager&, resources::FontManager&, resources::SoundManager&, settings::SettingsManager&>(
+        texturesManager, fontManager, soundManager, settingsManager
     );
-    /*stateEngine.stopAndStartState
-    <state::LevelState, std::string, resources::TexturesManager&, settings::SettingsManager&>(
-        "level.lua", texturesManager, settingsManager
-    );*/
 
     windowManager.run();
 

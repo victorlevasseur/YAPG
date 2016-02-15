@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 
+#include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
@@ -53,6 +54,7 @@ private:
 
 using TexturesManager = ResourcesManager<sf::Texture>;
 using FontManager = ResourcesManager<sf::Font>;
+using SoundManager = ResourcesManager<sf::SoundBuffer>;
 
 }
 

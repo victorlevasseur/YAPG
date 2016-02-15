@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include <SFML/Audio/Sound.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
@@ -24,7 +25,7 @@ namespace state
 class MainMenuState : public State
 {
 public:
-    MainMenuState(StateEngine& stateEngine, resources::TexturesManager& texturesManager, resources::FontManager& fontManager, settings::SettingsManager& settingsManager);
+    MainMenuState(StateEngine& stateEngine, resources::TexturesManager& texturesManager, resources::FontManager& fontManager, resources::SoundManager& soundManager, settings::SettingsManager& settingsManager);
 
     virtual void onStart();
 
@@ -43,6 +44,7 @@ public:
 private:
     resources::TexturesManager& m_texturesManager;
     resources::FontManager& m_fontManager;
+    resources::SoundManager& m_soundManager;
     settings::SettingsManager& m_settingsManager;
 
     resources::GuiResourcesGetter::Ptr m_guiResGetter;
@@ -62,6 +64,10 @@ private:
     animation::AnimatedSprite m_playerSprite;
     std::shared_ptr<sf::Texture> m_groundTexture;
     sf::Sprite m_groundSprite;
+
+    //Menu music
+    std::shared_ptr<sf::SoundBuffer> m_backgroundSoundBuffer;
+    sf::Sound m_backgroundSound;
 };
 
 }

@@ -9,10 +9,11 @@
 namespace state
 {
 
-MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManager& texturesManager, resources::FontManager& fontManager, settings::SettingsManager& settingsManager) :
+MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManager& texturesManager, resources::FontManager& fontManager, resources::SoundManager& soundManager, settings::SettingsManager& settingsManager) :
     State(stateEngine),
     m_texturesManager(texturesManager),
     m_fontManager(fontManager),
+    m_soundManager(soundManager),
     m_settingsManager(settingsManager),
     m_guiResGetter(resources::GuiResourcesGetter::create(m_fontManager)),
     m_logoTexture(texturesManager.requestResource("menu/YAPGLogo.png")),
@@ -24,7 +25,9 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManage
     m_playerAnimations(),
     m_playerSprite(texturesManager.requestResource("menu/spritesheet_players.png"), m_playerAnimations),
     m_groundTexture(texturesManager.requestResource("menu/ground.png")),
-    m_groundSprite(*m_groundTexture)
+    m_groundSprite(*m_groundTexture),
+    m_backgroundSoundBuffer(soundManager.requestResource("menu/bensound-clearday.ogg")),
+    m_backgroundSound(*m_backgroundSoundBuffer)
 {
     //Theme
     simplgui::Theme theme = simplgui::Theme::defaultTheme();
@@ -88,12 +91,12 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManage
 
 void MainMenuState::onStart()
 {
-
+    m_backgroundSound.play();
 }
 
 void MainMenuState::onStop()
 {
-
+    m_backgroundSound.stop();
 }
 
 void MainMenuState::onPause()
