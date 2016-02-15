@@ -1,5 +1,7 @@
 #include "State/MainMenuState.hpp"
 
+#include <cmath>
+
 #include "simplgui/Theme.h"
 #include "simplgui/Tools.h"
 
@@ -40,7 +42,8 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManage
     m_quitButton->setTheme(theme);
 
     //Logo
-    m_logoSprite.setPosition(sf::Vector2f(200.f, 25.f));
+    m_logoSprite.setOrigin(m_logoSprite.getLocalBounds().width/2.f, m_logoSprite.getLocalBounds().height/2.f);
+    m_logoSprite.setPosition(sf::Vector2f(512.f, 120.f));
 
     //Level path textbox
     m_levelPathTextBox->setPosition(sf::Vector2f(100.f, 250.f));
@@ -140,6 +143,9 @@ void MainMenuState::doStart()
 
 void MainMenuState::doUpdate(sf::Time dt)
 {
+    float scale = 1.f + 0.05f * std::sin(getTimeSinceStart().asSeconds());
+    m_logoSprite.setScale(sf::Vector2f(scale, scale));
+
     m_levelPathTextBox->update(dt);
     m_playLevelButton->update(dt);
     m_settingsButton->update(dt);
