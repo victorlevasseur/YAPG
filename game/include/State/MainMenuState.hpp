@@ -1,9 +1,16 @@
 #ifndef YAPG_GAME_STATE_MAINMENUSTATE_H
 #define YAPG_GAME_STATE_MAINMENUSTATE_H
 
+#include <memory>
+
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+
 #include "simplgui/Button.h"
 #include "simplgui/TextBox.h"
 
+#include "Animation/AnimatedSprite.hpp"
+#include "Animation/Animation.hpp"
 #include "Resources/GuiResourcesGetter.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
@@ -40,12 +47,21 @@ private:
 
     resources::GuiResourcesGetter::Ptr m_guiResGetter;
 
-    //GUI Widgets
+    //Menu elements
+    std::shared_ptr<sf::Texture> m_logoTexture;
+    sf::Sprite m_logoSprite;
+
     simplgui::TextBox::Ptr m_levelPathTextBox;
     simplgui::Button::Ptr m_playLevelButton;
 
     simplgui::Button::Ptr m_settingsButton;
     simplgui::Button::Ptr m_quitButton;
+
+    //Menu anim
+    std::map<std::string, animation::Animation> m_playerAnimations;
+    animation::AnimatedSprite m_playerSprite;
+    std::shared_ptr<sf::Texture> m_groundTexture;
+    sf::Sprite m_groundSprite;
 };
 
 }

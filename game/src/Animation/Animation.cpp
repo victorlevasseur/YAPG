@@ -12,6 +12,20 @@ Animation::Animation() :
 
 }
 
+Animation::Animation(const std::vector<Frame>& frames) :
+    m_frames(frames),
+    m_totalDuration(0.f)
+{
+
+}
+
+Animation::Animation(std::vector<Frame>&& frames) :
+    m_frames(std::move(frames)),
+    m_totalDuration(0.f)
+{
+
+}
+
 void Animation::normalizeFramesDurations()
 {
     float totalRelativeDuration = 0.f;

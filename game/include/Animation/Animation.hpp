@@ -10,6 +10,8 @@ class Animation
 {
 public:
     Animation();
+    Animation(const std::vector<Frame>& frames);
+    Animation(std::vector<Frame>&& frames);
 
     void normalizeFramesDurations();
 
@@ -17,6 +19,7 @@ public:
     Frame& getFrameAt(float t);
 
     float getDuration() const { return m_totalDuration; }
+    void setDuration(float duration) { m_totalDuration = duration; normalizeFramesDurations(); }
 
     static void registerClass();
 
