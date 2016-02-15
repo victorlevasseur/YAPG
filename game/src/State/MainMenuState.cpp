@@ -87,6 +87,10 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManage
     m_groundTexture->setRepeated(true);
     m_groundSprite.setPosition(sf::Vector2f(0.f, 556.f));
     m_groundSprite.setTextureRect(sf::IntRect(0, 0, 1024.f + 128.f, 384.f));
+
+    //Sound init
+    m_backgroundSound.setLoop(true);
+    m_backgroundSound.setVolume(20.f);
 }
 
 void MainMenuState::onStart()
