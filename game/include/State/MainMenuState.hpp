@@ -27,8 +27,6 @@ class MainMenuState : public State
 public:
     MainMenuState(StateEngine& stateEngine, resources::TexturesManager& texturesManager, resources::FontManager& fontManager, resources::SoundManager& soundManager, settings::SettingsManager& settingsManager);
 
-    virtual void onStart();
-
     virtual void onStop();
 
     virtual void onPause();
@@ -37,9 +35,12 @@ public:
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
-    virtual void update(sf::Time dt);
-
     virtual void render(sf::RenderTarget& target);
+
+protected:
+    virtual void doStart();
+
+    virtual void doUpdate(sf::Time dt);
 
 private:
     resources::TexturesManager& m_texturesManager;

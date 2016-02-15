@@ -11,6 +11,18 @@ State::State(StateEngine& stateEngine) :
 
 }
 
+void State::onStart()
+{
+    m_timeSinceStart = sf::Time();
+    doStart();
+}
+
+void State::update(sf::Time dt)
+{
+    m_timeSinceStart += dt;
+    doUpdate(dt);
+}
+
 const StateEngine& State::getStateEngine() const
 {
     return m_stateEngine;
@@ -19,6 +31,11 @@ const StateEngine& State::getStateEngine() const
 StateEngine& State::getStateEngine()
 {
     return m_stateEngine;
+}
+
+sf::Time State::getTimeSinceStart() const
+{
+    return m_timeSinceStart;
 }
 
 }

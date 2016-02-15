@@ -93,11 +93,6 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManage
     m_backgroundSound.setVolume(20.f);
 }
 
-void MainMenuState::onStart()
-{
-    m_backgroundSound.play();
-}
-
 void MainMenuState::onStop()
 {
     m_backgroundSound.stop();
@@ -123,7 +118,27 @@ void MainMenuState::processEvent(sf::Event event, sf::RenderTarget &target)
     m_quitButton->processEvent(guiEvent);
 }
 
-void MainMenuState::update(sf::Time dt)
+void MainMenuState::render(sf::RenderTarget& target)
+{
+    target.clear(sf::Color(140, 200, 255));
+
+    target.draw(m_logoSprite);
+
+    target.draw(m_playerSprite);
+    target.draw(m_groundSprite);
+
+    target.draw(*m_levelPathTextBox);
+    target.draw(*m_playLevelButton);
+    target.draw(*m_settingsButton);
+    target.draw(*m_quitButton);
+}
+
+void MainMenuState::doStart()
+{
+    m_backgroundSound.play();
+}
+
+void MainMenuState::doUpdate(sf::Time dt)
 {
     m_levelPathTextBox->update(dt);
     m_playLevelButton->update(dt);
@@ -144,21 +159,6 @@ void MainMenuState::update(sf::Time dt)
             m_groundSprite.getPosition().y
         ));
     }
-}
-
-void MainMenuState::render(sf::RenderTarget& target)
-{
-    target.clear(sf::Color(140, 200, 255));
-
-    target.draw(m_logoSprite);
-
-    target.draw(m_playerSprite);
-    target.draw(m_groundSprite);
-
-    target.draw(*m_levelPathTextBox);
-    target.draw(*m_playLevelButton);
-    target.draw(*m_settingsButton);
-    target.draw(*m_quitButton);
 }
 
 }

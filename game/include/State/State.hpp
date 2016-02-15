@@ -23,7 +23,7 @@ public:
 
     State(StateEngine& stateEngine);
 
-    virtual void onStart() {};
+    void onStart();
 
     virtual void onStop() {};
 
@@ -33,16 +33,23 @@ public:
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target) {};
 
-    virtual void update(sf::Time dt) {};
+    void update(sf::Time dt);
 
     virtual void render(sf::RenderTarget &target) {};
 
 protected:
+    virtual void doStart() {};
+
+    virtual void doUpdate(sf::Time dt) {};
+
     const StateEngine& getStateEngine() const;
     StateEngine& getStateEngine();
 
+    sf::Time getTimeSinceStart() const;
+
 private:
     StateEngine& m_stateEngine;
+    sf::Time m_timeSinceStart;
 };
 
 }

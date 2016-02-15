@@ -26,11 +26,6 @@ LevelState::LevelState(StateEngine& stateEngine, std::string path, resources::Te
     m_systemMgr.configure();
 }
 
-void LevelState::onStart()
-{
-
-}
-
 void LevelState::onStop()
 {
 
@@ -51,19 +46,24 @@ void LevelState::processEvent(sf::Event event, sf::RenderTarget &target)
 
 }
 
-void LevelState::update(sf::Time dt)
+void LevelState::render(sf::RenderTarget& target)
+{
+    target.clear(sf::Color(0, 180, 255));
+    m_systemMgr.system<systems::RenderSystem>()->render(target);
+}
+
+void LevelState::doStart()
+{
+
+}
+
+void LevelState::doUpdate(sf::Time dt)
 {
     m_systemMgr.update<systems::PlayerSystem>(dt.asSeconds());
     m_systemMgr.update<systems::HitboxUpdaterSystem>(dt.asSeconds());
     m_systemMgr.update<systems::PlatformerSystem>(dt.asSeconds());
     m_systemMgr.update<systems::CustomBehaviorSystem>(dt.asSeconds());
     m_systemMgr.update<systems::RenderSystem>(dt.asSeconds());
-}
-
-void LevelState::render(sf::RenderTarget& target)
-{
-    target.clear(sf::Color(0, 180, 255));
-    m_systemMgr.system<systems::RenderSystem>()->render(target);
 }
 
 }
