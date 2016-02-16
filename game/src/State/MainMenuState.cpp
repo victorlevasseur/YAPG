@@ -6,6 +6,7 @@
 #include "simplgui/Tools.h"
 
 #include "State/LevelState.hpp"
+#include "State/SettingsMenuState.hpp"
 #include "State/StateEngine.hpp"
 
 namespace state
@@ -60,7 +61,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManage
     m_playLevelButton->onClicked.bind([&](simplgui::Button::Ptr widget)
     {
         getStateEngine().stopAndStartState
-        <state::LevelState, std::string, resources::TexturesManager&, settings::SettingsManager&>(
+            <state::LevelState, std::string, resources::TexturesManager&, settings::SettingsManager&>(
             simplgui::tools::getSfString(m_levelPathTextBox->getText()).toAnsiString(), m_texturesManager, m_settingsManager
         );
     });
@@ -69,6 +70,15 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManage
     m_settingsButton->setPosition(sf::Vector2f(100.f, 650.f));
     m_settingsButton->setSize(sf::Vector2f(200.f, simplgui::AUTO_SIZE));
     m_settingsButton->setLabel(U"Settings");
+    m_settingsButton->onClicked.bind([&](simplgui::Button::Ptr widget)
+    {
+        getStateEngine().pauseAndStartState
+            <state::SettingsMenuState, resources::TexturesManager&,
+            resources::FontManager&, resources::SoundManager&,
+            settings::SettingsManager&>(
+            m_texturesManager, m_fontManager, m_soundManager, m_settingsManager
+        );
+    });
 
     //Quit button
     m_quitButton->setPosition(sf::Vector2f(724.f, 650.f));
