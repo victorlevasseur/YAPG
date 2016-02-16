@@ -61,8 +61,13 @@ private:
     simplgui::Button::Ptr m_quitButton;
 
     //Menu anim
+    // - Player
     std::map<std::string, animation::Animation> m_playerAnimations;
     animation::AnimatedSprite m_playerSprite;
+    bool m_draggingPlayer;
+    sf::Vector2f m_offsetToPlayer;
+
+    // - Ground
     std::shared_ptr<sf::Texture> m_groundTexture;
     sf::Sprite m_groundSprite;
 
