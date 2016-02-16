@@ -17,10 +17,10 @@ void State::onStart()
     doStart();
 }
 
-void State::update(sf::Time dt)
+void State::update(sf::Time dt, sf::RenderTarget &target)
 {
     m_timeSinceStart += dt;
-    doUpdate(dt);
+    doUpdate(dt, target);
 }
 
 const StateEngine& State::getStateEngine() const

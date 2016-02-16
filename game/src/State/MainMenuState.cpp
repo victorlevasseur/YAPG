@@ -177,18 +177,6 @@ void MainMenuState::render(sf::RenderTarget& target)
     target.draw(*m_quitButton);
 
     target.draw(m_playerSprite);
-
-    //TODO: Move it to doUpdate, but need a ref to the RenderTarget!
-    //Move the player to the mouse if it is dragged
-    if(m_draggingPlayer)
-    {
-        //TODO: Forbid the user to put the player sprite under the ground
-        sf::Vector2f playerDestination =
-            target.mapPixelToCoords(sf::Mouse::getPosition(dynamic_cast<sf::RenderWindow&>(target))) - m_offsetToPlayer;
-        m_playerSprite.setPosition(
-            playerDestination.x, std::min(playerDestination.y, 370.f)
-        );
-    }
 }
 
 void MainMenuState::doStart()
@@ -196,7 +184,7 @@ void MainMenuState::doStart()
     m_backgroundSound.play();
 }
 
-void MainMenuState::doUpdate(sf::Time dt)
+void MainMenuState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 {
     float scale = 1.f + 0.05f * std::sin(getTimeSinceStart().asSeconds());
     m_logoSprite.setScale(sf::Vector2f(scale, scale));
@@ -221,8 +209,17 @@ void MainMenuState::doUpdate(sf::Time dt)
         ));
     }
 
-    //Move the player sprite back to its position after a drag
-    if(!m_draggingPlayer)
+    //Move the player to the mouse if it is dragged
+    if(m_draggingPlayer)
+    {
+        //TODO: Forbid the user to put the player sprite under the ground
+        sf::Vector2f playerDestination =
+            target.mapPixelToCoords(sf::Mouse::getPosition(dynamic_cast<sf::RenderWindow&>(target))) - m_offsetToPlayer;
+        m_playerSprite.setPosition(
+            playerDestination.x, std::min(playerDestination.y, 370.f)
+        );
+    }
+    else //Move the player sprite back to its position after a drag
     {
         //Drag down the player when not dragged by the mouse
         if(m_playerSprite.getPosition().y < 370.f)

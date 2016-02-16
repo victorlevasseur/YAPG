@@ -33,14 +33,14 @@ public:
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target) {};
 
-    void update(sf::Time dt);
+    void update(sf::Time dt, sf::RenderTarget &target);
 
     virtual void render(sf::RenderTarget &target) {};
 
 protected:
     virtual void doStart() {};
 
-    virtual void doUpdate(sf::Time dt) {};
+    virtual void doUpdate(sf::Time dt, sf::RenderTarget &target) {};
 
     const StateEngine& getStateEngine() const;
     StateEngine& getStateEngine();

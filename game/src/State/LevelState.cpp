@@ -57,7 +57,7 @@ void LevelState::doStart()
 
 }
 
-void LevelState::doUpdate(sf::Time dt)
+void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 {
     m_systemMgr.update<systems::PlayerSystem>(dt.asSeconds());
     m_systemMgr.update<systems::HitboxUpdaterSystem>(dt.asSeconds());

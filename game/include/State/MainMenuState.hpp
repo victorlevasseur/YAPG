@@ -40,7 +40,7 @@ public:
 protected:
     virtual void doStart();
 
-    virtual void doUpdate(sf::Time dt);
+    virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);
 
 private:
     resources::TexturesManager& m_texturesManager;

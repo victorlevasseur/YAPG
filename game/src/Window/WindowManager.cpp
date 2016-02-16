@@ -44,7 +44,7 @@ void WindowManager::run()
         while(elapsedTime >= sf::seconds(1/60.f))
         {
             if(m_engine.getRunningState())
-                m_engine.getRunningState()->update(sf::seconds(1/60.f));
+                m_engine.getRunningState()->update(sf::seconds(1/60.f), m_window);
 
             elapsedTime -= sf::seconds(1/60.f);
         }

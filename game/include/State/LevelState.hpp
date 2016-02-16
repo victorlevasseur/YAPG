@@ -34,7 +34,7 @@ public:
 protected:
     virtual void doStart();
 
-    virtual void doUpdate(sf::Time dt);
+    virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);
 
 private:
     lua::LuaState m_luaState;
