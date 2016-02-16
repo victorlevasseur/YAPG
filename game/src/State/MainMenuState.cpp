@@ -234,12 +234,16 @@ void MainMenuState::doUpdate(sf::Time dt, sf::RenderTarget &target)
                 sf::Vector2f(m_playerSprite.getPosition().x, 370.f)
             );
         }
+    }
 
-        //Reset the animation when he's on the floor
-        if(m_playerSprite.getPosition().y >= 370.f && m_playerSprite.getCurrentAnimation() != "default")
-        {
-            m_playerSprite.setCurrentAnimation("default");
-        }
+    //Reset the animation to "default" when he's on the floor
+    if(m_playerSprite.getPosition().y >= 370.f && m_playerSprite.getCurrentAnimation() != "default")
+    {
+        m_playerSprite.setCurrentAnimation("default");
+    }
+    else if(m_playerSprite.getPosition().y < 370.f && m_playerSprite.getCurrentAnimation() != "jump")
+    {
+        m_playerSprite.setCurrentAnimation("jump");
     }
 }
 
