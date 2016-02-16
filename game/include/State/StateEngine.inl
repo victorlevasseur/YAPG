@@ -44,7 +44,7 @@ void StateEngine::pauseAndStartState(Args&&... args)
         }
 
         //Create the new state on top of the stack
-        m_states.push(m_todoNextFrameState);
+        m_states.push(std::move(m_todoNextFrameState));
         m_states.top()->onStart();
 
         notify();
