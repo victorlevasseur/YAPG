@@ -84,6 +84,10 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManage
     m_quitButton->setPosition(sf::Vector2f(724.f, 650.f));
     m_quitButton->setSize(sf::Vector2f(200.f, simplgui::AUTO_SIZE));
     m_quitButton->setLabel(U"Quit");
+    m_quitButton->onClicked.bind([&](simplgui::Button::Ptr widget)
+    {
+        getStateEngine().stopStateAndUnpause();
+    });
 
     //Main menu animations
     // - The player

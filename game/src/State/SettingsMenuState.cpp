@@ -73,7 +73,7 @@ SettingsMenuState::SettingsMenuState(StateEngine& stateEngine, resources::Textur
     m_jumpButton->onClicked.bind(keyChangeCallback);
 
     //Return button
-    m_returnButton->setPosition(sf::Vector2f(724.f, 650.f));
+    m_returnButton->setPosition(sf::Vector2f(412.f, 650.f));
     m_returnButton->setSize(sf::Vector2f(200.f, simplgui::AUTO_SIZE));
     m_returnButton->setLabel(U"Back");
     m_returnButton->onClicked.bind([&](simplgui::Button::Ptr button) {

@@ -20,7 +20,7 @@ void StateEngine::stopStateAndUnpause()
     m_todoNextFrame = [&]()
     {
         //If there is a top state, stop it
-        if(m_states.size() > 1)
+        if(m_states.size() >= 1)
         {
             m_states.top()->onStop();
             m_states.pop();
