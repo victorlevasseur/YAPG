@@ -50,9 +50,15 @@ private:
     settings::SettingsManager& m_settingsManager;
 
     resources::GuiResourcesGetter::Ptr m_guiResGetter;
+    std::shared_ptr<sf::Font> m_menuFont;
 
+    sf::Text m_settingsTitle;
+    sf::Text m_keySettingsTitle;
+    sf::Text m_leftButtonLabel;
     simplgui::Button::Ptr m_leftButton;
+    sf::Text m_rightButtonLabel;
     simplgui::Button::Ptr m_rightButton;
+    sf::Text m_jumpButtonLabel;
     simplgui::Button::Ptr m_jumpButton;
 
     simplgui::Button::Ptr m_returnButton;

@@ -15,8 +15,14 @@ SettingsMenuState::SettingsMenuState(StateEngine& stateEngine, resources::Textur
     m_soundManager(soundManager),
     m_settingsManager(settingsManager),
     m_guiResGetter(resources::GuiResourcesGetter::create(m_fontManager)),
+    m_menuFont(fontManager.requestResource("LiberationSans.ttf")),
+    m_settingsTitle("Settings", *m_menuFont, 60u),
+    m_keySettingsTitle("Keyboard settings", *m_menuFont, 40u),
+    m_leftButtonLabel("Left:", *m_menuFont),
     m_leftButton(simplgui::Button::create(m_guiResGetter)),
+    m_rightButtonLabel("Right:", *m_menuFont),
     m_rightButton(simplgui::Button::create(m_guiResGetter)),
+    m_jumpButtonLabel("Jump:", *m_menuFont),
     m_jumpButton(simplgui::Button::create(m_guiResGetter)),
     m_returnButton(simplgui::Button::create(m_guiResGetter)),
     m_currentPlayer(0),
@@ -32,12 +38,22 @@ SettingsMenuState::SettingsMenuState(StateEngine& stateEngine, resources::Textur
     m_jumpButton->setTheme(theme);
     m_returnButton->setTheme(theme);
 
+    m_settingsTitle.setPosition(sf::Vector2f(512.f - m_settingsTitle.getGlobalBounds().width/2.f, 50.f));
+    m_settingsTitle.setColor(sf::Color::Black);
+    m_keySettingsTitle.setPosition(sf::Vector2f(100.f, 180.f));
+    m_keySettingsTitle.setColor(sf::Color::Black);
     //Keys buttons
-    m_leftButton->setPosition(sf::Vector2f(300.f, 200.f));
+    m_leftButtonLabel.setPosition(sf::Vector2f(100.f, 250.f));
+    m_leftButtonLabel.setColor(sf::Color::Black);
+    m_leftButton->setPosition(sf::Vector2f(200.f, 250.f));
     m_leftButton->setSize(sf::Vector2f(150.f, simplgui::AUTO_SIZE));
-    m_rightButton->setPosition(sf::Vector2f(300.f, 250.f));
+    m_rightButtonLabel.setPosition(sf::Vector2f(100.f, 300.f));
+    m_rightButtonLabel.setColor(sf::Color::Black);
+    m_rightButton->setPosition(sf::Vector2f(200.f, 300.f));
     m_rightButton->setSize(sf::Vector2f(150.f, simplgui::AUTO_SIZE));
-    m_jumpButton->setPosition(sf::Vector2f(300.f, 300.f));
+    m_jumpButtonLabel.setPosition(sf::Vector2f(100.f, 350.f));
+    m_jumpButtonLabel.setColor(sf::Color::Black);
+    m_jumpButton->setPosition(sf::Vector2f(200.f, 350.f));
     m_jumpButton->setSize(sf::Vector2f(150.f, simplgui::AUTO_SIZE));
 
     auto keyChangeCallback = [&](simplgui::Button::Ptr button)
@@ -109,8 +125,13 @@ void SettingsMenuState::render(sf::RenderTarget& target)
 {
     target.clear(sf::Color(140, 200, 255));
 
+    target.draw(m_settingsTitle);
+    target.draw(m_keySettingsTitle);
+    target.draw(m_leftButtonLabel);
     target.draw(*m_leftButton);
+    target.draw(m_rightButtonLabel);
     target.draw(*m_rightButton);
+    target.draw(m_jumpButtonLabel);
     target.draw(*m_jumpButton);
 
     target.draw(*m_returnButton);
