@@ -32,16 +32,14 @@ int main(int argc, char** argv)
     settings::SettingsManager settingsManager("config.xml");
 
     //Texture manager and font manager
-    resources::TexturesManager texturesManager("assets");
-    resources::FontManager fontManager("assets");
-    resources::SoundManager soundManager("assets");
+    resources::AllResourcesManagers resManager("assets");
 
     //Window manager
     window::WindowManager windowManager(stateEngine, "Yet Another Platformer Game");
 
     stateEngine.stopAndStartState
-    <state::MainMenuState, resources::TexturesManager&, resources::FontManager&, resources::SoundManager&, settings::SettingsManager&>(
-        texturesManager, fontManager, soundManager, settingsManager
+    <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&>(
+        resManager, settingsManager
     );
 
     windowManager.run();

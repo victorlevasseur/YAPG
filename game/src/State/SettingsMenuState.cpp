@@ -8,14 +8,12 @@
 namespace state
 {
 
-SettingsMenuState::SettingsMenuState(StateEngine& stateEngine, resources::TexturesManager& texturesManager, resources::FontManager& fontManager, resources::SoundManager& soundManager, settings::SettingsManager& settingsManager) :
+SettingsMenuState::SettingsMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
     State(stateEngine),
-    m_texturesManager(texturesManager),
-    m_fontManager(fontManager),
-    m_soundManager(soundManager),
+    m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
-    m_guiResGetter(resources::GuiResourcesGetter::create(m_fontManager)),
-    m_menuFont(fontManager.requestResource("LiberationSans.ttf")),
+    m_guiResGetter(resources::GuiResourcesGetter::create(m_resourcesManager.getFonts())),
+    m_menuFont(m_resourcesManager.getFonts().requestResource("LiberationSans.ttf")),
     m_settingsTitle("Settings", *m_menuFont, 60u),
     m_keySettingsTitle("Keyboard settings", *m_menuFont, 40u),
     m_leftButtonLabel("Left:", *m_menuFont),

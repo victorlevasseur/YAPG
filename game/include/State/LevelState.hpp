@@ -19,7 +19,7 @@ namespace state
 class LevelState : public State
 {
 public:
-    LevelState(StateEngine& stateEngine, std::string path, resources::TexturesManager& texturesManager, settings::SettingsManager& settingsManager);
+    LevelState(StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
 
     virtual void onStop();
 

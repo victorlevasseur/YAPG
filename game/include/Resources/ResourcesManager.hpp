@@ -53,8 +53,34 @@ private:
 };
 
 using TexturesManager = ResourcesManager<sf::Texture>;
-using FontManager = ResourcesManager<sf::Font>;
-using SoundManager = ResourcesManager<sf::SoundBuffer>;
+using FontsManager = ResourcesManager<sf::Font>;
+using SoundsManager = ResourcesManager<sf::SoundBuffer>;
+
+class AllResourcesManagers
+{
+public:
+    AllResourcesManagers(const std::string& resourcesPath) :
+        m_texturesManager(resourcesPath),
+        m_fontsManager(resourcesPath),
+        m_soundsManager(resourcesPath)
+    {
+
+    }
+
+    const TexturesManager& getTextures() const { return m_texturesManager; }
+    TexturesManager& getTextures() { return m_texturesManager; }
+
+    const FontsManager& getFonts() const { return m_fontsManager; }
+    FontsManager& getFonts() { return m_fontsManager; }
+
+    const SoundsManager& getSounds() const { return m_soundsManager; }
+    SoundsManager& getSounds() { return m_soundsManager; }
+
+private:
+    TexturesManager m_texturesManager;
+    FontsManager m_fontsManager;
+    SoundsManager m_soundsManager;
+};
 
 }
 

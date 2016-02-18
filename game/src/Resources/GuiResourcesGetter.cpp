@@ -3,18 +3,18 @@
 namespace resources
 {
 
-std::shared_ptr<GuiResourcesGetter> GuiResourcesGetter::create(resources::FontManager& fontManager)
+std::shared_ptr<GuiResourcesGetter> GuiResourcesGetter::create(resources::FontsManager& fontsManager)
 {
-    return std::shared_ptr<GuiResourcesGetter>(new GuiResourcesGetter(fontManager));
+    return std::shared_ptr<GuiResourcesGetter>(new GuiResourcesGetter(fontsManager));
 }
 
 std::shared_ptr<sf::Font> GuiResourcesGetter::loadFont(const std::string& name)
 {
-    return m_fontManager.requestResource(name);
+    return m_fontsManager.requestResource(name);
 }
 
-GuiResourcesGetter::GuiResourcesGetter(resources::FontManager& fontManager) :
-    m_fontManager(fontManager)
+GuiResourcesGetter::GuiResourcesGetter(resources::FontsManager& fontsManager) :
+    m_fontsManager(fontsManager)
 {
 
 }

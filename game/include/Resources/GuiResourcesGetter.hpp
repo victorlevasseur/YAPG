@@ -16,15 +16,15 @@ class GuiResourcesGetter : public simplgui::ResourcesGetter
 public:
     using Ptr = std::shared_ptr<GuiResourcesGetter>;
 
-    static std::shared_ptr<GuiResourcesGetter> create(resources::FontManager& fontManager);
+    static std::shared_ptr<GuiResourcesGetter> create(resources::FontsManager& fontsManager);
 
     virtual std::shared_ptr<sf::Font> loadFont(const std::string& name);
 
 protected:
-    GuiResourcesGetter(resources::FontManager& fontManager);
+    GuiResourcesGetter(resources::FontsManager& fontsManager);
 
 private:
-    resources::FontManager& m_fontManager;
+    resources::FontsManager& m_fontsManager;
 };
 
 }

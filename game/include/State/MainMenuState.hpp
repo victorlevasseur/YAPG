@@ -25,7 +25,7 @@ namespace state
 class MainMenuState : public State
 {
 public:
-    MainMenuState(StateEngine& stateEngine, resources::TexturesManager& texturesManager, resources::FontManager& fontManager, resources::SoundManager& soundManager, settings::SettingsManager& settingsManager);
+    MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
 
     virtual void onStop();
 
@@ -43,9 +43,7 @@ protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);
 
 private:
-    resources::TexturesManager& m_texturesManager;
-    resources::FontManager& m_fontManager;
-    resources::SoundManager& m_soundManager;
+    resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;
 
     resources::GuiResourcesGetter::Ptr m_guiResGetter;

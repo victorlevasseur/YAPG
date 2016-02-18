@@ -23,7 +23,7 @@ namespace state
 class SettingsMenuState : public State
 {
 public:
-    SettingsMenuState(StateEngine& stateEngine, resources::TexturesManager& texturesManager, resources::FontManager& fontManager, resources::SoundManager& soundManager, settings::SettingsManager& settingsManager);
+    SettingsMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
 
     virtual void onStop();
 
@@ -44,9 +44,7 @@ private:
     void updateKeysButtonsFromSettings(int playerNumber);
     void updateSettingsFromKeysButtons();
 
-    resources::TexturesManager& m_texturesManager;
-    resources::FontManager& m_fontManager;
-    resources::SoundManager& m_soundManager;
+    resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;
 
     resources::GuiResourcesGetter::Ptr m_guiResGetter;

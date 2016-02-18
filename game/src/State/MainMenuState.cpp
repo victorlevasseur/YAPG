@@ -12,26 +12,24 @@
 namespace state
 {
 
-MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManager& texturesManager, resources::FontManager& fontManager, resources::SoundManager& soundManager, settings::SettingsManager& settingsManager) :
+MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
     State(stateEngine),
-    m_texturesManager(texturesManager),
-    m_fontManager(fontManager),
-    m_soundManager(soundManager),
+    m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
-    m_guiResGetter(resources::GuiResourcesGetter::create(m_fontManager)),
-    m_logoTexture(texturesManager.requestResource("menu/YAPGLogo.png")),
+    m_guiResGetter(resources::GuiResourcesGetter::create(m_resourcesManager.getFonts())),
+    m_logoTexture(m_resourcesManager.getTextures().requestResource("menu/YAPGLogo.png")),
     m_logoSprite(*m_logoTexture),
     m_levelPathTextBox(simplgui::TextBox::create(m_guiResGetter)),
     m_playLevelButton(simplgui::Button::create(m_guiResGetter)),
     m_settingsButton(simplgui::Button::create(m_guiResGetter)),
     m_quitButton(simplgui::Button::create(m_guiResGetter)),
     m_playerAnimations(),
-    m_playerSprite(texturesManager.requestResource("menu/spritesheet_players.png"), m_playerAnimations),
+    m_playerSprite(m_resourcesManager.getTextures().requestResource("menu/spritesheet_players.png"), m_playerAnimations),
     m_draggingPlayer(false),
     m_offsetToPlayer(0.f, 0.f),
-    m_groundTexture(texturesManager.requestResource("menu/ground.png")),
+    m_groundTexture(m_resourcesManager.getTextures().requestResource("menu/ground.png")),
     m_groundSprite(*m_groundTexture),
-    m_backgroundSoundBuffer(soundManager.requestResource("menu/bensound-clearday.ogg")),
+    m_backgroundSoundBuffer(m_resourcesManager.getSounds().requestResource("menu/bensound-clearday.ogg")),
     m_backgroundSound(*m_backgroundSoundBuffer)
 {
     //Theme
@@ -61,8 +59,8 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManage
     m_playLevelButton->onClicked.bind([&](simplgui::Button::Ptr widget)
     {
         getStateEngine().stopAndStartState
-            <state::LevelState, std::string, resources::TexturesManager&, settings::SettingsManager&>(
-            simplgui::tools::getSfString(m_levelPathTextBox->getText()).toAnsiString(), m_texturesManager, m_settingsManager
+            <state::LevelState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&>(
+            simplgui::tools::getSfString(m_levelPathTextBox->getText()).toAnsiString(), m_resourcesManager, m_settingsManager
         );
     });
 
@@ -73,10 +71,9 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::TexturesManage
     m_settingsButton->onClicked.bind([&](simplgui::Button::Ptr widget)
     {
         getStateEngine().pauseAndStartState
-            <state::SettingsMenuState, resources::TexturesManager&,
-            resources::FontManager&, resources::SoundManager&,
+            <state::SettingsMenuState, resources::AllResourcesManagers&,
             settings::SettingsManager&>(
-            m_texturesManager, m_fontManager, m_soundManager, m_settingsManager
+            m_resourcesManager, m_settingsManager
         );
     });
 
