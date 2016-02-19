@@ -1,7 +1,0 @@
-class RadioButton : public ToggleButton
-{
-	unsigned long getGroupID() const;
-	void setGroupID(unsigned long group);
-
-	RadioButton* getSelectedButtonInGroup() const;
-};
