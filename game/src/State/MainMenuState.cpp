@@ -62,6 +62,13 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
 
     windowBox->PackEnd(playBox);
 
+    auto editorButton = sfg::Button::Create("Level editor...");
+    editorButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+    {
+        //TODO: Open the editor state
+    });
+    windowBox->PackEnd(editorButton, true, true);
+
     auto settingsButton = sfg::Button::Create("Settings...");
     settingsButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
