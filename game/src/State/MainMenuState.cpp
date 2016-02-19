@@ -245,7 +245,8 @@ void MainMenuState::processEvent(sf::Event event, sf::RenderTarget &target)
     {
         if(m_lastSelectedKeyButton != nullptr)
         {
-            m_lastSelectedKeyButton->SetLabel(tools::keyToString(event.key.code));
+            if(event.key.code != sf::Keyboard::Escape)
+                m_lastSelectedKeyButton->SetLabel(tools::keyToString(event.key.code));
             m_lastSelectedKeyButton = nullptr;
             updateSettingsFromKeysButtons();
             updateKeysButtonsFromSettings();
