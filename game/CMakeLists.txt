@@ -29,6 +29,12 @@ if(SFML_FOUND)
     target_include_directories(yapg-game PUBLIC ${SFML_INCLUDE_DIR})
 endif()
 
+#SFGUI lib
+find_package(SFGUI 0.3 REQUIRED)
+if(SFGUI_FOUND)
+    target_include_directories(yapg-game PUBLIC ${SFGUI_INCLUDE_DIR})
+endif()
+
 #Lua
 find_package(Lua 5 REQUIRED)
 if(LUA_FOUND)
@@ -43,7 +49,7 @@ endif()
 
 #Linking
 target_link_libraries(yapg-game PUBLIC
-    ${ENTITYX_STATIC_LIBRARY} ${SIMPLGUI_STATIC_LIBRARY} ${SFML_LIBRARIES} ${LUA_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY}
+    ${ENTITYX_STATIC_LIBRARY} ${SIMPLGUI_STATIC_LIBRARY} ${SFML_LIBRARIES} ${SFGUI_LIBRARY} ${LUA_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY}
 )
 
 #Install the app

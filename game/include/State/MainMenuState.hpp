@@ -2,10 +2,16 @@
 #define YAPG_GAME_STATE_MAINMENUSTATE_H
 
 #include <memory>
+#include <vector>
 
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+
+#include <SFGUI/Button.hpp>
+#include <SFGUI/Desktop.hpp>
+#include <SFGUI/SFGUI.hpp>
+#include <SFGUI/Window.hpp>
 
 #include "simplgui/Button.h"
 #include "simplgui/TextBox.h"
@@ -25,7 +31,7 @@ namespace state
 class MainMenuState : public State
 {
 public:
-    MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
+    MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui);
 
     virtual void onStop();
 
@@ -43,20 +49,29 @@ protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);
 
 private:
+    struct PlayerKeysWidgets
+    {
+        sfg::Button::Ptr leftKeyButton;
+        sfg::Button::Ptr rightKeyButton;
+        sfg::Button::Ptr jumpKeyButton;
+    };
+
+    void updateKeysButtonsFromSettings();
+    void updateSettingsFromKeysButtons();
+
     resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;
-
-    resources::GuiResourcesGetter::Ptr m_guiResGetter;
 
     //Menu elements
     std::shared_ptr<sf::Texture> m_logoTexture;
     sf::Sprite m_logoSprite;
 
-    simplgui::TextBox::Ptr m_levelPathTextBox;
-    simplgui::Button::Ptr m_playLevelButton;
-
-    simplgui::Button::Ptr m_settingsButton;
-    simplgui::Button::Ptr m_quitButton;
+    //GUI
+    sfg::SFGUI& m_sfgui;
+    sfg::Desktop m_desktop;
+    sfg::Window::Ptr m_settingsWindow;
+    std::vector<PlayerKeysWidgets> m_playersKeysWidgets;
+    sfg::Button::Ptr m_lastSelectedKeyButton;
 
     //Menu anim
     // - Player

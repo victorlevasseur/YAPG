@@ -2,6 +2,8 @@
 
 #include <boost/filesystem.hpp>
 
+#include <SFGUI/SFGUI.hpp>
+
 #include "Lua/LuaState.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
@@ -18,7 +20,6 @@ int main(int argc, char** argv)
     state::StateEngine stateEngine;
 
     //Settings manager
-
     //If the settings file doesn't exists, use the default_config.xml file to
     //create it
     if(!fs::exists(fs::path("config.xml")))
@@ -37,9 +38,12 @@ int main(int argc, char** argv)
     //Window manager
     window::WindowManager windowManager(stateEngine, "Yet Another Platformer Game");
 
+    //SFGUI
+    sfg::SFGUI sfgui;
+
     stateEngine.stopAndStartState
-    <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&>(
-        resManager, settingsManager
+    <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&>(
+        resManager, settingsManager, sfgui
     );
 
     windowManager.run();
