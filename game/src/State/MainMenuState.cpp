@@ -67,6 +67,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     {
         //TODO: Open the editor state
     });
+    editorButton->SetState(sfg::Widget::State::INSENSITIVE);
     windowBox->PackEnd(editorButton, true, true);
 
     auto settingsButton = sfg::Button::Create("Settings...");
