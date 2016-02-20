@@ -11,6 +11,7 @@
 
 #include "Settings/KeySettings.hpp"
 #include "State/LevelState.hpp"
+#include "State/LevelEditorState.hpp"
 #include "State/StateEngine.hpp"
 #include "Tools/KeyStrings.hpp"
 
@@ -65,9 +66,11 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     auto editorButton = sfg::Button::Create("Level editor...");
     editorButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
-        //TODO: Open the editor state
+        getStateEngine().stopAndStartState
+            <state::LevelEditorState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&>(
+            "newlevel.lua", m_resourcesManager, m_settingsManager
+        );
     });
-    editorButton->SetState(sfg::Widget::State::INSENSITIVE);
     windowBox->PackEnd(editorButton, true, true);
 
     auto settingsButton = sfg::Button::Create("Settings...");
