@@ -13,12 +13,8 @@
 #include <SFGUI/SFGUI.hpp>
 #include <SFGUI/Window.hpp>
 
-#include "simplgui/Button.h"
-#include "simplgui/TextBox.h"
-
 #include "Animation/AnimatedSprite.hpp"
 #include "Animation/Animation.hpp"
-#include "Resources/GuiResourcesGetter.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
 #include "State/State.hpp"
