@@ -27,7 +27,7 @@ namespace state
 class MainMenuState : public State
 {
 public:
-    MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui);
+    MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
 
     virtual void onStop();
 
@@ -64,7 +64,8 @@ private:
 
     //GUI
     sfg::SFGUI& m_sfgui;
-    sfg::Desktop m_desktop;
+    sfg::Desktop& m_desktop;
+    sfg::Window::Ptr m_mainMenuWindow;
     sfg::Window::Ptr m_settingsWindow;
     std::vector<PlayerKeysWidgets> m_playersKeysWidgets;
     sfg::Button::Ptr m_lastSelectedKeyButton;

@@ -5,6 +5,10 @@
 
 #include "entityx/entityx.h"
 
+#include <SFGUI/Desktop.hpp>
+#include <SFGUI/SFGUI.hpp>
+#include <SFGUI/Window.hpp>
+
 #include "Level/Level.hpp"
 #include "Lua/LuaState.hpp"
 #include "Resources/ResourcesManager.hpp"
@@ -19,7 +23,7 @@ namespace state
 class LevelEditorState : public State
 {
 public:
-    LevelEditorState(StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
+    LevelEditorState(StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
 
     virtual void onStop();
 
@@ -38,6 +42,9 @@ protected:
 
 private:
     lua::LuaState m_luaState;
+
+    sfg::SFGUI& m_sfgui;
+    sfg::Desktop& m_desktop;
 
     level::Level m_level;
     entityx::SystemManager m_systemMgr;

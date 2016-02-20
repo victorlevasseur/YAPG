@@ -40,10 +40,11 @@ int main(int argc, char** argv)
 
     //SFGUI
     sfg::SFGUI sfgui;
+    sfg::Desktop desktop;
 
     stateEngine.stopAndStartState
-    <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&>(
-        resManager, settingsManager, sfgui
+    <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
+        resManager, settingsManager, sfgui, desktop
     );
 
     windowManager.run();

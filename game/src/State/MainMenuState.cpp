@@ -20,14 +20,15 @@
 namespace state
 {
 
-MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui) :
+MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop) :
     State(stateEngine),
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
     m_logoTexture(m_resourcesManager.getTextures().requestResource("menu/YAPGLogo.png")),
     m_logoSprite(*m_logoTexture),
     m_sfgui(sfgui),
-    m_desktop(),
+    m_desktop(desktop),
+    m_mainMenuWindow(),
     m_settingsWindow(),
     m_playersKeysWidgets(),
     m_lastSelectedKeyButton(),
@@ -45,7 +46,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     m_logoSprite.setPosition(sf::Vector2f(512.f, 120.f));
 
     //Main menu Window
-    auto menuWindow = sfg::Window::Create(sfg::Window::BACKGROUND|sfg::Window::SHADOW);
+    m_mainMenuWindow = sfg::Window::Create(sfg::Window::BACKGROUND|sfg::Window::SHADOW);
     auto windowBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.f);
     auto playBox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 0.f);
     auto playLevelEntry = sfg::Entry::Create("level.lua");
@@ -69,8 +70,8 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     editorButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
         getStateEngine().stopAndStartState
-            <state::LevelEditorState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&>(
-            "newlevel.lua", m_resourcesManager, m_settingsManager
+            <state::LevelEditorState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
+            "newlevel.lua", m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
         );
     });
     windowBox->PackEnd(editorButton, true, true);
@@ -90,14 +91,13 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     });
     windowBox->PackEnd(quitButton);
 
-    menuWindow->Add(windowBox);
+    m_mainMenuWindow->Add(windowBox);
 
-    menuWindow->SetPosition(sf::Vector2f(
-        512.f - menuWindow->GetAllocation().width/2.f,
-        300.f - menuWindow->GetAllocation().height/2.f
+    m_mainMenuWindow->SetPosition(sf::Vector2f(
+        512.f - m_mainMenuWindow->GetAllocation().width/2.f,
+        300.f - m_mainMenuWindow->GetAllocation().height/2.f
     ));
-    menuWindow->SetTitle("Main menu");
-    m_desktop.Add(menuWindow);
+    m_mainMenuWindow->SetTitle("Main menu");
 
     //Settings window
     m_settingsWindow = sfg::Window::Create(sfg::Window::TOPLEVEL|sfg::Window::SHADOW);
@@ -166,7 +166,6 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     });
     settingsMainBox->PackEnd(backButton);
 
-    m_desktop.Add(m_settingsWindow);
     m_settingsWindow->SetPosition(sf::Vector2f(
         512.f - m_settingsWindow->GetAllocation().width/2.f,
         300.f - m_settingsWindow->GetAllocation().height/2.f
@@ -208,16 +207,31 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
 void MainMenuState::onStop()
 {
     m_backgroundSound.stop();
+
+    m_desktop.Remove(m_mainMenuWindow);
+    m_desktop.Remove(m_settingsWindow);
+
+    m_mainMenuWindow = nullptr; //Force SFGUI to dismiss those menus
+    m_settingsWindow = nullptr;
 }
 
 void MainMenuState::onPause()
 {
+    m_mainMenuWindow->Show(false); //Hide them to be able to show them again when unpaused
+    m_settingsWindow->Show(false);
 
+    m_desktop.Remove(m_mainMenuWindow);
+    m_desktop.Remove(m_settingsWindow);
+    m_desktop.Refresh();
 }
 
 void MainMenuState::onUnpause()
 {
+    m_mainMenuWindow->Show(true); //Show again the main menu when unpaused
 
+    m_desktop.Add(m_mainMenuWindow);
+    m_desktop.Add(m_settingsWindow);
+    m_desktop.Refresh();
 }
 
 void MainMenuState::processEvent(sf::Event event, sf::RenderTarget &target)
@@ -281,6 +295,11 @@ void MainMenuState::render(sf::RenderTarget& target)
 void MainMenuState::doStart()
 {
     m_backgroundSound.play();
+
+    m_mainMenuWindow->Show(true);
+
+    m_desktop.Add(m_mainMenuWindow);
+    m_desktop.Add(m_settingsWindow);
 }
 
 void MainMenuState::doUpdate(sf::Time dt, sf::RenderTarget &target)
