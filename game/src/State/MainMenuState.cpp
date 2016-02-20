@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <SFML/Graphics/RenderWindow.hpp>
+
 #include <SFGUI/Box.hpp>
 #include <SFGUI/Button.hpp>
 #include <SFGUI/Entry.hpp>
