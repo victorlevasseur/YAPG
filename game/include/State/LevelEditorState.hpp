@@ -1,12 +1,14 @@
 #ifndef YAPG_GAME_STATE_LEVELEDITORSTATE_H
 #define YAPG_GAME_STATE_LEVELEDITORSTATE_H
 
+#include <memory>
 #include <string>
 
 #include "entityx/entityx.h"
 
 #include <SFGUI/Desktop.hpp>
 #include <SFGUI/SFGUI.hpp>
+#include <SFGUI/ScrolledWindow.hpp>
 #include <SFGUI/Window.hpp>
 
 #include "Level/Level.hpp"
@@ -41,13 +43,24 @@ protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);
 
 private:
+    void initGUI();
+    void initSystemManager();
+
+    resources::AllResourcesManagers& m_resourcesManager;
+    settings::SettingsManager& m_settingsManager;
+
     lua::LuaState m_luaState;
 
     sfg::SFGUI& m_sfgui;
     sfg::Desktop& m_desktop;
+    sfg::Window::Ptr m_fileToolbar;
+    sfg::Window::Ptr m_toolsToolbar;
+    sfg::Window::Ptr m_toolsSettingsToolbar;
+        sfg::ScrolledWindow::Ptr m_templatesScrolled;
+        sfg::ScrolledWindow::Ptr m_propertiesScrolled;
 
     level::Level m_level;
-    entityx::SystemManager m_systemMgr;
+    std::unique_ptr<entityx::SystemManager> m_systemMgr;
 };
 
 }
