@@ -43,13 +43,6 @@ void LevelEditorState::onStop()
     m_desktop.Remove(m_fileToolbar);
     m_desktop.Remove(m_toolsToolbar);
     m_desktop.Remove(m_toolsSettingsToolbar);
-    m_fileToolbar = nullptr;
-    m_toolsToolbar = nullptr;
-    m_toolsSettingsToolbar = nullptr;
-    m_templatesScrolled = nullptr;
-    m_propertiesScrolled = nullptr;
-    m_templatesListBox = nullptr;
-    m_templatesListButtons.clear();
 }
 
 void LevelEditorState::onPause()

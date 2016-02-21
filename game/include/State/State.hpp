@@ -22,6 +22,7 @@ public:
     using NonOwningPtr = State*;
 
     State(StateEngine& stateEngine);
+    virtual ~State() {};
 
     void onStart();
 

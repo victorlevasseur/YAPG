@@ -210,9 +210,6 @@ void MainMenuState::onStop()
 
     m_desktop.Remove(m_mainMenuWindow);
     m_desktop.Remove(m_settingsWindow);
-
-    m_mainMenuWindow = nullptr; //Force SFGUI to dismiss those menus
-    m_settingsWindow = nullptr;
 }
 
 void MainMenuState::onPause()
