@@ -1,6 +1,6 @@
 entity_template = {
     name = "kenney_block_grass",
-    friendlyname = "Friendly name of template",
+    friendlyname = "[Kenney] Grass block",
 
     parameters = {
         x = {

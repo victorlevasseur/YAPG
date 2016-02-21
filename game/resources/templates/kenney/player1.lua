@@ -1,6 +1,6 @@
 entity_template = {
     name = "kenney_player1",
-    friendlyname = "Friendly name of template",
+    friendlyname = "[Kenney] Player 1",
 
     parameters = {
         x = {

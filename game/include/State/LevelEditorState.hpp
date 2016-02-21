@@ -1,6 +1,7 @@
 #ifndef YAPG_GAME_STATE_LEVELEDITORSTATE_H
 #define YAPG_GAME_STATE_LEVELEDITORSTATE_H
 
+#include <map>
 #include <memory>
 #include <string>
 
@@ -14,6 +15,7 @@
 #include <SFGUI/Window.hpp>
 
 #include "Level/Level.hpp"
+#include "Lua/EntityTemplate.hpp"
 #include "Lua/LuaState.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
@@ -62,7 +64,7 @@ private:
     sfg::Window::Ptr m_toolsSettingsToolbar;
         sfg::ScrolledWindow::Ptr m_templatesScrolled;
             sfg::Box::Ptr m_templatesListBox;
-            std::vector<sfg::ToggleButton::Ptr> m_templatesListButtons;
+            std::map<sfg::ToggleButton::Ptr, const lua::EntityTemplate&> m_templatesListButtons;
             sfg::ToggleButton::Ptr m_selectedTemplateButton;
         sfg::ScrolledWindow::Ptr m_propertiesScrolled;
 

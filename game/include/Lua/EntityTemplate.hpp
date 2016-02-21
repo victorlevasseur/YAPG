@@ -37,6 +37,13 @@ public:
     };
 
     EntityTemplate(const sol::table& templateTable);
+    ~EntityTemplate() = default;
+
+    EntityTemplate(const EntityTemplate&) = delete;
+    EntityTemplate& operator=(const EntityTemplate&) = delete;
+
+    EntityTemplate(EntityTemplate&&) = default;
+    EntityTemplate& operator=(EntityTemplate&&) = default;
 
     void applyInheritance(LuaState& luaState);
 

@@ -129,7 +129,7 @@ void LevelEditorState::initGUI()
         m_fileToolbar->GetAllocation().top + m_fileToolbar->GetAllocation().height
     ));
     m_toolsToolbar->SetRequisition(sf::Vector2f(
-        200.f,
+        300.f,
         0.f
     ));
 
@@ -154,7 +154,7 @@ void LevelEditorState::initGUI()
         m_toolsToolbar->GetAllocation().top + m_toolsToolbar->GetAllocation().height
     ));
     m_toolsSettingsToolbar->SetRequisition(sf::Vector2f(
-        200.f,
+        300.f,
         400.f
     ));
 
@@ -209,11 +209,11 @@ void LevelEditorState::updateTemplatesList()
     auto& templatesList = m_luaState.getTemplates();
     for(auto& pair : templatesList)
     {
-        auto& entityTemplate = pair.second;
-        auto templateButton = sfg::ToggleButton::Create(entityTemplate.getName());
+        const auto& entityTemplate = pair.second;
+        auto templateButton = sfg::ToggleButton::Create(entityTemplate.getFriendlyName());
 
         m_templatesListBox->PackEnd(templateButton);
-        m_templatesListButtons.push_back(templateButton);
+        m_templatesListButtons.emplace(templateButton, entityTemplate);
     }
 }
 
