@@ -44,6 +44,10 @@ public:
 
     void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const sol::table& parametersTable) const;
 
+    std::string getName() const { return m_name; }
+
+    std::string getFriendlyName() const { return m_friendlyName; }
+
 private:
     std::string m_name;
     std::string m_friendlyName;

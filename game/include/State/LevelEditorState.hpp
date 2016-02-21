@@ -6,9 +6,11 @@
 
 #include "entityx/entityx.h"
 
+#include <SFGUI/Box.hpp>
 #include <SFGUI/Desktop.hpp>
 #include <SFGUI/SFGUI.hpp>
 #include <SFGUI/ScrolledWindow.hpp>
+#include <SFGUI/ToggleButton.hpp>
 #include <SFGUI/Window.hpp>
 
 #include "Level/Level.hpp"
@@ -46,6 +48,8 @@ private:
     void initGUI();
     void initSystemManager();
 
+    void updateTemplatesList();
+
     resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;
 
@@ -57,6 +61,9 @@ private:
     sfg::Window::Ptr m_toolsToolbar;
     sfg::Window::Ptr m_toolsSettingsToolbar;
         sfg::ScrolledWindow::Ptr m_templatesScrolled;
+            sfg::Box::Ptr m_templatesListBox;
+            std::vector<sfg::ToggleButton::Ptr> m_templatesListButtons;
+            sfg::ToggleButton::Ptr m_selectedTemplateButton;
         sfg::ScrolledWindow::Ptr m_propertiesScrolled;
 
     level::Level m_level;

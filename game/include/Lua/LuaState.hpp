@@ -25,6 +25,9 @@ public:
 
     const EntityTemplate& getTemplate(const std::string& name) const;
 
+    const std::map<std::string, EntityTemplate>& getTemplates() const { return m_templates; }
+    std::map<std::string, EntityTemplate>& getTemplates() { return m_templates; }
+
     /**
      * Merge the two tables into a single one.
      * None of the two table are overriden.
