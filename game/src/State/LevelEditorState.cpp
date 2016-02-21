@@ -20,6 +20,8 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, std::string path, r
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
     m_luaState(),
+    m_guiView(sf::FloatRect(0.f, 0.f, 1024.f, 768.f)),
+    m_levelView(m_guiView),
     m_sfgui(sfgui),
     m_desktop(desktop),
     m_fileToolbar(),
@@ -70,7 +72,9 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 void LevelEditorState::render(sf::RenderTarget& target)
 {
     target.clear(sf::Color(0, 180, 255));
+    target.setView(m_levelView);
     m_systemMgr->system<systems::RenderSystem>()->render(target);
+    target.setView(m_guiView);
     m_sfgui.Display(dynamic_cast<sf::RenderWindow&>(target));
 }
 
@@ -85,6 +89,29 @@ void LevelEditorState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 {
     m_systemMgr->update<systems::RenderSystem>(dt.asSeconds());
     m_desktop.Update(dt.asSeconds());
+
+    if(getEditionMode() == EditionMode::View)
+    {
+        //If no widgets have focus, the keys can move the view
+        sf::Vector2f centerPos = m_levelView.getCenter();
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        {
+            centerPos.x -= 400.f * dt.asSeconds();
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+            centerPos.x += 400.f * dt.asSeconds();
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        {
+            centerPos.y -= 400.f * dt.asSeconds();
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        {
+            centerPos.y += 400.f * dt.asSeconds();
+        }
+        m_levelView.setCenter(centerPos);
+    }
 }
 
 void LevelEditorState::initGUI()
@@ -139,12 +166,14 @@ void LevelEditorState::initGUI()
 
     auto radioGroup = sfg::RadioButtonGroup::Create();
 
-    auto insertionTool = sfg::RadioButton::Create("Insert new entities", radioGroup);
-    insertionTool->SetActive(true);
-    toolsBox->PackEnd(insertionTool);
+    m_insertionTool = sfg::RadioButton::Create("Insert new entities", radioGroup);
+    m_modifyTool = sfg::RadioButton::Create("Modify placed entities", radioGroup);
+    m_viewTool = sfg::RadioButton::Create("Change view", radioGroup);
 
-    auto modifyTool = sfg::RadioButton::Create("Modify placed entities", radioGroup);
-    toolsBox->PackEnd(modifyTool);
+    m_insertionTool->SetActive(true);
+    toolsBox->PackEnd(m_insertionTool);
+    toolsBox->PackEnd(m_modifyTool);
+    toolsBox->PackEnd(m_viewTool);
 
     //TEMPLATES TOOLBAR
     m_toolsSettingsToolbar = sfg::Window::Create(sfg::Window::BACKGROUND|sfg::Window::TITLEBAR);
@@ -182,11 +211,11 @@ void LevelEditorState::initGUI()
         toEnable.lock()->Show(true);
     };
 
-    insertionTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
+    m_insertionTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
         std::bind(enableCorrectToolSettings, m_templatesScrolled, "Templates")
     );
 
-    modifyTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
+    m_modifyTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
         std::bind(enableCorrectToolSettings, m_propertiesScrolled, "Properties")
     );
 }
@@ -200,6 +229,17 @@ void LevelEditorState::initSystemManager()
     m_systemMgr->configure();
 }
 
+LevelEditorState::EditionMode LevelEditorState::getEditionMode() const
+{
+    if(m_insertionTool->IsActive())
+        return EditionMode::Insertion;
+    else if(m_modifyTool->IsActive())
+        return EditionMode::Modify;
+    else if(m_viewTool->IsActive())
+        return EditionMode::View;
+    return EditionMode::Unknown;
+}
+
 void LevelEditorState::updateTemplatesList()
 {
     //Clear all buttons
@@ -211,10 +251,29 @@ void LevelEditorState::updateTemplatesList()
     {
         const auto& entityTemplate = pair.second;
         auto templateButton = sfg::ToggleButton::Create(entityTemplate.getFriendlyName());
+        templateButton->GetSignal(sfg::ToggleButton::OnToggle).Connect(std::bind([&](std::weak_ptr<sfg::ToggleButton> _templateButton)
+        {
+            if(_templateButton.lock()->IsActive())
+                selectTemplate(_templateButton.lock());
+        }, std::weak_ptr<sfg::ToggleButton>(templateButton)));
 
         m_templatesListBox->PackEnd(templateButton);
         m_templatesListButtons.emplace(templateButton, entityTemplate);
     }
+}
+
+void LevelEditorState::selectTemplate(sfg::ToggleButton::Ptr entityTemplateButton)
+{
+    //Untoggle all buttons
+    for(auto& pair : m_templatesListButtons)
+    {
+        if(pair.first != entityTemplateButton)
+            pair.first->SetActive(false);
+        else if(!entityTemplateButton->IsActive())
+            pair.first->SetActive(true);
+    }
+
+    m_selectedTemplateButton = entityTemplateButton;
 }
 
 }

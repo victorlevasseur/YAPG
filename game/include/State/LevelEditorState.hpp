@@ -9,6 +9,7 @@
 
 #include <SFGUI/Box.hpp>
 #include <SFGUI/Desktop.hpp>
+#include <SFGUI/RadioButton.hpp>
 #include <SFGUI/SFGUI.hpp>
 #include <SFGUI/ScrolledWindow.hpp>
 #include <SFGUI/ToggleButton.hpp>
@@ -47,20 +48,38 @@ protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);
 
 private:
+    enum class EditionMode
+    {
+        Insertion,
+        Modify,
+        View,
+        Unknown
+    };
+
     void initGUI();
     void initSystemManager();
 
+    EditionMode getEditionMode() const;
+
     void updateTemplatesList();
+    void selectTemplate(sfg::ToggleButton::Ptr entityTemplateButton);
+    void selectTemplate(const lua::EntityTemplate& entityTemplate);
 
     resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;
 
     lua::LuaState m_luaState;
 
+    sf::View m_guiView;
+    sf::View m_levelView;
+
     sfg::SFGUI& m_sfgui;
     sfg::Desktop& m_desktop;
     sfg::Window::Ptr m_fileToolbar;
     sfg::Window::Ptr m_toolsToolbar;
+        sfg::RadioButton::Ptr m_insertionTool;
+        sfg::RadioButton::Ptr m_modifyTool;
+        sfg::RadioButton::Ptr m_viewTool;
     sfg::Window::Ptr m_toolsSettingsToolbar;
         sfg::ScrolledWindow::Ptr m_templatesScrolled;
             sfg::Box::Ptr m_templatesListBox;
