@@ -8,6 +8,8 @@
 #include <SFGUI/RadioButtonGroup.hpp>
 #include <SFGUI/Separator.hpp>
 
+#include "Lua/EntityHandle.hpp"
+#include "Lua/EntityTemplate.hpp"
 #include "State/MainMenuState.hpp"
 #include "State/StateEngine.hpp"
 #include "Systems/RenderSystem.hpp"
@@ -62,6 +64,27 @@ void LevelEditorState::onUnpause()
 void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 {
     m_desktop.HandleEvent(event);
+
+    if(getEditionMode() == EditionMode::Insertion)
+    {
+        if(event.type == sf::Event::MouseButtonPressed &&
+            isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target) &&
+            m_templatesListBox->GetSelectedItemsCount() > 0)
+        {
+            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), m_levelView);
+
+            //Insert the new entity here
+            std::cout << m_templatesListBox->GetSelectedItemIndex() << std::endl;
+            const lua::EntityTemplate& entityTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
+
+            entityx::Entity newEntity = m_level.getEntityManager().create();
+            entityTemplate.initializeEntity(newEntity, level::SerializedEntityGetter());
+
+            //TODO: Use parameters to get the X and Y values to set instead of considering the PositionComponent.
+            lua::EntityHandle(newEntity).setAttributeAsDouble("Position", "x", mousePosition.x);
+            lua::EntityHandle(newEntity).setAttributeAsDouble("Position", "y", mousePosition.y);
+        }
+    }
 }
 
 void LevelEditorState::render(sf::RenderTarget& target)
@@ -246,6 +269,17 @@ void LevelEditorState::updateTemplatesList()
         m_templatesNames.push_back(pair.first);
         m_templatesListBox->AppendItem(entityTemplate.getFriendlyName());
     }
+}
+
+bool LevelEditorState::isMouseNotOnWidgets(sf::Vector2i mousePosition, sf::RenderTarget& target) const
+{
+    sf::Vector2f mouseCoords = target.mapPixelToCoords(mousePosition, m_guiView);
+
+    return (
+        !m_fileToolbar->GetClientRect().contains(mouseCoords) &&
+        !m_toolsToolbar->GetClientRect().contains(mouseCoords) &&
+        !m_toolsSettingsToolbar->GetClientRect().contains(mouseCoords)
+    );
 }
 
 }

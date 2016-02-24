@@ -411,7 +411,7 @@ ListBox::IndexType ListBox::GetItemAt( float y ) const {
 
 	if( item_index == 0 )
 		return 0 + m_first_displayed_item;
-	else if( item_index > m_max_displayed_items_count )
+	else if( item_index > GetDisplayedItemsCount() )
 		return NONE;
 	else
 		return item_index - 1 + m_first_displayed_item;

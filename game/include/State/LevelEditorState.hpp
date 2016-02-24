@@ -63,7 +63,9 @@ private:
     EditionMode getEditionMode() const;
 
     void updateTemplatesList();
-    
+
+    bool isMouseNotOnWidgets(sf::Vector2i mousePosition, sf::RenderTarget& target) const;
+
     resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;
 
