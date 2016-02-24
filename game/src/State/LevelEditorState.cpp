@@ -27,10 +27,8 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, std::string path, r
     m_fileToolbar(),
     m_toolsToolbar(),
     m_toolsSettingsToolbar(),
-    m_templatesScrolled(),
     m_templatesListBox(),
-    m_templatesListButtons(),
-    m_selectedTemplateButton(nullptr),
+    m_templatesNames(),
     m_propertiesScrolled(),
     m_level(path, m_luaState),
     m_systemMgr(nullptr)
@@ -52,8 +50,6 @@ void LevelEditorState::onPause()
     m_fileToolbar->Show(false);
     m_toolsToolbar->Show(false);
     m_toolsSettingsToolbar->Show(false);
-    m_templatesScrolled->Show(false);
-    m_propertiesScrolled->Show(false);
 }
 
 void LevelEditorState::onUnpause()
@@ -61,7 +57,6 @@ void LevelEditorState::onUnpause()
     m_fileToolbar->Show(true);
     m_toolsToolbar->Show(true);
     m_toolsSettingsToolbar->Show(true);
-    m_templatesScrolled->Show(true);
 }
 
 void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
@@ -190,20 +185,17 @@ void LevelEditorState::initGUI()
     auto toolsSettingsBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
     m_toolsSettingsToolbar->Add(toolsSettingsBox);
 
-    m_templatesScrolled = sfg::ScrolledWindow::Create();
-    toolsSettingsBox->PackEnd(m_templatesScrolled);
-
-    m_templatesListBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
-    m_templatesScrolled->AddWithViewport(m_templatesListBox);
+    m_templatesListBox = sfg::ListBox::Create();
+    toolsSettingsBox->PackEnd(m_templatesListBox);
 
     m_propertiesScrolled = sfg::ScrolledWindow::Create();
     m_propertiesScrolled->Show(false);
     toolsSettingsBox->PackEnd(m_propertiesScrolled);
 
     //END OF TOOLS TOOLBAR
-    auto enableCorrectToolSettings = [&](std::weak_ptr<sfg::ScrolledWindow> toEnable, sf::String title)
+    auto enableCorrectToolSettings = [&](std::weak_ptr<sfg::Widget> toEnable, sf::String title)
     {
-        m_templatesScrolled->Show(false);
+        m_templatesListBox->Show(false);
         m_propertiesScrolled->Show(false);
 
         m_toolsSettingsToolbar->SetTitle(title);
@@ -212,7 +204,7 @@ void LevelEditorState::initGUI()
     };
 
     m_insertionTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
-        std::bind(enableCorrectToolSettings, m_templatesScrolled, "Templates")
+        std::bind(enableCorrectToolSettings, m_templatesListBox, "Templates")
     );
 
     m_modifyTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
@@ -243,37 +235,17 @@ LevelEditorState::EditionMode LevelEditorState::getEditionMode() const
 void LevelEditorState::updateTemplatesList()
 {
     //Clear all buttons
-    m_templatesListButtons.clear();
-    m_templatesListBox->RemoveAll();
+    m_templatesListBox->Clear();
+    m_templatesNames.clear();
 
     auto& templatesList = m_luaState.getTemplates();
     for(auto& pair : templatesList)
     {
         const auto& entityTemplate = pair.second;
-        auto templateButton = sfg::ToggleButton::Create(entityTemplate.getFriendlyName());
-        templateButton->GetSignal(sfg::ToggleButton::OnToggle).Connect(std::bind([&](std::weak_ptr<sfg::ToggleButton> _templateButton)
-        {
-            if(_templateButton.lock()->IsActive())
-                selectTemplate(_templateButton.lock());
-        }, std::weak_ptr<sfg::ToggleButton>(templateButton)));
 
-        m_templatesListBox->PackEnd(templateButton);
-        m_templatesListButtons.emplace(templateButton, entityTemplate);
+        m_templatesNames.push_back(pair.first);
+        m_templatesListBox->AppendItem(entityTemplate.getFriendlyName());
     }
-}
-
-void LevelEditorState::selectTemplate(sfg::ToggleButton::Ptr entityTemplateButton)
-{
-    //Untoggle all buttons
-    for(auto& pair : m_templatesListButtons)
-    {
-        if(pair.first != entityTemplateButton)
-            pair.first->SetActive(false);
-        else if(!entityTemplateButton->IsActive())
-            pair.first->SetActive(true);
-    }
-
-    m_selectedTemplateButton = entityTemplateButton;
 }
 
 }

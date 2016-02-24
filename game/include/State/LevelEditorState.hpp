@@ -9,6 +9,7 @@
 
 #include <SFGUI/Box.hpp>
 #include <SFGUI/Desktop.hpp>
+#include <SFGUI/ListBox.hpp>
 #include <SFGUI/RadioButton.hpp>
 #include <SFGUI/SFGUI.hpp>
 #include <SFGUI/ScrolledWindow.hpp>
@@ -62,9 +63,7 @@ private:
     EditionMode getEditionMode() const;
 
     void updateTemplatesList();
-    void selectTemplate(sfg::ToggleButton::Ptr entityTemplateButton);
-    void selectTemplate(const lua::EntityTemplate& entityTemplate);
-
+    
     resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;
 
@@ -81,10 +80,8 @@ private:
         sfg::RadioButton::Ptr m_modifyTool;
         sfg::RadioButton::Ptr m_viewTool;
     sfg::Window::Ptr m_toolsSettingsToolbar;
-        sfg::ScrolledWindow::Ptr m_templatesScrolled;
-            sfg::Box::Ptr m_templatesListBox;
-            std::map<sfg::ToggleButton::Ptr, const lua::EntityTemplate&> m_templatesListButtons;
-            sfg::ToggleButton::Ptr m_selectedTemplateButton;
+        sfg::ListBox::Ptr m_templatesListBox;
+        std::vector<std::string> m_templatesNames;
         sfg::ScrolledWindow::Ptr m_propertiesScrolled;
 
     level::Level m_level;
