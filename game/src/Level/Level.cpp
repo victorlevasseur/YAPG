@@ -8,10 +8,11 @@
 namespace level
 {
 
-Level::Level(const std::string& path, lua::LuaState& luaState) :
+Level::Level(const std::string& path, lua::LuaState& luaState, LevelMode levelMode) :
     m_luaState(luaState),
     m_eventMgr(),
-    m_entityMgr(m_eventMgr)
+    m_entityMgr(m_eventMgr),
+    m_levelMode(levelMode)
 {
     std::cout << "Loading level \"" << path << "\"..." << std::endl;
 
@@ -61,24 +62,27 @@ Level::Level(const std::string& path, lua::LuaState& luaState) :
 
     std::cout << "Level successfully loaded (" << createdEntities.size() << " entities)." << std::endl;
 
-    std::cout << "Creating players..." << std::endl;
-
     //TODO: Support multiple players creation
-    std::vector<std::string> playersTemplates{ m_luaState.getState().get<sol::table>("level").get<sol::table>("players").get<std::string>(1) };
-    entityx::Entity playerEntity = m_entityMgr.create();
-    m_luaState.getTemplate(playersTemplates[0]).initializeEntity(
-        playerEntity,
-        entityGetter,
-        m_luaState.getState().get<sol::table>("level").get<sol::table>("spawn_position")
-        //Directly use the "spawn_position" table as parameter ==> it implies that players
-        //templates must only have x and y positions as parameters
-    );
-    if(!playerEntity.has_component<components::PlayerComponent>())
-        throw std::runtime_error(std::string("[Lua/Error] Player entities must have the \"Player\" component declared in their template ! Not the case with \"") + playersTemplates[0] + std::string("\""));
-    playerEntity.component<components::PlayerComponent>()->playerNumber = 0;
-    /////////////////////////////////////////
+    if(m_levelMode == LevelMode::PlayMode)
+    {
+        std::cout << "Creating players..." << std::endl;
 
-    std::cout << "Players created." << std::endl;
+        std::vector<std::string> playersTemplates{ m_luaState.getState().get<sol::table>("level").get<sol::table>("players").get<std::string>(1) };
+        entityx::Entity playerEntity = m_entityMgr.create();
+        m_luaState.getTemplate(playersTemplates[0]).initializeEntity(
+            playerEntity,
+            entityGetter,
+            m_luaState.getState().get<sol::table>("level").get<sol::table>("spawn_position")
+            //Directly use the "spawn_position" table as parameter ==> it implies that players
+            //templates must only have x and y positions as parameters
+        );
+        if(!playerEntity.has_component<components::PlayerComponent>())
+            throw std::runtime_error(std::string("[Lua/Error] Player entities must have the \"Player\" component declared in their template ! Not the case with \"") + playersTemplates[0] + std::string("\""));
+        playerEntity.component<components::PlayerComponent>()->playerNumber = 0;
+
+        std::cout << "Players created." << std::endl;
+    }
+    /////////////////////////////////////////
 }
 
 lua::EntityHandle Level::createNewEntity(const std::string& templateName)

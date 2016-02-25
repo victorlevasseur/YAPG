@@ -32,7 +32,7 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, std::string path, r
     m_templatesListBox(),
     m_templatesNames(),
     m_propertiesScrolled(),
-    m_level(path, m_luaState),
+    m_level(path, m_luaState, level::Level::LevelMode::EditMode),
     m_systemMgr(nullptr)
 {
     initSystemManager();
@@ -74,7 +74,6 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), m_levelView);
 
             //Insert the new entity here
-            std::cout << m_templatesListBox->GetSelectedItemIndex() << std::endl;
             const lua::EntityTemplate& entityTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
 
             entityx::Entity newEntity = m_level.getEntityManager().create();
@@ -276,9 +275,9 @@ bool LevelEditorState::isMouseNotOnWidgets(sf::Vector2i mousePosition, sf::Rende
     sf::Vector2f mouseCoords = target.mapPixelToCoords(mousePosition, m_guiView);
 
     return (
-        !m_fileToolbar->GetClientRect().contains(mouseCoords) &&
-        !m_toolsToolbar->GetClientRect().contains(mouseCoords) &&
-        !m_toolsSettingsToolbar->GetClientRect().contains(mouseCoords)
+        !m_fileToolbar->GetAllocation().contains(mouseCoords) &&
+        !m_toolsToolbar->GetAllocation().contains(mouseCoords) &&
+        !m_toolsSettingsToolbar->GetAllocation().contains(mouseCoords)
     );
 }
 

@@ -13,7 +13,13 @@ namespace level
 class Level
 {
 public:
-    Level(const std::string& path, lua::LuaState& luaState);
+    enum class LevelMode
+    {
+        PlayMode,
+        EditMode
+    };
+
+    Level(const std::string& path, lua::LuaState& luaState, LevelMode levelMode = LevelMode::PlayMode);
 
     const entityx::EventManager& getEventManager() const { return m_eventMgr; }
     entityx::EventManager& getEventManager() { return m_eventMgr; }
@@ -30,6 +36,8 @@ private:
 
     entityx::EventManager m_eventMgr;
     entityx::EntityManager m_entityMgr;
+
+    LevelMode m_levelMode;
 };
 
 }
