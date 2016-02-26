@@ -79,8 +79,6 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             entityx::Entity newEntity = m_level.getEntityManager().create();
             entityTemplate.initializeEntity(newEntity, level::SerializedEntityGetter());
 
-            //TODO: Use parameters to get the X and Y values to set instead of considering the PositionComponent.
-
             try
             {
                 auto& parameters = entityTemplate.getParameters();
