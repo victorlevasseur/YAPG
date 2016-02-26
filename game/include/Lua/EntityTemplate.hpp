@@ -55,6 +55,8 @@ public:
 
     std::string getFriendlyName() const { return m_friendlyName; }
 
+    const std::map<std::string, Parameter>& getParameters() const { return m_parameters; }
+
 private:
     std::string m_name;
     std::string m_friendlyName;

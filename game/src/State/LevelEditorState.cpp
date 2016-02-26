@@ -80,8 +80,22 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             entityTemplate.initializeEntity(newEntity, level::SerializedEntityGetter());
 
             //TODO: Use parameters to get the X and Y values to set instead of considering the PositionComponent.
-            lua::EntityHandle(newEntity).setAttributeAsDouble("Position", "x", mousePosition.x);
-            lua::EntityHandle(newEntity).setAttributeAsDouble("Position", "y", mousePosition.y);
+
+            try
+            {
+                auto& parameters = entityTemplate.getParameters();
+
+                const lua::EntityTemplate::Parameter& xParameter = parameters.at("x");
+                const lua::EntityTemplate::Parameter& yParameter = parameters.at("y");
+
+                lua::EntityHandle(newEntity).setAttributeAsDouble(xParameter.component, xParameter.attribute, mousePosition.x);
+                lua::EntityHandle(newEntity).setAttributeAsDouble(yParameter.component, yParameter.attribute, mousePosition.y);
+            }
+            catch(std::exception& e)
+            {
+                std::cout << "[Editor/Warning] The template \"" << entityTemplate.getName() << "\" can't be inserted because it doesn't have numerical X and Y parameters !" << std::endl;
+                newEntity.destroy();
+            }
         }
     }
 }
