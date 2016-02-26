@@ -52,7 +52,7 @@ Level::Level(const std::string& path, lua::LuaState& luaState, LevelMode levelMo
                 .get<sol::table>(i)
                 .get<sol::table>("values");
 
-        m_luaState.getTemplate(entityTemplateName).initializeEntity(*it, entityGetter, entityParameters);
+        m_luaState.getTemplate(entityTemplateName).initializeEntity(*it, entityGetter, entityParameters, /*templateComponent*/ m_levelMode == LevelMode::EditMode);
 
         ++i;
     }

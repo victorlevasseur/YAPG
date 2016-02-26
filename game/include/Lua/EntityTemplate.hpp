@@ -47,9 +47,9 @@ public:
 
     void applyInheritance(LuaState& luaState);
 
-    void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter) const;
+    void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, bool templateComponent = false) const;
 
-    void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const sol::table& parametersTable) const;
+    void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const sol::table& parametersTable, bool templateComponent = false) const;
 
     std::string getName() const { return m_name; }
 

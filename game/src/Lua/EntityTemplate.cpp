@@ -1,6 +1,7 @@
 #include "Lua/EntityTemplate.hpp"
 
 #include "Components/Component.hpp"
+#include "Components/TemplateComponent.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Lua/LuaState.hpp"
 
@@ -65,7 +66,7 @@ void EntityTemplate::applyInheritance(LuaState& luaState)
     }
 }
 
-void EntityTemplate::initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter) const
+void EntityTemplate::initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, bool templateComponent) const
 {
     //Add each components to the entity
     m_componentsTable.for_each([&](const sol::object& key, const sol::object& value) {
@@ -73,9 +74,15 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
 
         components::Component::assignComponent(entity, componentType, value, entityGetter);
     });
+
+    if(templateComponent)
+    {
+        //Add the template component, containing infos about the template
+        entity.assign<components::TemplateComponent>(getName());
+    }
 }
 
-void EntityTemplate::initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const sol::table& parametersTable) const
+void EntityTemplate::initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const sol::table& parametersTable, bool templateComponent) const
 {
     initializeEntity(entity, entityGetter);
     for(auto it = m_parameters.cbegin(); it != m_parameters.cend(); ++it)
