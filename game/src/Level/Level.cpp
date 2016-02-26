@@ -9,13 +9,18 @@
 namespace level
 {
 
-Level::Level(const std::string& path, lua::LuaState& luaState, LevelMode levelMode) :
+Level::Level(lua::LuaState& luaState, LevelMode levelMode) :
     m_luaState(luaState),
     m_eventMgr(),
     m_entityMgr(m_eventMgr),
     m_spawnPosition(),
     m_playersTemplates(),
     m_levelMode(levelMode)
+{
+
+}
+
+void Level::LoadFromFile(const std::string& path)
 {
     std::cout << "Loading level \"" << path << "\"..." << std::endl;
 
@@ -119,7 +124,7 @@ Level::Level(const std::string& path, lua::LuaState& luaState, LevelMode levelMo
     }
 
     //Put the current level instance into "current_level" lua global variable
-    luaState.getState().set("current_level", this);
+    m_luaState.getState().set("current_level", this);
 
     std::cout << "Level successfully loaded (" << createdEntities.size() << " entities)." << std::endl;
 

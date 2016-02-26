@@ -32,12 +32,14 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, std::string path, r
     m_templatesListBox(),
     m_templatesNames(),
     m_propertiesScrolled(),
-    m_level(path, m_luaState, level::Level::LevelMode::EditMode),
+    m_level(m_luaState, level::Level::LevelMode::EditMode),
     m_systemMgr(nullptr)
 {
     initSystemManager();
     initGUI();
     updateTemplatesList();
+
+    m_level.LoadFromFile(path);
 }
 
 void LevelEditorState::onStop()
