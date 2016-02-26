@@ -1,6 +1,8 @@
 #ifndef YAPG_GAME_LEVEL_LEVEL_H
 #define YAPG_GAME_LEVEL_LEVEL_H
 
+#include <SFML/System/Vector2.hpp>
+
 #include "entityx/entityx.h"
 
 #include "Level/SerializedEntityGetter.hpp"
@@ -36,6 +38,9 @@ private:
 
     entityx::EventManager m_eventMgr;
     entityx::EntityManager m_entityMgr;
+
+    sf::Vector2f m_spawnPosition;
+    std::vector<std::string> m_playersTemplates;
 
     LevelMode m_levelMode;
 };

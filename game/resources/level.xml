@@ -1,503 +1,379 @@
 <level>
     <spawn_position x="120" y="80"/>
     <players max_player="1">
-        <player entity_template="kenney_player1">/>
-    </player>
+        <player entity_template="kenney_player1"/>
+    </players>
     <objects>
-        <object
-            id="1"
-            template="kenney_block_grass">
+        <object id="1" template="kenney_block_grass">
             <parameters>
                 <x>64</x>
                 <y>384</y>
             </parameters>
         </object>
-        <object
-            id="2"
-            template="kenney_block_grass">
+        <object id="2" template="kenney_block_grass">
             <parameters>
                 <x>128</x>
                 <y>384</y>
             </parameters>
         </object>
-        <object
-            id="3"
-            template="kenney_block_grass">
+        <object id="3" template="kenney_block_grass">
             <parameters>
                 <x>192</x>
                 <y>384</y>
             </parameters>
         </object>
-        <object
-            id="4"
-            template="kenney_block_grass">
+        <object id="4" template="kenney_block_grass">
             <parameters>
                 <x>256</x>
                 <y>384</y>
             </parameters>
         </object>
-        <object
-            id="5"
-            template="kenney_block_grass_center">
+        <object id="5" template="kenney_block_grass_center">
             <parameters>
                 <x>64</x>
                 <y>448</y>
             </parameters>
         </object>
-        <object
-            id="6"
-            template="kenney_block_grass_center">
+        <object id="6" template="kenney_block_grass_center">
             <parameters>
                 <x>128</x>
                 <y>448</y>
             </parameters>
         </object>
-        <object
-            id="7"
-            template="kenney_block_grass_center">
+        <object id="7" template="kenney_block_grass_center">
             <parameters>
                 <x>192</x>
                 <y>448</y>
             </parameters>
         </object>
-        <object
-            id="8"
-            template="kenney_block_grass_center">
+        <object id="8" template="kenney_block_grass_center">
             <parameters>
                 <x>256</x>
                 <y>448</y>
             </parameters>
         </object>
-        <object
-            id="9"
-            template="kenney_block_wood_platform">
+        <object id="9" template="kenney_block_wood_platform">
             <parameters>
                 <x>128</x>
-                <y>4.320</y>
+                <y>288</y>
             </parameters>
         </object>
-        <object
-            id="10"
-            template="kenney_block_wood_platform">
+        <object id="10" template="kenney_block_wood_platform">
             <parameters>
                 <x>192</x>
-                <y>4.320</y>
+                <y>288</y>
             </parameters>
         </object>
-        <object
-            id="11"
-            template="kenney_block_grass_center">
+        <object id="11" template="kenney_block_grass_center">
             <parameters>
                 <x>64</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="12"
-            template="kenney_block_grass_center">
+        <object id="12" template="kenney_block_grass_center">
             <parameters>
                 <x>128</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="13"
-            template="kenney_block_grass_center">
+        <object id="13" template="kenney_block_grass_center">
             <parameters>
                 <x>192</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="14"
-            template="kenney_block_grass_center">
+        <object id="14" template="kenney_block_grass_center">
             <parameters>
                 <x>256</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="15"
-            template="kenney_block_grass_center">
+        <object id="15" template="kenney_block_grass_center">
             <parameters>
                 <x>320</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="16"
-            template="kenney_block_grass_center">
+        <object id="16" template="kenney_block_grass_center">
             <parameters>
                 <x>384</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="17"
-            template="kenney_block_grass_center">
+        <object id="17" template="kenney_block_grass_center">
             <parameters>
                 <x>448</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="18"
-            template="kenney_block_grass_center">
+        <object id="18" template="kenney_block_grass_center">
             <parameters>
                 <x>512</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="19"
-            template="kenney_block_grass_center">
+        <object id="19" template="kenney_block_grass_center">
             <parameters>
                 <x>576</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="20"
-            template="kenney_block_grass_center">
+        <object id="20" template="kenney_block_grass_center">
             <parameters>
                 <x>640</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="21"
-            template="kenney_block_grass_center">
+        <object id="21" template="kenney_block_grass_center">
             <parameters>
                 <x>704</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="22"
-            template="kenney_block_grass_center">
+        <object id="22" template="kenney_block_grass_center">
             <parameters>
                 <x>768</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="23"
-            template="kenney_block_grass_center">
+        <object id="23" template="kenney_block_grass_center">
             <parameters>
                 <x>64</x>
                 <y>640</y>
             </parameters>
         </object>
-        <object
-            id="24"
-            template="kenney_block_grass_center">
+        <object id="24" template="kenney_block_grass_center">
             <parameters>
                 <x>64</x>
                 <y>576</y>
             </parameters>
         </object>
-        <object
-            id="25"
-            template="kenney_block_grass_center">
+        <object id="25" template="kenney_block_grass_center">
             <parameters>
                 <x>64</x>
                 <y>512</y>
             </parameters>
         </object>
-        <object
-            id="26"
-            template="kenney_block_grass_center">
+        <object id="26" template="kenney_block_grass_center">
             <parameters>
                 <x>832</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="27"
-            template="kenney_block_grass_center">
+        <object id="27" template="kenney_block_grass_center">
             <parameters>
                 <x>896</x>
                 <y>704</y>
             </parameters>
         </object>
-        <object
-            id="28"
-            template="kenney_block_grass_center">
+        <object id="28" template="kenney_block_grass_center">
             <parameters>
                 <x>896</x>
                 <y>640</y>
             </parameters>
         </object>
-        <object
-            id="29"
-            template="kenney_block_grass_center">
+        <object id="29" template="kenney_block_grass_center">
             <parameters>
                 <x>896</x>
                 <y>576</y>
             </parameters>
         </object>
-        <object
-            id="30"
-            template="kenney_block_grass_center">
+        <object id="30" template="kenney_block_grass_center">
             <parameters>
                 <x>896</x>
                 <y>512</y>
             </parameters>
         </object>
-        <object
-            id="31"
-            template="kenney_block_wood_platform">
+        <object id="31" template="kenney_block_wood_platform">
             <parameters>
                 <x>320</x>
                 <y>384</y>
             </parameters>
         </object>
-        <object
-            id="31"
-            template="kenney_block_wood_platform">
+        <object id="31" template="kenney_block_wood_platform">
             <parameters>
                 <x>448</x>
                 <y>384</y>
             </parameters>
         </object>
-        <object
-            id="31"
-            template="kenney_block_wood_platform">
+        <object id="31" template="kenney_block_wood_platform">
             <parameters>
                 <x>384</x>
                 <y>448</y>
             </parameters>
         </object>
-        <object
-            id="32"
-            template="kenney_block_wood_platform">
+        <object id="32" template="kenney_block_wood_platform">
             <parameters>
                 <x>320</x>
                 <y>640</y>
             </parameters>
         </object>
-        <object
-            id="35"
-            template="kenney_block_wood_platform">
+        <object id="35" template="kenney_block_wood_platform">
             <parameters>
                 <x>384</x>
                 <y>576</y>
             </parameters>
         </object>
-        <object
-            id="36"
-            template="kenney_block_wood_platform">
+        <object id="36" template="kenney_block_wood_platform">
             <parameters>
                 <x>448</x>
                 <y>576</y>
             </parameters>
         </object>
-        <object
-            id="37"
-            template="kenney_block_grass_center">
+        <object id="37" template="kenney_block_grass_center">
             <parameters>
                 <x>512</x>
                 <y>512</y>
             </parameters>
         </object>
-        <object
-            id="38"
-            template="kenney_block_grass_center">
+        <object id="38" template="kenney_block_grass_center">
             <parameters>
                 <x>512</x>
                 <y>448</y>
             </parameters>
         </object>
-        <object
-            id="39"
-            template="kenney_block_grass_center">
+        <object id="39" template="kenney_block_grass_center">
             <parameters>
                 <x>512</x>
                 <y>384</y>
             </parameters>
         </object>
-        <object
-            id="40"
-            template="kenney_block_grass_center">
+        <object id="40" template="kenney_block_grass_center">
             <parameters>
                 <x>512</x>
                 <y>320</y>
             </parameters>
         </object>
-        <object
-            id="41"
-            template="kenney_block_grass_center">
+        <object id="41" template="kenney_block_grass_center">
             <parameters>
                 <x>512</x>
                 <y>256</y>
             </parameters>
         </object>
-        <object
-            id="42"
-            template="kenney_block_grass_center">
+        <object id="42" template="kenney_block_grass_center">
             <parameters>
                 <x>512</x>
                 <y>192</y>
             </parameters>
         </object>
-        <object
-            id="43"
-            template="kenney_block_grass_center">
+        <object id="43" template="kenney_block_grass_center">
             <parameters>
                 <x>512</x>
                 <y>128</y>
             </parameters>
         </object>
-        <object
-            id="44"
-            template="kenney_block_grass_center">
+        <object id="44" template="kenney_block_grass_center">
             <parameters>
                 <x>512</x>
                 <y>64</y>
             </parameters>
         </object>
-        <object
-            id="45"
-            template="kenney_block_grass_center">
+        <object id="45" template="kenney_block_grass_center">
             <parameters>
                 <x>512</x>
                 <y>0</y>
             </parameters>
         </object>
-        <object
-            id="46"
-            template="kenney_block_grass_center">
+        <object id="46" template="kenney_block_grass_center">
             <parameters>
                 <x>896</x>
                 <y>448</y>
             </parameters>
         </object>
-        <object
-            id="47"
-            template="kenney_block_grass">
+        <object id="47" template="kenney_block_grass">
             <parameters>
                 <x>896</x>
                 <y>384</y>
             </parameters>
         </object>
-        <object
-            id="48"
-            template="kenney_block_grass">
+        <object id="48" template="kenney_block_grass">
             <parameters>
                 <x>640</x>
                 <y>640</y>
             </parameters>
         </object>
-        <object
-            id="49"
-            template="kenney_block_grass_slope_right">
+        <object id="49" template="kenney_block_grass_slope_right">
             <parameters>
                 <x>704</x>
                 <y>576</y>
             </parameters>
         </object>
-        <object
-            id="50"
-            template="kenney_block_grass_slope_right">
+        <object id="50" template="kenney_block_grass_slope_right">
             <parameters>
                 <x>768</x>
                 <y>512</y>
             </parameters>
         </object>
-        <object
-            id="51"
-            template="kenney_block_grass_slope_right">
+        <object id="51" template="kenney_block_grass_slope_right">
             <parameters>
                 <x>832</x>
                 <y>448</y>
             </parameters>
         </object>
-        <object
-            id="52"
-            template="kenney_block_grass_slope_right_center">
+        <object id="52" template="kenney_block_grass_slope_right_center">
             <parameters>
                 <x>704</x>
                 <y>640</y>
             </parameters>
         </object>
-        <object
-            id="53"
-            template="kenney_block_grass_slope_right_center">
+        <object id="53" template="kenney_block_grass_slope_right_center">
             <parameters>
                 <x>768</x>
                 <y>576</y>
             </parameters>
         </object>
-        <object
-            id="53"
-            template="kenney_block_grass_slope_right_center">
+        <object id="53" template="kenney_block_grass_slope_right_center">
             <parameters>
                 <x>832</x>
                 <y>512</y>
             </parameters>
         </object>
-        <object
-            id="54"
-            template="kenney_block_grass_center">
+        <object id="54" template="kenney_block_grass_center">
             <parameters>
                 <x>832</x>
                 <y>576</y>
             </parameters>
         </object>
-        <object
-            id="55"
-            template="kenney_block_grass_center">
+        <object id="55" template="kenney_block_grass_center">
             <parameters>
                 <x>832</x>
                 <y>640</y>
             </parameters>
         </object>
-        <object
-            id="56"
-            template="kenney_block_grass_center">
+        <object id="56" template="kenney_block_grass_center">
             <parameters>
                 <x>768</x>
                 <y>640</y>
             </parameters>
         </object>
-        <object
-            id="57"
-            template="kenney_block_grass_slope_right">
+        <object id="57" template="kenney_block_grass_slope_right">
             <parameters>
                 <x>576</x>
                 <y>640</y>
             </parameters>
         </object>
-        <object
-            id="58"
-            template="kenney_block_wood_platform">
+        <object id="58" template="kenney_block_wood_platform">
             <parameters>
                 <x>576</x>
-                <y>4.320</y>
+                <y>288</y>
             </parameters>
         </object>
-        <object
-            id="59"
-            template="kenney_block_wood_platform">
+        <object id="59" template="kenney_block_wood_platform">
             <parameters>
                 <x>640</x>
-                <y>4.320</y>
+                <y>288</y>
             </parameters>
         </object>
-        <object
-            id="60"
-            template="kenney_block_wood_platform">
+        <object id="60" template="kenney_block_wood_platform">
             <parameters>
                 <x>704</x>
-                <y>4.320</y>
+                <y>288</y>
             </parameters>
         </object>
-        <object
-            id="61"
-            template="kenney_block_wood_platform">
+        <object id="61" template="kenney_block_wood_platform">
             <parameters>
                 <x>768</x>
-                <y>4.320</y>
+                <y>288</y>
             </parameters>
         </object>
     </objects>

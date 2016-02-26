@@ -4,6 +4,7 @@
 
 #include "Components/Component.hpp"
 #include "Components/PlayerComponent.hpp"
+#include "Settings/tinyxml2.h"
 
 namespace level
 {
@@ -12,47 +13,107 @@ Level::Level(const std::string& path, lua::LuaState& luaState, LevelMode levelMo
     m_luaState(luaState),
     m_eventMgr(),
     m_entityMgr(m_eventMgr),
+    m_spawnPosition(),
+    m_playersTemplates(),
     m_levelMode(levelMode)
 {
     std::cout << "Loading level \"" << path << "\"..." << std::endl;
 
-    m_luaState.getState().open_file(path);
+    tinyxml2::XMLDocument levelDocument;
+    if(levelDocument.LoadFile(path.c_str()) != tinyxml2::XML_NO_ERROR)
+    {
+        throw std::runtime_error("[Level/Error] Can't load the level \"" + path + "\" ! Not found or parsing error !");
+    }
+
+    tinyxml2::XMLElement* levelElement = levelDocument.RootElement();
+    if(!levelElement)
+    {
+        throw std::runtime_error("[Level/Error] Can't find <level> root markup in the level !");
+    }
+
+    //Load the spawn position
+    tinyxml2::XMLElement* spawnPosElement = levelElement->FirstChildElement("spawn_position");
+    if(!spawnPosElement)
+    {
+        throw std::runtime_error("[Level/Error] Can't find <spawn_position> markup in the level !");
+    }
+    if(spawnPosElement->QueryFloatAttribute("x", &(m_spawnPosition.x)) != tinyxml2::XML_NO_ERROR || spawnPosElement->QueryFloatAttribute("y", &(m_spawnPosition.y)) != tinyxml2::XML_NO_ERROR)
+    {
+        throw std::runtime_error("[Level/Error] Can't find x and y in <spawn_position> markup in the level !");
+    }
+
+    //Load the players templates names
+    tinyxml2::XMLElement* playersElement = levelElement->FirstChildElement("players");
+    if(!playersElement)
+    {
+        throw std::runtime_error("[Level/Error] Can't find <players> markup in the level !");
+    }
+    for(tinyxml2::XMLElement* playerElem = playersElement->FirstChildElement("player");
+        playerElem != nullptr;
+        playerElem = playersElement->NextSiblingElement("player"))
+    {
+        const char* playerTemplate = playerElem->Attribute("entity_template");
+        if(!playerTemplate)
+        {
+            std::cout << "[Level/Warning] Invalid player template !" << std::endl;
+            continue;
+        }
+        m_playersTemplates.push_back(std::string(playerTemplate));
+    }
 
     //First, load all the entity and register them to the SerializedEntityGetter
+    tinyxml2::XMLElement* objectsElement = levelElement->FirstChildElement("objects");
+    if(!objectsElement)
+    {
+        throw std::runtime_error("[Level/Error] Can't find <object> markup in the level !");
+    }
+
     SerializedEntityGetter entityGetter;
     std::vector<entityx::Entity> createdEntities;
-    m_luaState.getState()
-        .get<sol::table>("level")
-        .get<sol::table>("objects")
-        .for_each([&](const sol::object& key, const sol::object& value) {
-            //Create the entity
-            entityx::Entity newEntity = m_entityMgr.create();
-            createdEntities.push_back(newEntity);
 
-            //Register it with its id
-            entityGetter.registerEntity(newEntity, value.as<sol::table>().get<int>("id"));
-        });
+    for(tinyxml2::XMLElement* objectElem = objectsElement->FirstChildElement("object");
+        objectElem != nullptr;
+        objectElem = objectElem->NextSiblingElement("object"))
+    {
+        //Create the entity
+        entityx::Entity newEntity = m_entityMgr.create();
+        createdEntities.push_back(newEntity);
+
+        //Register it with its id (if it has a id attribute)
+        int newEntityId = -1;
+        auto error = objectElem->QueryIntAttribute("id", &newEntityId);
+        if(error == tinyxml2::XML_NO_ERROR)
+        {
+            entityGetter.registerEntity(newEntity, newEntityId);
+        }
+    }
 
     //Now that all entities are created and registered, iterate all of them to
     //assign the components according to their template !
-    unsigned int i = 1;
-    for(auto it = createdEntities.begin(); it != createdEntities.end(); ++it)
+    unsigned int i = 0;
+    for(tinyxml2::XMLElement* objectElem = objectsElement->FirstChildElement("object");
+        objectElem != nullptr;
+        objectElem = objectElem->NextSiblingElement("object"))
     {
-        std::string entityTemplateName =
-            m_luaState.getState()
-                .get<sol::table>("level")
-                .get<sol::table>("objects")
-                .get<sol::table>(i)
-                .get<std::string>("template");
+        if(!objectElem->Attribute("template"))
+        {
+            //There's no template defined, remove the entity.
+            std::cout << "[Level/Warning] No template attribute defined for an <object> !" << std::endl;
+            createdEntities.erase(createdEntities.begin() + i);
+            continue;
+        }
+        std::string entityTemplateName(objectElem->Attribute("template"));
 
-        const sol::table& entityParameters =
-            m_luaState.getState()
-                .get<sol::table>("level")
-                .get<sol::table>("objects")
-                .get<sol::table>(i)
-                .get<sol::table>("values");
+        tinyxml2::XMLElement* entityParameters = objectElem->FirstChildElement("parameters");
+        if(!entityParameters)
+        {
+            //There's no template defined, remove the entity.
+            std::cout << "[Level/Warning] No <parameters> in <object> !" << std::endl;
+            createdEntities.erase(createdEntities.begin() + i);
+            continue;
+        }
 
-        m_luaState.getTemplate(entityTemplateName).initializeEntity(*it, entityGetter, entityParameters, /*templateComponent*/ m_levelMode == LevelMode::EditMode);
+        m_luaState.getTemplate(entityTemplateName).initializeEntity(createdEntities[i], entityGetter, entityParameters, /*templateComponent*/ m_levelMode == LevelMode::EditMode);
 
         ++i;
     }
@@ -67,17 +128,22 @@ Level::Level(const std::string& path, lua::LuaState& luaState, LevelMode levelMo
     {
         std::cout << "Creating players..." << std::endl;
 
-        std::vector<std::string> playersTemplates{ m_luaState.getState().get<sol::table>("level").get<sol::table>("players").get<std::string>(1) };
+        const lua::EntityTemplate& playerTemplate = m_luaState.getTemplate(m_playersTemplates[0]);
+
         entityx::Entity playerEntity = m_entityMgr.create();
-        m_luaState.getTemplate(playersTemplates[0]).initializeEntity(
-            playerEntity,
-            entityGetter,
-            m_luaState.getState().get<sol::table>("level").get<sol::table>("spawn_position")
-            //Directly use the "spawn_position" table as parameter ==> it implies that players
-            //templates must only have x and y positions as parameters
-        );
+        playerTemplate.initializeEntity(playerEntity, entityGetter);
+
+        //Set x and y parameters according to spawn_position
+        auto& parameters = playerTemplate.getParameters();
+
+        const lua::EntityTemplate::Parameter& xParameter = parameters.at("x");
+        const lua::EntityTemplate::Parameter& yParameter = parameters.at("y");
+
+        lua::EntityHandle(playerEntity).setAttributeAsDouble(xParameter.component, xParameter.attribute, m_spawnPosition.x);
+        lua::EntityHandle(playerEntity).setAttributeAsDouble(yParameter.component, yParameter.attribute, m_spawnPosition.y);
+
         if(!playerEntity.has_component<components::PlayerComponent>())
-            throw std::runtime_error(std::string("[Lua/Error] Player entities must have the \"Player\" component declared in their template ! Not the case with \"") + playersTemplates[0] + std::string("\""));
+            throw std::runtime_error(std::string("[Level/Error] Player entities must have the \"Player\" component declared in their template ! Not the case with \"") + m_playersTemplates[0] + std::string("\""));
         playerEntity.component<components::PlayerComponent>()->playerNumber = 0;
 
         std::cout << "Players created." << std::endl;

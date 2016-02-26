@@ -10,6 +10,7 @@
 #include "Lua/sol.hpp"
 
 namespace lua{ class LuaState; }
+namespace tinyxml2{ class XMLElement; }
 
 namespace lua
 {
@@ -49,7 +50,7 @@ public:
 
     void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, bool templateComponent = false) const;
 
-    void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const sol::table& parametersTable, bool templateComponent = false) const;
+    void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement, bool templateComponent = false) const;
 
     std::string getName() const { return m_name; }
 

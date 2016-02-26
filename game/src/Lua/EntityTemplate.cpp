@@ -4,6 +4,7 @@
 #include "Components/TemplateComponent.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Lua/LuaState.hpp"
+#include "Settings/tinyxml2.h"
 
 namespace lua
 {
@@ -82,28 +83,56 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
     }
 }
 
-void EntityTemplate::initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const sol::table& parametersTable, bool templateComponent) const
+void EntityTemplate::initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement, bool templateComponent) const
 {
     initializeEntity(entity, entityGetter);
     for(auto it = m_parameters.cbegin(); it != m_parameters.cend(); ++it)
     {
-        sol::object parameterValue = parametersTable.get<sol::object>(it->first);
-        if(it->second.attributeType == Parameter::String && parameterValue.is<std::string>())
+        try
         {
-            lua::EntityHandle(entity).setAttributeAsString(it->second.component, it->second.attribute, parameterValue.as<std::string>());
+            const tinyxml2::XMLElement* parameterElement = parametersElement->FirstChildElement(it->first.c_str());
+            if(!parameterElement)
+            {
+                throw std::runtime_error("Template \"" + m_name + "\" needs the parameter \"" + it->first + "\" but not given by the instanciated object !");
+            }
+
+            //String parameter
+            if(it->second.attributeType == Parameter::String)
+            {
+                const char* stringValue = parameterElement->GetText();
+                if(!stringValue)
+                {
+                    throw std::runtime_error("Template \"" + m_name + "\" needs the parameter \"" + it->first + "\" but not of the correct type !");
+                }
+
+                lua::EntityHandle(entity).setAttributeAsString(it->second.component, it->second.attribute, std::string(stringValue));
+            }
+            else if(it->second.attributeType == Parameter::Number)
+            {
+                double doubleValue = 0.0;
+                if(parameterElement->QueryDoubleText(&doubleValue) != tinyxml2::XML_SUCCESS)
+                {
+                    throw std::runtime_error("Template \"" + m_name + "\" needs the parameter \"" + it->first + "\" but not of the correct type !");
+                }
+
+                lua::EntityHandle(entity).setAttributeAsDouble(it->second.component, it->second.attribute, doubleValue);
+            }
+            else if(it->second.attributeType == Parameter::Boolean)
+            {
+                bool boolValue = false;
+                if(!parameterElement->GetText())
+                {
+                    throw std::runtime_error("Template \"" + m_name + "\" needs the parameter \"" + it->first + "\" but not of the correct type !");
+                }
+                boolValue = (strcmp(parameterElement->GetText(), "True") == 0);
+
+                lua::EntityHandle(entity).setAttributeAsBool(it->second.component, it->second.attribute, boolValue);
+            }
+
         }
-        else if(it->second.attributeType == Parameter::Number && parameterValue.is<double>())
+        catch(std::exception& e)
         {
-            lua::EntityHandle(entity).setAttributeAsDouble(it->second.component, it->second.attribute, parameterValue.as<double>());
-        }
-        else if(it->second.attributeType == Parameter::Boolean && parameterValue.is<bool>())
-        {
-            lua::EntityHandle(entity).setAttributeAsBool(it->second.component, it->second.attribute, parameterValue.as<bool>());
-        }
-        //TODO: Do it for other supported type in parameters (Entity and Function)
-        else
-        {
-            std::cout << "[Lua/Warning] Template \"" << m_name << "\" needs the parameter \"" << it->first << "\" but not given by the instanciated entity or not of the correct type !" << std::endl;
+            std::cout << "[Lua/Warning] " << e.what() << std::endl;
         }
     }
 }

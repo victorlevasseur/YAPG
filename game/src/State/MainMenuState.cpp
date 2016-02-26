@@ -49,7 +49,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     m_mainMenuWindow = sfg::Window::Create(sfg::Window::BACKGROUND|sfg::Window::SHADOW);
     auto windowBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.f);
     auto playBox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 0.f);
-    auto playLevelEntry = sfg::Entry::Create("level.lua");
+    auto playLevelEntry = sfg::Entry::Create("level.xml");
 
     playLevelEntry->SetRequisition(sf::Vector2f(200.f, 0.f));
     playBox->PackEnd(playLevelEntry, true, true);
@@ -71,7 +71,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     {
         getStateEngine().stopAndStartState
             <state::LevelEditorState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-            "newlevel.lua", m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+            "newlevel.xml", m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
         );
     });
     windowBox->PackEnd(editorButton, true, true);
