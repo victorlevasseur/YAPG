@@ -5,9 +5,10 @@
 namespace components
 {
 
-TemplateComponent::TemplateComponent(const std::string& _templateName) :
+TemplateComponent::TemplateComponent(int serializedId, const std::string& templateName) :
     Component(),
-    templateName(_templateName)
+    serializedId(serializedId),
+    templateName(templateName)
 {
 
 }

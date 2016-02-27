@@ -79,7 +79,7 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
     if(templateComponent)
     {
         //Add the template component, containing infos about the template
-        entity.assign<components::TemplateComponent>(getName());
+        entity.assign<components::TemplateComponent>(entityGetter.getSerializationIdFromEntity(entity), getName());
     }
 }
 

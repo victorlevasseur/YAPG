@@ -25,6 +25,7 @@ public:
     void registerEntity(entityx::Entity entity, int id);
 
     entityx::Entity getEntityFromSerializationId(int id) const;
+    int getSerializationIdFromEntity(entityx::Entity entity) const;
 
 private:
     std::map<int, entityx::Entity> m_unserializedEntities;

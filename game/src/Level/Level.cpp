@@ -4,6 +4,7 @@
 
 #include "Components/Component.hpp"
 #include "Components/PlayerComponent.hpp"
+#include "Components/TemplateComponent.hpp"
 #include "Settings/tinyxml2.h"
 
 namespace level
@@ -22,6 +23,8 @@ Level::Level(lua::LuaState& luaState, LevelMode levelMode) :
 
 void Level::LoadFromFile(const std::string& path)
 {
+    m_entityMgr.reset();
+
     std::cout << "Loading level \"" << path << "\"..." << std::endl;
 
     tinyxml2::XMLDocument levelDocument;

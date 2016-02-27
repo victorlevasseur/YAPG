@@ -11,13 +11,14 @@ namespace components
 class TemplateComponent : public Component
 {
 public:
-    TemplateComponent(const std::string& _templateName);
+    TemplateComponent(int serializedId, const std::string& templateName);
     virtual ~TemplateComponent();
 
     virtual std::string getName() const;
 
     static void registerComponent(lua::LuaState& state);
 
+    const int serializedId;
     const std::string templateName;
 };
 
