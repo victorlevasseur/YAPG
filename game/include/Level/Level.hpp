@@ -31,7 +31,9 @@ public:
     const entityx::EntityManager& getEntityManager() const { return m_entityMgr; }
     entityx::EntityManager& getEntityManager() { return m_entityMgr; }
 
-    lua::EntityHandle createNewEntity(const std::string& templateName);
+    entityx::Entity createNewEntity(const std::string& templateName, bool templateComponent = false);
+
+    lua::EntityHandle createNewEntityLua(const std::string& templateName);
 
     static void registerClass(lua::LuaState& luaState);
 
@@ -45,6 +47,8 @@ private:
     std::vector<std::string> m_playersTemplates;
 
     LevelMode m_levelMode;
+
+    int m_nextId;
 };
 
 }

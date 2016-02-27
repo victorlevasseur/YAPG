@@ -78,8 +78,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             //Insert the new entity here
             const lua::EntityTemplate& entityTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
 
-            entityx::Entity newEntity = m_level.getEntityManager().create();
-            entityTemplate.initializeEntity(newEntity, level::SerializedEntityGetter());
+            entityx::Entity newEntity = m_level.createNewEntity(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()], true);
 
             try
             {

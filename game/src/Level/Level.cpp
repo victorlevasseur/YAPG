@@ -16,7 +16,8 @@ Level::Level(lua::LuaState& luaState, LevelMode levelMode) :
     m_entityMgr(m_eventMgr),
     m_spawnPosition(),
     m_playersTemplates(),
-    m_levelMode(levelMode)
+    m_levelMode(levelMode),
+    m_nextId(0)
 {
 
 }
@@ -24,6 +25,7 @@ Level::Level(lua::LuaState& luaState, LevelMode levelMode) :
 void Level::LoadFromFile(const std::string& path)
 {
     m_entityMgr.reset();
+    m_nextId = 0;
 
     std::cout << "Loading level \"" << path << "\"..." << std::endl;
 
@@ -93,6 +95,7 @@ void Level::LoadFromFile(const std::string& path)
         if(error == tinyxml2::XML_NO_ERROR)
         {
             entityGetter.registerEntity(newEntity, newEntityId);
+            m_nextId = std::max(m_nextId, newEntityId);
         }
     }
 
@@ -159,20 +162,30 @@ void Level::LoadFromFile(const std::string& path)
     /////////////////////////////////////////
 }
 
-lua::EntityHandle Level::createNewEntity(const std::string& templateName)
+entityx::Entity Level::createNewEntity(const std::string& templateName, bool templateComponent)
 {
     entityx::Entity newEntity = m_entityMgr.create();
+    m_luaState.getTemplate(templateName).initializeEntity(newEntity, SerializedEntityGetter(), templateComponent);
 
-    m_luaState.getTemplate(templateName).initializeEntity(newEntity, SerializedEntityGetter());
+    if(templateComponent)
+    {
+        newEntity.component<components::TemplateComponent>()->serializedId = m_nextId;
+        ++m_nextId;
+    }
 
-    return lua::EntityHandle(newEntity);
+    return newEntity;
+}
+
+lua::EntityHandle Level::createNewEntityLua(const std::string& templateName)
+{
+    return lua::EntityHandle(createNewEntity(templateName));
 }
 
 void Level::registerClass(lua::LuaState& luaState)
 {
     sol::constructors<> ctor;
     sol::usertype<Level> levelLuaClass(ctor,
-        "create_new_entity", &Level::createNewEntity
+        "create_new_entity", &Level::createNewEntityLua
     );
     luaState.getState().set_usertype("level", levelLuaClass);
 }

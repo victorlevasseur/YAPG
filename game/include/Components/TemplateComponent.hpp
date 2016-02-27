@@ -18,7 +18,7 @@ public:
 
     static void registerComponent(lua::LuaState& state);
 
-    const int serializedId;
+    int serializedId;
     const std::string templateName;
 };
 
