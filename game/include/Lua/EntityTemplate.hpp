@@ -46,6 +46,10 @@ public:
     EntityTemplate(EntityTemplate&&) = default;
     EntityTemplate& operator=(EntityTemplate&&) = default;
 
+    /**
+     * Apply the inheritance to the template (if it has a base template).
+     * **Must be called after all template are loaded**.
+     */
     void applyInheritance(LuaState& luaState);
 
     /**

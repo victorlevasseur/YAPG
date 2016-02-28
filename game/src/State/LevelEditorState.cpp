@@ -87,14 +87,8 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 
             try
             {
-                //Set x and y parameters
-                auto& parameters = entityTemplate.getParameters();
-
-                const lua::EntityTemplate::Parameter& xParameter = parameters.at("x");
-                const lua::EntityTemplate::Parameter& yParameter = parameters.at("y");
-
-                lua::EntityHandle(newEntity).setAttributeAsDouble(xParameter.component, xParameter.attribute, mousePosition.x);
-                lua::EntityHandle(newEntity).setAttributeAsDouble(yParameter.component, yParameter.attribute, mousePosition.y);
+                newEntity.component<components::TemplateComponent>()->parametersHelper.setDoubleParameter("x", mousePosition.x);
+                newEntity.component<components::TemplateComponent>()->parametersHelper.setDoubleParameter("y", mousePosition.y);
             }
             catch(std::exception& e)
             {
@@ -113,8 +107,11 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 
             if(m_selectedEntity)
             {
-                auto position = m_selectedEntity.component<components::PositionComponent>(); //TODO: Use EntityHandle getAttributeAsDouble instead !
-                m_mouseOffsetToSelected = mousePosition - sf::Vector2f(position->x, position->y);
+                sf::Vector2f entityPos;
+                entityPos.x = m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.getDoubleParameter("x");
+                entityPos.y = m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.getDoubleParameter("y");
+
+                m_mouseOffsetToSelected = mousePosition - entityPos;
             }
 
             //TODO: Update properties
@@ -123,17 +120,8 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         {
             if(m_selectedEntity)
             {
-                auto templateComponent = m_selectedEntity.component<components::TemplateComponent>();
-                const lua::EntityTemplate& selectedEntityTemplate = m_luaState.getTemplate(templateComponent->templateName);
-
-                //Set x and y parameters
-                auto& parameters = selectedEntityTemplate.getParameters();
-
-                const lua::EntityTemplate::Parameter& xParameter = parameters.at("x");
-                const lua::EntityTemplate::Parameter& yParameter = parameters.at("y");
-
-                lua::EntityHandle(m_selectedEntity).setAttributeAsDouble(xParameter.component, xParameter.attribute, event.mouseButton.x - m_mouseOffsetToSelected.x);
-                lua::EntityHandle(m_selectedEntity).setAttributeAsDouble(yParameter.component, yParameter.attribute, event.mouseButton.y - m_mouseOffsetToSelected.y);
+                m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setDoubleParameter("x", event.mouseButton.x - m_mouseOffsetToSelected.x);
+                m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setDoubleParameter("y", event.mouseButton.y - m_mouseOffsetToSelected.y);
             }
         }
     }

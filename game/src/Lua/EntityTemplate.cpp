@@ -3,6 +3,7 @@
 #include "Components/Component.hpp"
 #include "Components/TemplateComponent.hpp"
 #include "Lua/EntityHandle.hpp"
+#include "Lua/EntityParametersHelper.hpp"
 #include "Lua/LuaState.hpp"
 #include "Settings/tinyxml2.h"
 
@@ -79,7 +80,11 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
     if(templateComponent)
     {
         //Add the template component, containing infos about the template
-        entity.assign<components::TemplateComponent>(entityGetter.getSerializationIdFromEntity(entity), getName());
+        entity.assign<components::TemplateComponent>(
+            entityGetter.getSerializationIdFromEntity(entity),
+            getName(),
+            lua::EntityParametersHelper(this, entity)
+        );
     }
 }
 
