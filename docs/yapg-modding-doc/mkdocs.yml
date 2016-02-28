@@ -1,0 +1,7 @@
+site_name: YAPG − Modding documentation
+theme: readthedocs
+pages:
+    - Home: index.md
+    - Templates: templates.md
+    - Entities components reference: components.md
+    - Lua functions reference: lua.md
