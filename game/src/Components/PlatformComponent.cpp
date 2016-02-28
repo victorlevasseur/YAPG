@@ -25,7 +25,7 @@ std::string PlatformComponent::getName() const
 
 void PlatformComponent::registerComponent(lua::LuaState& state)
 {
-    meta::MetadataStore::registerClass<PlatformComponent>()
+    meta::MetadataStore::registerClass<PlatformComponent>("Platform")
         .setExtraLoadFunction([](PlatformComponent* platform, const sol::object& luaObject)
         {
             const sol::object& platformTypeLua = luaObject.as<sol::table>().get<sol::object>("platform_type");

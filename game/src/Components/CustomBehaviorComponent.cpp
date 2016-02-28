@@ -24,7 +24,7 @@ std::string CustomBehaviorComponent::getName() const
 
 void CustomBehaviorComponent::registerComponent(lua::LuaState& state)
 {
-    meta::MetadataStore::registerClass<CustomBehaviorComponent>()
+    meta::MetadataStore::registerClass<CustomBehaviorComponent>("CustomBehavior")
         .declareAttribute<sol::function>("on_update", &CustomBehaviorComponent::updateFunction);
 
     lua::EntityHandle::declareComponent<CustomBehaviorComponent>("CustomBehavior");

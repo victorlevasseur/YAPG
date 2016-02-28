@@ -23,7 +23,7 @@ std::string HitboxComponent::getName() const
 
 void HitboxComponent::registerComponent(lua::LuaState& state)
 {
-    meta::MetadataStore::registerClass<HitboxComponent>()
+    meta::MetadataStore::registerClass<HitboxComponent>("Hitbox")
         .declareAttribute("polygon", &HitboxComponent::m_polygon);
 
     lua::EntityHandle::declareComponent<HitboxComponent>("Hitbox");

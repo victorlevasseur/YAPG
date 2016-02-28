@@ -26,7 +26,7 @@ std::string TemplateComponent::getName() const
 
 void TemplateComponent::registerComponent(lua::LuaState& state)
 {
-    meta::MetadataStore::registerClass<TemplateComponent>();
+    meta::MetadataStore::registerClass<TemplateComponent>("Template");
 }
 
 std::ostream& operator<<(std::ostream& stream, const TemplateComponent& component)

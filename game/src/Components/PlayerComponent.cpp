@@ -23,7 +23,7 @@ std::string PlayerComponent::getName() const
 
 void PlayerComponent::registerComponent(lua::LuaState& state)
 {
-    meta::MetadataStore::registerClass<PlayerComponent>()
+    meta::MetadataStore::registerClass<PlayerComponent>("Player")
         .declareAttribute("player_number", &PlayerComponent::playerNumber, false, true, false);
 
     lua::EntityHandle::declareComponent<PlayerComponent>("Player");
