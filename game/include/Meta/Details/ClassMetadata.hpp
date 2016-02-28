@@ -39,6 +39,12 @@ public:
         loadImpl(reinterpret_cast<C*>(object), luaObject);
     }
 
+    virtual void loadFromXml(void* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const
+    {
+        //TODO: Support this for classes
+        std::cout << "Compound classes do not support being loaded from XML yet ! (TODO!)" << std::endl;
+    }
+
     template<typename T>
     ClassMetadata<C>& declareAttribute(const std::string& name, T C::*member, bool loadableFromLua = true, bool gettableFromLua = true, bool settableFromLua = true)
     {

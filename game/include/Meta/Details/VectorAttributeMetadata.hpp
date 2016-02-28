@@ -53,6 +53,12 @@ public:
         });
     }
 
+    virtual void loadFromXml(C* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const
+    {
+        //TODO: Support it !
+        std::cout << "[Meta/Warning] Loading std::vector attributes from XML is not supported yet !" << std::endl;
+    }
+
     /**
      * Return the attribute into "result" as a lua table containing all values of the vector.
      * T must be a type declared to Lua.

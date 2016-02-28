@@ -31,7 +31,13 @@ public:
         if(!AttributeMetadataBase<C>::m_loadableFromLua)
             return;
         //Get the metadata of the class/type to be able to load the attribute
-        MetadataStore::getMetadata<T>().load(&((*object).*m_member), luaObject);
+        MetadataStore::getMetadata<T>().load(&(object->*m_member), luaObject);
+    }
+
+    virtual void loadFromXml(C* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const
+    {
+        //Get the metadata of the class/type to be able to load the attribute from XML according to its meta definition
+        MetadataStore::getMetadata<T>().loadFromXml(&(object->*m_member), xmlElement, entityGetter);
     }
 
     virtual std::string getAsString(const C* object) const

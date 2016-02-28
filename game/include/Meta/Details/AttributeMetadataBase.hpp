@@ -26,6 +26,8 @@ public:
 
     virtual void load(C* object, const sol::object& luaObject) const = 0;
 
+    virtual void loadFromXml(C* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const = 0;
+
     virtual std::string getAsString(const C* object) const
     {
         std::cout << "Script trying to get a value not convertible to std::string !" << std::endl;
