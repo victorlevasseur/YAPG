@@ -27,7 +27,7 @@ std::string RenderComponent::getName() const
 
 void RenderComponent::registerComponent(lua::LuaState& state)
 {
-    meta::MetadataStore::registerClass<RenderComponent>("Render")
+    meta::MetadataStore::registerClass<RenderComponent>("RenderComponent")
         .declareAttribute("texture", &RenderComponent::textureName)
         .declareAttribute("current_animation", &RenderComponent::currentAnimation)
         .declareAttribute("animations", &RenderComponent::animations)

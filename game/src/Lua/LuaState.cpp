@@ -46,12 +46,42 @@ LuaState::LuaState() :
     );
 
     //Declare the metadatas of some basic types
-    meta::MetadataStore::registerType<int>();
-    meta::MetadataStore::registerType<unsigned int>();
-    meta::MetadataStore::registerType<bool>();
-    meta::MetadataStore::registerType<float>();
-    meta::MetadataStore::registerType<double>();
-    meta::MetadataStore::registerType<std::string>();
+    meta::MetadataStore::registerType<int>()
+        .setXmlLoadFunction([](int* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        {
+            xmlElement->QueryIntText(value);
+        });
+    meta::MetadataStore::registerType<unsigned int>()
+        .setXmlLoadFunction([](unsigned int* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        {
+            int intValue = static_cast<int>(*value);
+            xmlElement->QueryIntText(&intValue);
+            *value = static_cast<unsigned int>(intValue);
+        });
+    meta::MetadataStore::registerType<bool>()
+        .setXmlLoadFunction([](bool* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        {
+            const char* stringValue = xmlElement->GetText();
+            if(stringValue)
+                *value = strcmp(stringValue, "true");
+        });
+    meta::MetadataStore::registerType<float>()
+        .setXmlLoadFunction([](float* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        {
+            xmlElement->QueryFloatText(value);
+        });
+    meta::MetadataStore::registerType<double>()
+        .setXmlLoadFunction([](double* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        {
+            xmlElement->QueryDoubleText(value);
+        });
+    meta::MetadataStore::registerType<std::string>()
+        .setXmlLoadFunction([](std::string* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        {
+            const char* stringValue = xmlElement->GetText();
+            if(stringValue)
+                *value = std::string(stringValue);
+        });
     meta::MetadataStore::registerType<sol::function>();
     meta::MetadataStore::registerClass<sf::Vector2f>()
         .declareAttribute("x", &sf::Vector2f::x)

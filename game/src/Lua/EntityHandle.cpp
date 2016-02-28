@@ -26,6 +26,18 @@ EntityHandle::EntityHandle(entityx::Entity entity) :
 
 }
 
+void EntityHandle::loadAttributeFromXml(const std::string& componentName, const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+{
+    if(attributesCallbacks.count(componentName) > 0)
+    {
+        (this->*(attributesCallbacks.at(componentName).loadFromXmlCallback))(attributeName, xmlElement, entityGetter);
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
+    }
+}
+
 std::string EntityHandle::getAttributeAsString(const std::string& componentName, const std::string& attributeName) const
 {
     if(attributesCallbacks.count(componentName) > 0)

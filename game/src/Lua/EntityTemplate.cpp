@@ -101,39 +101,8 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
                 throw std::runtime_error("Template \"" + m_name + "\" needs the parameter \"" + it->first + "\" but not given by the instanciated object !");
             }
 
-            //String parameter
-            if(it->second.attributeType == Parameter::String)
-            {
-                const char* stringValue = parameterElement->GetText();
-                if(!stringValue)
-                {
-                    throw std::runtime_error("Template \"" + m_name + "\" needs the parameter \"" + it->first + "\" but not of the correct type !");
-                }
-
-                lua::EntityHandle(entity).setAttributeAsString(it->second.component, it->second.attribute, std::string(stringValue));
-            }
-            else if(it->second.attributeType == Parameter::Number)
-            {
-                double doubleValue = 0.0;
-                if(parameterElement->QueryDoubleText(&doubleValue) != tinyxml2::XML_SUCCESS)
-                {
-                    throw std::runtime_error("Template \"" + m_name + "\" needs the parameter \"" + it->first + "\" but not of the correct type !");
-                }
-
-                lua::EntityHandle(entity).setAttributeAsDouble(it->second.component, it->second.attribute, doubleValue);
-            }
-            else if(it->second.attributeType == Parameter::Boolean)
-            {
-                bool boolValue = false;
-                if(!parameterElement->GetText())
-                {
-                    throw std::runtime_error("Template \"" + m_name + "\" needs the parameter \"" + it->first + "\" but not of the correct type !");
-                }
-                boolValue = (strcmp(parameterElement->GetText(), "True") == 0);
-
-                lua::EntityHandle(entity).setAttributeAsBool(it->second.component, it->second.attribute, boolValue);
-            }
-
+            //Load the corresponding attribute (from parameter infos) using the XML element
+            EntityHandle(entity).loadAttributeFromXml(it->second.component, it->second.attribute, parameterElement, entityGetter);
         }
         catch(std::exception& e)
         {

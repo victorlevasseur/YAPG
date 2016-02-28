@@ -42,7 +42,7 @@ std::string PlatformerComponent::getName() const
 
 void PlatformerComponent::registerComponent(lua::LuaState& state)
 {
-    meta::MetadataStore::registerClass<PlatformerComponent>("Platformer")
+    meta::MetadataStore::registerClass<PlatformerComponent>("PlatformerComponent")
         .declareAttribute("onIdle", &PlatformerComponent::onIdleFunc)
         .declareAttribute("onStartWalking", &PlatformerComponent::onWalkingFunc)
         .declareAttribute("onStartJumping", &PlatformerComponent::onJumpingFunc)

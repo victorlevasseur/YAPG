@@ -2,12 +2,29 @@ namespace lua
 {
 
 template<class C>
+void EntityHandle::doLoadAttributeFromXml(const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& serializedEntityGetter)
+{
+    if(m_entity.has_component<C>())
+    {
+        auto& metadata = dynamic_cast<meta::ClassMetadata<C>&>(
+            meta::MetadataStore::getMetadata<C>()
+        );
+        metadata.getAttribute(attributeName).loadFromXml(m_entity.component<C>().get(), xmlElement, serializedEntityGetter);
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a component from an entity that doesn't have it !" << std::endl;
+    }
+}
+
+template<class C>
 void EntityHandle::declareComponent(const std::string& componentName)
 {
     //Create a ComponentAttributesCallbacks instance containing all the needed callbacks
     attributesCallbacks.emplace(
         componentName,
         ComponentAttributesCallbacks{
+            &EntityHandle::doLoadAttributeFromXml<C>,
             &EntityHandle::doGetAttributeAsString<C>,
             &EntityHandle::doSetAttributeAsString<C>,
             &EntityHandle::doGetAttributeAsBool<C>,

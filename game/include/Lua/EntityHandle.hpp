@@ -28,6 +28,8 @@ public:
      */
     struct ComponentAttributesCallbacks
     {
+        void (EntityHandle::*loadFromXmlCallback)(const std::string&, const tinyxml2::XMLElement*, const level::SerializedEntityGetter&);
+
         std::string (EntityHandle::*getStringCallback)(const std::string&) const;
         void (EntityHandle::*setStringCallback)(const std::string&, const std::string&);
 
@@ -43,6 +45,8 @@ public:
 
     EntityHandle();
     EntityHandle(entityx::Entity entity);
+
+    void loadAttributeFromXml(const std::string& componentName, const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter);
 
     std::string getAttributeAsString(const std::string& componentName, const std::string& attributeName) const;
     void setAttributeAsString(const std::string& componentName, const std::string& attributeName, const std::string& value);
@@ -66,6 +70,9 @@ public:
     static void declareComponent(const std::string& componentName);
 
 private:
+    template<class C>
+    void doLoadAttributeFromXml(const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& serializedEntityGetter);
+
     template<class C>
     std::string doGetAttributeAsString(const std::string& attributeName) const;
 
