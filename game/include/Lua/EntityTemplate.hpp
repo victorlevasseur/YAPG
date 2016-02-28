@@ -48,8 +48,21 @@ public:
 
     void applyInheritance(LuaState& luaState);
 
+    /**
+     * Initializes an entity with this template.
+     * \param entity the entity to initialize (must be an already created entity)
+     * \param entityGetter the entity getter where all entities id are linked to their Entity instance
+     * \param templateComponent create or not the TemplateComponent containing infos about which template initialized this entity
+     */
     void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, bool templateComponent = false) const;
 
+    /**
+     * Initializes an entity with this template and fulfills its parameters with the parameters in parametersElement XML element.
+     * \param entity the entity to initialize (must be an already created entity)
+     * \param entityGetter the entity getter where all entities id are linked to their Entity instance
+     * \param parametersElement the XML Element containing the values of all the parameters needed by this template
+     * \param templateComponent create or not the TemplateComponent containing infos about which template initialized this entity
+     */
     void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement, bool templateComponent = false) const;
 
     std::string getName() const { return m_name; }
