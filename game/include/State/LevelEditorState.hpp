@@ -66,6 +66,9 @@ private:
 
     bool isMouseNotOnWidgets(sf::Vector2i mousePosition, sf::RenderTarget& target) const;
 
+    entityx::Entity getFirstEntityUnderMouse(sf::Vector2i mousePosition, sf::RenderTarget& target);
+    bool isEntityUnderMouse(entityx::Entity entity, sf::Vector2i mousePosition, sf::RenderTarget& target) const;
+
     resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;
 
@@ -88,6 +91,9 @@ private:
 
     level::Level m_level;
     std::unique_ptr<entityx::SystemManager> m_systemMgr;
+
+    entityx::Entity m_selectedEntity;
+    sf::Vector2f m_mouseOffsetToSelected;
 };
 
 }

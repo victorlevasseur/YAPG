@@ -1,5 +1,6 @@
 #include "State/LevelEditorState.hpp"
 
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include <SFGUI/Box.hpp>
@@ -8,6 +9,8 @@
 #include <SFGUI/RadioButtonGroup.hpp>
 #include <SFGUI/Separator.hpp>
 
+#include "Components/PositionComponent.hpp"
+#include "Components/TemplateComponent.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Lua/EntityTemplate.hpp"
 #include "State/MainMenuState.hpp"
@@ -33,7 +36,9 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, std::string path, r
     m_templatesNames(),
     m_propertiesScrolled(),
     m_level(m_luaState, level::Level::LevelMode::EditMode),
-    m_systemMgr(nullptr)
+    m_systemMgr(nullptr),
+    m_selectedEntity(),
+    m_mouseOffsetToSelected()
 {
     initSystemManager();
     initGUI();
@@ -82,6 +87,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 
             try
             {
+                //Set x and y parameters
                 auto& parameters = entityTemplate.getParameters();
 
                 const lua::EntityTemplate::Parameter& xParameter = parameters.at("x");
@@ -97,13 +103,66 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             }
         }
     }
+    else if(getEditionMode() == EditionMode::Modify)
+    {
+        sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), m_levelView);
+
+        if(event.type == sf::Event::MouseButtonPressed && isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
+        {
+            m_selectedEntity = getFirstEntityUnderMouse(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target);
+
+            if(m_selectedEntity)
+            {
+                auto position = m_selectedEntity.component<components::PositionComponent>(); //TODO: Use EntityHandle getAttributeAsDouble instead !
+                m_mouseOffsetToSelected = mousePosition - sf::Vector2f(position->x, position->y);
+            }
+
+            //TODO: Update properties
+        }
+        else if(event.type == sf::Event::MouseButtonReleased)
+        {
+            if(m_selectedEntity)
+            {
+                auto templateComponent = m_selectedEntity.component<components::TemplateComponent>();
+                const lua::EntityTemplate& selectedEntityTemplate = m_luaState.getTemplate(templateComponent->templateName);
+
+                //Set x and y parameters
+                auto& parameters = selectedEntityTemplate.getParameters();
+
+                const lua::EntityTemplate::Parameter& xParameter = parameters.at("x");
+                const lua::EntityTemplate::Parameter& yParameter = parameters.at("y");
+
+                lua::EntityHandle(m_selectedEntity).setAttributeAsDouble(xParameter.component, xParameter.attribute, event.mouseButton.x - m_mouseOffsetToSelected.x);
+                lua::EntityHandle(m_selectedEntity).setAttributeAsDouble(yParameter.component, yParameter.attribute, event.mouseButton.y - m_mouseOffsetToSelected.y);
+            }
+        }
+    }
 }
 
 void LevelEditorState::render(sf::RenderTarget& target)
 {
     target.clear(sf::Color(0, 180, 255));
+
+    //Render the level
     target.setView(m_levelView);
     m_systemMgr->system<systems::RenderSystem>()->render(target);
+
+    if(getEditionMode() == EditionMode::Modify)
+    {
+        //Draw the selection box
+        if(m_selectedEntity)
+        {
+            auto position = m_selectedEntity.component<components::PositionComponent>();
+            sf::RectangleShape selectionRect(sf::Vector2f(position->width, position->height));
+            selectionRect.setPosition(sf::Vector2f(position->x, position->y));
+            selectionRect.setFillColor(sf::Color(0, 0, 255, 100));
+            selectionRect.setOutlineThickness(1.f);
+            selectionRect.setOutlineColor(sf::Color(0, 0, 255, 128));
+            target.draw(selectionRect);
+        }
+    }
+
+    //Render the gui
     target.setView(m_guiView);
     m_sfgui.Display(dynamic_cast<sf::RenderWindow&>(target));
 }
@@ -292,6 +351,31 @@ bool LevelEditorState::isMouseNotOnWidgets(sf::Vector2i mousePosition, sf::Rende
         !m_toolsToolbar->GetAllocation().contains(mouseCoords) &&
         !m_toolsSettingsToolbar->GetAllocation().contains(mouseCoords)
     );
+}
+
+entityx::Entity LevelEditorState::getFirstEntityUnderMouse(sf::Vector2i mousePosition, sf::RenderTarget& target)
+{
+    entityx::ComponentHandle<components::PositionComponent> position;
+    for(entityx::Entity entity : m_level.getEntityManager().entities_with_components(position))
+    {
+        if(isEntityUnderMouse(entity, mousePosition, target))
+            return entity;
+    }
+
+    return entityx::Entity();
+}
+
+bool LevelEditorState::isEntityUnderMouse(entityx::Entity entity, sf::Vector2i mousePosition, sf::RenderTarget& target) const
+{
+    sf::Vector2f mouseAbsolutePos = target.mapPixelToCoords(mousePosition, m_levelView);
+
+    auto positionComponent = entity.component<components::PositionComponent>();
+    if(!positionComponent)
+        return false;
+
+    sf::FloatRect entityBoundingBox(positionComponent->x, positionComponent->y, positionComponent->width, positionComponent->height);
+
+    return entityBoundingBox.contains(mouseAbsolutePos);
 }
 
 }
