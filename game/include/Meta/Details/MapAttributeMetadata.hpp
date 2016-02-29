@@ -11,14 +11,14 @@ namespace meta
 {
 
 /**
- * Used to declare a std::map<T, U> attribute.
+ * Used to declare a std::map<T, U> attribute. Specialization of AttributeMetadata with T = std::map<U, V>
  * Note: T and U must have a default constructor and be (at least) movable.
  */
 template<class C, typename T, typename U>
-class MapAttributeMetadata : public AttributeMetadataBase<C>
+class AttributeMetadata<C, std::map<T, U>> : public AttributeMetadataBase<C>
 {
 public:
-    MapAttributeMetadata(
+    AttributeMetadata(
         std::map<T, U> C::*mapMember,
         bool loadableFromLua = true,
         bool gettableFromLua = true,
@@ -28,10 +28,10 @@ public:
         m_mapMember(mapMember)
 
     {
-
+        
     }
 
-    virtual ~MapAttributeMetadata() {};
+    virtual ~AttributeMetadata() {};
 
     virtual void load(C* object, const sol::object& luaObject) const
     {

@@ -11,14 +11,14 @@ namespace meta
 {
 
 /**
- * Used to declare a std::vector<T> attribute.
+ * Used to declare a std::vector<T> attribute. Specialization of AttributeMetadata for T <- std::vector<T>
  * Note: T must have a default constructor.
  */
 template<class C, typename T>
-class VectorAttributeMetadata : public AttributeMetadataBase<C>
+class AttributeMetadata<C, std::vector<T>> : public AttributeMetadataBase<C>
 {
 public:
-    VectorAttributeMetadata(
+    AttributeMetadata(
         std::vector<T> C::*vectorMember,
         bool loadableFromLua = true,
         bool gettableFromLua = true,
@@ -28,10 +28,10 @@ public:
         m_vectorMember(vectorMember)
 
     {
-
+        
     }
 
-    virtual ~VectorAttributeMetadata() {};
+    virtual ~AttributeMetadata() {};
 
     virtual void load(C* object, const sol::object& luaObject) const
     {
