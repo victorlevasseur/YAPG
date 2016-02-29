@@ -1,7 +1,8 @@
 site_name: YAPG − Modding documentation
-theme: readthedocs
 pages:
     - Home: index.md
     - Templates: templates.md
-    - Entities components reference: components.md
+    - Types and Components reference:
+        - Native types: components/native-types.md
+        - Components and classes: components/components.md
     - Lua functions reference: lua.md

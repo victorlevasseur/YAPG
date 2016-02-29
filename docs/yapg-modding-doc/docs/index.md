@@ -1,5 +1,7 @@
 # Welcome to the YAPG modding documentation
 
+![](img/YAPGLogo.png)
+
 Welcome to the modding documentation of YAPG. It will describe how to create
 new entity templates and how to write lua function using the game features.
 
