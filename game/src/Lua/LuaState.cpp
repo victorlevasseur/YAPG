@@ -151,35 +151,6 @@ const sol::state& LuaState::getState() const
     return m_luaState;
 }
 
-int LuaState::getTableSize(const std::string& tableName)
-{
-    std::string command("temp = array_tools.table_size(" + tableName + ")");
-    m_luaState.script(command);
-
-    return m_luaState.get<int>("temp");
-}
-
-std::vector<std::string> LuaState::getTableKeys(const std::string& tableName)
-{
-    std::string command("temp = array_tools.get_keys(" + tableName + ")");
-    m_luaState.script(command);
-
-    std::string s = m_luaState.get<std::string>("temp");
-
-    char c = '|';
-    std::string buff{""};
-	std::vector<std::string> v;
-
-	for(auto n:s)
-	{
-		if(n != c) buff+=n; else
-		if(n == c && buff != "") { v.push_back(buff); buff = ""; }
-	}
-	if(buff != "") v.push_back(buff);
-
-	return v;
-}
-
 const EntityTemplate& LuaState::getTemplate(const std::string& name) const
 {
     return m_templates.at(name);

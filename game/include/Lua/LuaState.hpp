@@ -20,9 +20,6 @@ public:
     sol::state& getState();
     const sol::state& getState() const;
 
-    int getTableSize(const std::string& tableName);
-    std::vector<std::string> getTableKeys(const std::string& tableName);
-
     const EntityTemplate& getTemplate(const std::string& name) const;
 
     const std::map<std::string, EntityTemplate>& getTemplates() const { return m_templates; }
