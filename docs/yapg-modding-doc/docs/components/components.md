@@ -57,7 +57,7 @@ myEntity:set_attribute("Position", "x", float_value(new_x_pos))
 Name | Type | Description | [U](#vocabulary) | [G/S](#vocabulary)
 -----|------|-------------|---|---
 texture | string | The filepath to the texture picture. | ✓ | ✓
-animations | map associating String to [Animation](utility-classes.md#animation-class) | Associates the animation name with the animation. | ✓ | …
+animations | map associating string to [animation](utility-classes.md#animation-class) | Associates the animation name with the animation. | ✓ | …
 current_animation | string | The current animation of the entity. | ✓ | ✓
 
 #### Lua serialization
