@@ -1,41 +1,41 @@
-# Native types
+# Basic types
 
-Natives types are not used directly by the engine. But they are often used as attributes of components.
+This section describes how objects of a specific type are represented when **serialized in a lua template file** or **in an XML level file**. This **does not describe how the objects are represented during runtime** (See [Lua functions reference](../lua.md) for that).
 
 ## Lua and XML serialization
 
-**Most types can be defined in two ways:**
+**Most values can be defined in two ways:**
 
- - the first one shows how the type should be represented in a template lua file in its **lua serialization form**: the form used to instanciate an entity from a template where classes are represented using a lua table containing keys for attributes. In fact, this is the way classes/values are written in attributes of a template lua file.
- - the second one shows how the type is represented in its **XML serialization form** when serialized into a level XML file.
+ - the first one shows how the value should be represented in a template lua file in its **lua serialization form**: the form used to instanciate an entity from a template where classes are represented using a lua table containing keys for attributes.
+ - the second one shows how the type is represented in its **XML serialization form** when serialized into a XML level file. This is mainly used to write the parameters values of a particular instance of a template.
 
-To sum up, use the **lua serialization form** to describe objects in template lua files. Use the **XML serialization form** to describe objects in level XML files (mainly used to define **parameters**).
+**The runtime representation (in lua functions) of objects has nothing to do with these two formats that are just two ways of unserialize an entity/template.** See [Lua functions reference](../lua.md) to see how to get/change attributes/objects values during runtime.
 
 ## Number
 Attributes of type "Number" can be any value, with or without a point.
 
-Lua serialization | XML runtime
+Lua | XML
 ------------------|----------------
-2.56 | 2.56 | 2.56
+2.56 | 2.56
 
 ## String
 Attributes of type "String" can be any string, written between `"`.
 
-Lua serialization | XML runtime
-------------------|----------------
+Lua | XML
+------------------|---------------
 "my string" | my string (no quotes!)
 
 ## Boolean
 Attributes of type "Boolean" can be `true` or `false`.
 
-Lua serialization | XML runtime
+Lua | XML
 ------------------|----------------
-true | true | true
+true | true
 
-## Array of "T"
+## Array
 Attributes of type "Array of T", with T a type.
 
-### Lua serialization
+### Lua
 ```lua             
 {
     first_item, --items must be respectively in the lua serialization form of T and U
@@ -44,7 +44,7 @@ Attributes of type "Array of T", with T a type.
 }
 ```
 
-### XML serialization
+### XML
 ```xml
 <value>first_item_value</value>
 <!-- first_item_value is the XML serialization form of T -->
@@ -54,10 +54,10 @@ Attributes of type "Array of T", with T a type.
 
 In this form, the table contains real objects of type T (a real lua type).
 
-## Map associating "T" to "U"
+## Map
 Attributes of type "Map associating T to U", with T and U types.
 
-### Lua serialization
+### Lua
 ```lua             
 {
     first_key = first_item, --keys and items must be in the lua serialization form of T
@@ -66,7 +66,7 @@ Attributes of type "Map associating T to U", with T and U types.
 }
 ```
 
-### XML serialization
+### XML
 ```xml
 <pair>
     <key>first_key_value</key>
@@ -83,14 +83,39 @@ Attributes of type "Map associating T to U", with T and U types.
 
 In this form, the table contains real objects of type T and U (a real lua type).
 
-## Function returning T with parameters X, Y...
+## Function
 
-Function are only defined in template lua files. So, only the lua serialization form exists.
+Function are only defined in template lua files. So, only the lua form exists.
 
-### Lua serialization form
+For a function returning type T with parameters of types X, Y, ... it's written this way:
+### Lua
 ```lua
 function(parameter_of_type_x, parameter_of_type_y, ...)
     --doing something there
     return object_of_type_t --an object of type T
 end
 ```
+
+## Class
+Classes can contain multiple attributes of different types. All the objects described in the [Utility classes section](utility-classes.md) and [Components section](components.md) are classes.
+
+When serialized in a lua template file, classes are represented with a lua table with keys being the attributes' names (and the associated values being the lua serialized representation of the values).
+
+For example, for a class name MyClass containing two attributes (a1 of type T and a2 of type U), we can describe the class like this:
+
+### Lua
+```lua
+{
+    a1 = value_of_a1, --must be the lua serialization form of the type T
+    a2 = value_of_a2, --must be the lua serialization form of the type U
+}
+```
+
+### XML
+```xml
+<a1>value_of_a1</a1>
+<!-- value_of_a1 must be the XML serialization form of the type T -->
+<a2>value_of_a2</a2>
+```
+
+**XML serialization form not yet implemented in the engine**

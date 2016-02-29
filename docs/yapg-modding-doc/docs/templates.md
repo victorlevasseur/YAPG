@@ -50,7 +50,9 @@ The `components` field contains an array of component's tables describing the va
 
 In the above code, if the game instanciates an entity with this template, the entity will be initialized with components `"ComponentNumberOne"` and `"ComponentNumberTwo"` and with their attributes set to the values written in the tables (the attribute `component_attribute_one` of `"ComponentNumberOne"` will be initialized with `"value"`). This is important to understand that after instanciation, the attributes of the entities' components can change independently: a mysterious script can decide to change the texture used by one and only one particular **instance** (entity) of the template.
 
-All availables components and their respective attributes are described in the [Entities components reference](components.md) section.
+**All availables components, how to write their attributes' values is described in detail in the "Lua/XML serialization" section. See [Basic types](components/native-types.md), [Utility classes](components/utility-classes.md) and [Components](components/components.md).**
+
+You can also use the default templates as examples for writing new ones.
 
 ### The parameters
 

@@ -2,7 +2,8 @@ site_name: YAPG − Modding documentation
 pages:
     - Home: index.md
     - Templates: templates.md
-    - Types and Components reference:
-        - Native types: components/native-types.md
+    - Lua/XML serialization:
+        - Basic types: components/native-types.md
+        - Utility classes: components/utility-classes.md
         - Components and classes: components/components.md
-    - Lua functions reference: lua.md
+    - Lua runtime: lua.md
