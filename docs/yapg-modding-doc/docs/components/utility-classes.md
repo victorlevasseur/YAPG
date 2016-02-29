@@ -6,14 +6,14 @@ Utility classes are classes used by components to represent some specific data s
 
 In the attribute's tables below, the "U" column tells if the attributes can be unserialized from lua/XML. The "R" column tells if the attributes can be changed at runtime with lua scripting. "✓" means "yes", "…" means that it will be included in a future version (planned) and nothing means "no".
 
-## Animation class
+## animation class
 
 #### Attributes
 
  Name | Type | Description | [U](#vocabulary) | [R](#vocabulary)
  -----|------|-------------|---|---
-duration | Number | The total duration of the animation, in seconds. | ✓ | …
-frames | Array of [Frame](#frame-class) | The frames of the animation. | ✓ | …
+duration | float | The total duration of the animation, in seconds. | ✓ | …
+frames | array of [frame](#frame-class) | The frames of the animation. | ✓ | …
 
 #### Lua serialization example
 ```lua
@@ -32,16 +32,16 @@ frames | Array of [Frame](#frame-class) | The frames of the animation. | ✓ | �
 }
 ```
 
-## Frame class
+## frame class
 
 #### Attributes
 
 Name | Type | Description | [U](#vocabulary) | [R](#vocabulary)
 -----|------|-------------|---|---
-rect | [IntRect](#intrect-class) | The part of the texture (defined in the RenderComponent) to use during this frame. | ✓ | …
-relative_duration | Number | The relative duration of this frame, relatively to the [Animation](#animation-class) total duration. | ✓ | …
+rect | [int_rect](#int_rect-class) | The part of the texture (defined in the RenderComponent) to use during this frame. | ✓ | …
+relative_duration | float | The relative duration of this frame, relatively to the [Animation](#animation-class) total duration. | ✓ | …
 
-## IntRect class
+## int_rect class
 
 Represents a axis-aligned rectangle.
 
@@ -49,7 +49,7 @@ Represents a axis-aligned rectangle.
 
 Name | Type | Description | [U](#vocabulary) | [R](#vocabulary)
 -----|------|-------------|---|---
-x | Number | The X position of the top-left corner. | ✓ | …
-y | Number | The Y position of the top-left corner. | ✓ | …
-width | Number | The width of the rectangle. | ✓ | …
-height | Number | The height of the rectangle. | ✓ | …
+x | int | The X position of the top-left corner. | ✓ | …
+y | int | The Y position of the top-left corner. | ✓ | …
+width | int | The width of the rectangle. | ✓ | …
+height | int | The height of the rectangle. | ✓ | …

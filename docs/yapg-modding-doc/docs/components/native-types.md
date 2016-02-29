@@ -11,29 +11,29 @@ This section describes how objects of a specific type are represented when **ser
 
 **The runtime representation (in lua functions) of objects has nothing to do with these two formats that are just two ways of unserialize an entity/template.** See [Lua functions reference](../lua.md) to see how to get/change attributes/objects values during runtime.
 
-## Number
-Attributes of type "Number" can be any value, with or without a point.
+## Numbers (float, double, int, unsigned_int)
+Attributes of type "float", "double", "int", "unsigned_int" can be any value, with or without a point.
 
 Lua | XML
 ------------------|----------------
 2.56 | 2.56
 
-## String
-Attributes of type "String" can be any string, written between `"`.
+## string
+Attributes of type "string" can be any string, written between `"`.
 
 Lua | XML
 ------------------|---------------
 "my string" | my string (no quotes!)
 
-## Boolean
-Attributes of type "Boolean" can be `true` or `false`.
+## bool
+Attributes of type "bool" can be `true` or `false`.
 
 Lua | XML
 ------------------|----------------
 true | true
 
-## Array
-Attributes of type "Array of T", with T a type.
+## array
+Attributes of type "array of T", with T a type.
 
 ### Lua
 ```lua             
@@ -54,7 +54,7 @@ Attributes of type "Array of T", with T a type.
 
 In this form, the table contains real objects of type T (a real lua type).
 
-## Map
+## map
 Attributes of type "Map associating T to U", with T and U types.
 
 ### Lua
@@ -83,7 +83,7 @@ Attributes of type "Map associating T to U", with T and U types.
 
 In this form, the table contains real objects of type T and U (a real lua type).
 
-## Function
+## function
 
 Function are only defined in template lua files. So, only the lua form exists.
 

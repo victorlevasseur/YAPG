@@ -22,10 +22,10 @@ Currently, the game has the following components:
 
 Name | Type | Description | [U](#vocabulary) | [G/S](#vocabulary)
 -----|------|-------------|---|---
-x | Number | | ✓ | ✓
-y | Number | | ✓ | ✓
-width | Number | | ✓ | ✓
-height | Number | | ✓ | ✓
+x | float | | ✓ | ✓
+y | float | | ✓ | ✓
+width | float | | ✓ | ✓
+height | float | | ✓ | ✓
 
 #### Lua serialization
 
@@ -41,15 +41,24 @@ components = {
 }
 ```
 
+#### Lua script example
+This example moves the entity by 100px towards the right direction.
+```lua
+--myEntity is an particular entity instance
+local old_x_pos = as_float(myEntity:get_attribute("Position", "x"))
+local new_x_pos = old_x_pos + 100
+myEntity:set_attribute("Position", "x", float_value(new_x_pos))
+```
+
 ### RenderComponent
 
 #### Attributes
 
 Name | Type | Description | [U](#vocabulary) | [G/S](#vocabulary)
 -----|------|-------------|---|---
-texture | String | The filepath to the texture picture. | ✓ | ✓
-animations | Map associating String to [Animation](utility-classes.md#animation-class) | Associates the animation name with the animation. | ✓ | …
-current_animation | String | The current animation of the entity. | ✓ | ✓
+texture | string | The filepath to the texture picture. | ✓ | ✓
+animations | map associating String to [Animation](utility-classes.md#animation-class) | Associates the animation name with the animation. | ✓ | …
+current_animation | string | The current animation of the entity. | ✓ | ✓
 
 #### Lua serialization
 
