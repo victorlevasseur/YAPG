@@ -30,39 +30,6 @@ public:
 
     virtual void loadFromXml(C* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const = 0;
 
-    virtual std::string getAsString(const C* object) const
-    {
-        std::cout << "Script trying to get a value not convertible to std::string !" << std::endl;
-        return "";
-    }
-
-    virtual void setAsString(C* object, const std::string& value) const
-    {
-        std::cout << "Script trying to set a value not convertible from std::string !" << std::endl;
-    }
-
-    virtual bool getAsBool(const C* object) const
-    {
-        std::cout << "Script trying to get a value not convertible to bool !" << std::endl;
-        return false;
-    }
-
-    virtual void setAsBool(C* object, bool value) const
-    {
-        std::cout << "Script trying to set a value not convertible from bool !" << std::endl;
-    }
-
-    virtual double getAsDouble(const C* object) const
-    {
-        std::cout << "Script trying to get a value not convertible to double !" << std::endl;
-        return 0.0;
-    }
-
-    virtual void setAsDouble(C* object, double value) const
-    {
-        std::cout << "Script trying to set a value not convertible from double !" << std::endl;
-    }
-
     virtual boost::any getAsAny(const C* object) const
     {
         std::cout << "Script trying to get a value not storable in boost::any" << std::endl;
