@@ -3,6 +3,8 @@
 
 #include <type_traits>
 
+#include <boost/any.hpp>
+
 #include "entityx/entityx.h"
 
 #include "Lua/sol.hpp"
@@ -30,14 +32,8 @@ public:
     {
         void (EntityHandle::*loadFromXmlCallback)(const std::string&, const tinyxml2::XMLElement*, const level::SerializedEntityGetter&);
 
-        std::string (EntityHandle::*getStringCallback)(const std::string&) const;
-        void (EntityHandle::*setStringCallback)(const std::string&, const std::string&);
-
-        bool (EntityHandle::*getBoolCallback)(const std::string&) const;
-        void (EntityHandle::*setBoolCallback)(const std::string&, bool);
-
-        double (EntityHandle::*getDoubleCallback)(const std::string&) const;
-        void (EntityHandle::*setDoubleCallback)(const std::string&, double);
+        boost::any (EntityHandle::*getAnyCallback)(const std::string&) const;
+        void (EntityHandle::*setAnyCallback)(const std::string&, const boost::any&);
 
         void (EntityHandle::*getLuaTableCallback)(const std::string&, sol::table) const;
         void (EntityHandle::*setLuaTableCallback)(const std::string&, sol::table);
@@ -48,14 +44,8 @@ public:
 
     void loadAttributeFromXml(const std::string& componentName, const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter);
 
-    std::string getAttributeAsString(const std::string& componentName, const std::string& attributeName) const;
-    void setAttributeAsString(const std::string& componentName, const std::string& attributeName, const std::string& value);
-
-    bool getAttributeAsBool(const std::string& componentName, const std::string& attributeName) const;
-    void setAttributeAsBool(const std::string& componentName, const std::string& attributeName, bool value);
-
-    double getAttributeAsDouble(const std::string& componentName, const std::string& attributeName) const;
-    void setAttributeAsDouble(const std::string& componentName, const std::string& attributeName, double value);
+    boost::any getAttributeAsAny(const std::string& componentName, const std::string& attributeName) const;
+    void setAttributeAsAny(const std::string& componentName, const std::string& attributeName, const boost::any& value);
 
     void getAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table result) const;
     void setAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table value);
@@ -74,22 +64,10 @@ private:
     void doLoadAttributeFromXml(const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& serializedEntityGetter);
 
     template<class C>
-    std::string doGetAttributeAsString(const std::string& attributeName) const;
+    boost::any doGetAttributeAsAny(const std::string& attributeName) const;
 
     template<class C>
-    void doSetAttributeAsString(const std::string& attributeName, const std::string& value);
-
-    template<class C>
-    bool doGetAttributeAsBool(const std::string& attributeName) const;
-
-    template<class C>
-    void doSetAttributeAsBool(const std::string& attributeName, bool value);
-
-    template<class C>
-    double doGetAttributeAsDouble(const std::string& attributeName) const;
-
-    template<class C>
-    void doSetAttributeAsDouble(const std::string& attributeName, double value);
+    void doSetAttributeAsAny(const std::string& attributeName, const boost::any& value);
 
     template<class C>
     void doGetAttributeAsLuaTable(const std::string& attributeName, sol::table result) const;

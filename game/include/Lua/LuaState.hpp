@@ -28,6 +28,9 @@ public:
     const std::map<std::string, EntityTemplate>& getTemplates() const { return m_templates; }
     std::map<std::string, EntityTemplate>& getTemplates() { return m_templates; }
 
+    template<class T>
+    void declareAnyConvertibleType(const std::string& typeName);
+
     /**
      * Merge the two tables into a single one.
      * None of the two table are overriden.
@@ -44,5 +47,7 @@ private:
 };
 
 }
+
+#include "Lua/LuaState.inl"
 
 #endif

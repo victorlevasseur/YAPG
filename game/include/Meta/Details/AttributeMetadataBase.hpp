@@ -1,6 +1,8 @@
 #ifndef YAPG_GAME_META_DETAILS_ATTRIBUTEMETADATABASE_H
 #define YAPG_GAME_META_DETAILS_ATTRIBUTEMETADATABASE_H
 
+#include <boost/any.hpp>
+
 #include "Lua/sol.hpp"
 
 namespace meta
@@ -59,6 +61,17 @@ public:
     virtual void setAsDouble(C* object, double value) const
     {
         std::cout << "Script trying to set a value not convertible from double !" << std::endl;
+    }
+
+    virtual boost::any getAsAny(const C* object) const
+    {
+        std::cout << "Script trying to get a value not storable in boost::any" << std::endl;
+        return boost::any();
+    }
+
+    virtual void setAsAny(C* object, const boost::any& value)
+    {
+        std::cout << "Script trying to set a value not convertible from boost::any" << std::endl;
     }
 
     /**

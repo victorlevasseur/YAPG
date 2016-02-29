@@ -38,11 +38,11 @@ void EntityHandle::loadAttributeFromXml(const std::string& componentName, const 
     }
 }
 
-std::string EntityHandle::getAttributeAsString(const std::string& componentName, const std::string& attributeName) const
+boost::any EntityHandle::getAttributeAsAny(const std::string& componentName, const std::string& attributeName) const
 {
     if(attributesCallbacks.count(componentName) > 0)
     {
-        return (this->*(attributesCallbacks.at(componentName).getStringCallback))(attributeName);
+        return (this->*(attributesCallbacks.at(componentName).getAnyCallback))(attributeName);
     }
     else
     {
@@ -51,61 +51,11 @@ std::string EntityHandle::getAttributeAsString(const std::string& componentName,
     }
 }
 
-void EntityHandle::setAttributeAsString(const std::string& componentName, const std::string& attributeName, const std::string& value)
+void EntityHandle::setAttributeAsAny(const std::string& componentName, const std::string& attributeName, const boost::any& value)
 {
     if(attributesCallbacks.count(componentName) > 0)
     {
-        (this->*(attributesCallbacks.at(componentName).setStringCallback))(attributeName, value);
-    }
-    else
-    {
-        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
-    }
-}
-
-bool EntityHandle::getAttributeAsBool(const std::string& componentName, const std::string& attributeName) const
-{
-    if(attributesCallbacks.count(componentName) > 0)
-    {
-        return (this->*(attributesCallbacks.at(componentName).getBoolCallback))(attributeName);
-    }
-    else
-    {
-        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
-        return false;
-    }
-}
-
-void EntityHandle::setAttributeAsBool(const std::string& componentName, const std::string& attributeName, bool value)
-{
-    if(attributesCallbacks.count(componentName) > 0)
-    {
-        (this->*(attributesCallbacks.at(componentName).setBoolCallback))(attributeName, value);
-    }
-    else
-    {
-        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
-    }
-}
-
-double EntityHandle::getAttributeAsDouble(const std::string& componentName, const std::string& attributeName) const
-{
-    if(attributesCallbacks.count(componentName) > 0)
-    {
-        return (this->*(attributesCallbacks.at(componentName).getDoubleCallback))(attributeName);
-    }
-    else
-    {
-        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
-        return false;
-    }
-}
-
-void EntityHandle::setAttributeAsDouble(const std::string& componentName, const std::string& attributeName, double value)
-{
-    if(attributesCallbacks.count(componentName) > 0)
-    {
-        (this->*(attributesCallbacks.at(componentName).setDoubleCallback))(attributeName, value);
+        (this->*(attributesCallbacks.at(componentName).setAnyCallback))(attributeName, value);
     }
     else
     {
@@ -151,12 +101,8 @@ void EntityHandle::registerClass(LuaState &state)
 {
     state.getState().new_usertype<EntityHandle>("entity_handle",
         "remove_entity", &EntityHandle::removeEntity,
-        "get_string_attribute", &EntityHandle::getAttributeAsString,
-        "set_string_attribute", &EntityHandle::setAttributeAsString,
-        "get_bool_attribute", &EntityHandle::getAttributeAsBool,
-        "set_bool_attribute", &EntityHandle::setAttributeAsBool,
-        "get_number_attribute", &EntityHandle::getAttributeAsDouble,
-        "set_number_attribute", &EntityHandle::setAttributeAsDouble,
+        "get_attribute", &EntityHandle::getAttributeAsAny,
+        "set_attribute", &EntityHandle::setAttributeAsAny,
         "get_table_attribute", &EntityHandle::getAttributeAsLuaTable,
         "set_table_attribute", &EntityHandle::setAttributeAsLuaTable,
         "write_to_console", &EntityHandle::writeToConsole

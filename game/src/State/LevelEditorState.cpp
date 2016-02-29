@@ -87,8 +87,8 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 
             try
             {
-                newEntity.component<components::TemplateComponent>()->parametersHelper.setDoubleParameter("x", mousePosition.x);
-                newEntity.component<components::TemplateComponent>()->parametersHelper.setDoubleParameter("y", mousePosition.y);
+                newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", mousePosition.x);
+                newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", mousePosition.y);
             }
             catch(std::exception& e)
             {
@@ -108,8 +108,8 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             if(m_selectedEntity)
             {
                 sf::Vector2f entityPos;
-                entityPos.x = m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.getDoubleParameter("x");
-                entityPos.y = m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.getDoubleParameter("y");
+                entityPos.x = boost::any_cast<float>(m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.getParameter("x"));
+                entityPos.y = boost::any_cast<float>(m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.getParameter("y"));
 
                 m_mouseOffsetToSelected = mousePosition - entityPos;
             }
@@ -120,8 +120,8 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         {
             if(m_selectedEntity)
             {
-                m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setDoubleParameter("x", event.mouseButton.x - m_mouseOffsetToSelected.x);
-                m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setDoubleParameter("y", event.mouseButton.y - m_mouseOffsetToSelected.y);
+                m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", event.mouseButton.x - m_mouseOffsetToSelected.x);
+                m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", event.mouseButton.y - m_mouseOffsetToSelected.y);
             }
         }
     }

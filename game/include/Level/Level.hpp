@@ -1,6 +1,8 @@
 #ifndef YAPG_GAME_LEVEL_LEVEL_H
 #define YAPG_GAME_LEVEL_LEVEL_H
 
+#include <boost/any.hpp>
+
 #include <SFML/System/Vector2.hpp>
 
 #include "entityx/entityx.h"

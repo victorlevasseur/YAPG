@@ -150,8 +150,8 @@ void Level::LoadFromFile(const std::string& path)
         const lua::EntityTemplate::Parameter& xParameter = parameters.at("x");
         const lua::EntityTemplate::Parameter& yParameter = parameters.at("y");
 
-        lua::EntityHandle(playerEntity).setAttributeAsDouble(xParameter.component, xParameter.attribute, m_spawnPosition.x);
-        lua::EntityHandle(playerEntity).setAttributeAsDouble(yParameter.component, yParameter.attribute, m_spawnPosition.y);
+        lua::EntityHandle(playerEntity).setAttributeAsAny(xParameter.component, xParameter.attribute, m_spawnPosition.x);
+        lua::EntityHandle(playerEntity).setAttributeAsAny(yParameter.component, yParameter.attribute, m_spawnPosition.y);
 
         if(!playerEntity.has_component<components::PlayerComponent>())
             throw std::runtime_error(std::string("[Level/Error] Player entities must have the \"Player\" component declared in their template ! Not the case with \"") + m_playersTemplates[0] + std::string("\""));

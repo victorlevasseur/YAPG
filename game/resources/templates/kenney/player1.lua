@@ -27,22 +27,22 @@ entity_template = {
         },
         ["Platformer"] = {
             onIdle = function(entity)
-                entity:set_string_attribute("Render", "current_animation", "idle")
+                entity:set_attribute("Render", "current_animation", string_to_any("idle"))
             end,
             onStartWalking = function(entity)
-                entity:set_string_attribute("Render", "current_animation", "walking")
+                entity:set_attribute("Render", "current_animation", string_to_any("walking"))
             end,
             onStartJumping = function(entity)
-                entity:set_string_attribute("Render", "current_animation", "jump")
+                entity:set_attribute("Render", "current_animation", string_to_any("jump"))
             end,
             onStartFalling = function(entity)
-                entity:set_string_attribute("Render", "current_animation", "jump")
+                entity:set_attribute("Render", "current_animation", string_to_any("jump"))
             end,
             onTurnRight = function(entity)
-                entity:set_bool_attribute("Render", "flipped", false)
+                entity:set_attribute("Render", "flipped", bool_to_any(false))
             end,
             onTurnLeft = function(entity)
-                entity:set_bool_attribute("Render", "flipped", true)
+                entity:set_attribute("Render", "flipped", bool_to_any(true))
             end,
         },
         ["Player"] = {

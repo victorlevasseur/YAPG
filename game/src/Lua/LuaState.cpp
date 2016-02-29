@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include <boost/any.hpp>
 #include <boost/filesystem.hpp>
 
 #include <SFML/Graphics/Rect.hpp>
@@ -45,12 +46,16 @@ LuaState::LuaState() :
         sol::lib::os
     );
 
+    m_luaState.new_usertype<boost::any>("boost_any"); //boost::any declaration to lua
+
     //Declare the metadatas of some basic types
     meta::MetadataStore::registerType<int>()
         .setXmlLoadFunction([](int* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
         {
             xmlElement->QueryIntText(value);
         });
+    declareAnyConvertibleType<int>("int");
+
     meta::MetadataStore::registerType<unsigned int>()
         .setXmlLoadFunction([](unsigned int* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
         {
@@ -58,6 +63,8 @@ LuaState::LuaState() :
             xmlElement->QueryIntText(&intValue);
             *value = static_cast<unsigned int>(intValue);
         });
+    declareAnyConvertibleType<unsigned int>("unsigned_int");
+
     meta::MetadataStore::registerType<bool>()
         .setXmlLoadFunction([](bool* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
         {
@@ -65,16 +72,22 @@ LuaState::LuaState() :
             if(stringValue)
                 *value = strcmp(stringValue, "true");
         });
+    declareAnyConvertibleType<bool>("bool");
+
     meta::MetadataStore::registerType<float>()
         .setXmlLoadFunction([](float* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
         {
             xmlElement->QueryFloatText(value);
         });
+    declareAnyConvertibleType<float>("float");
+
     meta::MetadataStore::registerType<double>()
         .setXmlLoadFunction([](double* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
         {
             xmlElement->QueryDoubleText(value);
         });
+    declareAnyConvertibleType<double>("double");
+
     meta::MetadataStore::registerType<std::string>()
         .setXmlLoadFunction([](std::string* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
         {
@@ -82,6 +95,8 @@ LuaState::LuaState() :
             if(stringValue)
                 *value = std::string(stringValue);
         });
+    declareAnyConvertibleType<std::string>("string");
+
     meta::MetadataStore::registerType<sol::function>();
     meta::MetadataStore::registerClass<sf::Vector2f>()
         .declareAttribute("x", &sf::Vector2f::x)

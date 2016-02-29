@@ -13,20 +13,20 @@ EntityParametersHelper::EntityParametersHelper(const EntityTemplate* entityTempl
 
 }
 
-double EntityParametersHelper::getDoubleParameter(const std::string& name) const
+boost::any EntityParametersHelper::getParameter(const std::string& name) const
 {
     auto& parameters = m_entityTemplate->getParameters();
 
     const lua::EntityTemplate::Parameter& parameter = parameters.at(name);
-    return lua::EntityHandle(m_entity).getAttributeAsDouble(parameter.component, parameter.attribute);
+    return lua::EntityHandle(m_entity).getAttributeAsAny(parameter.component, parameter.attribute);
 }
 
-void EntityParametersHelper::setDoubleParameter(const std::string& name, double value) const
+void EntityParametersHelper::setParameter(const std::string& name, const boost::any& value) const
 {
     auto& parameters = m_entityTemplate->getParameters();
 
     const lua::EntityTemplate::Parameter& parameter = parameters.at(name);
-    lua::EntityHandle(m_entity).setAttributeAsDouble(parameter.component, parameter.attribute, value);
+    lua::EntityHandle(m_entity).setAttributeAsAny(parameter.component, parameter.attribute, value);
 }
 
 }

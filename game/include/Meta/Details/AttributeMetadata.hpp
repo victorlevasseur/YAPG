@@ -106,6 +106,16 @@ public:
         setAsDoubleImpl(object, value);
     }
 
+    virtual boost::any getAsAny(const C* object) const
+    {
+        return getAsAnyImpl(object);
+    }
+
+    virtual void setAsAny(C* object, const boost::any& value)
+    {
+        setAsAnyImpl(object, value);
+    }
+
 private:
     /////////////////////// getAsStringImpl /////////////////////////////////////////////////////////////////////////////////
     template<typename U = T>
@@ -192,6 +202,36 @@ private:
     typename std::enable_if<!std::is_constructible<U, double>::value, void>::type setAsDoubleImpl(C* object, double value) const
     {
         std::cout << "Script trying to set a value as bool but the value is not assignable from double !" << std::endl;
+    }
+
+    /////////////////// getAsAnyImpl ///////////////////////////////////////////////////////////////////////////////////////////
+    template<typename U = T>
+    typename std::enable_if<std::is_copy_constructible<U>::value && std::is_nothrow_destructible<U>::value, boost::any>::type getAsAnyImpl(const C* object) const
+    {
+        return boost::any(object->*m_member);
+    }
+
+    template<typename U = T>
+    typename std::enable_if<!std::is_copy_constructible<U>::value || !std::is_nothrow_destructible<U>::value, boost::any>::type getAsAnyImpl(const C* object) const
+    {
+        std::cout << "Script to get a value as boost::any but the value is not supported by boost::any (not copy constructible or not nothrow destructible) !" << std::endl;
+        return boost::any();
+    }
+
+    /////////////////// setAsAnyImpl ///////////////////////////////////////////////////////////////////////////////////////////
+    template<typename U = T>
+    typename std::enable_if<std::is_copy_constructible<U>::value && std::is_nothrow_destructible<U>::value, void>::type setAsAnyImpl(C* object, const boost::any& value) const
+    {
+        if(value.type() == typeid(U))
+            object->*m_member = boost::any_cast<U>(value);
+        else
+            std::cout << "Script trying to set a value as boost::any but with an invalid type !" << std::endl;
+    }
+
+    template<typename U = T>
+    typename std::enable_if<!std::is_copy_constructible<U>::value || !std::is_nothrow_destructible<U>::value, void>::type setAsAnyImpl(C* object, const boost::any& value) const
+    {
+        std::cout << "Script to set a value as boost::any but the value is not supported by boost::any (not copy constructible or not nothrow destructible) !" << std::endl;
     }
 
     /**
