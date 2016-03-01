@@ -1,31 +1,33 @@
 # Components and classes
 This section describes the attributes of each components.
 
-**Be sure to read [Basic types](native-types.md) before continuing your reading.**
+**Be sure to read [Basic types](../native-types.md) before continuing your reading.**
 
 ## Vocabulary
 
-In the attribute's tables below, the "U" column tells if the attributes can be unserialized from lua/XML. The "G/S" column tells if the attributes can be received or changed at runtime **with `entity:get_attribute("aComp", "attrName")` and `entity:set_attribute("aComp", "attrName", newVal)` methods.** See [Lua functions reference](../lua.md) to see how to get/change attributes' values of components during runtime.
+In the attribute's tables below:
+
+ - the **"U"** column tells if the attributes can be unserialized from lua/XML
+ - the **"G/S"** column tells if the attributes can be received or changed at runtime **with `entity:get_attribute("aComp", "attrName")` and `entity:set_attribute("aComp", "attrName", val)` methods.** See [Lua functions reference](../lua.md) to see how to get/change attributes' values of components during runtime.
+ - the **"P"** column tells if the attributes can be used as a template parameter.
 
 "✓" means "yes", "…" means that it will be included in a future version (planned) and nothing means "no".
-
-## Availables components
 
 Currently, the game has the following components:
 
  - [PositionComponent](#positioncomponent)
  - [RenderComponent](#rendercomponent)
 
-### PositionComponent
+## PositionComponent
 
 #### Attributes
 
-Name | Type | Description | [U](#vocabulary) | [G/S](#vocabulary)
------|------|-------------|---|---
-x | float | | ✓ | ✓
-y | float | | ✓ | ✓
-width | float | | ✓ | ✓
-height | float | | ✓ | ✓
+Name | Type | Description | [U](#vocabulary) | [G/S](#vocabulary) | [P](#vocabulary)
+-----|------|-------------|---|------|---
+x | float | | ✓ | ✓ | ✓
+y | float | | ✓ | ✓ | ✓
+width | float | | ✓ | ✓ | ✓
+height | float | | ✓ | ✓ | ✓
 
 #### Lua serialization
 
@@ -50,15 +52,15 @@ local new_x_pos = old_x_pos + 100
 myEntity:set_attribute("Position", "x", float_value(new_x_pos))
 ```
 
-### RenderComponent
+## RenderComponent
 
 #### Attributes
 
-Name | Type | Description | [U](#vocabulary) | [G/S](#vocabulary)
------|------|-------------|---|---
-texture | string | The filepath to the texture picture. | ✓ | ✓
-animations | map associating string to [animation](utility-classes.md#animation-class) | Associates the animation name with the animation. | ✓ | …
-current_animation | string | The current animation of the entity. | ✓ | ✓
+Name | Type | Description | [U](#vocabulary) | [G/S](#vocabulary) | [P](#vocabulary)
+-----|------|-------------|---|------|---
+texture | string | The filepath to the texture picture. | ✓ | ✓ | ✓
+animations | map associating string to [animation](utility-classes.md#animation-class) | Associates the animation name with the animation. | ✓ | … |
+current_animation | string | The current animation of the entity. | ✓ | ✓ | ✓
 
 #### Lua serialization
 

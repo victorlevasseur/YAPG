@@ -4,7 +4,12 @@ Utility classes are classes used by components to represent some specific data s
 
 ## Vocabulary
 
-In the attribute's tables below, the "U" column tells if the attributes can be unserialized from lua/XML. The "R" column tells if the attributes can be changed at runtime with lua scripting. "✓" means "yes", "…" means that it will be included in a future version (planned) and nothing means "no".
+In the attribute's tables below:
+
+ - The "U" column tells if the attributes can be unserialized from lua/XML.
+ - The "R" column tells if the attributes can be changed at runtime with lua scripting using the `myObject.attribute = newValue` syntax.
+
+"✓" means "yes", "…" means that it will be included in a future version (planned) and nothing means "no".
 
 ## animation class
 

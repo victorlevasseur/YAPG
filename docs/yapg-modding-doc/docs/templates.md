@@ -50,7 +50,7 @@ The `components` field contains an array of component's tables describing the va
 
 In the above code, if the game instanciates an entity with this template, the entity will be initialized with components `"ComponentNumberOne"` and `"ComponentNumberTwo"` and with their attributes set to the values written in the tables (the attribute `component_attribute_one` of `"ComponentNumberOne"` will be initialized with `"value"`). This is important to understand that after instanciation, the attributes of the entities' components can change independently: a mysterious script can decide to change the texture used by one and only one particular **instance** (entity) of the template.
 
-**All availables components, how to write their attributes' values is described in detail in the "Lua/XML serialization" section. See [Basic types](components/native-types.md), [Utility classes](components/utility-classes.md) and [Components](components/components.md).**
+**All availables components, how to write their attributes' values is described in detail in the "Lua/XML serialization" section. See [Basic types](native-types.md), [Components](components/components.md) and [Utility classes](components/utility-classes.md).**
 
 You can also use the default templates as examples for writing new ones.
 
@@ -65,3 +65,5 @@ In the example above, this means that the template has one parameter called `par
 **Parameters are not mandatory to** instanciate an entity, so be sure to provide a value in to the concerned attributes in the `components` table.
 
 They are used mainly in the level editor (where they can be edited by the user) and in the level file that, for each entity, stores its template name and the values of the parameters.
+
+Please note that not all components' attributes can be used as template parameters. See [Components reference > Components section](components/components.md) for further information.
