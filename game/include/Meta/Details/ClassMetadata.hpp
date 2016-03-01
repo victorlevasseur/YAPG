@@ -4,14 +4,12 @@
 #include <iostream>
 
 #include "Lua/sol.hpp"
+#include "Meta/Details/AttributeMetadataBase.hpp"
 #include "Meta/Details/Metadata.hpp"
 #include "Meta/Details/MetadataStore.hpp"
 
 namespace meta
 {
-
-template<class C>
-class AttributeMetadataBase;
 
 template<class C, typename T>
 class AttributeMetadata;
@@ -34,6 +32,11 @@ public:
 
     }
 
+    virtual std::type_index getType() const override
+    {
+        return typeid(C);
+    }
+
     virtual void load(void* object, const sol::object& luaObject) const
     {
         loadImpl(reinterpret_cast<C*>(object), luaObject);
@@ -48,7 +51,7 @@ public:
     template<typename T>
     ClassMetadata<C>& declareAttribute(const std::string& name, T C::*member, bool loadableFromLua = true, bool gettableFromLua = true, bool settableFromLua = true)
     {
-        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase<C>>(new AttributeMetadata<C, T>(member, loadableFromLua, gettableFromLua, settableFromLua)));
+        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase>(new AttributeMetadata<C, T>(member, loadableFromLua, gettableFromLua, settableFromLua)));
         return *this;
     }
 
@@ -58,12 +61,14 @@ public:
         return *this;
     }
 
-    const AttributeMetadataBase<C>& getAttribute(const std::string& name) const
+    virtual bool hasAttributes() const { return true; }
+
+    virtual const AttributeMetadataBase& getAttribute(const std::string& name) const
     {
         return *(m_attributes.at(name));
     }
 
-    AttributeMetadataBase<C>& getAttribute(const std::string& name)
+    AttributeMetadataBase& getAttribute(const std::string& name)
     {
         return *(m_attributes.at(name));
     }
@@ -86,7 +91,7 @@ private:
         }
     }
 
-    std::map<std::string, std::unique_ptr<AttributeMetadataBase<C>>> m_attributes;
+    std::map<std::string, std::unique_ptr<AttributeMetadataBase>> m_attributes;
     std::function<void(C*, const sol::object&)> m_extraFunction;
 };
 

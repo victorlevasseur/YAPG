@@ -15,7 +15,7 @@ namespace meta
  * Note: T must have a default constructor.
  */
 template<class C, typename T>
-class AttributeMetadata<C, std::vector<T>> : public AttributeMetadataBase<C>
+class AttributeMetadata<C, std::vector<T>> : public AttributeMetadataBase
 {
 public:
     AttributeMetadata(
@@ -24,22 +24,29 @@ public:
         bool gettableFromLua = true,
         bool settableFromLua = true
         ) :
-        AttributeMetadataBase<C>(loadableFromLua, gettableFromLua, settableFromLua),
+        AttributeMetadataBase(loadableFromLua, gettableFromLua, settableFromLua),
         m_vectorMember(vectorMember)
 
     {
-        
+
     }
 
     virtual ~AttributeMetadata() {};
 
-    virtual void load(C* object, const sol::object& luaObject) const
+    virtual std::type_index getType() const override
     {
-        if(!AttributeMetadataBase<C>::m_loadableFromLua)
+        return typeid(std::vector<T>);
+    }
+
+    virtual void load(void* object_, const sol::object& luaObject) const override
+    {
+        if(!AttributeMetadataBase::m_loadableFromLua)
             return;
 
         if(!luaObject.is<sol::table>())
             return;
+
+        C* object = reinterpret_cast<C*>(object_);
 
         const sol::table& table = luaObject.as<sol::table>();
 
@@ -53,7 +60,7 @@ public:
         });
     }
 
-    virtual void loadFromXml(C* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const
+    virtual void loadFromXml(void* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
     {
         //TODO: Support it !
         std::cout << "[Meta/Warning] Loading std::vector attributes from XML is not supported yet !" << std::endl;
@@ -68,9 +75,9 @@ public:
      * Warning: it doesn't convert the vector elements to their serialized
      * form !
      */
-    virtual void getAsLuaTable(const C* object, sol::table result) const
+    virtual void getAsLuaTable(const void* object, sol::table result) const override
     {
-        getAsLuaTableImpl(object, result);
+        getAsLuaTableImpl(reinterpret_cast<const C*>(object), result);
     }
 
     /**
@@ -83,9 +90,9 @@ public:
      * Warning: it doesn't convert the element from their serialized form (on the
      * contrary, that's what loadFromLua does !).
      */
-    virtual void setAsLuaTable(C* object, sol::table value) const
+    virtual void setAsLuaTable(void* object, sol::table value) const override
     {
-        setAsLuaTableImpl(object, value);
+        setAsLuaTableImpl(reinterpret_cast<C*>(object), value);
     }
 
 private:

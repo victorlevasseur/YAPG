@@ -11,7 +11,7 @@ namespace meta
 {
 
 template<class C, typename T>
-class AttributeMetadata : public AttributeMetadataBase<C>
+class AttributeMetadata : public AttributeMetadataBase
 {
 public:
     AttributeMetadata(
@@ -20,34 +20,42 @@ public:
         bool gettableFromLua = true,
         bool settableFromLua = true
         ) :
-        AttributeMetadataBase<C>(loadableFromLua, gettableFromLua, settableFromLua),
+        AttributeMetadataBase(loadableFromLua, gettableFromLua, settableFromLua),
         m_member(member)
     {
 
     }
 
-    virtual void load(C* object, const sol::object& luaObject) const
+    virtual std::type_index getType() const override
     {
-        if(!AttributeMetadataBase<C>::m_loadableFromLua)
+        return typeid(T);
+    }
+
+    virtual void load(void* object_, const sol::object& luaObject) const override
+    {
+        if(!AttributeMetadataBase::m_loadableFromLua)
             return;
+
+        C* object = reinterpret_cast<C*>(object_);
         //Get the metadata of the class/type to be able to load the attribute
         MetadataStore::getMetadata<T>().load(&(object->*m_member), luaObject);
     }
 
-    virtual void loadFromXml(C* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const
+    virtual void loadFromXml(void* object_, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
     {
+        C* object = reinterpret_cast<C*>(object_);
         //Get the metadata of the class/type to be able to load the attribute from XML according to its meta definition
         MetadataStore::getMetadata<T>().loadFromXml(&(object->*m_member), xmlElement, entityGetter);
     }
 
-    virtual boost::any getAsAny(const C* object) const
+    virtual boost::any getAsAny(const void* object) const override
     {
-        return getAsAnyImpl(object);
+        return getAsAnyImpl(reinterpret_cast<const C*>(object));
     }
 
-    virtual void setAsAny(C* object, const boost::any& value)
+    virtual void setAsAny(void* object, const boost::any& value) override
     {
-        setAsAnyImpl(object, value);
+        setAsAnyImpl(reinterpret_cast<C*>(object), value);
     }
 
 private:

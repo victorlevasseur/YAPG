@@ -24,7 +24,12 @@ public:
 
     }
 
-    virtual void load(void* value, const sol::object& luaObject) const
+    virtual std::type_index getType() const override
+    {
+        return typeid(T);
+    }
+
+    virtual void load(void* value, const sol::object& luaObject) const override
     {
         m_loadFunction(reinterpret_cast<T*>(value), luaObject);
     }
@@ -35,7 +40,7 @@ public:
         return *this;
     }
 
-    virtual void loadFromXml(void* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const
+    virtual void loadFromXml(void* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
     {
         if(m_loadXmlFunction)
             m_loadXmlFunction(reinterpret_cast<T*>(value), xmlElement, entityGetter);

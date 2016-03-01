@@ -1,14 +1,17 @@
 #ifndef YAPG_GAME_META_DETAILS_ATTRIBUTEMETADATABASE_H
 #define YAPG_GAME_META_DETAILS_ATTRIBUTEMETADATABASE_H
 
+#include <typeindex>
+
 #include <boost/any.hpp>
 
+#include "Level/SerializedEntityGetter.hpp"
 #include "Lua/sol.hpp"
+#include "Settings/tinyxml2.h"
 
 namespace meta
 {
 
-template<class C>
 class AttributeMetadataBase
 {
 public:
@@ -26,17 +29,19 @@ public:
 
     virtual ~AttributeMetadataBase() {};
 
-    virtual void load(C* object, const sol::object& luaObject) const = 0;
+    virtual std::type_index getType() const = 0;
 
-    virtual void loadFromXml(C* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const = 0;
+    virtual void load(void* object, const sol::object& luaObject) const = 0;
 
-    virtual boost::any getAsAny(const C* object) const
+    virtual void loadFromXml(void* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const = 0;
+
+    virtual boost::any getAsAny(const void* object) const
     {
         std::cout << "Script trying to get a value not storable in boost::any" << std::endl;
         return boost::any();
     }
 
-    virtual void setAsAny(C* object, const boost::any& value)
+    virtual void setAsAny(void* object, const boost::any& value)
     {
         std::cout << "Script trying to set a value not convertible from boost::any" << std::endl;
     }
@@ -48,12 +53,12 @@ public:
      * Note: sol::table is just a ref to the real lua table, so no need to pass it by
      * reference.
      */
-    virtual void getAsLuaTable(const C* object, sol::table result) const
+    virtual void getAsLuaTable(const void* object, sol::table result) const
     {
         std::cout << "Script trying to get a value not convertible to a lua table !" << std::endl;
     }
 
-    virtual void setAsLuaTable(C* object, sol::table value) const
+    virtual void setAsLuaTable(void* object, sol::table value) const
     {
         std::cout << "Script trying to set a value not convertible from a lua table !" << std::endl;
     }

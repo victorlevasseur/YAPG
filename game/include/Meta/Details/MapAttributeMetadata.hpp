@@ -15,7 +15,7 @@ namespace meta
  * Note: T and U must have a default constructor and be (at least) movable.
  */
 template<class C, typename T, typename U>
-class AttributeMetadata<C, std::map<T, U>> : public AttributeMetadataBase<C>
+class AttributeMetadata<C, std::map<T, U>> : public AttributeMetadataBase
 {
 public:
     AttributeMetadata(
@@ -24,22 +24,29 @@ public:
         bool gettableFromLua = true,
         bool settableFromLua = true
         ) :
-        AttributeMetadataBase<C>(loadableFromLua, gettableFromLua, settableFromLua),
+        AttributeMetadataBase(loadableFromLua, gettableFromLua, settableFromLua),
         m_mapMember(mapMember)
 
     {
-        
+
     }
 
     virtual ~AttributeMetadata() {};
 
-    virtual void load(C* object, const sol::object& luaObject) const
+    virtual std::type_index getType() const override
     {
-        if(!AttributeMetadataBase<C>::m_loadableFromLua)
+        return typeid(std::map<T, U>);
+    }
+
+    virtual void load(void* object_, const sol::object& luaObject) const override
+    {
+        if(!AttributeMetadataBase::m_loadableFromLua)
             return;
 
         if(!luaObject.is<sol::table>())
             return;
+
+        C* object = reinterpret_cast<C*>(object_);
 
         const sol::table& table = luaObject.as<sol::table>();
 
@@ -58,7 +65,7 @@ public:
         });
     }
 
-    virtual void loadFromXml(C* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const
+    virtual void loadFromXml(void* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
     {
         //TODO: Support it !
         std::cout << "[Meta/Warning] Loading std::map attributes from XML is not supported yet !" << std::endl;
