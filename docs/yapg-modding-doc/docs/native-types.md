@@ -1,6 +1,6 @@
 # Basic types
 
-This section describes how objects of a specific type are represented when **serialized in a lua template file** or **in an XML level file**. This **does not describe how the objects are represented during runtime** (See [Lua functions reference](../lua.md) for that).
+This section describes how objects of a specific type are represented when **serialized in a lua template file** or **in an XML level file**. This **does not describe how the objects are represented during runtime** (See [Lua functions reference](lua.md) for that).
 
 ## Lua and XML serialization
 
@@ -9,7 +9,7 @@ This section describes how objects of a specific type are represented when **ser
  - the first one shows how the value should be represented in a template lua file in its **lua serialization form**: the form used to instanciate an entity from a template where classes are represented using a lua table containing keys for attributes.
  - the second one shows how the type is represented in its **XML serialization form** when serialized into a XML level file. This is mainly used to write the parameters values of a particular instance of a template.
 
-**The runtime representation (in lua functions) of objects has nothing to do with these two formats that are just two ways of unserialize an entity/template.** See [Lua functions reference](../lua.md) to see how to get/change attributes/objects values during runtime.
+**The runtime representation (in lua functions) of objects has nothing to do with these two formats that are just two ways of unserialize an entity/template.** See [Lua functions reference](lua.md) to see how to get/change attributes/objects values during runtime.
 
 ## Numbers (float, double, int, unsigned_int)
 Attributes of type "float", "double", "int", "unsigned_int" can be any value, with or without a point.
@@ -97,7 +97,7 @@ end
 ```
 
 ## Class
-Classes can contain multiple attributes of different types. All the objects described in the [Utility classes section](utility-classes.md) and [Components section](components.md) are classes.
+Classes can contain multiple attributes of different types. All the objects described in the [Components section](components/components.md) and [Utility classes section](components/utility-classes.md) are classes.
 
 When serialized in a lua template file, classes are represented with a lua table with keys being the attributes' names (and the associated values being the lua serialized representation of the values).
 
