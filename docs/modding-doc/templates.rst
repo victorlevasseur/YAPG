@@ -85,9 +85,9 @@ texture used by one and only one particular **instance** (entity) of the
 template.
 
 **All availables components, how to write their attributes' values is
-described in detail in the "Lua/XML serialization" section. See `Basic
-types <native-types.md>`__, `Components <components/components.md>`__
-and `Utility classes <components/utility-classes.md>`__.**
+described in detail in the "Lua/XML serialization" section. See**
+:doc:`serialization-format`, :doc:`utility-classes`
+and :doc:`components` **.**
 
 You can also use the default templates as examples for writing new ones.
 
@@ -123,5 +123,4 @@ the user) and in the level file that, for each entity, stores its
 template name and the values of the parameters.
 
 Please note that not all components' attributes can be used as template
-parameters. See `Components reference > Components
-section <components/components.md>`__ for further information.
+parameters. See :doc:`components` for further information.

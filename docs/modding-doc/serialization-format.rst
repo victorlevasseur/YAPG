@@ -4,7 +4,7 @@ Lua/XML templates serialization syntax
 This section describes how objects of a specific type are represented
 when **serialized in a lua template file** or **in an XML level file**.
 This **does not describe how the objects are represented during
-runtime** (See `Lua functions reference <lua.md>`__ for that).
+runtime** (See :doc:`lua` for that).
 
 Lua and XML serialization
 -------------------------
@@ -22,7 +22,7 @@ Lua and XML serialization
 
 **The runtime representation (in lua functions) of objects has nothing
 to do with these two formats that are just two ways of unserialize an
-entity/template.** See `Lua functions reference <lua.md>`__ to see how
+entity/template.** See :doc:`lua` to see how
 to get/change attributes/objects values during runtime.
 
 Numbers (float, double, int, unsigned\_int)

@@ -78,9 +78,8 @@ objects. These functions are :
 -  ``xxx_value()``: converts a value of type xxx to a proxy object usable
    by ``set_attribute``.
 
-``xxx`` must be the name of the attribute's type. See the `Components
-reference > Components section <components/components.md>`__ to see the
-precise type of each attributes.
+``xxx`` must be the name of the attribute's type. See the :doc:`components` to
+see the precise type of each attributes.
 
 **Warning: using int_value()/as_int() for an attribute of type
 float will not work. You must use the exactly correct type for

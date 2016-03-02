@@ -3,7 +3,7 @@ Components and classes
 
 This section describes the attributes of each components.
 
-**Be sure to read `Basic types <../native-types.md>`__ before continuing
+**Be sure to read** :doc:`serialization-format` **before continuing
 your reading.**
 
 Vocabulary
@@ -17,7 +17,7 @@ In the attribute's tables below:
    changed at runtime with
    ``entity:get_attribute("aComp", "attrName")`` and
    ``entity:set_attribute("aComp", "attrName", val)`` methods. See
-   `Lua functions reference <../lua.md>`__ to see how to get/change
+   :doc:`lua` to see how to get/change
    attributes' values of components during runtime.
 -  the **"P"** column tells if the attributes can be used as a template
    parameter.
@@ -27,8 +27,81 @@ In the attribute's tables below:
 
 Currently, the game has the following components:
 
+-  `CustomBehaviorComponent <#custombehaviorcomponent>`__
+-  `HitboxComponent <#hitboxcomponent>`__
 -  `PositionComponent <#positioncomponent>`__
 -  `RenderComponent <#rendercomponent>`__
+
+CustomBehaviorComponent
+-----------------------
+
+Attributes
+^^^^^^^^^^
+
++------------+-------------+------------------------------------------------------------------------------------------------------+-----------------------+-------------------------+-----------------------+
+| Name       | Type        | Description                                                                                          | `U <#vocabulary>`__   | `G/S <#vocabulary>`__   | `P <#vocabulary>`__   |
++============+=============+======================================================================================================+=======================+=========================+=======================+
+| on_update  | function    | A function called each frame with two arguments : entity and dt (the time since the previous frame). | ✓                     |                         |                       |
++------------+-------------+------------------------------------------------------------------------------------------------------+-----------------------+-------------------------+-----------------------+
+
+Lua serialization
+^^^^^^^^^^^^^^^^^
+
+.. code:: lua
+
+    components = {
+        --The CustomBehaviorComponent
+        ["CustomBehavior"] = {
+            on_update = function(entity, dt)
+                --act on the entity
+            end,
+        },
+    }
+
+
+HitboxComponent
+-----------------------
+
+Attributes
+^^^^^^^^^^
+
++---------+-------------------------------------------+---------------------+-----------------------+-------------------------+-----------------------+
+| Name    | Type                                      | Description         | `U <#vocabulary>`__   | `G/S <#vocabulary>`__   | `P <#vocabulary>`__   |
++=========+===========================================+=====================+=======================+=========================+=======================+
+| polygon | :ref:`utility_classes_polygon`            | The polygon hitbox. | ✓                     |                         |                       |
++---------+-------------------------------------------+---------------------+-----------------------+-------------------------+-----------------------+
+
+Lua serialization
+^^^^^^^^^^^^^^^^^
+
+.. code:: lua
+
+    components = {
+        --The HitboxComponent
+        ["Hitbox"] = {
+            --this is a square hitbox
+            polygon = {
+                points = {
+                    {
+                        x = 0,
+                        y = 0
+                    },
+                    {
+                        x = 64,
+                        y = 0
+                    },
+                    {
+                        x = 64,
+                        y = 64
+                    },
+                    {
+                        x = 0,
+                        y = 64
+                    },
+                }
+            },
+        },
+    }
 
 PositionComponent
 -----------------
@@ -86,7 +159,7 @@ Attributes
 +======================+================================================================================+=====================================================+=======================+=========================+=======================+
 | texture              | string                                                                         | The filepath to the texture picture.                | ✓                     | ✓                       | ✓                     |
 +----------------------+--------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+-------------------------+-----------------------+
-| animations           | map associating string to `animation <utility-classes.md#animation-class>`__   | Associates the animation name with the animation.   | ✓                     | …                       |                       |
+| animations           | map associating string to :ref:`utility_classes_animation`                     | Associates the animation name with the animation.   | ✓                     | …                       |                       |
 +----------------------+--------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+-------------------------+-----------------------+
 | current\_animation   | string                                                                         | The current animation of the entity.                | ✓                     | ✓                       | ✓                     |
 +----------------------+--------------------------------------------------------------------------------+-----------------------------------------------------+-----------------------+-------------------------+-----------------------+
