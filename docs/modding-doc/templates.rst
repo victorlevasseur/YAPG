@@ -99,7 +99,7 @@ game to add some variation to the instanciated entities: each entities
 instanciated from a template can be instanciated with different values
 in their parameters.
 
-**The parameters are declared in the ``parameters`` table as an array of
+**The parameters are declared in the **``parameters``** table as an array of
 parameters.** The key (on the left of "=") must be a unique name (for
 all the parameters in that template). Inside the table (inside "{}"), a
 friendly name is given (``name`` field), the concerned component
