@@ -53,7 +53,7 @@ public:
         return getAsAnyImpl(reinterpret_cast<const C*>(object));
     }
 
-    virtual void setAsAny(void* object, const boost::any& value) override
+    virtual void setAsAny(void* object, const boost::any& value) const override
     {
         setAsAnyImpl(reinterpret_cast<C*>(object), value);
     }

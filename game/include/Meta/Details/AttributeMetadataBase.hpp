@@ -41,7 +41,7 @@ public:
         return boost::any();
     }
 
-    virtual void setAsAny(void* object, const boost::any& value)
+    virtual void setAsAny(void* object, const boost::any& value) const
     {
         std::cout << "Script trying to set a value not convertible from boost::any" << std::endl;
     }

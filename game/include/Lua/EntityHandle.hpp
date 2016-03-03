@@ -1,6 +1,7 @@
 #ifndef YAPG_GAME_LUA_ENTITYHANDLE_H
 #define YAPG_GAME_LUA_ENTITYHANDLE_H
 
+#include <typeindex>
 #include <type_traits>
 
 #include <boost/any.hpp>
@@ -60,24 +61,26 @@ public:
     static void declareComponent(const std::string& componentName);
 
 private:
-    template<class C>
-    void doLoadAttributeFromXml(const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& serializedEntityGetter);
+
+    void* getComponentPtr(const std::string& componentName);
+    const void* getComponentPtr(const std::string& componentName) const;
+    bool hasComponent(const std::string& componentName) const;
 
     template<class C>
-    boost::any doGetAttributeAsAny(const std::string& attributeName) const;
+    void* doGetComponentPtr();
 
     template<class C>
-    void doSetAttributeAsAny(const std::string& attributeName, const boost::any& value);
+    const void* doGetComponentPtrConst() const;
 
     template<class C>
-    void doGetAttributeAsLuaTable(const std::string& attributeName, sol::table result) const;
-
-    template<class C>
-    void doSetAttributeAsLuaTable(const std::string& attributeName, sol::table value);
+    bool doHasComponent() const;
 
     entityx::Entity m_entity;
 
-    static std::map<std::string, ComponentAttributesCallbacks> attributesCallbacks;
+    static std::map<std::string, std::type_index> componentsTypeIndex;
+    static std::map<std::string, std::function<void*(EntityHandle*)>> componentsGetters;
+    static std::map<std::string, std::function<const void*(const EntityHandle*)>> componentsGettersConst;
+    static std::map<std::string, std::function<bool(const EntityHandle*)>> componentsCheckers;
 };
 
 }

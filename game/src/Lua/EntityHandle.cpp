@@ -10,9 +10,17 @@
 namespace lua
 {
 
-std::map<std::string, EntityHandle::ComponentAttributesCallbacks>
-    EntityHandle::attributesCallbacks =
-        std::map<std::string, EntityHandle::ComponentAttributesCallbacks>();
+std::map<std::string, std::type_index> EntityHandle::componentsTypeIndex =
+        std::map<std::string, std::type_index>();
+
+std::map<std::string, std::function<void*(EntityHandle*)>> EntityHandle::componentsGetters =
+        std::map<std::string, std::function<void*(EntityHandle*)>>();
+
+std::map<std::string, std::function<const void*(const EntityHandle*)>> EntityHandle::componentsGettersConst =
+        std::map<std::string, std::function<const void*(const EntityHandle*)>>();
+
+std::map<std::string, std::function<bool(const EntityHandle*)>> EntityHandle::componentsCheckers =
+        std::map<std::string, std::function<bool(const EntityHandle*)>>();
 
 EntityHandle::EntityHandle() :
     m_entity()
@@ -28,9 +36,11 @@ EntityHandle::EntityHandle(entityx::Entity entity) :
 
 void EntityHandle::loadAttributeFromXml(const std::string& componentName, const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
 {
-    if(attributesCallbacks.count(componentName) > 0)
+    if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
-        (this->*(attributesCallbacks.at(componentName).loadFromXmlCallback))(attributeName, xmlElement, entityGetter);
+        const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
+        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
+        attributeMetadata.loadFromXml(getComponentPtr(componentName), xmlElement, entityGetter);
     }
     else
     {
@@ -40,9 +50,11 @@ void EntityHandle::loadAttributeFromXml(const std::string& componentName, const 
 
 boost::any EntityHandle::getAttributeAsAny(const std::string& componentName, const std::string& attributeName) const
 {
-    if(attributesCallbacks.count(componentName) > 0)
+    if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
-        return (this->*(attributesCallbacks.at(componentName).getAnyCallback))(attributeName);
+        const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
+        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
+        return attributeMetadata.getAsAny(getComponentPtr(componentName));
     }
     else
     {
@@ -53,9 +65,11 @@ boost::any EntityHandle::getAttributeAsAny(const std::string& componentName, con
 
 void EntityHandle::setAttributeAsAny(const std::string& componentName, const std::string& attributeName, const boost::any& value)
 {
-    if(attributesCallbacks.count(componentName) > 0)
+    if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
-        (this->*(attributesCallbacks.at(componentName).setAnyCallback))(attributeName, value);
+        const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
+        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
+        attributeMetadata.setAsAny(getComponentPtr(componentName), value);
     }
     else
     {
@@ -65,9 +79,11 @@ void EntityHandle::setAttributeAsAny(const std::string& componentName, const std
 
 void EntityHandle::getAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table result) const
 {
-    if(attributesCallbacks.count(componentName) > 0)
+    if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
-        (this->*(attributesCallbacks.at(componentName).getLuaTableCallback))(attributeName, result);
+        const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
+        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
+        attributeMetadata.getAsLuaTable(getComponentPtr(componentName), result);
     }
     else
     {
@@ -77,9 +93,11 @@ void EntityHandle::getAttributeAsLuaTable(const std::string& componentName, cons
 
 void EntityHandle::setAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table value)
 {
-    if(attributesCallbacks.count(componentName) > 0)
+    if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
-        (this->*(attributesCallbacks.at(componentName).setLuaTableCallback))(attributeName, value);
+        const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
+        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
+        attributeMetadata.setAsLuaTable(getComponentPtr(componentName), value);
     }
     else
     {
@@ -107,6 +125,21 @@ void EntityHandle::registerClass(LuaState &state)
         "set_table_attribute", &EntityHandle::setAttributeAsLuaTable,
         "write_to_console", &EntityHandle::writeToConsole
     );
+}
+
+void* EntityHandle::getComponentPtr(const std::string& componentName)
+{
+    return componentsGetters.at(componentName)(this);
+}
+
+const void* EntityHandle::getComponentPtr(const std::string& componentName) const
+{
+    return componentsGettersConst.at(componentName)(this);
+}
+
+bool EntityHandle::hasComponent(const std::string& componentName) const
+{
+    return componentsCheckers.at(componentName)(this);
 }
 
 }
