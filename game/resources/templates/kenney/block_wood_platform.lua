@@ -6,13 +6,11 @@ entity_template = {
         x = {
             name = "X position",
             component = "Position",
-            type = "number",
             attribute = "x",
         },
         y = {
             name = "Y position",
             component = "Position",
-            type = "number",
             attribute = "y",
         },
     },
