@@ -35,6 +35,8 @@ public:
 
     virtual void loadFromXml(void* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const = 0;
 
+    virtual void saveToXml(const void* object, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const = 0;
+
     virtual boost::any getAsAny(const void* object) const
     {
         std::cout << "Script trying to get a value not storable in boost::any" << std::endl;

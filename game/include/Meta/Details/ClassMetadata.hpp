@@ -48,6 +48,12 @@ public:
         std::cout << "Compound classes do not support being loaded from XML yet ! (TODO!)" << std::endl;
     }
 
+    virtual void saveToXml(const void* object, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const
+    {
+        //TODO: Support for this feature for classes
+        std::cout << "Compound classes do not support being saved to XML yet ! (TODO!)" << std::endl;
+    }
+
     template<typename T>
     ClassMetadata<C>& declareAttribute(const std::string& name, T C::*member, bool loadableFromLua = true, bool gettableFromLua = true, bool settableFromLua = true)
     {

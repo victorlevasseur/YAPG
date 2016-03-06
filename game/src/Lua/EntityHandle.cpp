@@ -48,6 +48,20 @@ void EntityHandle::loadAttributeFromXml(const std::string& componentName, const 
     }
 }
 
+void EntityHandle::saveAttributeToXml(const std::string& componentName, const std::string& attributeName, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const
+{
+    if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
+    {
+        const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
+        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
+        attributeMetadata.saveToXml(getComponentPtr(componentName), xmlElement, entityGetter);
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
+    }
+}
+
 boost::any EntityHandle::getAttributeAsAny(const std::string& componentName, const std::string& attributeName) const
 {
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))

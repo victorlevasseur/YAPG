@@ -53,6 +53,10 @@ LuaState::LuaState() :
         .setXmlLoadFunction([](int* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
         {
             xmlElement->QueryIntText(value);
+        })
+        .setXmlSaveFunction([](const int* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        {
+            xmlElement->SetText(*value);
         });
     declareAnyConvertibleType<int>("int");
 
@@ -62,6 +66,10 @@ LuaState::LuaState() :
             int intValue = static_cast<int>(*value);
             xmlElement->QueryIntText(&intValue);
             *value = static_cast<unsigned int>(intValue);
+        })
+        .setXmlSaveFunction([](const unsigned int* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        {
+            xmlElement->SetText(static_cast<int>(*value));
         });
     declareAnyConvertibleType<unsigned int>("unsigned_int");
 
@@ -71,6 +79,10 @@ LuaState::LuaState() :
             const char* stringValue = xmlElement->GetText();
             if(stringValue)
                 *value = strcmp(stringValue, "true");
+        })
+        .setXmlSaveFunction([](const bool* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        {
+            xmlElement->SetText(*value);
         });
     declareAnyConvertibleType<bool>("bool");
 
@@ -78,6 +90,10 @@ LuaState::LuaState() :
         .setXmlLoadFunction([](float* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
         {
             xmlElement->QueryFloatText(value);
+        })
+        .setXmlSaveFunction([](const float* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        {
+            xmlElement->SetText(*value);
         });
     declareAnyConvertibleType<float>("float");
 
@@ -85,6 +101,10 @@ LuaState::LuaState() :
         .setXmlLoadFunction([](double* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
         {
             xmlElement->QueryDoubleText(value);
+        })
+        .setXmlSaveFunction([](const double* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        {
+            xmlElement->SetText(*value);
         });
     declareAnyConvertibleType<double>("double");
 
@@ -94,6 +114,10 @@ LuaState::LuaState() :
             const char* stringValue = xmlElement->GetText();
             if(stringValue)
                 *value = std::string(stringValue);
+        })
+        .setXmlSaveFunction([](const std::string* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        {
+            xmlElement->SetText(value->c_str());
         });
     declareAnyConvertibleType<std::string>("string");
 

@@ -44,6 +44,7 @@ public:
     EntityHandle(entityx::Entity entity);
 
     void loadAttributeFromXml(const std::string& componentName, const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter);
+    void saveAttributeToXml(const std::string& componentName, const std::string& attributeName, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const;
 
     boost::any getAttributeAsAny(const std::string& componentName, const std::string& attributeName) const;
     void setAttributeAsAny(const std::string& componentName, const std::string& attributeName, const boost::any& value);

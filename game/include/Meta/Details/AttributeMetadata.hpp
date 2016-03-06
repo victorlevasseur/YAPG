@@ -48,6 +48,13 @@ public:
         MetadataStore::getMetadata<T>().loadFromXml(&(object->*m_member), xmlElement, entityGetter);
     }
 
+    virtual void saveToXml(const void* object_, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
+    {
+        const C* object = reinterpret_cast<const C*>(object_);
+        //Get the metadata of the class/type to be able to save the attribute to XML according to its meta definition
+        MetadataStore::getMetadata<T>().saveToXml(&(object->*m_member), xmlElement, entityGetter);
+    }
+
     virtual boost::any getAsAny(const void* object) const override
     {
         return getAsAnyImpl(reinterpret_cast<const C*>(object));

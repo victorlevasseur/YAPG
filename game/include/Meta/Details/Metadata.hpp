@@ -27,6 +27,8 @@ public:
 
     virtual void loadFromXml(void* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const = 0;
 
+    virtual void saveToXml(const void* object, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const = 0;
+
     /**
      * \return whether the type/class described by this metadata has attributes or not.
      */

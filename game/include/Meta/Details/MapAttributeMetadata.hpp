@@ -71,6 +71,12 @@ public:
         std::cout << "[Meta/Warning] Loading std::map attributes from XML is not supported yet !" << std::endl;
     }
 
+    virtual void saveToXml(const void* object, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
+    {
+        //TODO: Support it !
+        std::cout << "[Meta/Warning] Saving std::map attributes to XML is not supported yet !" << std::endl;
+    }
+
     //TODO: Implement get/setAsLuaTable
 
 private:

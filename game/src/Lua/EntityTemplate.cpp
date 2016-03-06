@@ -111,4 +111,17 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
     }
 }
 
+void EntityTemplate::saveEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, tinyxml2::XMLElement* parametersElement) const
+{
+    tinyxml2::XMLDocument* doc = parametersElement->GetDocument();
+
+    for(auto it = m_parameters.cbegin(); it != m_parameters.cend(); ++it)
+    {
+        tinyxml2::XMLElement* parameterElement = doc->NewElement(it->first.c_str());
+
+        //TODO:
+        EntityHandle(entity).saveAttributeToXml(it->second.component, it->second.attribute, parameterElement, entityGetter);
+    }
+}
+
 }

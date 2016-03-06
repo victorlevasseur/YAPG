@@ -19,7 +19,8 @@ public:
             if(luaObject.is<T>())
                 *value = luaObject.as<T>();
         }),
-        m_loadXmlFunction()
+        m_loadXmlFunction(),
+        m_saveXmlFunction()
     {
 
     }
@@ -54,9 +55,24 @@ public:
         return *this;
     }
 
+    virtual void saveToXml(const void* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
+    {
+        if(m_saveXmlFunction)
+            m_saveXmlFunction(reinterpret_cast<const T*>(value), xmlElement, entityGetter);
+        else
+            std::cout << "[Meta/Warning] " << typeid(T).name() << " type does not support being saved to XML !" << std::endl;
+    }
+
+    TypeMetadata<T>& setXmlSaveFunction(std::function<void(const T*, tinyxml2::XMLElement*, const level::SerializedEntityGetter&)> saveXmlFunction)
+    {
+        m_saveXmlFunction = saveXmlFunction;
+        return *this;
+    }
+
 private:
     std::function<void(T*, const sol::object&)> m_loadFunction;
     std::function<void(T*, const tinyxml2::XMLElement*, const level::SerializedEntityGetter&)> m_loadXmlFunction;
+    std::function<void(const T*, tinyxml2::XMLElement*, const level::SerializedEntityGetter&)> m_saveXmlFunction;
 };
 
 }

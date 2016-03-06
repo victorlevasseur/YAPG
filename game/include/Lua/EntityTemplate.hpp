@@ -69,6 +69,11 @@ public:
      */
     void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement, bool templateComponent = false) const;
 
+    /**
+     * Save the entity parameters in the given parametersElement.
+     */
+    void saveEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, tinyxml2::XMLElement* parametersElement) const;
+
     std::string getName() const { return m_name; }
 
     std::string getFriendlyName() const { return m_friendlyName; }
