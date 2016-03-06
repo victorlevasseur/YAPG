@@ -15,6 +15,7 @@
 #include "Lua/EntityTemplate.hpp"
 #include "State/MainMenuState.hpp"
 #include "State/StateEngine.hpp"
+#include "State/Editor/EntryPropertyWidget.hpp"
 #include "Systems/RenderSystem.hpp"
 
 namespace state
@@ -299,6 +300,10 @@ void LevelEditorState::initGUI()
 
     //Init the properties manager
     m_propertiesManager.reset(new editor::PropertiesManager(m_propertiesScrolled));
+    m_propertiesManager->registerPropertyWidget<float, editor::EntryPropertyWidget<float>>();
+    m_propertiesManager->registerPropertyWidget<int, editor::EntryPropertyWidget<int>>();
+    m_propertiesManager->registerPropertyWidget<unsigned int, editor::EntryPropertyWidget<unsigned int>>();
+    m_propertiesManager->registerPropertyWidget<std::string, editor::EntryPropertyWidget<std::string>>();
 }
 
 void LevelEditorState::initSystemManager()

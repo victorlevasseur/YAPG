@@ -17,7 +17,8 @@ PropertiesManager::PropertiesManager(sfg::ScrolledWindow::Ptr propertiesScrolled
     m_propertiesScrolled(propertiesScrolled),
     m_propertiesTable(sfg::Table::Create()),
     m_propertiesWidgets(),
-    m_currentEntity()
+    m_currentEntity(),
+    m_registeredWidgets()
 {
     m_propertiesScrolled->AddWithViewport(m_propertiesTable);
     m_propertiesTable->SetRowSpacings(5.f);
@@ -71,25 +72,33 @@ void PropertiesManager::setCurrentEntity(entityx::Entity currentEntity)
                 sfg::Table::FILL
             );
 
-            m_propertiesWidgets.emplace_back(static_cast<PropertyWidget*>(new EntryPropertyWidget<float>(m_currentEntity, it->second)));
-            m_propertiesWidgets.back()->getWidget()->SetRequisition(sf::Vector2f(150.f, 0.f));
-            m_propertiesTable->Attach(
-                m_propertiesWidgets.back()->getWidget(),
-                sf::Rect<sf::Uint32>(1u, position, 1u, 1u),
-                sfg::Table::FILL|sfg::Table::EXPAND
-            );
+            //Add the corresponding property widget (if not available, put a text saying that the parameter is not editable from the editor !)
+            std::type_index parameterType = templateComponent->parametersHelper.getParameterType(it->first);
+            if(m_registeredWidgets.count(parameterType) > 0)
+            {
+                m_propertiesWidgets.emplace_back(
+                    m_registeredWidgets.at(parameterType)(m_currentEntity, it->second)
+                );
+                m_propertiesWidgets.back()->getWidget()->SetRequisition(sf::Vector2f(150.f, 0.f));
+                m_propertiesTable->Attach(
+                    m_propertiesWidgets.back()->getWidget(),
+                    sf::Rect<sf::Uint32>(1u, position, 1u, 1u),
+                    sfg::Table::FILL|sfg::Table::EXPAND
+                );
+            }
+            else
+            {
+                m_propertiesTable->Attach(
+                    sfg::Label::Create("Not supported in editor!"),
+                    sf::Rect<sf::Uint32>(1u, position, 1u, 1u),
+                    sfg::Table::FILL|sfg::Table::EXPAND
+                );
+            }
+
 
             ++position;
         }
-
-        //Update their values
-        updateParametersValues();
     }
-}
-
-void PropertiesManager::updateParametersValues()
-{
-
 }
 
 }

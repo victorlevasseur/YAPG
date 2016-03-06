@@ -77,6 +77,20 @@ void EntityHandle::setAttributeAsAny(const std::string& componentName, const std
     }
 }
 
+std::type_index EntityHandle::getAttributeType(const std::string& componentName, const std::string& attributeName) const
+{
+    if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
+    {
+        const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
+        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
+        return attributeMetadata.getType();
+    }
+    else
+    {
+        std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
+    }
+}
+
 void EntityHandle::getAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table result) const
 {
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))

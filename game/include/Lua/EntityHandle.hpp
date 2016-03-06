@@ -47,6 +47,7 @@ public:
 
     boost::any getAttributeAsAny(const std::string& componentName, const std::string& attributeName) const;
     void setAttributeAsAny(const std::string& componentName, const std::string& attributeName, const boost::any& value);
+    std::type_index getAttributeType(const std::string& componentName, const std::string& attributeName) const;
 
     void getAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table result) const;
     void setAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table value);

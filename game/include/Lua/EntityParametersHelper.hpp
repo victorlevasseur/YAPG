@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <typeindex>
 
 #include <boost/any.hpp>
 
@@ -35,6 +36,7 @@ public:
 
     boost::any getParameter(const std::string& name) const;
     void setParameter(const std::string& name, const boost::any& value) const;
+    std::type_index getParameterType(const std::string& name) const;
 
     std::map<std::string, EntityTemplate::Parameter>::const_iterator parametersBegin() const;
     std::map<std::string, EntityTemplate::Parameter>::const_iterator parametersEnd() const;
