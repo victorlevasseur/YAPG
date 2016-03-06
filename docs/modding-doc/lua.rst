@@ -105,6 +105,7 @@ entity:
 This other example shows how to change an animation duration of an entity:
 
 .. code:: lua
+
     -- considering that "entity" is the variable holding the entity instance.
     local animations_table = {}
 
