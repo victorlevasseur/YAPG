@@ -24,7 +24,9 @@ Level::Level(lua::LuaState& luaState, LevelMode levelMode) :
 
 void Level::LoadFromFile(const std::string& path)
 {
-    m_entityMgr.reset();
+    for(entityx::Entity entity : m_entityMgr.entities_for_debugging())
+        entity.destroy();
+    m_playersTemplates.clear();
     m_nextId = 0;
 
     std::cout << "Loading level \"" << path << "\"..." << std::endl;
@@ -160,6 +162,85 @@ void Level::LoadFromFile(const std::string& path)
         std::cout << "Players created." << std::endl;
     }
     /////////////////////////////////////////
+}
+
+void Level::SaveToFile(const std::string& path)
+{
+    if(m_levelMode == LevelMode::PlayMode)
+    {
+        throw std::runtime_error("[Level/Error] Can't save a level opened in play mode !");
+    }
+
+    tinyxml2::XMLDocument levelDocument;
+
+    tinyxml2::XMLElement* levelElement = levelDocument.NewElement("level");
+    levelDocument.LinkEndChild(levelElement);
+
+    //Save the spawn position
+    {
+        tinyxml2::XMLElement* spawnElement = levelDocument.NewElement("spawn_position");
+        spawnElement->SetAttribute("x", m_spawnPosition.x);
+        spawnElement->SetAttribute("y", m_spawnPosition.y);
+
+        levelElement->LinkEndChild(spawnElement);
+    }
+
+    //Save the players templates
+    {
+        tinyxml2::XMLElement* playersElement = levelDocument.NewElement("players");
+        playersElement->SetAttribute("max_player", static_cast<int>(m_playersTemplates.size()));
+
+        for(auto it = m_playersTemplates.cbegin(); it != m_playersTemplates.cend(); ++it)
+        {
+            tinyxml2::XMLElement* playerElement = levelDocument.NewElement("player");
+            playerElement->SetAttribute("entity_template", (*it).c_str());
+
+            playersElement->LinkEndChild(playerElement);
+        }
+
+        levelElement->LinkEndChild(playersElement);
+    }
+
+    //Save the entities
+    {
+        tinyxml2::XMLElement* objectsElement = levelDocument.NewElement("objects");
+
+        //Go through all entities and create an XMLElement element for them and set an ID
+        //Give the ID to the SerializedEntityGetter
+        std::map<entityx::Entity, tinyxml2::XMLElement*> entityElements;
+
+        SerializedEntityGetter entityGetter;
+        unsigned int nextId = 1;
+        m_entityMgr.each<components::TemplateComponent>([&entityGetter, &nextId, &entityElements, &objectsElement, &levelDocument](entityx::Entity entity, components::TemplateComponent& templateComponent)
+        {
+            entityGetter.registerEntity(entity, nextId);
+
+            tinyxml2::XMLElement* entityElement = levelDocument.NewElement("object");
+            entityElement->SetAttribute("id", static_cast<int>(nextId));
+            entityElement->SetAttribute("template", templateComponent.templateName.c_str());
+
+            entityElements[entity] = entityElement;
+            objectsElement->LinkEndChild(entityElement);
+
+            ++nextId;
+        });
+
+        //Go through all entities again to save their parameters and entity template name
+        //This allows all entities to be able to get the other's ID while saving their parameters
+        m_entityMgr.each<components::TemplateComponent>([&](entityx::Entity entity, components::TemplateComponent& templateComponent)
+        {
+            const lua::EntityTemplate& entityTemplate = m_luaState.getTemplate(templateComponent.templateName);
+
+            tinyxml2::XMLElement* parametersElement = levelDocument.NewElement("parameters");
+            entityElements.at(entity)->LinkEndChild(parametersElement);
+
+            entityTemplate.saveEntity(entity, entityGetter, parametersElement);
+        });
+
+        levelElement->LinkEndChild(objectsElement);
+    }
+
+    levelDocument.SaveFile(path.c_str());
 }
 
 entityx::Entity Level::createNewEntity(const std::string& templateName, bool templateComponent)

@@ -210,12 +210,20 @@ void LevelEditorState::initGUI()
 
         auto openButton = sfg::Button::Create("Open level...");
         fileBox->PackEnd(openButton);
+        openButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+        {
+            m_level.LoadFromFile("savedlevel.xml");
+        });
 
         auto saveButton = sfg::Button::Create("Save");
         fileBox->PackEnd(saveButton);
 
         auto saveAsButton = sfg::Button::Create("Save as...");
         fileBox->PackEnd(saveAsButton);
+        saveAsButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+        {
+            m_level.SaveToFile("savedlevel.xml");
+        });
 
         fileBox->PackEnd(sfg::Separator::Create(sfg::Separator::Orientation::VERTICAL));
 

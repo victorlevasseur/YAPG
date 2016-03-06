@@ -26,6 +26,7 @@ public:
     Level(lua::LuaState& luaState, LevelMode levelMode = LevelMode::PlayMode);
 
     void LoadFromFile(const std::string& path);
+    void SaveToFile(const std::string& path);
 
     const entityx::EventManager& getEventManager() const { return m_eventMgr; }
     entityx::EventManager& getEventManager() { return m_eventMgr; }

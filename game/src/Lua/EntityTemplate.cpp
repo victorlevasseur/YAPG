@@ -90,7 +90,7 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
 
 void EntityTemplate::initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement, bool templateComponent) const
 {
-    initializeEntity(entity, entityGetter);
+    initializeEntity(entity, entityGetter, templateComponent);
     for(auto it = m_parameters.cbegin(); it != m_parameters.cend(); ++it)
     {
         try
@@ -118,8 +118,8 @@ void EntityTemplate::saveEntity(entityx::Entity entity, const level::SerializedE
     for(auto it = m_parameters.cbegin(); it != m_parameters.cend(); ++it)
     {
         tinyxml2::XMLElement* parameterElement = doc->NewElement(it->first.c_str());
+        parametersElement->LinkEndChild(parameterElement);
 
-        //TODO:
         EntityHandle(entity).saveAttributeToXml(it->second.component, it->second.attribute, parameterElement, entityGetter);
     }
 }
