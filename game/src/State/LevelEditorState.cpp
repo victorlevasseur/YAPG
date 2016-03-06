@@ -35,6 +35,7 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, std::string path, r
     m_templatesListBox(),
     m_templatesNames(),
     m_propertiesScrolled(),
+    m_propertiesManager(nullptr),
     m_level(m_luaState, level::Level::LevelMode::EditMode),
     m_systemMgr(nullptr),
     m_selectedEntity(),
@@ -74,6 +75,8 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 
     if(getEditionMode() == EditionMode::Insertion)
     {
+        m_selectedEntity = entityx::Entity();
+
         if(event.type == sf::Event::MouseButtonPressed &&
             isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target) &&
             m_templatesListBox->GetSelectedItemsCount() > 0)
@@ -104,6 +107,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         if(event.type == sf::Event::MouseButtonPressed && isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
         {
             m_selectedEntity = getFirstEntityUnderMouse(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target);
+            m_propertiesManager->setCurrentEntity(m_selectedEntity);
 
             if(m_selectedEntity)
             {
@@ -116,7 +120,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 
             //TODO: Update properties
         }
-        else if(event.type == sf::Event::MouseButtonReleased)
+        else if(event.type == sf::Event::MouseButtonReleased && isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
         {
             if(m_selectedEntity)
             {
@@ -292,6 +296,9 @@ void LevelEditorState::initGUI()
     m_modifyTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
         std::bind(enableCorrectToolSettings, m_propertiesScrolled, "Properties")
     );
+
+    //Init the properties manager
+    m_propertiesManager.reset(new editor::PropertiesManager(m_propertiesScrolled));
 }
 
 void LevelEditorState::initSystemManager()

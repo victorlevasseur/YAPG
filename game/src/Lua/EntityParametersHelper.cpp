@@ -29,4 +29,14 @@ void EntityParametersHelper::setParameter(const std::string& name, const boost::
     lua::EntityHandle(m_entity).setAttributeAsAny(parameter.component, parameter.attribute, value);
 }
 
+std::map<std::string, EntityTemplate::Parameter>::const_iterator EntityParametersHelper::parametersBegin() const
+{
+    return m_entityTemplate->getParameters().begin();
+}
+
+std::map<std::string, EntityTemplate::Parameter>::const_iterator EntityParametersHelper::parametersEnd() const
+{
+    return m_entityTemplate->getParameters().end();
+}
+
 }

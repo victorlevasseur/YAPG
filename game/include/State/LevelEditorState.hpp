@@ -21,6 +21,7 @@
 #include "Lua/LuaState.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
+#include "State/Editor/PropertiesManager.hpp"
 #include "State/State.hpp"
 
 namespace state{ class StateEngine; }
@@ -88,6 +89,7 @@ private:
         sfg::ListBox::Ptr m_templatesListBox;
         std::vector<std::string> m_templatesNames;
         sfg::ScrolledWindow::Ptr m_propertiesScrolled;
+        std::unique_ptr<editor::PropertiesManager> m_propertiesManager;
 
     level::Level m_level;
     std::unique_ptr<entityx::SystemManager> m_systemMgr;

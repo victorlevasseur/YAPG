@@ -1,12 +1,16 @@
 #ifndef YAPG_GAME_LUA_ENTITYPARAMETERSHELPER_H
 #define YAPG_GAME_LUA_ENTITYPARAMETERSHELPER_H
 
+#include <map>
+#include <string>
+
 #include <boost/any.hpp>
 
 #include "entityx/entityx.h"
 
+#include "Lua/EntityTemplate.hpp"
+
 namespace lua{ class EntityHandle; }
-namespace lua{ class EntityTemplate; }
 
 namespace lua
 {
@@ -31,6 +35,9 @@ public:
 
     boost::any getParameter(const std::string& name) const;
     void setParameter(const std::string& name, const boost::any& value) const;
+
+    std::map<std::string, EntityTemplate::Parameter>::const_iterator parametersBegin() const;
+    std::map<std::string, EntityTemplate::Parameter>::const_iterator parametersEnd() const;
 
 private:
     EntityParametersHelper(const EntityTemplate* entityTemplate, entityx::Entity entity);
