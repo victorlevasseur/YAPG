@@ -78,32 +78,32 @@ FileDialogImpl::FileDialogImpl(
     {
         //Calculate the needed buffer size
         std::size_t filterBufferSize = calculateBufferSize(filters);
+
         //Construct the filters string
-        TCHAR* filtersStr = new TCHAR[filterBufferSize];
+        TCHAR* filtersStr = (TCHAR*)malloc(filterBufferSize * sizeof(wchar_t));
         TCHAR* currentPos = filtersStr;
-        filtersStr[0] = '\0';
         for(auto filterIt = filters.cbegin(); filterIt != filters.cend(); ++filterIt)
         {
-            wmemcopy(currentPos, stringToWide(filterIt->name).c_str(), stringToWide(filterIt->name).size());
+            wmemcpy(currentPos, stringToWide(filterIt->name).c_str(), stringToWide(filterIt->name).size());
             currentPos += stringToWide(filterIt->name).size();
-            wmemcopy(filtersStr, L"\0", 1);
+            wmemcpy(currentPos, L"\0", 1);
             currentPos += 1;
 
             for(auto patternIt = filterIt->patterns.cbegin(); patternIt != filterIt->patterns.cend(); ++patternIt)
             {
-                wmemcopy(currentPos, stringToWide(*patternIt).c_str(), stringToWide(*patternIt).size());
+                wmemcpy(currentPos, stringToWide(*patternIt).c_str(), stringToWide(*patternIt).size());
                 currentPos += stringToWide(*patternIt).size();
 
-                wmemcopy(currentPos, L";", 1);
+                wmemcpy(currentPos, L";", 1);
                 currentPos += 1;
             }
 
-            wmemcopy(filterIt->patterns.size() > 0 ? currentPos - 1 : currentPos, L"\0", 1);
+            wmemcpy(filterIt->patterns.size() > 0 ? (currentPos - 1) : currentPos, L"\0", 1);
             if(filterIt->patterns.size() == 0)
                 currentPos += 1;
         }
 
-        wmemcopy(currentPos, L"\0", 1);
+        wmemcpy(currentPos, L"\0", 1);
 
         m_fileDialogStruct->lpstrFilter = filtersStr;
     }
@@ -112,7 +112,7 @@ FileDialogImpl::FileDialogImpl(
         m_fileDialogStruct->lpstrFilter = nullptr;
     }
 
-    m_fileDialogStruct->nFilterIndex = selectedFilter;
+    m_fileDialogStruct->nFilterIndex = selectedFilter + 1;
 
     m_fileDialogStruct->lpstrInitialDir = nullptr;
     m_fileDialogStruct->lpstrTitle = wideTitle.c_str(); //The window title

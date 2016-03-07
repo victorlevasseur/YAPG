@@ -213,7 +213,7 @@ void LevelEditorState::initGUI()
         fileBox->PackEnd(openButton);
         openButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
         {
-            nativegui::FileDialog fileDialog("Select a level to open...", nativegui::FileDialog::Open, { { "XML levels", {"*.xml", "*.lua"} }, { "C++ src", { "*.cpp", "*.hpp", "*.inl" } } }, 1);
+            nativegui::FileDialog fileDialog("Select a level to open...", nativegui::FileDialog::Open, { { "XML levels", {"*.xml"} } });
             if(fileDialog.run())
                 m_level.LoadFromFile(fileDialog.getFilename());
         });
@@ -225,7 +225,7 @@ void LevelEditorState::initGUI()
         fileBox->PackEnd(saveAsButton);
         saveAsButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
         {
-            nativegui::FileDialog fileDialog("Select where to save the level...", nativegui::FileDialog::Save);
+            nativegui::FileDialog fileDialog("Select where to save the level...", nativegui::FileDialog::Save, { { "XML levels", {"*.xml"} } });
             if(fileDialog.run())
                 m_level.SaveToFile(fileDialog.getFilename());
         });
