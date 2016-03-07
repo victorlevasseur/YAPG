@@ -22,7 +22,7 @@
 namespace state
 {
 
-LevelEditorState::LevelEditorState(StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop) :
+LevelEditorState::LevelEditorState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop) :
     State(stateEngine),
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
@@ -39,6 +39,7 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, std::string path, r
     m_propertiesScrolled(),
     m_propertiesManager(nullptr),
     m_level(m_luaState, level::Level::LevelMode::EditMode),
+    m_filepath(),
     m_systemMgr(nullptr),
     m_selectedEntity(),
     m_mouseOffsetToSelected()
@@ -47,7 +48,7 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, std::string path, r
     initGUI();
     updateTemplatesList();
 
-    m_level.LoadFromFile(path);
+    newLevel();
 }
 
 void LevelEditorState::onStop()
@@ -208,27 +209,19 @@ void LevelEditorState::initGUI()
 
         auto newButton = sfg::Button::Create("New level");
         fileBox->PackEnd(newButton);
+        newButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&LevelEditorState::newLevel, this));
 
         auto openButton = sfg::Button::Create("Open level...");
         fileBox->PackEnd(openButton);
-        openButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
-        {
-            nativegui::FileDialog fileDialog("Select a level to open...", nativegui::FileDialog::Open, { { "XML levels", {"*.xml"} } });
-            if(fileDialog.run())
-                m_level.LoadFromFile(fileDialog.getFilename());
-        });
+        openButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&LevelEditorState::openLevel, this));
 
         auto saveButton = sfg::Button::Create("Save");
         fileBox->PackEnd(saveButton);
+        saveButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&LevelEditorState::saveLevel, this));
 
         auto saveAsButton = sfg::Button::Create("Save as...");
         fileBox->PackEnd(saveAsButton);
-        saveAsButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
-        {
-            nativegui::FileDialog fileDialog("Select where to save the level...", nativegui::FileDialog::Save, { { "XML levels", {"*.xml"} } });
-            if(fileDialog.run())
-                m_level.SaveToFile(fileDialog.getFilename());
-        });
+        saveAsButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&LevelEditorState::saveAsLevel, this));
 
         fileBox->PackEnd(sfg::Separator::Create(sfg::Separator::Orientation::VERTICAL));
 
@@ -326,6 +319,40 @@ void LevelEditorState::initSystemManager()
     m_systemMgr->add<systems::RenderSystem>(m_resourcesManager.getTextures());
 
     m_systemMgr->configure();
+}
+
+void LevelEditorState::newLevel()
+{
+    m_level.LoadFromFile("newlevel.xml");
+    m_filepath = std::string();
+}
+
+void LevelEditorState::openLevel()
+{
+    nativegui::FileDialog fileDialog("Select a level to open...", nativegui::FileDialog::Open, { { "XML levels", {"*.xml"} } });
+    if(fileDialog.run())
+    {
+        m_level.LoadFromFile(fileDialog.getFilename());
+        m_filepath = fileDialog.getFilename();
+    }
+}
+
+void LevelEditorState::saveLevel()
+{
+    if(m_filepath.empty())
+        saveAsLevel();
+    else
+        m_level.SaveToFile(m_filepath);
+}
+
+void LevelEditorState::saveAsLevel()
+{
+    nativegui::FileDialog fileDialog("Select where to save the level...", nativegui::FileDialog::Save, { { "XML levels", {"*.xml"} } });
+    if(fileDialog.run())
+    {
+        m_level.SaveToFile(fileDialog.getFilename());
+        m_filepath = fileDialog.getFilename();
+    }
 }
 
 LevelEditorState::EditionMode LevelEditorState::getEditionMode() const

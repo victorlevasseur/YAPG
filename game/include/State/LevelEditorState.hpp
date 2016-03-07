@@ -32,7 +32,7 @@ namespace state
 class LevelEditorState : public State
 {
 public:
-    LevelEditorState(StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
+    LevelEditorState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
 
     virtual void onStop();
 
@@ -60,6 +60,11 @@ private:
 
     void initGUI();
     void initSystemManager();
+
+    void newLevel();
+    void openLevel();
+    void saveLevel();
+    void saveAsLevel();
 
     EditionMode getEditionMode() const;
 
@@ -92,6 +97,8 @@ private:
         std::unique_ptr<editor::PropertiesManager> m_propertiesManager;
 
     level::Level m_level;
+    std::string m_filepath;
+
     std::unique_ptr<entityx::SystemManager> m_systemMgr;
 
     entityx::Entity m_selectedEntity;

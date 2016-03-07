@@ -70,8 +70,8 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     editorButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
         getStateEngine().stopAndStartState
-            <state::LevelEditorState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-            "newlevel.xml", m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+            <state::LevelEditorState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
+            m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
         );
     });
     windowBox->PackEnd(editorButton, true, true);
