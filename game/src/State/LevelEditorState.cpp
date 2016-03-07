@@ -225,7 +225,9 @@ void LevelEditorState::initGUI()
         fileBox->PackEnd(saveAsButton);
         saveAsButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
         {
-            m_level.SaveToFile("savedlevel.xml");
+            nativegui::FileDialog fileDialog("Select where to save the level...", nativegui::FileDialog::Save);
+            if(fileDialog.run())
+                m_level.SaveToFile(fileDialog.getFilename());
         });
 
         fileBox->PackEnd(sfg::Separator::Create(sfg::Separator::Orientation::VERTICAL));

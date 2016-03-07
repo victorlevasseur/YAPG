@@ -20,7 +20,7 @@ FileDialogImpl::FileDialogImpl(const std::string& title, FileDialog::Action acti
         action == FileDialog::Open ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SAVE,
         _("_Cancel"),
         GTK_RESPONSE_CANCEL,
-        _("_Open"),
+        action == FileDialog::Open ? _("_Open") : _("Save"),
         GTK_RESPONSE_ACCEPT,
         nullptr
     );
