@@ -53,7 +53,7 @@ bool FileDialogImpl::run()
     return result == GTK_RESPONSE_ACCEPT;
 }
 
-const std::string& FileDialogImpl::getFilename() const
+std::string FileDialogImpl::getFilename() const
 {
     return m_selectedFileName;
 }

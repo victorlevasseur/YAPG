@@ -3,6 +3,9 @@
 #ifdef OS_LINUX
 #include "NativeGui/Linux/FileDialogImpl.hpp"
 #endif
+#ifdef OS_WINDOWS
+#include "NativeGui/Win32/FileDialogImpl.hpp"
+#endif
 
 namespace nativegui
 {
@@ -23,7 +26,7 @@ bool FileDialog::run()
     return m_impl->run();
 }
 
-const std::string& FileDialog::getFilename() const
+std::string FileDialog::getFilename() const
 {
     return m_impl->getFilename();
 }

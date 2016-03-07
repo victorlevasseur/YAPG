@@ -1,11 +1,11 @@
-#ifndef YAPG_GAME_NATIVEGUI_LINUX_FILEDIALOGIMPL_H
-#define YAPG_GAME_NATIVEGUI_LINUX_FILEDIALOGIMPL_H
+#ifndef YAPG_GAME_NATIVEGUI_WIN32_FILEDIALOGIMPL_H
+#define YAPG_GAME_NATIVEGUI_WIN32_FILEDIALOGIMPL_H
 
-#ifdef OS_LINUX
+#ifdef OS_WINDOWS
+
+#include <windows.h>
 
 #include "NativeGui/FileDialog.hpp"
-
-#include <gtk/gtk.h>
 
 namespace nativegui
 {
@@ -23,8 +23,7 @@ public:
     std::string getFilename() const;
 
 private:
-    GtkWidget* m_fileDialog;
-    std::string m_selectedFileName;
+    OPENFILENAME *m_fileDialogStruct;
 };
 
 }

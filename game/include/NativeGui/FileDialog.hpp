@@ -24,7 +24,7 @@ public:
 
     bool run();
 
-    const std::string& getFilename() const;
+    std::string getFilename() const;
 
 private:
     std::unique_ptr<impl::FileDialogImpl> m_impl;
