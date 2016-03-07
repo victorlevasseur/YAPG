@@ -24,6 +24,7 @@ public:
 
 private:
     OPENFILENAME *m_fileDialogStruct;
+    FileDialog::Action m_action;
 };
 
 }

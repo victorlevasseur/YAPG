@@ -11,7 +11,8 @@ namespace impl
 {
 
 FileDialogImpl::FileDialogImpl(const std::string& title, FileDialog::Action action) :
-    m_fileDialogStruct(new OPENFILENAME())
+    m_fileDialogStruct(new OPENFILENAME()),
+    m_action(action)
 {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring wideTitle = converter.from_bytes(title);
@@ -28,7 +29,8 @@ FileDialogImpl::FileDialogImpl(const std::string& title, FileDialog::Action acti
     m_fileDialogStruct->nFilterIndex = 0;
     m_fileDialogStruct->lpstrInitialDir = nullptr;
     m_fileDialogStruct->lpstrTitle = wideTitle.c_str();
-    m_fileDialogStruct->Flags = OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST;
+    m_fileDialogStruct->Flags =
+        m_action == FileDialog::Open ? OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST : 0;
 }
 
 FileDialogImpl::~FileDialogImpl()
@@ -38,7 +40,12 @@ FileDialogImpl::~FileDialogImpl()
 
 bool FileDialogImpl::run()
 {
-    return GetOpenFileName(m_fileDialogStruct) != 0;
+    if(m_action == FileDialog::Open)
+        return GetOpenFileName(m_fileDialogStruct) != 0;
+    else if(m_action == FileDialog::Save)
+        return GetSaveFileName(m_fileDialogStruct) != 0;
+
+    return false;
 }
 
 std::string FileDialogImpl::getFilename() const
