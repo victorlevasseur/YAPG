@@ -13,6 +13,7 @@
 #include "Components/TemplateComponent.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Lua/EntityTemplate.hpp"
+#include "NativeGui/FileDialog.hpp"
 #include "State/MainMenuState.hpp"
 #include "State/StateEngine.hpp"
 #include "State/Editor/EntryPropertyWidget.hpp"
@@ -212,7 +213,9 @@ void LevelEditorState::initGUI()
         fileBox->PackEnd(openButton);
         openButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
         {
-            m_level.LoadFromFile("savedlevel.xml");
+            nativegui::FileDialog fileDialog("Select a level to open...", nativegui::FileDialog::Open);
+            if(fileDialog.run())
+                m_level.LoadFromFile(fileDialog.getFilename());
         });
 
         auto saveButton = sfg::Button::Create("Save");

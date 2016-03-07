@@ -4,6 +4,8 @@
 
 #include <SFGUI/SFGUI.hpp>
 
+#include <gtk/gtk.h> //TODO: Only on Linux
+
 #include "Lua/LuaState.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
@@ -16,6 +18,9 @@ namespace fs = boost::filesystem;
 
 int main(int argc, char** argv)
 {
+    //Init GTK TODO: Only on Linux
+    gtk_init(&argc, &argv);
+
     //State manager
     state::StateEngine stateEngine;
 
