@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace nativegui{ namespace impl { class FileDialogImpl; } }
 
@@ -12,13 +13,24 @@ namespace nativegui
 class FileDialog
 {
 public:
+    struct Filter
+    {
+        std::string name;
+        std::vector<std::string> patterns;
+    };
+
     enum Action
     {
         Open,
         Save
     };
 
-    FileDialog(const std::string& title, Action action);
+    FileDialog(
+        const std::string& title,
+        Action action,
+        const std::vector<Filter>& filters = std::vector<Filter>(),
+        std::size_t selectedFilter = 0
+        );
 
     ~FileDialog();
 

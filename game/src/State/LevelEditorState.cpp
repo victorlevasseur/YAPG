@@ -213,7 +213,7 @@ void LevelEditorState::initGUI()
         fileBox->PackEnd(openButton);
         openButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
         {
-            nativegui::FileDialog fileDialog("Select a level to open...", nativegui::FileDialog::Open);
+            nativegui::FileDialog fileDialog("Select a level to open...", nativegui::FileDialog::Open, { { "XML levels", {"*.xml", "*.lua"} }, { "C++ src", { "*.cpp", "*.hpp", "*.inl" } } }, 1);
             if(fileDialog.run())
                 m_level.LoadFromFile(fileDialog.getFilename());
         });

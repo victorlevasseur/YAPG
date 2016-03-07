@@ -10,10 +10,16 @@ namespace nativegui
 namespace impl
 {
 
-FileDialogImpl::FileDialogImpl(const std::string& title, FileDialog::Action action) :
+FileDialogImpl::FileDialogImpl(
+    const std::string& title,
+    FileDialog::Action action,
+    const std::vector<FileDialog::Filter>& filters,
+    std::size_t selectedFilter
+    ) :
     m_fileDialog(nullptr),
     m_selectedFileName()
 {
+    //Init the dialog
     m_fileDialog = gtk_file_chooser_dialog_new(
         title.c_str(),
         nullptr,
@@ -24,6 +30,25 @@ FileDialogImpl::FileDialogImpl(const std::string& title, FileDialog::Action acti
         GTK_RESPONSE_ACCEPT,
         nullptr
     );
+
+    //Init the filters
+    for(auto it = filters.cbegin(); it != filters.cend(); ++it)
+    {
+        GtkFileFilter* filter = gtk_file_filter_new();
+        gtk_file_filter_set_name(filter, it->name.c_str());
+
+        for(auto it2 = it->patterns.cbegin(); it2 != it->patterns.cend(); ++it2)
+            gtk_file_filter_add_pattern(filter, (*it2).c_str());
+
+        gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(m_fileDialog), filter);
+    }
+
+    //Set the default filter
+    GSList* filtersList = gtk_file_chooser_list_filters(GTK_FILE_CHOOSER(m_fileDialog));
+    if(selectedFilter < g_slist_length(filtersList))
+        gtk_file_chooser_set_filter(GTK_FILE_CHOOSER(m_fileDialog), GTK_FILE_FILTER(g_slist_nth_data(filtersList, selectedFilter)));
+
+    g_slist_free(filtersList);
 
     gtk_window_set_keep_above(GTK_WINDOW(m_fileDialog), TRUE);
 }

@@ -10,8 +10,13 @@
 namespace nativegui
 {
 
-FileDialog::FileDialog(const std::string& title, Action action) :
-    m_impl(std::make_unique<impl::FileDialogImpl>(title, action))
+FileDialog::FileDialog(
+    const std::string& title,
+    Action action,
+    const std::vector<Filter>& filters,
+    std::size_t selectedFilter
+    ) :
+    m_impl(std::make_unique<impl::FileDialogImpl>(title, action, filters, selectedFilter))
 {
 
 }

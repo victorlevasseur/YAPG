@@ -15,7 +15,12 @@ namespace impl
 class FileDialogImpl
 {
 public:
-    FileDialogImpl(const std::string& title, FileDialog::Action action);
+    FileDialogImpl(
+        const std::string& title,
+        FileDialog::Action action,
+        const std::vector<FileDialog::Filter>& filters = std::vector<FileDialog::Filter>(),
+        std::size_t selectedFilter = 0
+        );
     ~FileDialogImpl();
 
     bool run();
