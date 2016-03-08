@@ -9,6 +9,7 @@
 
 #include <SFGUI/Box.hpp>
 #include <SFGUI/Desktop.hpp>
+#include <SFGUI/Label.hpp>
 #include <SFGUI/ListBox.hpp>
 #include <SFGUI/RadioButton.hpp>
 #include <SFGUI/SFGUI.hpp>
@@ -86,6 +87,7 @@ private:
     sfg::SFGUI& m_sfgui;
     sfg::Desktop& m_desktop;
     sfg::Window::Ptr m_fileToolbar;
+        sfg::Label::Ptr m_filepathLabel;
     sfg::Window::Ptr m_toolsToolbar;
         sfg::RadioButton::Ptr m_insertionTool;
         sfg::RadioButton::Ptr m_modifyTool;

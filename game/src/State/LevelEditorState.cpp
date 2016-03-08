@@ -32,6 +32,7 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, resources::AllResou
     m_sfgui(sfgui),
     m_desktop(desktop),
     m_fileToolbar(),
+    m_filepathLabel(),
     m_toolsToolbar(),
     m_toolsSettingsToolbar(),
     m_templatesListBox(),
@@ -203,9 +204,16 @@ void LevelEditorState::initGUI()
     //FILE TOOLBAR
     m_fileToolbar = sfg::Window::Create(sfg::Window::BACKGROUND);
     {
+        auto verticalFileBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
+        verticalFileBox->SetSpacing(5.f);
+        m_fileToolbar->Add(verticalFileBox);
+
+        m_filepathLabel = sfg::Label::Create("(Not saved yet)");
+        verticalFileBox->PackEnd(m_filepathLabel);
+
         auto fileBox = sfg::Box::Create();
         fileBox->SetSpacing(5.f);
-        m_fileToolbar->Add(fileBox);
+        verticalFileBox->PackEnd(fileBox);
 
         auto newButton = sfg::Button::Create("New level");
         fileBox->PackEnd(newButton);
@@ -325,6 +333,8 @@ void LevelEditorState::newLevel()
 {
     m_level.LoadFromFile("newlevel.xml");
     m_filepath = std::string();
+
+    m_filepathLabel->SetText("(not saved yet)");
 }
 
 void LevelEditorState::openLevel()
@@ -334,6 +344,8 @@ void LevelEditorState::openLevel()
     {
         m_level.LoadFromFile(fileDialog.getFilename());
         m_filepath = fileDialog.getFilename();
+
+        m_filepathLabel->SetText(m_filepath);
     }
 }
 
@@ -352,6 +364,8 @@ void LevelEditorState::saveAsLevel()
     {
         m_level.SaveToFile(fileDialog.getFilename());
         m_filepath = fileDialog.getFilename();
+
+        m_filepathLabel->SetText(m_filepath);
     }
 }
 
