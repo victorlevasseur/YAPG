@@ -38,7 +38,13 @@ public:
      * \param name the attribute's name
      * \return the metadata associated with the attribute named "name"
      */
-    virtual const AttributeMetadataBase& getAttribute(const std::string& name) const { }
+    virtual const AttributeMetadataBase* getAttribute(const std::string& name) const { return nullptr; }
+
+    /**
+     * \param name the attribute's name
+     * \return the metadata associated with the attribute named "name"
+     */
+    virtual AttributeMetadataBase* getAttribute(const std::string& name) { return nullptr; }
 
 private:
 };

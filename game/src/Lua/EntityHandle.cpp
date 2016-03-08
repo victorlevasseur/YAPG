@@ -39,8 +39,8 @@ void EntityHandle::loadAttributeFromXml(const std::string& componentName, const 
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
         const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
-        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
-        attributeMetadata.loadFromXml(getComponentPtr(componentName), xmlElement, entityGetter);
+        const meta::AttributeMetadataBase* attributeMetadata = componentMetadata.getAttribute(attributeName);
+        attributeMetadata->loadFromXml(getComponentPtr(componentName), xmlElement, entityGetter);
     }
     else
     {
@@ -53,8 +53,8 @@ void EntityHandle::saveAttributeToXml(const std::string& componentName, const st
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
         const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
-        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
-        attributeMetadata.saveToXml(getComponentPtr(componentName), xmlElement, entityGetter);
+        const meta::AttributeMetadataBase* attributeMetadata = componentMetadata.getAttribute(attributeName);
+        attributeMetadata->saveToXml(getComponentPtr(componentName), xmlElement, entityGetter);
     }
     else
     {
@@ -67,8 +67,8 @@ boost::any EntityHandle::getAttributeAsAny(const std::string& componentName, con
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
         const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
-        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
-        return attributeMetadata.getAsAny(getComponentPtr(componentName));
+        const meta::AttributeMetadataBase* attributeMetadata = componentMetadata.getAttribute(attributeName);
+        return attributeMetadata->getAsAny(getComponentPtr(componentName));
     }
     else
     {
@@ -82,8 +82,8 @@ void EntityHandle::setAttributeAsAny(const std::string& componentName, const std
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
         const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
-        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
-        attributeMetadata.setAsAny(getComponentPtr(componentName), value);
+        const meta::AttributeMetadataBase* attributeMetadata = componentMetadata.getAttribute(attributeName);
+        attributeMetadata->setAsAny(getComponentPtr(componentName), value);
     }
     else
     {
@@ -96,12 +96,13 @@ std::type_index EntityHandle::getAttributeType(const std::string& componentName,
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
         const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
-        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
-        return attributeMetadata.getType();
+        const meta::AttributeMetadataBase* attributeMetadata = componentMetadata.getAttribute(attributeName);
+        return attributeMetadata->getType();
     }
     else
     {
         std::cout << "[Lua/Warning] Trying to access a not existing component !" << std::endl;
+        return typeid(void);
     }
 }
 
@@ -110,8 +111,8 @@ void EntityHandle::getAttributeAsLuaTable(const std::string& componentName, cons
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
         const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
-        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
-        attributeMetadata.getAsLuaTable(getComponentPtr(componentName), result);
+        const meta::AttributeMetadataBase* attributeMetadata = componentMetadata.getAttribute(attributeName);
+        attributeMetadata->getAsLuaTable(getComponentPtr(componentName), result);
     }
     else
     {
@@ -124,8 +125,8 @@ void EntityHandle::setAttributeAsLuaTable(const std::string& componentName, cons
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
         const meta::Metadata& componentMetadata = meta::MetadataStore::getMetadata(componentsTypeIndex.at(componentName));
-        const meta::AttributeMetadataBase& attributeMetadata = componentMetadata.getAttribute(attributeName);
-        attributeMetadata.setAsLuaTable(getComponentPtr(componentName), value);
+        const meta::AttributeMetadataBase* attributeMetadata = componentMetadata.getAttribute(attributeName);
+        attributeMetadata->setAsLuaTable(getComponentPtr(componentName), value);
     }
     else
     {

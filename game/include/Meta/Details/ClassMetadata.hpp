@@ -69,14 +69,14 @@ public:
 
     virtual bool hasAttributes() const { return true; }
 
-    virtual const AttributeMetadataBase& getAttribute(const std::string& name) const
+    virtual const AttributeMetadataBase* getAttribute(const std::string& name) const
     {
-        return *(m_attributes.at(name));
+        return m_attributes.at(name).get();
     }
 
-    AttributeMetadataBase& getAttribute(const std::string& name)
+    AttributeMetadataBase* getAttribute(const std::string& name)
     {
-        return *(m_attributes.at(name));
+        return m_attributes.at(name).get();
     }
 
 private:
