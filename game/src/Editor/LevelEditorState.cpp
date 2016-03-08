@@ -44,7 +44,9 @@ LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::A
     m_systemMgr(nullptr),
     m_selectedEntity(),
     m_mouseOffsetToSelected(),
-    m_dragging(false)
+    m_dragging(false),
+    m_draggingView(false),
+    m_mousePosBeforeDrag()
 {
     initSystemManager();
     initGUI();
@@ -107,7 +109,10 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
     }
     else if(getEditionMode() == EditionMode::Modify)
     {
-        if(event.type == sf::Event::MouseButtonPressed && isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
+        if(event.type == sf::Event::MouseButtonPressed
+            && isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target)
+            && event.mouseButton.button == sf::Mouse::Left
+            )
         {
             sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), m_levelView);
 
@@ -142,6 +147,30 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         {
             m_dragging = false;
         }
+    }
+
+    //View dragging
+    if(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right)
+    {
+        sf::Vector2i mousePos(event.mouseButton.x, event.mouseButton.y);
+        if(isMouseNotOnWidgets(mousePos, target))
+        {
+            m_draggingView = true;
+            m_mousePosBeforeDrag = mousePos;
+        }
+    }
+    else if(event.type == sf::Event::MouseMoved)
+    {
+        sf::Vector2i mousePos(event.mouseMove.x, event.mouseMove.y);
+        if(m_draggingView)
+        {
+            m_levelView.move(m_mousePosBeforeDrag.x - mousePos.x, m_mousePosBeforeDrag.y - mousePos.y);
+            m_mousePosBeforeDrag = mousePos;
+        }
+    }
+    else if(event.type == sf::Event::MouseButtonReleased)
+    {
+        m_draggingView = false;
     }
 }
 
@@ -184,29 +213,6 @@ void LevelEditorState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 {
     m_systemMgr->update<systems::RenderSystem>(dt.asSeconds());
     m_desktop.Update(dt.asSeconds());
-
-    if(getEditionMode() == EditionMode::View)
-    {
-        //If no widgets have focus, the keys can move the view
-        sf::Vector2f centerPos = m_levelView.getCenter();
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        {
-            centerPos.x -= 400.f * dt.asSeconds();
-        }
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        {
-            centerPos.x += 400.f * dt.asSeconds();
-        }
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        {
-            centerPos.y -= 400.f * dt.asSeconds();
-        }
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        {
-            centerPos.y += 400.f * dt.asSeconds();
-        }
-        m_levelView.setCenter(centerPos);
-    }
 }
 
 void LevelEditorState::initGUI()
@@ -274,12 +280,10 @@ void LevelEditorState::initGUI()
 
     m_insertionTool = sfg::RadioButton::Create("Insert new entities", radioGroup);
     m_modifyTool = sfg::RadioButton::Create("Modify placed entities", radioGroup);
-    m_viewTool = sfg::RadioButton::Create("Change view", radioGroup);
 
     m_insertionTool->SetActive(true);
     toolsBox->PackEnd(m_insertionTool);
     toolsBox->PackEnd(m_modifyTool);
-    toolsBox->PackEnd(m_viewTool);
 
     //TEMPLATES TOOLBAR
     m_toolsSettingsToolbar = sfg::Window::Create(sfg::Window::BACKGROUND|sfg::Window::TITLEBAR);
@@ -385,8 +389,6 @@ LevelEditorState::EditionMode LevelEditorState::getEditionMode() const
         return EditionMode::Insertion;
     else if(m_modifyTool->IsActive())
         return EditionMode::Modify;
-    else if(m_viewTool->IsActive())
-        return EditionMode::View;
     return EditionMode::Unknown;
 }
 

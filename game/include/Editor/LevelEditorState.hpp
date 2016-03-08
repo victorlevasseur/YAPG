@@ -55,7 +55,6 @@ private:
     {
         Insertion,
         Modify,
-        View,
         Unknown
     };
 
@@ -91,7 +90,6 @@ private:
     sfg::Window::Ptr m_toolsToolbar;
         sfg::RadioButton::Ptr m_insertionTool;
         sfg::RadioButton::Ptr m_modifyTool;
-        sfg::RadioButton::Ptr m_viewTool;
     sfg::Window::Ptr m_toolsSettingsToolbar;
         sfg::ListBox::Ptr m_templatesListBox;
         std::vector<std::string> m_templatesNames;
@@ -103,9 +101,14 @@ private:
 
     std::unique_ptr<entityx::SystemManager> m_systemMgr;
 
+    //Entity selection stuff in "Modify" mode
     entityx::Entity m_selectedEntity;
     sf::Vector2f m_mouseOffsetToSelected;
     bool m_dragging;
+
+    //Move the view stuff
+    bool m_draggingView;
+    sf::Vector2i m_mousePosBeforeDrag;
 };
 
 }
