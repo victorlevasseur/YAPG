@@ -107,10 +107,10 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
     }
     else if(getEditionMode() == EditionMode::Modify)
     {
-        sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), m_levelView);
-
         if(event.type == sf::Event::MouseButtonPressed && isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
         {
+            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), m_levelView);
+
             m_selectedEntity = getFirstEntityUnderMouse(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target);
             m_propertiesManager->setCurrentEntity(m_selectedEntity);
 
@@ -124,9 +124,11 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
                 m_dragging = true;
             }
         }
-        else if(event.type == sf::Event::MouseButtonReleased)
+        else if(event.type == sf::Event::MouseMoved)
         {
-            if(isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
+            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y), m_levelView);
+
+            if(isMouseNotOnWidgets(sf::Vector2i(event.mouseMove.x, event.mouseMove.y), target))
             {
                 if(m_selectedEntity && m_dragging)
                 {
@@ -134,7 +136,9 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
                     m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", mousePosition.y - m_mouseOffsetToSelected.y);
                 }
             }
-
+        }
+        else if(event.type == sf::Event::MouseButtonReleased)
+        {
             m_dragging = false;
         }
     }
