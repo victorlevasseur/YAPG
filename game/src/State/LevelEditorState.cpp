@@ -43,7 +43,8 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, resources::AllResou
     m_filepath(),
     m_systemMgr(nullptr),
     m_selectedEntity(),
-    m_mouseOffsetToSelected()
+    m_mouseOffsetToSelected(),
+    m_dragging(false)
 {
     initSystemManager();
     initGUI();
@@ -120,17 +121,23 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
                 entityPos.y = boost::any_cast<float>(m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.getParameter("y"));
 
                 m_mouseOffsetToSelected = mousePosition - entityPos;
+                m_dragging = true;
             }
 
             //TODO: Update properties
         }
-        else if(event.type == sf::Event::MouseButtonReleased && isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
+        else if(event.type == sf::Event::MouseButtonReleased)
         {
-            if(m_selectedEntity)
+            if(isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
             {
-                m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", event.mouseButton.x - m_mouseOffsetToSelected.x);
-                m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", event.mouseButton.y - m_mouseOffsetToSelected.y);
+                if(m_selectedEntity && m_dragging)
+                {
+                    m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", mousePosition.x - m_mouseOffsetToSelected.x);
+                    m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", mousePosition.y - m_mouseOffsetToSelected.y);
+                }
             }
+
+            m_dragging = false;
         }
     }
 }

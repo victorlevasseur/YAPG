@@ -105,6 +105,7 @@ private:
 
     entityx::Entity m_selectedEntity;
     sf::Vector2f m_mouseOffsetToSelected;
+    bool m_dragging;
 };
 
 }
