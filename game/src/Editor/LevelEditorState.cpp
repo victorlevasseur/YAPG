@@ -132,8 +132,9 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             {
                 if(m_selectedEntity && m_dragging)
                 {
-                    m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", mousePosition.x - m_mouseOffsetToSelected.x);
-                    m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", mousePosition.y - m_mouseOffsetToSelected.y);
+                    m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", std::round(mousePosition.x - m_mouseOffsetToSelected.x));
+                    m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", std::round(mousePosition.y - m_mouseOffsetToSelected.y));
+                    m_propertiesManager->setCurrentEntity(m_selectedEntity);
                 }
             }
         }
