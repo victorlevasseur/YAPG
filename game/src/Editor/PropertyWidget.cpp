@@ -1,7 +1,5 @@
-#include "State/Editor/PropertyWidget.hpp"
+#include "Editor/PropertyWidget.hpp"
 
-namespace state
-{
 namespace editor
 {
 
@@ -17,5 +15,4 @@ PropertyWidget::~PropertyWidget()
 
 }
 
-}
 }

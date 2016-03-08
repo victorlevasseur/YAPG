@@ -22,18 +22,18 @@
 #include "Lua/LuaState.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
-#include "State/Editor/PropertiesManager.hpp"
+#include "Editor/PropertiesManager.hpp"
 #include "State/State.hpp"
 
 namespace state{ class StateEngine; }
 
-namespace state
+namespace editor
 {
 
-class LevelEditorState : public State
+class LevelEditorState : public state::State
 {
 public:
-    LevelEditorState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
+    LevelEditorState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
 
     virtual void onStop();
 
@@ -96,7 +96,7 @@ private:
         sfg::ListBox::Ptr m_templatesListBox;
         std::vector<std::string> m_templatesNames;
         sfg::ScrolledWindow::Ptr m_propertiesScrolled;
-        std::unique_ptr<editor::PropertiesManager> m_propertiesManager;
+        std::unique_ptr<PropertiesManager> m_propertiesManager;
 
     level::Level m_level;
     std::string m_filepath;

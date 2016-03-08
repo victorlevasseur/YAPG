@@ -1,4 +1,4 @@
-#include "State/LevelState.hpp"
+#include "Level/LevelState.hpp"
 
 #include "State/StateEngine.hpp"
 
@@ -8,11 +8,11 @@
 #include "Systems/PlayerSystem.hpp"
 #include "Systems/RenderSystem.hpp"
 
-namespace state
+namespace level
 {
 
-LevelState::LevelState(StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
-    State(stateEngine),
+LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
+    state::State(stateEngine),
     m_luaState(),
     m_level(m_luaState),
     m_systemMgr(m_level.getEntityManager(), m_level.getEventManager())

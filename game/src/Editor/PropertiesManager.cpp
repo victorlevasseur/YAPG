@@ -1,4 +1,4 @@
-#include "State/Editor/PropertiesManager.hpp"
+#include "Editor/PropertiesManager.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -6,10 +6,8 @@
 #include <SFGUI/Label.hpp>
 
 #include "Components/TemplateComponent.hpp"
-#include "State/Editor/EntryPropertyWidget.hpp"
+#include "Editor/EntryPropertyWidget.hpp"
 
-namespace state
-{
 namespace editor
 {
 
@@ -101,5 +99,4 @@ void PropertiesManager::setCurrentEntity(entityx::Entity currentEntity)
     }
 }
 
-}
 }

@@ -13,13 +13,13 @@
 
 namespace state{ class StateEngine; }
 
-namespace state
+namespace level
 {
 
-class LevelState : public State
+class LevelState : public state::State
 {
 public:
-    LevelState(StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
+    LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
 
     virtual void onStop();
 

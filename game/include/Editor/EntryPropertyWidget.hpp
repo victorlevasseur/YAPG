@@ -6,10 +6,8 @@
 #include <SFGUI/Entry.hpp>
 
 #include "Components/TemplateComponent.hpp"
-#include "State/Editor/PropertyWidget.hpp"
+#include "Editor/PropertyWidget.hpp"
 
-namespace state
-{
 namespace editor
 {
 
@@ -59,7 +57,6 @@ private:
     sfg::Entry::Ptr m_entry;
 };
 
-}
 }
 
 #endif

@@ -7,8 +7,6 @@
 
 #include "Lua/EntityTemplate.hpp"
 
-namespace state
-{
 namespace editor
 {
 
@@ -25,7 +23,6 @@ protected:
     const lua::EntityTemplate::Parameter& m_parameter;
 };
 
-}
 }
 
 #endif

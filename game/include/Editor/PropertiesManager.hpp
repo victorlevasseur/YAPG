@@ -10,10 +10,8 @@
 
 #include "entityx/entityx.h"
 
-#include "State/Editor/PropertyWidget.hpp"
+#include "Editor/PropertyWidget.hpp"
 
-namespace state
-{
 namespace editor
 {
 
@@ -38,8 +36,7 @@ private:
 };
 
 }
-}
 
-#include "State/Editor/PropertiesManager.inl"
+#include "Editor/PropertiesManager.inl"
 
 #endif

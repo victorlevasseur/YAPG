@@ -1,5 +1,3 @@
-namespace state
-{
 namespace editor
 {
 
@@ -15,5 +13,4 @@ void PropertiesManager::registerPropertyWidget()
     );
 }
 
-}
 }

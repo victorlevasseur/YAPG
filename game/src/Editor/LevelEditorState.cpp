@@ -1,4 +1,4 @@
-#include "State/LevelEditorState.hpp"
+#include "Editor/LevelEditorState.hpp"
 
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -11,19 +11,19 @@
 
 #include "Components/PositionComponent.hpp"
 #include "Components/TemplateComponent.hpp"
+#include "Editor/EntryPropertyWidget.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Lua/EntityTemplate.hpp"
 #include "NativeGui/FileDialog.hpp"
 #include "State/MainMenuState.hpp"
 #include "State/StateEngine.hpp"
-#include "State/Editor/EntryPropertyWidget.hpp"
 #include "Systems/RenderSystem.hpp"
 
-namespace state
+namespace editor
 {
 
-LevelEditorState::LevelEditorState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop) :
-    State(stateEngine),
+LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop) :
+    state::State(stateEngine),
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
     m_luaState(),
@@ -123,8 +123,6 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
                 m_mouseOffsetToSelected = mousePosition - entityPos;
                 m_dragging = true;
             }
-
-            //TODO: Update properties
         }
         else if(event.type == sf::Event::MouseButtonReleased)
         {
@@ -320,7 +318,7 @@ void LevelEditorState::initGUI()
     );
 
     //Init the properties manager
-    m_propertiesManager.reset(new editor::PropertiesManager(m_propertiesScrolled));
+    m_propertiesManager.reset(new PropertiesManager(m_propertiesScrolled));
     m_propertiesManager->registerPropertyWidget<float, editor::EntryPropertyWidget<float>>();
     m_propertiesManager->registerPropertyWidget<int, editor::EntryPropertyWidget<int>>();
     m_propertiesManager->registerPropertyWidget<unsigned int, editor::EntryPropertyWidget<unsigned int>>();

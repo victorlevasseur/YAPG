@@ -11,9 +11,9 @@
 #include <SFGUI/Notebook.hpp>
 #include <SFGUI/Table.hpp>
 
+#include "Editor/LevelEditorState.hpp"
+#include "Level/LevelState.hpp"
 #include "Settings/KeySettings.hpp"
-#include "State/LevelState.hpp"
-#include "State/LevelEditorState.hpp"
 #include "State/StateEngine.hpp"
 #include "Tools/KeyStrings.hpp"
 
@@ -58,7 +58,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     playLevelButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind([&](sfg::Entry::PtrConst levelPathEntry)
     {
         getStateEngine().stopAndStartState
-            <state::LevelState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&>(
+            <level::LevelState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&>(
             levelPathEntry->GetText(), m_resourcesManager, m_settingsManager
         );
     }, playLevelEntry));
@@ -70,7 +70,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     editorButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
         getStateEngine().stopAndStartState
-            <state::LevelEditorState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
+            <editor::LevelEditorState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
             m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
         );
     });
