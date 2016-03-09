@@ -58,7 +58,7 @@ Usage
 ^^^^^
 
 In the last two methods, ``"componentName"`` is the name of the
-Component owning the attribute. **Do put ``"Component"`` at the end of
+Component owning the attribute. **Do not put ``"Component"`` at the end of
 the name: for example, for the PositionComponent, just type
 ``"Position"``.**
 
@@ -118,6 +118,6 @@ This other example shows how to change an animation duration of an entity:
     theAnimationToChange.duration = 2
     -- Note that theAnimationToChange is not a table but an animation object.
     -- It's not the serialized version of an animation but the runtime object used by the game engine.
-    -- 
+    --
     -- update the animation attribute with the table
     entity:set_table_attribute("Render", "animations", animations_table)
