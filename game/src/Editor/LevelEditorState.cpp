@@ -97,8 +97,20 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 
             try
             {
-                newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", mousePosition.x);
-                newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", mousePosition.y);
+                if(newEntity.has_component<components::PositionComponent>())
+                {
+                    auto positionComponent = newEntity.component<components::PositionComponent>();
+
+                    sf::Vector2f insertionPos = getInsertionPosition(mousePosition, positionComponent->width, positionComponent->height);
+
+                    newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", insertionPos.x);
+                    newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", insertionPos.y);
+                }
+                else
+                {
+                    newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", mousePosition.x);
+                    newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", mousePosition.y);
+                }
             }
             catch(std::exception& e)
             {
@@ -182,7 +194,11 @@ void LevelEditorState::render(sf::RenderTarget& target)
     target.setView(m_levelView);
     m_systemMgr->system<systems::RenderSystem>()->render(target);
 
-    if(getEditionMode() == EditionMode::Modify)
+    if(getEditionMode() == EditionMode::Insertion)
+    {
+        
+    }
+    else if(getEditionMode() == EditionMode::Modify)
     {
         //Draw the selection box
         if(m_selectedEntity)
@@ -431,17 +447,69 @@ entityx::Entity LevelEditorState::getFirstEntityUnderMouse(sf::Vector2i mousePos
     return entityx::Entity();
 }
 
+entityx::Entity LevelEditorState::getFirstEntityUnderMouse(sf::Vector2f position)
+{
+    entityx::ComponentHandle<components::PositionComponent> positionComponent;
+    for(entityx::Entity entity : m_level.getEntityManager().entities_with_components(positionComponent))
+    {
+        if(isEntityUnderMouse(entity, position))
+            return entity;
+    }
+
+    return entityx::Entity();
+}
+
 bool LevelEditorState::isEntityUnderMouse(entityx::Entity entity, sf::Vector2i mousePosition, sf::RenderTarget& target) const
 {
     sf::Vector2f mouseAbsolutePos = target.mapPixelToCoords(mousePosition, m_levelView);
 
+    return isEntityUnderMouse(entity, mouseAbsolutePos);
+}
+
+bool LevelEditorState::isEntityUnderMouse(entityx::Entity entity, sf::Vector2f position) const
+{
     auto positionComponent = entity.component<components::PositionComponent>();
     if(!positionComponent)
         return false;
 
     sf::FloatRect entityBoundingBox(positionComponent->x, positionComponent->y, positionComponent->width, positionComponent->height);
 
-    return entityBoundingBox.contains(mouseAbsolutePos);
+    return entityBoundingBox.contains(position);
+}
+
+sf::Vector2f LevelEditorState::getInsertionPosition(sf::Vector2f position, float entityWidth, float entityHeight)
+{
+    entityx::Entity entityUnderMouse = getFirstEntityUnderMouse(position);
+    if(entityUnderMouse)
+    {
+        auto positionComponent = entityUnderMouse.component<components::PositionComponent>();
+        if(!positionComponent)
+            return position;
+
+        sf::FloatRect entityUnderMouseBoundingBox(positionComponent->x, positionComponent->y, positionComponent->width, positionComponent->height);
+
+        sf::Vector2f newPosition;
+
+        if(position.x < entityUnderMouseBoundingBox.left + entityUnderMouseBoundingBox.width/3.f)
+            newPosition.x = entityUnderMouseBoundingBox.left - entityWidth;
+        else if(position.x > entityUnderMouseBoundingBox.left + 2.f * entityUnderMouseBoundingBox.width/3.f)
+            newPosition.x = entityUnderMouseBoundingBox.left + entityUnderMouseBoundingBox.width;
+        else
+            newPosition.x = entityUnderMouseBoundingBox.left;
+
+        if(position.y < entityUnderMouseBoundingBox.top + entityUnderMouseBoundingBox.height/3.f)
+            newPosition.y = entityUnderMouseBoundingBox.top - entityHeight;
+        else if(position.y > entityUnderMouseBoundingBox.top + 2.f * entityUnderMouseBoundingBox.height/3.f)
+            newPosition.y = entityUnderMouseBoundingBox.top + entityUnderMouseBoundingBox.height;
+        else
+            newPosition.y = entityUnderMouseBoundingBox.top;
+
+        return newPosition;
+    }
+    else
+    {
+        return position;
+    }
 }
 
 }

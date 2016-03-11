@@ -73,7 +73,11 @@ private:
     bool isMouseNotOnWidgets(sf::Vector2i mousePosition, sf::RenderTarget& target) const;
 
     entityx::Entity getFirstEntityUnderMouse(sf::Vector2i mousePosition, sf::RenderTarget& target);
+    entityx::Entity getFirstEntityUnderMouse(sf::Vector2f position);
     bool isEntityUnderMouse(entityx::Entity entity, sf::Vector2i mousePosition, sf::RenderTarget& target) const;
+    bool isEntityUnderMouse(entityx::Entity entity, sf::Vector2f position) const;
+
+    sf::Vector2f getInsertionPosition(sf::Vector2f position, float entityWidth, float entityHeight);
 
     resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;
