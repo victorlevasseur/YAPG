@@ -502,7 +502,7 @@ bool LevelEditorState::isEntityUnderMouse(entityx::Entity entity, sf::Vector2f p
 sf::Vector2f LevelEditorState::getInsertionPosition(sf::Vector2f position, float entityWidth, float entityHeight)
 {
     entityx::Entity entityUnderMouse = getFirstEntityUnderMouse(position);
-    if(entityUnderMouse)
+    if(entityUnderMouse && !sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
     {
         auto positionComponent = entityUnderMouse.component<components::PositionComponent>();
         if(!positionComponent)
