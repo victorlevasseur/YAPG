@@ -196,7 +196,29 @@ void LevelEditorState::render(sf::RenderTarget& target)
 
     if(getEditionMode() == EditionMode::Insertion)
     {
-        
+        if(m_templatesListBox->GetSelectedItemsCount() > 0)
+        {
+            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Mouse::getPosition(dynamic_cast<sf::RenderWindow&>(target)), m_levelView);
+
+            const lua::EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
+            if(selectedTemplate.getComponentsTable().get<sol::object>("Position").is<sol::table>())
+            {
+                sol::table positionComponent = selectedTemplate.getComponentsTable().get<sol::object>("Position").as<sol::table>();
+
+                if(positionComponent.get<sol::object>("width").is<float>() && positionComponent.get<sol::object>("height").is<float>())
+                {
+                    float width = positionComponent.get<sol::object>("width").as<float>();
+                    float height = positionComponent.get<sol::object>("height").as<float>();
+
+                    sf::RectangleShape ghostRect(sf::Vector2f(width, height));
+                    ghostRect.setPosition(getInsertionPosition(mousePosition, width, height));
+                    ghostRect.setFillColor(sf::Color(0, 0, 255, 100));
+                    ghostRect.setOutlineThickness(1.f);
+                    ghostRect.setOutlineColor(sf::Color(0, 0, 255, 128));
+                    target.draw(ghostRect);
+                }
+            }
+        }
     }
     else if(getEditionMode() == EditionMode::Modify)
     {

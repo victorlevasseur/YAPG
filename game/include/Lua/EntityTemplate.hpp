@@ -80,6 +80,8 @@ public:
 
     const std::map<std::string, Parameter>& getParameters() const { return m_parameters; }
 
+    const sol::table& getComponentsTable() const { return m_componentsTable; }
+
 private:
     std::string m_name;
     std::string m_friendlyName;
