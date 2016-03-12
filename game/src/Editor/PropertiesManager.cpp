@@ -20,6 +20,7 @@ PropertiesManager::PropertiesManager(sfg::ScrolledWindow::Ptr propertiesScrolled
 {
     m_propertiesScrolled->AddWithViewport(m_propertiesTable);
     m_propertiesTable->SetRowSpacings(5.f);
+    m_propertiesTable->SetRequisition(sf::Vector2f(200.f, 0.f));
 }
 
 void PropertiesManager::setCurrentEntity(entityx::Entity currentEntity)
@@ -77,7 +78,7 @@ void PropertiesManager::setCurrentEntity(entityx::Entity currentEntity)
                 m_propertiesWidgets.emplace_back(
                     m_registeredWidgets.at(parameterType)(m_currentEntity, it->second)
                 );
-                m_propertiesWidgets.back()->getWidget()->SetRequisition(sf::Vector2f(150.f, 0.f));
+                
                 m_propertiesTable->Attach(
                     m_propertiesWidgets.back()->getWidget(),
                     sf::Rect<sf::Uint32>(1u, position, 1u, 1u),

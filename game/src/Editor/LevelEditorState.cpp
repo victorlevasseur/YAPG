@@ -370,7 +370,7 @@ void LevelEditorState::initGUI()
     m_propertiesManager->registerPropertyWidget<float, editor::EntryPropertyWidget<float>>();
     m_propertiesManager->registerPropertyWidget<int, editor::EntryPropertyWidget<int>>();
     m_propertiesManager->registerPropertyWidget<unsigned int, editor::EntryPropertyWidget<unsigned int>>();
-    m_propertiesManager->registerPropertyWidget<std::string, editor::EntryPropertyWidget<std::string>>();
+    m_propertiesManager->registerPropertyWidget<std::string, editor::EntryPropertyWidget<std::string, true>>();
 }
 
 void LevelEditorState::initSystemManager()
