@@ -1,5 +1,7 @@
 #include "NativeGui/Linux/TextBoxWindowImpl.hpp"
 
+#ifdef OS_LINUX
+
 namespace nativegui
 {
 namespace impl
@@ -96,3 +98,5 @@ std::string TextBoxWindowImpl::getText() const
 
 }
 }
+
+#endif

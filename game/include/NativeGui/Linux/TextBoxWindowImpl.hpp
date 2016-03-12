@@ -1,5 +1,6 @@
 #ifndef YAPG_GAME_NATIVEGUI_LINUX_TEXTBOXWINDOWIMPL_H
 #define YAPG_GAME_NATIVEGUI_LINUX_TEXTBOXWINDOWIMPL_H
+#ifdef OS_LINUX
 
 #include <string>
 
@@ -31,4 +32,5 @@ private:
 }
 }
 
+#endif
 #endif

@@ -37,13 +37,14 @@ std::string wideToString(const std::wstring& wstr)
 TextBoxWindowImpl::TextBoxWindowImpl(const std::string& initialText, const std::string& title) :
 	m_window(nullptr),
 	m_editControl(nullptr),
-	m_initialText(stringToWide(initialText))
+	m_initialText(stringToWide(initialText)),
+    m_text()
 {
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
 
 	if(!classInitialized)
 	{
-		LoadLibrary(TEXT("Riched20.dll"));
+		LoadLibrary(TEXT("Msftedit.dll"));
 
 		WNDCLASSEX wcex;
 
@@ -128,7 +129,7 @@ int TextBoxWindowImpl::run()
 
 std::string TextBoxWindowImpl::getText() const
 {
-
+    return m_text;
 }
 
 LRESULT CALLBACK TextBoxWindowImpl::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -160,7 +161,7 @@ LRESULT CALLBACK TextBoxWindowImpl::WndProc(HWND hWnd, UINT message, WPARAM wPar
 				);
 
 		   	instanceImpl->m_editControl = CreateWindowEx(
-							   0, RICHEDIT_CLASS/*L"EDIT"*/,   // predefined class
+							   0, _T("RICHEDIT50W"), // predefined class
 							   NULL,         // no window title
 							   WS_CHILD | WS_VISIBLE | WS_VSCROLL |
 							   ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL,
@@ -189,7 +190,35 @@ LRESULT CALLBACK TextBoxWindowImpl::WndProc(HWND hWnd, UINT message, WPARAM wPar
            return 0;
 
 	    case WM_DESTROY:
-	        PostQuitMessage(0);
+            {
+                //Get the final text before destroying the window
+                TCHAR * buffer = 0;
+                int nLen = 0;
+
+                nLen = GetWindowTextLength(instanceImpl->m_editControl);
+                if(nLen > 0)
+                {
+                    buffer = new TCHAR[nLen+1];
+                    int ok = GetWindowText(instanceImpl->m_editControl, buffer, nLen+1);
+
+                    if(ok > 0)
+                    {
+                        instanceImpl->m_text = std::string(wideToString(std::wstring(buffer)));
+                        delete [] buffer;
+                    }
+                    else
+                    {
+                        delete [] buffer;
+                        instanceImpl->m_text = std::string();
+                    }
+                }
+                else
+                {
+                    instanceImpl->m_text = std::string();
+                }
+
+    	        PostQuitMessage(0);
+            }
 	        break;
 	    default:
 	        return DefWindowProc(hWnd, message, wParam, lParam);

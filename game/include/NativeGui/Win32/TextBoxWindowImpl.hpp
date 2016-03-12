@@ -32,6 +32,8 @@ private:
 	HWND m_editControl;
 
 	std::wstring m_initialText;
+	
+	std::string m_text;
 };
 
 }
