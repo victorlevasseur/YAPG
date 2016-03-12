@@ -86,37 +86,48 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         m_selectedEntity = entityx::Entity();
 
         if(event.type == sf::Event::MouseButtonPressed &&
-            isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target) &&
-            m_templatesListBox->GetSelectedItemsCount() > 0)
+            isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
         {
             sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), m_levelView);
 
-            //Insert the new entity here
-            const lua::EntityTemplate& entityTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
-
-            entityx::Entity newEntity = m_level.createNewEntity(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()], true);
-
-            try
+            if(m_templatesListBox->GetSelectedItemsCount() > 0 && event.mouseButton.button == sf::Mouse::Left)
             {
-                if(newEntity.has_component<components::PositionComponent>())
+                //Insert the new entity here
+                const lua::EntityTemplate& entityTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
+
+                entityx::Entity newEntity = m_level.createNewEntity(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()], true);
+
+                try
                 {
-                    auto positionComponent = newEntity.component<components::PositionComponent>();
+                    if(newEntity.has_component<components::PositionComponent>())
+                    {
+                        auto positionComponent = newEntity.component<components::PositionComponent>();
 
-                    sf::Vector2f insertionPos = getInsertionPosition(mousePosition, positionComponent->width, positionComponent->height);
+                        sf::Vector2f insertionPos = getInsertionPosition(mousePosition, positionComponent->width, positionComponent->height);
 
-                    newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", insertionPos.x);
-                    newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", insertionPos.y);
+                        newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", insertionPos.x);
+                        newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", insertionPos.y);
+                    }
+                    else
+                    {
+                        newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", mousePosition.x);
+                        newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", mousePosition.y);
+                    }
                 }
-                else
+                catch(std::exception& e)
                 {
-                    newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", mousePosition.x);
-                    newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", mousePosition.y);
+                    std::cout << "[Editor/Warning] The template \"" << entityTemplate.getName() << "\" can't be inserted because it doesn't have numerical X and Y parameters !" << std::endl;
+                    newEntity.destroy();
                 }
             }
-            catch(std::exception& e)
+            else if(event.mouseButton.button == sf::Mouse::Right)
             {
-                std::cout << "[Editor/Warning] The template \"" << entityTemplate.getName() << "\" can't be inserted because it doesn't have numerical X and Y parameters !" << std::endl;
-                newEntity.destroy();
+                //Remove the entity under the mouse
+                entityx::Entity entityUnderMouse = getFirstEntityUnderMouse(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target);
+                if(entityUnderMouse)
+                {
+                    entityUnderMouse.destroy();
+                }
             }
         }
     }
@@ -159,6 +170,11 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         else if(event.type == sf::Event::MouseButtonReleased)
         {
             m_dragging = false;
+        }
+        else if(event.type == sf::Event::KeyPressed && m_selectedEntity)
+        {
+            //Remove the selected entity
+            m_selectedEntity.destroy();
         }
     }
 
