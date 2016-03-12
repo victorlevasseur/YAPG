@@ -500,39 +500,52 @@ bool LevelEditorState::isEntityUnderMouse(entityx::Entity entity, sf::Vector2f p
     return entityBoundingBox.contains(position);
 }
 
+namespace
+{
+    bool isNear(float pos, float compare, float threshold = 10.f)
+    {
+        return (pos >= compare - threshold && pos <= compare + threshold);
+    }
+}
+
 sf::Vector2f LevelEditorState::getInsertionPosition(sf::Vector2f position, float entityWidth, float entityHeight)
 {
-    entityx::Entity entityUnderMouse = getFirstEntityUnderMouse(position);
-    if(entityUnderMouse && !sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-    {
-        auto positionComponent = entityUnderMouse.component<components::PositionComponent>();
-        if(!positionComponent)
-            return position;
-
-        sf::FloatRect entityUnderMouseBoundingBox(positionComponent->x, positionComponent->y, positionComponent->width, positionComponent->height);
-
-        sf::Vector2f newPosition;
-
-        if(position.x < entityUnderMouseBoundingBox.left + entityUnderMouseBoundingBox.width/3.f)
-            newPosition.x = entityUnderMouseBoundingBox.left - entityWidth;
-        else if(position.x > entityUnderMouseBoundingBox.left + 2.f * entityUnderMouseBoundingBox.width/3.f)
-            newPosition.x = entityUnderMouseBoundingBox.left + entityUnderMouseBoundingBox.width;
-        else
-            newPosition.x = entityUnderMouseBoundingBox.left;
-
-        if(position.y < entityUnderMouseBoundingBox.top + entityUnderMouseBoundingBox.height/3.f)
-            newPosition.y = entityUnderMouseBoundingBox.top - entityHeight;
-        else if(position.y > entityUnderMouseBoundingBox.top + 2.f * entityUnderMouseBoundingBox.height/3.f)
-            newPosition.y = entityUnderMouseBoundingBox.top + entityUnderMouseBoundingBox.height;
-        else
-            newPosition.y = entityUnderMouseBoundingBox.top;
-
-        return newPosition;
-    }
-    else
-    {
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
         return position;
+
+    sf::Vector2f newPosition = position;
+
+    entityx::ComponentHandle<components::PositionComponent> positionComponent;
+    for(entityx::Entity entity : m_level.getEntityManager().entities_with_components(positionComponent))
+    {
+        sf::FloatRect otherEntityBoundingBox(positionComponent->x, positionComponent->y, positionComponent->width, positionComponent->height);
+
+        if(newPosition.y + entityHeight >= otherEntityBoundingBox.top - 10.f && newPosition.y <= otherEntityBoundingBox.top + otherEntityBoundingBox.height + 10.f)
+        {
+            if(isNear(newPosition.x + entityWidth, otherEntityBoundingBox.left))
+                newPosition.x = otherEntityBoundingBox.left - entityWidth;
+            else if(isNear(newPosition.x, otherEntityBoundingBox.left))
+                newPosition.x = otherEntityBoundingBox.left;
+            else if(isNear(newPosition.x + entityWidth, otherEntityBoundingBox.left + otherEntityBoundingBox.width))
+                newPosition.x = otherEntityBoundingBox.left + otherEntityBoundingBox.width - entityWidth;
+            else if(isNear(newPosition.x, otherEntityBoundingBox.left + otherEntityBoundingBox.width))
+                newPosition.x = otherEntityBoundingBox.left + otherEntityBoundingBox.width;
+        }
+
+        if(newPosition.x + entityWidth >= otherEntityBoundingBox.left - 10.f && newPosition.x <= otherEntityBoundingBox.left + otherEntityBoundingBox.width + 10.f)
+        {
+            if(isNear(newPosition.y + entityHeight, otherEntityBoundingBox.top))
+                newPosition.y = otherEntityBoundingBox.top - entityHeight;
+            else if(isNear(newPosition.y, otherEntityBoundingBox.top))
+                newPosition.y = otherEntityBoundingBox.top;
+            else if(isNear(newPosition.y + entityHeight, otherEntityBoundingBox.top + otherEntityBoundingBox.height))
+                newPosition.y = otherEntityBoundingBox.top + otherEntityBoundingBox.height - entityHeight;
+            else if(isNear(newPosition.y, otherEntityBoundingBox.top + otherEntityBoundingBox.height))
+                newPosition.y = otherEntityBoundingBox.top + otherEntityBoundingBox.height;
+        }
     }
+
+    return newPosition;
 }
 
 }
