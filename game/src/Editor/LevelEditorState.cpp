@@ -349,7 +349,7 @@ void LevelEditorState::newLevel()
     std::cout << "Opening a window with this horrible Win32 API" << std::endl;
     nativegui::TextBoxWindow textBoxWindow("This is cool !", "YAPG - Code editor");
     textBoxWindow.run();
-    std::cout << "Ok" << std::endl;
+    std::cout << textBoxWindow.getText() << std::endl;
     m_level.LoadFromFile("newlevel.xml");
     m_filepath = std::string();
 

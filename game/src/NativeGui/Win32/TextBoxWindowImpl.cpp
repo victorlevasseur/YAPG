@@ -1,5 +1,7 @@
 #include "NativeGui/Win32/TextBoxWindowImpl.hpp"
 
+#ifdef OS_WINDOWS
+
 #include <codecvt>
 #include <iostream>
 #include <locale>
@@ -199,3 +201,5 @@ LRESULT CALLBACK TextBoxWindowImpl::WndProc(HWND hWnd, UINT message, WPARAM wPar
 
 }
 }
+
+#endif
