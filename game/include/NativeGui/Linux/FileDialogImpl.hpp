@@ -28,7 +28,11 @@ public:
     std::string getFilename() const;
 
 private:
-    GtkWidget* m_fileDialog;
+    std::string m_title;
+    FileDialog::Action m_action;
+    std::vector<FileDialog::Filter> m_filters;
+    std::size_t m_selectedFilter;
+
     std::string m_selectedFileName;
 };
 

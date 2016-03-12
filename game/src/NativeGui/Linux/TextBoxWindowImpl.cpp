@@ -29,6 +29,8 @@ int TextBoxWindowImpl::run()
         nullptr
     ));
 
+    gtk_window_set_keep_above(GTK_WINDOW(dialog), true);
+
     GtkTextView* textView = GTK_TEXT_VIEW(gtk_text_view_new());
 
     gtk_text_buffer_set_text(
