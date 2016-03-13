@@ -99,20 +99,18 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 
                 try
                 {
+                    sf::Vector2f position = mousePosition;
                     if(newEntity.has_component<components::PositionComponent>())
                     {
                         auto positionComponent = newEntity.component<components::PositionComponent>();
-
-                        sf::Vector2f insertionPos = getInsertionPosition(mousePosition, positionComponent->width, positionComponent->height);
-
-                        newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", insertionPos.x);
-                        newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", insertionPos.y);
+                        position = getInsertionPosition(
+                            mousePosition - sf::Vector2f(positionComponent->width / 2.f, positionComponent->height / 2.f),
+                            positionComponent->width,
+                            positionComponent->height
+                        );
                     }
-                    else
-                    {
-                        newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", mousePosition.x);
-                        newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", mousePosition.y);
-                    }
+                    newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", position.x);
+                    newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", position.y);
                 }
                 catch(std::exception& e)
                 {
@@ -120,14 +118,16 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
                     newEntity.destroy();
                 }
             }
-            else if(event.mouseButton.button == sf::Mouse::Right)
+        }
+        else if(event.type == sf::Event::KeyPressed &&
+            isMouseNotOnWidgets(sf::Mouse::getPosition(dynamic_cast<sf::RenderWindow&>(target)), target) &&
+            event.key.code == sf::Keyboard::Delete)
+        {
+            //Remove the entity under the mouse
+            entityx::Entity entityUnderMouse = getFirstEntityUnderMouse(sf::Mouse::getPosition(dynamic_cast<sf::RenderWindow&>(target)), target);
+            if(entityUnderMouse)
             {
-                //Remove the entity under the mouse
-                entityx::Entity entityUnderMouse = getFirstEntityUnderMouse(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target);
-                if(entityUnderMouse)
-                {
-                    entityUnderMouse.destroy();
-                }
+                entityUnderMouse.destroy();
             }
         }
     }
@@ -178,7 +178,9 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         {
             m_dragging = false;
         }
-        else if(event.type == sf::Event::KeyPressed && m_selectedEntity)
+        else if(event.type == sf::Event::KeyPressed &&
+            m_selectedEntity &&
+            event.key.code == sf::Keyboard::Delete)
         {
             //Remove the selected entity
             m_selectedEntity.destroy();
@@ -235,7 +237,7 @@ void LevelEditorState::render(sf::RenderTarget& target)
                     float height = positionComponent.get<sol::object>("height").as<float>();
 
                     sf::RectangleShape ghostRect(sf::Vector2f(width, height));
-                    ghostRect.setPosition(getInsertionPosition(mousePosition, width, height));
+                    ghostRect.setPosition(getInsertionPosition(mousePosition - sf::Vector2f(width / 2.f, height / 2.f), width, height));
                     ghostRect.setFillColor(sf::Color(0, 0, 255, 100));
                     ghostRect.setOutlineThickness(1.f);
                     ghostRect.setOutlineColor(sf::Color(0, 0, 255, 128));
