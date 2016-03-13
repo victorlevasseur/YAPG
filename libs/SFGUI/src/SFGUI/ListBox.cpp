@@ -74,6 +74,7 @@ void ListBox::AppendItem( const sf::String& str ) {
 
 	UpdateDisplayedItems();
     RequestResize();
+	HandleSizeChange();
     Invalidate();
 }
 
@@ -97,6 +98,7 @@ void ListBox::InsertItem( IndexType index, const sf::String& str ) {
 
 	UpdateDisplayedItems();
     RequestResize();
+	HandleSizeChange();
     Invalidate();
 }
 
@@ -117,6 +119,7 @@ void ListBox::PrependItem( const sf::String& str ) {
 
 	UpdateDisplayedItems();
 	RequestResize();
+	HandleSizeChange();
     Invalidate();
 }
 
@@ -126,6 +129,9 @@ void ListBox::ChangeItem( IndexType index, const sf::String& str ) {
 	}
 
 	m_items[ static_cast<std::size_t>( index ) ] = str;
+
+	UpdateDisplayedItems();
+	Invalidate();
 }
 
 void ListBox::RemoveItem( IndexType index ) {
@@ -155,6 +161,7 @@ void ListBox::RemoveItem( IndexType index ) {
 
 	UpdateDisplayedItems();
 	RequestResize();
+	HandleSizeChange();
     Invalidate();
 }
 
@@ -164,6 +171,7 @@ void ListBox::Clear() {
 
 	UpdateDisplayedItems();
 	RequestResize();
+	HandleSizeChange();
 	Invalidate();
 }
 
@@ -427,6 +435,8 @@ void ListBox::HandleSizeChange() {
 	UpdateScrollbarAllocation();
 
 	UpdateDisplayedItemsText();
+
+	Invalidate();
 }
 
 bool ListBox::HandleAdd( Widget::Ptr widget ) {
