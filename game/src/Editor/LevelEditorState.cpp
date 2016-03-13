@@ -161,8 +161,15 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             {
                 if(m_selectedEntity && m_dragging)
                 {
-                    m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", std::round(mousePosition.x - m_mouseOffsetToSelected.x));
-                    m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", std::round(mousePosition.y - m_mouseOffsetToSelected.y));
+                    sf::Vector2f newPosition = mousePosition - m_mouseOffsetToSelected;
+                    if(m_selectedEntity.has_component<components::PositionComponent>())
+                    {
+                        auto posComponent = m_selectedEntity.component<components::PositionComponent>();
+                        newPosition = getInsertionPosition(newPosition, posComponent->width, posComponent->height, m_selectedEntity);
+                    }
+
+                    m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", std::round(newPosition.x));
+                    m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", std::round(newPosition.y));
                     m_propertiesManager->setCurrentEntity(m_selectedEntity);
                 }
             }
@@ -524,7 +531,7 @@ namespace
     }
 }
 
-sf::Vector2f LevelEditorState::getInsertionPosition(sf::Vector2f position, float entityWidth, float entityHeight)
+sf::Vector2f LevelEditorState::getInsertionPosition(sf::Vector2f position, float entityWidth, float entityHeight, entityx::Entity ignore)
 {
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
         return position;
@@ -534,6 +541,9 @@ sf::Vector2f LevelEditorState::getInsertionPosition(sf::Vector2f position, float
     entityx::ComponentHandle<components::PositionComponent> positionComponent;
     for(entityx::Entity entity : m_level.getEntityManager().entities_with_components(positionComponent))
     {
+        if(ignore == entity)
+            continue;
+
         sf::FloatRect otherEntityBoundingBox(positionComponent->x, positionComponent->y, positionComponent->width, positionComponent->height);
 
         if(newPosition.y + entityHeight >= otherEntityBoundingBox.top - 10.f && newPosition.y <= otherEntityBoundingBox.top + otherEntityBoundingBox.height + 10.f)

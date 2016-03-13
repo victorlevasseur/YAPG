@@ -77,7 +77,7 @@ private:
     bool isEntityUnderMouse(entityx::Entity entity, sf::Vector2i mousePosition, sf::RenderTarget& target) const;
     bool isEntityUnderMouse(entityx::Entity entity, sf::Vector2f position) const;
 
-    sf::Vector2f getInsertionPosition(sf::Vector2f position, float entityWidth, float entityHeight);
+    sf::Vector2f getInsertionPosition(sf::Vector2f position, float entityWidth, float entityHeight, entityx::Entity ignore = entityx::Entity());
 
     resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;
