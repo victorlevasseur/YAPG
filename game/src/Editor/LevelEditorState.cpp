@@ -43,6 +43,10 @@ LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::A
     m_level(m_luaState, level::Level::LevelMode::EditMode),
     m_filepath(),
     m_systemMgr(nullptr),
+    m_isInserting(false),
+    m_insertionPos(),
+    m_insertionCount(),
+    m_templateSize(),
     m_selectedEntity(),
     m_mouseOffsetToSelected(),
     m_dragging(false),
@@ -86,37 +90,94 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         m_selectedEntity = entityx::Entity();
 
         if(event.type == sf::Event::MouseButtonPressed &&
+            event.mouseButton.button == sf::Mouse::Left &&
             isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
         {
-            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), m_levelView);
-
-            if(m_templatesListBox->GetSelectedItemsCount() > 0 && event.mouseButton.button == sf::Mouse::Left)
+            if(m_templatesListBox->GetSelectedItemsCount() > 0)
             {
-                //Insert the new entity here
-                const lua::EntityTemplate& entityTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
-
-                entityx::Entity newEntity = m_level.createNewEntity(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()], true);
-
-                try
+                //Get the template, its width and height (just to check it's available!)
+                const lua::EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
+                if(selectedTemplate.getComponentsTable().get<sol::object>("Position").is<sol::table>())
                 {
-                    sf::Vector2f position = mousePosition;
-                    if(newEntity.has_component<components::PositionComponent>())
+                    sol::table positionComponent = selectedTemplate.getComponentsTable().get<sol::object>("Position").as<sol::table>();
+
+                    if(positionComponent.get<sol::object>("width").is<float>() && positionComponent.get<sol::object>("height").is<float>())
                     {
-                        auto positionComponent = newEntity.component<components::PositionComponent>();
-                        position = getInsertionPosition(
-                            mousePosition - sf::Vector2f(positionComponent->width / 2.f, positionComponent->height / 2.f),
-                            positionComponent->width,
-                            positionComponent->height
-                        );
+                        m_isInserting = true;
+                        m_insertionCount = sf::Vector2i(0, 0);
                     }
-                    newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", position.x);
-                    newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", position.y);
                 }
-                catch(std::exception& e)
+            }
+
+        }
+        else if(event.type == sf::Event::MouseMoved)
+        {
+            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y), m_levelView);
+
+            //When not in insertion process, move the insertion pos according to the mouse
+            if(!m_isInserting)
+            {
+                if(m_templatesListBox->GetSelectedItemsCount() > 0)
                 {
-                    std::cout << "[Editor/Warning] The template \"" << entityTemplate.getName() << "\" can't be inserted because it doesn't have numerical X and Y parameters !" << std::endl;
-                    newEntity.destroy();
+                    //Get the template, its width and height
+                    const lua::EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
+                    if(selectedTemplate.getComponentsTable().get<sol::object>("Position").is<sol::table>())
+                    {
+                        sol::table positionComponent = selectedTemplate.getComponentsTable().get<sol::object>("Position").as<sol::table>();
+
+                        if(positionComponent.get<sol::object>("width").is<float>() && positionComponent.get<sol::object>("height").is<float>())
+                        {
+                            m_templateSize.x = positionComponent.get<sol::object>("width").as<float>();
+                            m_templateSize.y = positionComponent.get<sol::object>("height").as<float>();
+
+                            //Set the future insertion position
+                            m_insertionPos = getInsertionPosition(mousePosition - m_templateSize / 2.f, m_templateSize.x, m_templateSize.y);
+                        }
+                    }
                 }
+            }
+            //If in insertion process, see how many entities the user wants to insert from m_insertionPos to the mouse position
+            else
+            {
+                m_insertionCount.x = (mousePosition.x - m_insertionPos.x) / m_templateSize.x - (mousePosition.x - m_insertionPos.x < 0.f ? 1 : 0);
+                m_insertionCount.y = (mousePosition.y - m_insertionPos.y) / m_templateSize.y - (mousePosition.y - m_insertionPos.y < 0.f ? 1 : 0);
+            }
+        }
+        else if(event.type == sf::Event::MouseButtonReleased &&
+            event.mouseButton.button == sf::Mouse::Left &&
+            isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
+        {
+            if(m_isInserting)
+            {
+                //Insert the new entities when the mouse is released.
+                if(m_templatesListBox->GetSelectedItemsCount() > 0)
+                {
+                    //Get the template of the entities to insert
+                    const lua::EntityTemplate& entityTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
+
+                    //Insert all the new entities
+                    for(int i = std::min(0, m_insertionCount.x); i <= std::max(0, m_insertionCount.x); ++i)
+                    {
+                        for(int j = std::min(0, m_insertionCount.y); j <= std::max(0, m_insertionCount.y); ++j)
+                        {
+                            entityx::Entity newEntity = m_level.createNewEntity(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()], true);
+
+                            try
+                            {
+                                newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", m_insertionPos.x + i * m_templateSize.x);
+                                newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", m_insertionPos.y + j * m_templateSize.y);
+                            }
+                            catch(std::exception& e)
+                            {
+                                std::cout << "[Editor/Warning] The template \"" << entityTemplate.getName() << "\" can't be inserted because it doesn't have numerical X and Y parameters !" << std::endl;
+                                newEntity.destroy();
+                            }
+                        }
+                    }
+                }
+
+                m_isInserting = false;
+                m_insertionCount = sf::Vector2i(0, 0);
             }
         }
         else if(event.type == sf::Event::KeyPressed &&
@@ -222,29 +283,22 @@ void LevelEditorState::render(sf::RenderTarget& target)
 
     if(getEditionMode() == EditionMode::Insertion)
     {
-        if(m_templatesListBox->GetSelectedItemsCount() > 0)
-        {
-            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Mouse::getPosition(dynamic_cast<sf::RenderWindow&>(target)), m_levelView);
-
-            const lua::EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
-            if(selectedTemplate.getComponentsTable().get<sol::object>("Position").is<sol::table>())
-            {
-                sol::table positionComponent = selectedTemplate.getComponentsTable().get<sol::object>("Position").as<sol::table>();
-
-                if(positionComponent.get<sol::object>("width").is<float>() && positionComponent.get<sol::object>("height").is<float>())
-                {
-                    float width = positionComponent.get<sol::object>("width").as<float>();
-                    float height = positionComponent.get<sol::object>("height").as<float>();
-
-                    sf::RectangleShape ghostRect(sf::Vector2f(width, height));
-                    ghostRect.setPosition(getInsertionPosition(mousePosition - sf::Vector2f(width / 2.f, height / 2.f), width, height));
-                    ghostRect.setFillColor(sf::Color(0, 0, 255, 100));
-                    ghostRect.setOutlineThickness(1.f);
-                    ghostRect.setOutlineColor(sf::Color(0, 0, 255, 128));
-                    target.draw(ghostRect);
-                }
-            }
-        }
+        sf::RectangleShape ghostRect(m_templateSize
+            + sf::Vector2f(
+                std::abs(static_cast<float>(m_insertionCount.x)) * m_templateSize.x,
+                std::abs(static_cast<float>(m_insertionCount.y)) * m_templateSize.y
+            )
+        );
+        ghostRect.setPosition(
+            sf::Vector2f(
+                m_insertionPos.x + std::min(static_cast<float>(m_insertionCount.x) * m_templateSize.x, 0.f),
+                m_insertionPos.y + std::min(static_cast<float>(m_insertionCount.y) * m_templateSize.y, 0.f)
+            )
+        );
+        ghostRect.setFillColor(sf::Color(0, 0, 255, 100));
+        ghostRect.setOutlineThickness(1.f);
+        ghostRect.setOutlineColor(sf::Color(0, 0, 255, 128));
+        target.draw(ghostRect);
     }
     else if(getEditionMode() == EditionMode::Modify)
     {
@@ -253,7 +307,9 @@ void LevelEditorState::render(sf::RenderTarget& target)
         {
             auto position = m_selectedEntity.component<components::PositionComponent>();
             sf::RectangleShape selectionRect(sf::Vector2f(position->width, position->height));
-            selectionRect.setPosition(sf::Vector2f(position->x, position->y));
+            selectionRect.setPosition(
+                sf::Vector2f(position->x, position->y)
+            );
             selectionRect.setFillColor(sf::Color(0, 0, 255, 100));
             selectionRect.setOutlineThickness(1.f);
             selectionRect.setOutlineColor(sf::Color(0, 0, 255, 128));

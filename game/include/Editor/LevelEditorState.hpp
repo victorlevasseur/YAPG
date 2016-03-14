@@ -105,6 +105,12 @@ private:
 
     std::unique_ptr<entityx::SystemManager> m_systemMgr;
 
+    //Future entity position in insertion mode
+    bool m_isInserting;
+    sf::Vector2f m_insertionPos;
+    sf::Vector2i m_insertionCount;
+    sf::Vector2f m_templateSize;
+
     //Entity selection stuff in "Modify" mode
     entityx::Entity m_selectedEntity;
     sf::Vector2f m_mouseOffsetToSelected;
