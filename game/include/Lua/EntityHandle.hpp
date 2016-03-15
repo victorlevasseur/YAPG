@@ -53,7 +53,7 @@ public:
     void getAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table result) const;
     void setAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table value);
 
-    void getLuaData(sol::table result);
+    sol::table& getLuaData();
 
     void writeToConsole(const std::string& str);
 
