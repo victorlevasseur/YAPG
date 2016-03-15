@@ -18,7 +18,6 @@ public:
 
     static void registerComponent(lua::LuaState& state);
 
-private:
     sol::table m_luaDataTable;
 };
 

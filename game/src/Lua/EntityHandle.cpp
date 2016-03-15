@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "Components/Component.hpp"
+#include "Components/LuaDataComponent.hpp"
 #include "Components/PositionComponent.hpp"
 #include "Components/RenderComponent.hpp"
 #include "Lua/LuaState.hpp"
@@ -134,6 +135,14 @@ void EntityHandle::setAttributeAsLuaTable(const std::string& componentName, cons
     }
 }
 
+void EntityHandle::getLuaData(sol::table result)
+{
+    if(m_entity.has_component<components::LuaDataComponent>())
+    {
+        result.set("data", m_entity.component<components::LuaDataComponent>()->m_luaDataTable);
+    }
+}
+
 void EntityHandle::writeToConsole(const std::string& str)
 {
     std::cout << str << std::endl;
@@ -152,6 +161,7 @@ void EntityHandle::registerClass(LuaState &state)
         "set_attribute", &EntityHandle::setAttributeAsAny,
         "get_table_attribute", &EntityHandle::getAttributeAsLuaTable,
         "set_table_attribute", &EntityHandle::setAttributeAsLuaTable,
+        "get_lua_data", &EntityHandle::getLuaData,
         "write_to_console", &EntityHandle::writeToConsole
     );
 }
