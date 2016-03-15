@@ -58,6 +58,10 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
     {
         entity.assign<RenderComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
+    else if(component == "LuaData")
+    {
+        //Don't do anything, it's managed by initializeEntity from EntityTemplate
+    }
     else
     {
         std::cout << "Unknown component of type \"" << component << "\" !" << std::endl;

@@ -1,6 +1,7 @@
 #include "Lua/EntityTemplate.hpp"
 
 #include "Components/Component.hpp"
+#include "Components/LuaDataComponent.hpp"
 #include "Components/TemplateComponent.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Lua/EntityParametersHelper.hpp"
@@ -76,6 +77,17 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
 
         components::Component::assignComponent(entity, componentType, value, entityGetter);
     });
+
+    //Add the LuaData component (special case!)
+    entity.assign<components::LuaDataComponent>(m_componentsTable.state());
+    if(m_componentsTable.get<sol::object>("LuaData").is<sol::table>())
+    {
+        //If the template has LuaDataComponent defined, it means that he needs to predefine some values
+        entity.component<components::LuaDataComponent>()->loadFromLua(
+            m_componentsTable.get<sol::object>("LuaData"),
+            entityGetter
+        );
+    }
 
     if(templateComponent)
     {
