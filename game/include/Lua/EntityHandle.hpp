@@ -12,6 +12,7 @@
 #include "Meta/Metadata.hpp"
 
 namespace components{ class Component; }
+namespace components{ class LuaDataComponent; }
 namespace lua{ class LuaState; }
 
 
@@ -53,7 +54,7 @@ public:
     void getAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table result) const;
     void setAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table value);
 
-    sol::table& getLuaData();
+    components::LuaDataComponent* getLuaData();
 
     void writeToConsole(const std::string& str);
 

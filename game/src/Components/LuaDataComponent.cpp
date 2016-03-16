@@ -5,14 +5,11 @@
 namespace components
 {
 
-LuaDataComponent::LuaDataComponent(lua_State* L) :
+LuaDataComponent::LuaDataComponent() :
     Component(),
-    m_luaDataTable()
+    m_dataTable()
 {
-    //Create an empty lua table
-    lua_createtable(L, 0, 0);
-    m_luaDataTable = sol::table(L);
-    lua_pop(L, 1);
+
 }
 
 LuaDataComponent::~LuaDataComponent()
@@ -30,19 +27,32 @@ void LuaDataComponent::registerComponent(lua::LuaState& state)
     meta::MetadataStore::registerClass<LuaDataComponent>()
         .setExtraLoadFunction([](LuaDataComponent* luaData, const sol::object& luaObject)
         {
-            sol::object luaTable = luaObject.as<sol::table>().get<sol::object>("data");
-            if(luaTable.is<sol::table>())
-                luaData->m_luaDataTable = luaTable;
-            else
-            {
-                //Create an empty lua table
-                lua_createtable(luaObject.state(), 0, 0);
-                luaData->m_luaDataTable = sol::table(luaObject.state());
-                lua_pop(luaObject.state(), 1);
-            }
+            //TODO
         });
 
     lua::EntityHandle::declareComponent<LuaDataComponent>("LuaData");
+
+    state.getState().new_usertype<LuaDataComponent>("data_component",
+        "has_value", &LuaDataComponent::hasValue,
+        "get_value", &LuaDataComponent::getValue,
+        "set_value", &LuaDataComponent::setValue
+    );
+}
+
+bool LuaDataComponent::hasValue(const std::string& key) const
+{
+    return m_dataTable.count(key) > 0;
+}
+
+boost::any LuaDataComponent::getValue(const std::string& key) const
+{
+    return m_dataTable.at(key);
+    //TODO: Return an empty boost::any if doesn't exists
+}
+
+void LuaDataComponent::setValue(const std::string& key, const boost::any& value)
+{
+    m_dataTable[key] = value;
 }
 
 std::ostream& operator<<(std::ostream& stream, const LuaDataComponent& component)

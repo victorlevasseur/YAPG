@@ -12,6 +12,7 @@
 #include "Animation/Frame.hpp"
 #include "Components/CustomBehaviorComponent.hpp"
 #include "Components/HitboxComponent.hpp"
+#include "Components/LuaDataComponent.hpp"
 #include "Components/PlatformComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PlayerComponent.hpp"
@@ -144,6 +145,7 @@ LuaState::LuaState() :
     components::Component::registerComponent(*this);
     components::CustomBehaviorComponent::registerComponent(*this);
     components::HitboxComponent::registerComponent(*this);
+    components::LuaDataComponent::registerComponent(*this);
     components::PlatformComponent::registerComponent(*this);
     components::PlatformerComponent::registerComponent(*this);
     components::PlayerComponent::registerComponent(*this);

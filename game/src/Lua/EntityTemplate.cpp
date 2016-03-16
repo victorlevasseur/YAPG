@@ -79,7 +79,7 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
     });
 
     //Add the LuaData component (special case!)
-    entity.assign<components::LuaDataComponent>(m_componentsTable.state());
+    entity.assign<components::LuaDataComponent>();
     if(m_componentsTable.get<sol::object>("LuaData").is<sol::table>())
     {
         //If the template has LuaDataComponent defined, it means that he needs to predefine some values

@@ -135,12 +135,9 @@ void EntityHandle::setAttributeAsLuaTable(const std::string& componentName, cons
     }
 }
 
-sol::table& EntityHandle::getLuaData()
+components::LuaDataComponent* EntityHandle::getLuaData()
 {
-    if(m_entity.has_component<components::LuaDataComponent>())
-    {
-        return m_entity.component<components::LuaDataComponent>()->m_luaDataTable;
-    }
+    return m_entity.component<components::LuaDataComponent>().get();
 }
 
 void EntityHandle::writeToConsole(const std::string& str)
