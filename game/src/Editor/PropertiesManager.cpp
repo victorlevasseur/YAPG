@@ -78,7 +78,7 @@ void PropertiesManager::setCurrentEntity(entityx::Entity currentEntity)
                 m_propertiesWidgets.emplace_back(
                     m_registeredWidgets.at(parameterType)(m_currentEntity, it->second)
                 );
-                
+
                 m_propertiesTable->Attach(
                     m_propertiesWidgets.back()->getWidget(),
                     sf::Rect<sf::Uint32>(1u, position, 1u, 1u),

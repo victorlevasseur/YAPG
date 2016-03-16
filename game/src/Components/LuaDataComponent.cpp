@@ -27,7 +27,29 @@ void LuaDataComponent::registerComponent(lua::LuaState& state)
     meta::MetadataStore::registerClass<LuaDataComponent>()
         .setExtraLoadFunction([](LuaDataComponent* luaData, const sol::object& luaObject)
         {
-            //TODO
+            if(luaObject.is<sol::table>())
+            {
+                sol::table luaTable = luaObject.as<sol::table>();
+                luaTable.for_each([&](const sol::object& key, const sol::object& value)
+                {
+                    if(!key.is<std::string>())
+                    {
+                        std::cout << "[Lua/Error] LuaDataComponent table keys must be strings!" << std::endl;
+                        return;
+                    }
+                    if(!value.is<boost::any>())
+                    {
+                        std::cout << "[Lua/Error] LuaDataComponent table value must be boost::any (constructed with XXX_value(...) lua function)!" << std::endl;
+                        return;
+                    }
+
+                    luaData->setValue(key.as<std::string>(), value.as<boost::any>());
+                });
+            }
+            else
+            {
+                std::cout << "[Lua/Error] Can't load LuaDataComponent: not a table!" << std::endl;
+            }
         });
 
     lua::EntityHandle::declareComponent<LuaDataComponent>("LuaData");

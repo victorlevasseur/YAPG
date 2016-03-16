@@ -21,20 +21,23 @@ public:
 
     struct Parameter
     {
+        enum Type
+        {
+            ComponentAttributeParameter,
+            CustomDataFieldParameter
+        };
+
         std::string name;
         std::string friendlyName;
 
+        Type parameterType;
+
+        //Only for ComponentAttributeParameter
         std::string component;
         std::string attribute;
-        enum
-        {
-            String,
-            Number,
-            Boolean,
-            Entity,
-            Function,
-            Unknown
-        } attributeType;
+
+        //Only for CustomDataFieldParameter
+        std::string field;
     };
 
     EntityTemplate(const sol::table& templateTable);

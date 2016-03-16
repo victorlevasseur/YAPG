@@ -32,24 +32,37 @@ EntityTemplate::EntityTemplate(const sol::table& templateTable) :
         templateTable.get<sol::table>("parameters").for_each([&](const sol::object &key, const sol::object &value)
         {
             sol::table valueTable = value.as<sol::table>();
-            std::string type = valueTable.get<std::string>("type");
 
-            m_parameters.emplace(
-                key.as<std::string>(),
-                Parameter{
+            if(valueTable.get<sol::object>("custom_data_field").valid())
+            {
+                //It's a custom data parameter (a parameter that affects a value to a data stored in LuaDataComponent : can be any type of data)
+                m_parameters.emplace(
                     key.as<std::string>(),
-                    valueTable.get<std::string>("name"),
-                    valueTable.get<std::string>("component"),
-                    valueTable.get<std::string>("attribute"),
-                    (type == "string" ? Parameter::String :
-                        (type == "number" ? Parameter::Number :
-                        (type == "boolean" ? Parameter::Boolean :
-                        (type == "entity" ? Parameter::Entity :
-                        (type == "function" ? Parameter::Function :
-                        Parameter::Unknown
-                    )))))
-                }
-            );
+                    Parameter{
+                        key.as<std::string>(),
+                        valueTable.get<std::string>("name"),
+                        Parameter::CustomDataFieldParameter,
+                        "",
+                        "",
+                        valueTable.get<std::string>("custom_data_field")
+                    }
+                );
+            }
+            else
+            {
+                //It's a parameter to a component's attribute
+                m_parameters.emplace(
+                    key.as<std::string>(),
+                    Parameter{
+                        key.as<std::string>(),
+                        valueTable.get<std::string>("name"),
+                        Parameter::ComponentAttributeParameter,
+                        valueTable.get<std::string>("component"),
+                        valueTable.get<std::string>("attribute"),
+                        ""
+                    }
+                );
+            }
         });
     }
 }
@@ -113,8 +126,20 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
                 throw std::runtime_error("Template \"" + m_name + "\" needs the parameter \"" + it->first + "\" but not given by the instanciated object !");
             }
 
-            //Load the corresponding attribute (from parameter infos) using the XML element
-            EntityHandle(entity).loadAttributeFromXml(it->second.component, it->second.attribute, parameterElement, entityGetter);
+            //Load the corresponding parameter (from parameter infos) using the XML element
+            if(it->second.parameterType == Parameter::ComponentAttributeParameter)
+            {
+                EntityHandle(entity).loadAttributeFromXml(it->second.component, it->second.attribute, parameterElement, entityGetter);
+            }
+            else
+            {
+                if(EntityHandle(entity).getLuaData()->hasValue(it->second.field)) //Note: the template must have already defined the custom data value.
+                {
+                    boost::any value = EntityHandle(entity).getLuaData()->getValue(it->second.field);
+                    meta::MetadataStore::getMetadata(value.type()).loadFromXml(boost::unsafe_any_cast<void*>(&value), parameterElement, entityGetter);
+                    EntityHandle(entity).getLuaData()->setValue(it->second.field, value);
+                }
+            }
         }
         catch(std::exception& e)
         {
@@ -132,7 +157,18 @@ void EntityTemplate::saveEntity(entityx::Entity entity, const level::SerializedE
         tinyxml2::XMLElement* parameterElement = doc->NewElement(it->first.c_str());
         parametersElement->LinkEndChild(parameterElement);
 
-        EntityHandle(entity).saveAttributeToXml(it->second.component, it->second.attribute, parameterElement, entityGetter);
+        if(it->second.parameterType == Parameter::ComponentAttributeParameter)
+        {
+            EntityHandle(entity).saveAttributeToXml(it->second.component, it->second.attribute, parameterElement, entityGetter);
+        }
+        else
+        {
+            if(EntityHandle(entity).getLuaData()->hasValue(it->second.field))
+            {
+                boost::any value = EntityHandle(entity).getLuaData()->getValue(it->second.field);
+                meta::MetadataStore::getMetadata(value.type()).saveToXml(boost::unsafe_any_cast<void*>(&value), parameterElement, entityGetter);
+            }
+        }
     }
 }
 
