@@ -49,6 +49,9 @@ void PlatformerComponent::registerComponent(lua::LuaState& state)
         .declareAttribute("onStartFalling", &PlatformerComponent::onFallingFunc)
         .declareAttribute("onTurnRight", &PlatformerComponent::onTurnRightFunc)
         .declareAttribute("onTurnLeft", &PlatformerComponent::onTurnLeftFunc)
+        .declareAttribute("wants_to_jump", &PlatformerComponent::wantsToJump)
+        .declareAttribute("wants_to_go_left", &PlatformerComponent::wantsToGoLeft)
+        .declareAttribute("wants_to_go_right", &PlatformerComponent::wantsToGoRight)
         .setExtraLoadFunction([](PlatformerComponent* c, const sol::object& luaObject) {
             c->movementStateCallbacks.registerCallback(State::Idle, c->onIdleFunc);
             c->movementStateCallbacks.registerCallback(State::Walking, c->onWalkingFunc);
