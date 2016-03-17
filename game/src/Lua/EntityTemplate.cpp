@@ -1,7 +1,7 @@
 #include "Lua/EntityTemplate.hpp"
 
 #include "Components/Component.hpp"
-#include "Components/LuaDataComponent.hpp"
+#include "Components/CustomDataComponent.hpp"
 #include "Components/TemplateComponent.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Lua/EntityParametersHelper.hpp"
@@ -35,7 +35,7 @@ EntityTemplate::EntityTemplate(const sol::table& templateTable) :
 
             if(valueTable.get<sol::object>("custom_data_field").valid())
             {
-                //It's a custom data parameter (a parameter that affects a value to a data stored in LuaDataComponent : can be any type of data)
+                //It's a custom data parameter (a parameter that affects a value to a data stored in CustomDataComponent : can be any type of data)
                 m_parameters.emplace(
                     key.as<std::string>(),
                     Parameter{
@@ -91,13 +91,13 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
         components::Component::assignComponent(entity, componentType, value, entityGetter);
     });
 
-    //Add the LuaData component (special case!)
-    entity.assign<components::LuaDataComponent>();
-    if(m_componentsTable.get<sol::object>("LuaData").is<sol::table>())
+    //Add the CustomData component (special case!)
+    entity.assign<components::CustomDataComponent>();
+    if(m_componentsTable.get<sol::object>("CustomData").is<sol::table>())
     {
-        //If the template has LuaDataComponent defined, it means that he needs to predefine some values
-        entity.component<components::LuaDataComponent>()->loadFromLua(
-            m_componentsTable.get<sol::object>("LuaData"),
+        //If the template has CustomDataComponent defined, it means that he needs to predefine some values
+        entity.component<components::CustomDataComponent>()->loadFromLua(
+            m_componentsTable.get<sol::object>("CustomData"),
             entityGetter
         );
     }
@@ -133,11 +133,11 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
             }
             else
             {
-                if(EntityHandle(entity).getLuaData()->hasValue(it->second.field)) //Note: the template must have already defined the custom data value.
+                if(EntityHandle(entity).getCustomData()->hasValue(it->second.field)) //Note: the template must have already defined the custom data value.
                 {
-                    boost::any value = EntityHandle(entity).getLuaData()->getValue(it->second.field);
+                    boost::any value = EntityHandle(entity).getCustomData()->getValue(it->second.field);
                     meta::MetadataStore::getMetadata(value.type()).loadFromXml(boost::unsafe_any_cast<void*>(&value), parameterElement, entityGetter);
-                    EntityHandle(entity).getLuaData()->setValue(it->second.field, value);
+                    EntityHandle(entity).getCustomData()->setValue(it->second.field, value);
                 }
             }
         }
@@ -163,9 +163,9 @@ void EntityTemplate::saveEntity(entityx::Entity entity, const level::SerializedE
         }
         else
         {
-            if(EntityHandle(entity).getLuaData()->hasValue(it->second.field))
+            if(EntityHandle(entity).getCustomData()->hasValue(it->second.field))
             {
-                boost::any value = EntityHandle(entity).getLuaData()->getValue(it->second.field);
+                boost::any value = EntityHandle(entity).getCustomData()->getValue(it->second.field);
                 meta::MetadataStore::getMetadata(value.type()).saveToXml(boost::unsafe_any_cast<void*>(&value), parameterElement, entityGetter);
             }
         }

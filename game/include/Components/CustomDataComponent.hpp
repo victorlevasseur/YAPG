@@ -1,5 +1,5 @@
-#ifndef YAPG_GAME_COMPONENTS_LUADATACOMPONENT_H
-#define YAPG_GAME_COMPONENTS_LUADATACOMPONENT_H
+#ifndef YAPG_GAME_COMPONENTS_CUSTOMDATACOMPONENT_H
+#define YAPG_GAME_COMPONENTS_CUSTOMDATACOMPONENT_H
 
 #include <map>
 
@@ -12,11 +12,11 @@
 namespace components
 {
 
-class LuaDataComponent : public Component
+class CustomDataComponent : public Component
 {
 public:
-    LuaDataComponent();
-    virtual ~LuaDataComponent();
+    CustomDataComponent();
+    virtual ~CustomDataComponent();
 
     virtual std::string getName() const;
 
@@ -29,7 +29,7 @@ public:
     std::map<std::string, boost::any> m_dataTable;
 };
 
-std::ostream& operator<<(std::ostream& stream, const LuaDataComponent& component);
+std::ostream& operator<<(std::ostream& stream, const CustomDataComponent& component);
 
 }
 
