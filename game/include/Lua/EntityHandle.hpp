@@ -47,6 +47,8 @@ public:
     void loadAttributeFromXml(const std::string& componentName, const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter);
     void saveAttributeToXml(const std::string& componentName, const std::string& attributeName, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const;
 
+    bool hasComponent(const std::string& componentName) const;
+
     boost::any getAttributeAsAny(const std::string& componentName, const std::string& attributeName) const;
     void setAttributeAsAny(const std::string& componentName, const std::string& attributeName, const boost::any& value);
     std::type_index getAttributeType(const std::string& componentName, const std::string& attributeName) const;
@@ -69,7 +71,6 @@ private:
 
     void* getComponentPtr(const std::string& componentName);
     const void* getComponentPtr(const std::string& componentName) const;
-    bool hasComponent(const std::string& componentName) const;
 
     template<class C>
     void* doGetComponentPtr();

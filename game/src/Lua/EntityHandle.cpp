@@ -63,6 +63,11 @@ void EntityHandle::saveAttributeToXml(const std::string& componentName, const st
     }
 }
 
+bool EntityHandle::hasComponent(const std::string& componentName) const
+{
+    return componentsCheckers.at(componentName)(this);
+}
+
 boost::any EntityHandle::getAttributeAsAny(const std::string& componentName, const std::string& attributeName) const
 {
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
@@ -154,6 +159,7 @@ void EntityHandle::registerClass(LuaState &state)
 {
     state.getState().new_usertype<EntityHandle>("entity_handle",
         "remove_entity", &EntityHandle::removeEntity,
+        "has_component", &EntityHandle::hasComponent,
         "get_attribute", &EntityHandle::getAttributeAsAny,
         "set_attribute", &EntityHandle::setAttributeAsAny,
         "get_table_attribute", &EntityHandle::getAttributeAsLuaTable,
@@ -171,11 +177,6 @@ void* EntityHandle::getComponentPtr(const std::string& componentName)
 const void* EntityHandle::getComponentPtr(const std::string& componentName) const
 {
     return componentsGettersConst.at(componentName)(this);
-}
-
-bool EntityHandle::hasComponent(const std::string& componentName) const
-{
-    return componentsCheckers.at(componentName)(this);
 }
 
 }
