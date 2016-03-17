@@ -3,6 +3,7 @@
 
 #include "entityx/entityx.h"
 
+namespace systems{ class CollisionSystem; }
 
 namespace systems
 {
@@ -10,11 +11,12 @@ namespace systems
 class PlatformerSystem : public entityx::System<PlatformerSystem>
 {
 public:
-    PlatformerSystem();
+    PlatformerSystem(CollisionSystem& collisionSystem);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
 private:
+    CollisionSystem& m_collisionSystem;
 };
 
 }

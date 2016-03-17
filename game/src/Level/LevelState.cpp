@@ -2,6 +2,7 @@
 
 #include "State/StateEngine.hpp"
 
+#include "Systems/CollisionSystem.hpp"
 #include "Systems/CustomBehaviorSystem.hpp"
 #include "Systems/HitboxUpdaterSystem.hpp"
 #include "Systems/PlatformerSystem.hpp"
@@ -19,7 +20,8 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
 {
     m_systemMgr.add<systems::RenderSystem>(resourcesManager.getTextures());
     m_systemMgr.add<systems::CustomBehaviorSystem>();
-    m_systemMgr.add<systems::PlatformerSystem>();
+    m_systemMgr.add<systems::CollisionSystem>();
+    m_systemMgr.add<systems::PlatformerSystem>(*(m_systemMgr.system<systems::CollisionSystem>()));
     m_systemMgr.add<systems::HitboxUpdaterSystem>();
     m_systemMgr.add<systems::PlayerSystem>(settingsManager);
 
@@ -64,6 +66,7 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
     m_systemMgr.update<systems::PlayerSystem>(dt.asSeconds());
     m_systemMgr.update<systems::HitboxUpdaterSystem>(dt.asSeconds());
     m_systemMgr.update<systems::PlatformerSystem>(dt.asSeconds());
+    m_systemMgr.update<systems::CollisionSystem>(dt.asSeconds());
     m_systemMgr.update<systems::CustomBehaviorSystem>(dt.asSeconds());
     m_systemMgr.update<systems::RenderSystem>(dt.asSeconds());
 }

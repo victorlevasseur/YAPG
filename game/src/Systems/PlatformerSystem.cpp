@@ -5,10 +5,12 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
+#include "Components/ColliderComponent.hpp"
 #include "Components/HitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PositionComponent.hpp"
+#include "Systems/CollisionSystem.hpp"
 #include "Tools/Polygon.hpp"
 
 namespace c = components;
@@ -20,8 +22,9 @@ namespace e = entityx;
 namespace systems
 {
 
-PlatformerSystem::PlatformerSystem() :
-    entityx::System<PlatformerSystem>()
+PlatformerSystem::PlatformerSystem(CollisionSystem& collisionSystem) :
+    entityx::System<PlatformerSystem>(),
+    m_collisionSystem(collisionSystem)
 {
 
 }
@@ -259,10 +262,22 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
             requestedYFloorMove = floorCPos->y - platformer.oldFloorPosY;
         }
 
-        //Detect collision on the X-axis
+        //Move the player's hitbox if the floor has moved
         MovePolygon(polygon, requestedXFloorMove, requestedYFloorMove);
-        bool reqXPositive = requestedXMove > 0.f;
 
+        //Get all colliding platforms and give them to CollisionSystem (it will filter those that have a CollidableComponent)
+        //(after the X change)
+        if(entity.has_component<c::ColliderComponent>())
+        {
+            auto collidedPlatforms = GetCollidingObstacles(polygon, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::All);
+            for(auto& platform : collidedPlatforms)
+            {
+                m_collisionSystem.declareCollision(entity, platform);
+            }
+        }
+
+        //Detect collision on the X-axis
+        bool reqXPositive = requestedXMove > 0.f;
         while(IsCollidingObstacle(polygon, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::Platform))
         {
             //Try to move the object on Y-axis to support slopes
@@ -340,6 +355,17 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         bool reqYPositive = requestedFall > 0.f;
         MovePolygon(polygon, 0.f, requestedFall);
 
+        //Get all colliding platforms and give them to CollisionSystem (it will filter those that have a CollidableComponent)
+        //(after the Y change)
+        if(entity.has_component<c::ColliderComponent>())
+        {
+            auto collidedPlatforms = GetCollidingObstacles(polygon, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::All);
+            for(auto& platform : collidedPlatforms)
+            {
+                m_collisionSystem.declareCollision(entity, platform);
+            }
+        }
+
         //Delete Jumpthru which are under or overlapping the player
         std::vector<entityx::Entity> allCollidingObstacles = GetCollidingObstacles(polygon, potentialObstacles, overlappingJumpthrus);
 
@@ -388,7 +414,6 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         position.x += requestedXMove;
         position.y += requestedYMove;
 
-        //TODO: Rework how messages are handled --> LUA functions calls ? (with function like onWalking, onJumping, onFalling, ...)
         if(IsOnFloor(polygon, potentialObstacles, overlappingJumpthrus))
         {
             if(abs(position.x - oldX - requestedXFloorMove) > 0.1f)

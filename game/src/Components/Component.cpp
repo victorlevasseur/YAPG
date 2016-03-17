@@ -1,5 +1,7 @@
 #include "Components/Component.hpp"
 
+#include "Components/CollidableComponent.hpp"
+#include "Components/ColliderComponent.hpp"
 #include "Components/CustomBehaviorComponent.hpp"
 #include "Components/HitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
@@ -61,6 +63,14 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
     else if(component == "CustomData")
     {
         //Don't do anything, it's managed by initializeEntity from EntityTemplate
+    }
+    else if(component == "Collidable")
+    {
+        entity.assign<CollidableComponent>().get()->loadFromLua(luaTable, entityGetter);
+    }
+    else if(component == "Collider")
+    {
+        entity.assign<ColliderComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
     else
     {
