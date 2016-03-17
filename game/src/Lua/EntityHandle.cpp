@@ -164,7 +164,7 @@ void EntityHandle::registerClass(LuaState &state)
         "set_attribute", &EntityHandle::setAttributeAsAny,
         "get_table_attribute", &EntityHandle::getAttributeAsLuaTable,
         "set_table_attribute", &EntityHandle::setAttributeAsLuaTable,
-        "get_lua_data", &EntityHandle::getCustomData,
+        "get_custom_data", &EntityHandle::getCustomData,
         "write_to_console", &EntityHandle::writeToConsole
     );
 }
