@@ -16,7 +16,6 @@ WindowManager::WindowManager(state::StateEngine& engine, const sf::String& windo
     m_window(sf::VideoMode(1024, 768), windowTitle),
     m_engine(engine)
 {
-    m_window.setVerticalSyncEnabled(true);
     m_engine.addObserver(*this);
 }
 
