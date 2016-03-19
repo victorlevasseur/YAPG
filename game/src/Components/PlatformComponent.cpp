@@ -7,6 +7,7 @@ namespace components
 
 PlatformComponent::PlatformComponent() :
     Component(),
+    activated(true),
     platformType(Platform),
     layer(0)
 {
@@ -26,6 +27,7 @@ std::string PlatformComponent::getName() const
 void PlatformComponent::registerComponent(lua::LuaState& state)
 {
     meta::MetadataStore::registerClass<PlatformComponent>("PlatformComponent")
+        .declareAttribute("activated", &PlatformComponent::activated)
         .setExtraLoadFunction([](PlatformComponent* platform, const sol::object& luaObject)
         {
             const sol::object& platformTypeLua = luaObject.as<sol::table>().get<sol::object>("platform_type");

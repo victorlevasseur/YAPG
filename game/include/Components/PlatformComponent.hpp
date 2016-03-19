@@ -24,6 +24,7 @@ public:
 
     static void registerComponent(lua::LuaState& state);
 
+    bool activated;
     PlatformType platformType;
     int layer;
 };

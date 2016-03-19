@@ -82,7 +82,7 @@ bool IsCollidingObstacle(tools::Polygon polygon, std::vector<e::Entity> potentia
         entityx::ComponentHandle<c::HitboxComponent> obstacleCPolygon = obstacle.component<c::HitboxComponent>();
         entityx::ComponentHandle<c::PlatformComponent> obstacleCO = obstacle.component<c::PlatformComponent>();
 
-        if(!obstacleCPolygon || !obstacleCO || ((onlyOfType & obstacleCO->platformType) == 0))
+        if(!obstacleCPolygon || !obstacleCO || ((onlyOfType & obstacleCO->platformType) == 0) || !obstacleCO->activated)
         {
             continue;
         }
@@ -101,8 +101,9 @@ bool IsCollidingObstacle(tools::Polygon polygon, e::Entity obstacle)
 {
     //Get the collision polygon
     entityx::ComponentHandle<c::HitboxComponent> obstacleCPolygon = obstacle.component<c::HitboxComponent>();
+    entityx::ComponentHandle<c::PlatformComponent> obstacleCO = obstacle.component<c::PlatformComponent>();
 
-    if(!obstacleCPolygon)
+    if(!obstacleCPolygon || !obstacleCO || !obstacleCO->activated)
     {
         return false;
     }
@@ -134,7 +135,7 @@ std::vector<e::Entity> GetCollidingObstacles(tools::Polygon polygon, std::vector
         entityx::ComponentHandle<c::HitboxComponent> obstacleCPolygon = obstacle.component<c::HitboxComponent>();
         entityx::ComponentHandle<c::PlatformComponent> obstacleCO = obstacle.component<c::PlatformComponent>();
 
-        if(!obstacleCPolygon || !obstacleCO || ((types & obstacleCO->platformType) == 0))
+        if(!obstacleCPolygon || !obstacleCO || ((types & obstacleCO->platformType) == 0) || !obstacleCO->activated)
         {
             continue;
         }
