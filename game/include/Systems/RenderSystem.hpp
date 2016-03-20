@@ -36,6 +36,10 @@ private:
     void addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, sf::RenderStates states, float z);
 
     std::list<Renderable> m_renderingQueue;
+    bool m_viewInit;
+    sf::View m_renderingView;
+    int m_centerOnPlayer;
+    entityx::Entity m_lastGroundEntity;
 
     std::map<entityx::Entity, std::shared_ptr<animation::AnimatedSprite>> m_animatedSprites;
 

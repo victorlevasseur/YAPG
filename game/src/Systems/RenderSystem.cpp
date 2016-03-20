@@ -6,6 +6,8 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 
 #include "Components/HitboxComponent.hpp"
+#include "Components/PlatformerComponent.hpp"
+#include "Components/PlayerComponent.hpp"
 #include "Components/PositionComponent.hpp"
 #include "Components/RenderComponent.hpp"
 #include "Lua/EntityHandle.hpp"
@@ -19,6 +21,10 @@ namespace systems
 RenderSystem::RenderSystem(resources::TexturesManager& texturesManager, bool debugHitboxDraw) :
     entityx::System<RenderSystem>(),
     m_renderingQueue(),
+    m_viewInit(false),
+    m_renderingView(),
+    m_centerOnPlayer(0),
+    m_lastGroundEntity(),
     m_animatedSprites(),
     m_texturesManager(texturesManager),
     m_debugHitboxDraw(debugHitboxDraw)
@@ -83,14 +89,62 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
 
         addToRenderingQueue(animatedSprite, sf::RenderStates::Default, position.z); //TODO: Get z position from RenderComponent
     });
+
+    //Update the camera
+    es.each<c::PlayerComponent, c::PlatformerComponent, c::PositionComponent>([&](entityx::Entity entity, c::PlayerComponent& player, c::PlatformerComponent& platformer, c::PositionComponent& position) {
+        if(player.playerNumber != m_centerOnPlayer)
+            return; //Only center on the selected player
+
+        float newX = position.x + position.width / 2.f;
+        float newY = m_renderingView.getCenter().y;
+
+        if(platformer.groundEntity && platformer.groundEntity.has_component<c::PositionComponent>())
+        {
+            m_lastGroundEntity = platformer.groundEntity;
+        }
+
+        if(m_lastGroundEntity)
+        {
+            auto groundPosition = m_lastGroundEntity.component<c::PositionComponent>();
+
+            //If the player is on the ground, update to Y position.
+            if(std::abs(newY - groundPosition->y) > 10.f)
+            {
+                newY += (newY > groundPosition->y ? -1 : 1) * 150.f * dt;
+            }
+
+            //If the player goes beyond some limits, remove the last ground entity and try to center on player
+            if(position.y + position.height > newY + 200.f || position.y + position.height < newY - 200.f)
+            {
+                m_lastGroundEntity = entityx::Entity();
+            }
+        }
+        else
+        {
+            newY += (newY > position.y ? -1 : 1) * std::abs(newY - position.y) * 2 * dt + (platformer.fallingSpeed - platformer.jumpingSpeed) * dt;
+        }
+
+        m_renderingView.setCenter(sf::Vector2f(newX, newY));
+    });
 }
 
 void RenderSystem::render(sf::RenderTarget& target)
 {
+    if(!m_viewInit)
+    {
+        m_renderingView = target.getView();
+        m_viewInit = true;
+    }
+
+    sf::View oldView = target.getView();
+    target.setView(m_renderingView);
+
     for(auto it = m_renderingQueue.cbegin(); it != m_renderingQueue.cend(); ++it)
     {
         target.draw(*(it->drawable), it->states);
     }
+
+    target.setView(oldView);
 }
 
 void RenderSystem::addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, sf::RenderStates states, float z)
