@@ -26,7 +26,7 @@ public:
         float z;
     };
 
-    RenderSystem(resources::TexturesManager& texturesManager, bool debugHitboxDraw = false);
+    RenderSystem(resources::TexturesManager& texturesManager, bool disableViewManage = false, bool debugHitboxDraw = false);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
@@ -34,6 +34,8 @@ public:
 
 private:
     void addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, sf::RenderStates states, float z);
+
+    bool m_noViewManage;
 
     std::list<Renderable> m_renderingQueue;
     bool m_viewInit;
