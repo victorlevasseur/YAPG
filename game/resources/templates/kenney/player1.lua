@@ -68,6 +68,9 @@ entity_template = {
                 }
             }
         },
+        ["Collider"] = {
+
+        },
         ["Render"] = {
             texture = "spritesheet_complete.png",
             current_animation = "idle",
