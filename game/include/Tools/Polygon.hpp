@@ -4,12 +4,11 @@
 #include <vector>
 #include <initializer_list>
 
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
 
-namespace sf
-{
-    class RenderTarget;
-}
+namespace sf{ class RenderTarget; }
+namespace lua{ class LuaState; }
 
 namespace tools
 {
@@ -30,6 +29,7 @@ public:
     float GetAngle() const {return m_angle;};
 
     const std::vector<sf::Vector2f>& GetLocalVertices() const {return m_vertices;};
+    sf::FloatRect GetLocalBoundingBox() const;
 
     const std::vector<sf::Vector2f>& GetGlobalVertices() const {return m_globalVertices;};
     const std::vector<sf::Vector2f>& GetGlobalEdges() const {return m_globalEdges;};
@@ -44,7 +44,7 @@ public:
 
     static Polygon Rectangle(float width, float height);
 
-    static void registerClass();
+    static void registerClass(lua::LuaState& state);
 
 private:
     //Relative vertices positions

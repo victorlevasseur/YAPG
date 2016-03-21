@@ -125,20 +125,31 @@ LuaState::LuaState() :
     declareAnyConvertibleType<std::string>("string");
 
     meta::MetadataStore::registerType<sol::function>();
+
     meta::MetadataStore::registerClass<sf::Vector2f>()
         .declareAttribute("x", &sf::Vector2f::x)
         .declareAttribute("y", &sf::Vector2f::y);
+    getState().new_usertype<sf::Vector2f>("sf_vector_2f",
+        "x", &sf::Vector2f::x,
+        "y", &sf::Vector2f::y);
+
     meta::MetadataStore::registerClass<sf::IntRect>()
         .declareAttribute("left", &sf::IntRect::left)
         .declareAttribute("top", &sf::IntRect::top)
         .declareAttribute("width", &sf::IntRect::width)
         .declareAttribute("height", &sf::IntRect::height);
+    getState().new_usertype<sf::FloatRect>("sf_float_rect",
+        "left", &sf::FloatRect::left,
+        "top", &sf::FloatRect::top,
+        "width", &sf::FloatRect::width,
+        "height", &sf::FloatRect::height);
+
     std::cout << "[Lua/Note] Primitive types registered." << std::endl;
 
     //Declare class metadatas
     animation::Animation::registerClass();
     animation::Frame::registerClass();
-    tools::Polygon::registerClass();
+    tools::Polygon::registerClass(*this);
     std::cout << "[Lua/Note] Classes registered." << std::endl;
 
     //Declare main C++ classes and declare their metadatas

@@ -6,6 +6,7 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 
+#include "Lua/LuaState.hpp"
 #include "Meta/Metadata.hpp"
 
 #define M_PI       3.14159265358979323846
@@ -33,6 +34,22 @@ Polygon::Polygon(std::vector<sf::Vector2f> vertices) : m_vertices(vertices), m_o
 Polygon::~Polygon()
 {
 
+}
+
+sf::FloatRect Polygon::GetLocalBoundingBox() const
+{
+    sf::Vector2f topLeftMax;
+    sf::Vector2f bottomRightMax;
+
+    for(const sf::Vector2f& vertex : m_vertices)
+    {
+        topLeftMax.x = std::min(vertex.x, topLeftMax.x);
+        topLeftMax.y = std::min(vertex.y, topLeftMax.y);
+        bottomRightMax.x = std::max(vertex.x, bottomRightMax.x);
+        bottomRightMax.y = std::max(vertex.y, bottomRightMax.y);
+    }
+
+    return sf::FloatRect(topLeftMax, bottomRightMax);
 }
 
 void Polygon::DrawDebugPolygon(sf::RenderTarget &target)
@@ -65,7 +82,7 @@ Polygon Polygon::Rectangle(float width, float height)
     return Polygon({sf::Vector2f(-width/2, -height/2), sf::Vector2f(+width/2, -height/2), sf::Vector2f(+width/2, +height/2), sf::Vector2f(-width/2, +height/2)});
 }
 
-void Polygon::registerClass()
+void Polygon::registerClass(lua::LuaState& state)
 {
     meta::MetadataStore::registerClass<Polygon>()
         .declareAttribute("points", &Polygon::m_vertices)
@@ -74,6 +91,12 @@ void Polygon::registerClass()
             c->ComputeGlobalEdges();
             c->ComputeGlobalCenter();
         });
+
+    state.getState().new_usertype<Polygon>("polygon",
+        "get_local_bounding_box", &Polygon::GetLocalBoundingBox
+    );
+
+    state.declareAnyConvertibleType<Polygon>("polygon");
 }
 
 void Polygon::ComputeGlobalVertices()
