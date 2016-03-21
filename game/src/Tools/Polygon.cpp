@@ -38,8 +38,11 @@ Polygon::~Polygon()
 
 sf::FloatRect Polygon::GetLocalBoundingBox() const
 {
-    sf::Vector2f topLeftMax;
-    sf::Vector2f bottomRightMax;
+    if(m_vertices.size() == 0)
+        return sf::FloatRect();
+
+    sf::Vector2f topLeftMax = m_vertices[0];
+    sf::Vector2f bottomRightMax = m_vertices[0];
 
     for(const sf::Vector2f& vertex : m_vertices)
     {
@@ -49,7 +52,9 @@ sf::FloatRect Polygon::GetLocalBoundingBox() const
         bottomRightMax.y = std::max(vertex.y, bottomRightMax.y);
     }
 
-    return sf::FloatRect(topLeftMax, bottomRightMax);
+    std::cout << topLeftMax.x << ";" << topLeftMax.y << std::endl;
+
+    return sf::FloatRect(topLeftMax, bottomRightMax - topLeftMax);
 }
 
 void Polygon::DrawDebugPolygon(sf::RenderTarget &target)
