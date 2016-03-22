@@ -43,20 +43,21 @@ std::string PlatformerComponent::getName() const
 void PlatformerComponent::registerComponent(lua::LuaState& state)
 {
     meta::MetadataStore::registerClass<PlatformerComponent>("PlatformerComponent")
-        .declareAttribute("onIdle", &PlatformerComponent::onIdleFunc)
-        .declareAttribute("onStartWalking", &PlatformerComponent::onWalkingFunc)
-        .declareAttribute("onStartJumping", &PlatformerComponent::onJumpingFunc)
-        .declareAttribute("onStartFalling", &PlatformerComponent::onFallingFunc)
-        .declareAttribute("onTurnRight", &PlatformerComponent::onTurnRightFunc)
-        .declareAttribute("onTurnLeft", &PlatformerComponent::onTurnLeftFunc)
         .declareAttribute("max_walking_speed", &PlatformerComponent::maxSpeed)
         .declareAttribute("max_jumping_speed", &PlatformerComponent::maxJumpingSpeed)
         .declareAttribute("max_falling_speed", &PlatformerComponent::maxFallingSpeed)
         .declareAttribute("acceleration", &PlatformerComponent::acceleration)
         .declareAttribute("deceleration", &PlatformerComponent::deceleration)
+        .declareAttribute("gravity", &PlatformerComponent::gravity)
         .declareAttribute("wants_to_jump", &PlatformerComponent::wantsToJump)
         .declareAttribute("wants_to_go_left", &PlatformerComponent::wantsToGoLeft)
         .declareAttribute("wants_to_go_right", &PlatformerComponent::wantsToGoRight)
+        .declareAttribute("on_idle", &PlatformerComponent::onIdleFunc)
+        .declareAttribute("on_start_walking", &PlatformerComponent::onWalkingFunc)
+        .declareAttribute("on_start_jumping", &PlatformerComponent::onJumpingFunc)
+        .declareAttribute("on_start_falling", &PlatformerComponent::onFallingFunc)
+        .declareAttribute("on_turn_right", &PlatformerComponent::onTurnRightFunc)
+        .declareAttribute("on_turn_left", &PlatformerComponent::onTurnLeftFunc)
         .setExtraLoadFunction([](PlatformerComponent* c, const sol::object& luaObject) {
             c->movementStateCallbacks.registerCallback(State::Idle, c->onIdleFunc);
             c->movementStateCallbacks.registerCallback(State::Walking, c->onWalkingFunc);
