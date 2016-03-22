@@ -1,8 +1,0 @@
-site_name: YAPG Modding doc
-pages:
-- Home: index.md
-- Templates: templates.md
-- Template serialization: serialization-format.md
-- Utility classes: utility-classes.md
-- Components: components.md
-- Lua runtime: lua.md

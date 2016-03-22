@@ -1,4 +1,0 @@
-YAPG − Modding documentation
-============================
-
-
