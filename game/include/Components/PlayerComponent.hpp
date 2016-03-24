@@ -19,6 +19,7 @@ public:
     static void registerComponent(lua::LuaState& state);
 
     int playerNumber;
+    bool finishedLevel;
 };
 
 std::ostream& operator<<(std::ostream& stream, const PlayerComponent& component);

@@ -3,6 +3,7 @@
 #include "Components/CollidableComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/CustomBehaviorComponent.hpp"
+#include "Components/FinishLineComponent.hpp"
 #include "Components/HitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
@@ -71,6 +72,10 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
     else if(component == "Collider")
     {
         entity.assign<ColliderComponent>().get()->loadFromLua(luaTable, entityGetter);
+    }
+    else if(component == "FinishLine")
+    {
+        entity.assign<FinishLineComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
     else
     {

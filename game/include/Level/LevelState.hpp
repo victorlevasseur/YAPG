@@ -5,6 +5,9 @@
 
 #include "entityx/entityx.h"
 
+#include <SFGUI/Desktop.hpp>
+#include <SFGUI/SFGUI.hpp>
+
 #include "Level/Level.hpp"
 #include "Lua/LuaState.hpp"
 #include "Resources/ResourcesManager.hpp"
@@ -19,7 +22,7 @@ namespace level
 class LevelState : public state::State
 {
 public:
-    LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
+    LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
 
     virtual void onStop();
 
@@ -41,6 +44,11 @@ private:
 
     level::Level m_level;
     entityx::SystemManager m_systemMgr;
+
+    resources::AllResourcesManagers& m_resourcesManager;
+    settings::SettingsManager& m_settingsManager;
+    sfg::SFGUI& m_sfgui;
+    sfg::Desktop& m_desktop;
 };
 
 }
