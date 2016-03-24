@@ -6,7 +6,9 @@ namespace components
 {
 
 PlayerComponent::PlayerComponent() :
-    Component()
+    Component(),
+    playerNumber(-1),
+    finishedLevel(false)
 {
 
 }

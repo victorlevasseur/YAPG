@@ -1,9 +1,11 @@
 #include "Level/LevelState.hpp"
 
+#include "State/MainMenuState.hpp"
 #include "State/StateEngine.hpp"
 
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/CustomBehaviorSystem.hpp"
+#include "Systems/FinishLineSystem.hpp"
 #include "Systems/HitboxUpdaterSystem.hpp"
 #include "Systems/PlatformerSystem.hpp"
 #include "Systems/PlayerSystem.hpp"
@@ -12,11 +14,15 @@
 namespace level
 {
 
-LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
+LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop) :
     state::State(stateEngine),
     m_luaState(),
     m_level(m_luaState),
-    m_systemMgr(m_level.getEntityManager(), m_level.getEventManager())
+    m_systemMgr(m_level.getEntityManager(), m_level.getEventManager()),
+    m_resourcesManager(resourcesManager),
+    m_settingsManager(settingsManager),
+    m_sfgui(sfgui),
+    m_desktop(desktop)
 {
     m_systemMgr.add<systems::RenderSystem>(resourcesManager.getTextures());
     m_systemMgr.add<systems::CustomBehaviorSystem>();
@@ -24,6 +30,7 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_systemMgr.add<systems::PlatformerSystem>(*(m_systemMgr.system<systems::CollisionSystem>()));
     m_systemMgr.add<systems::HitboxUpdaterSystem>();
     m_systemMgr.add<systems::PlayerSystem>(settingsManager);
+    m_systemMgr.add<systems::FinishLineSystem>();
 
     m_systemMgr.configure();
 
@@ -69,6 +76,15 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
     m_systemMgr.update<systems::CollisionSystem>(dt.asSeconds());
     m_systemMgr.update<systems::CustomBehaviorSystem>(dt.asSeconds());
     m_systemMgr.update<systems::RenderSystem>(dt.asSeconds());
+    m_systemMgr.update<systems::FinishLineSystem>(dt.asSeconds());
+
+    if(m_systemMgr.system<systems::FinishLineSystem>()->haveAllPlayersFinished()) //TODO: Rework this with message system
+    {
+        getStateEngine().stopAndStartState
+        <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
+            m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+        );
+    }
 }
 
 }

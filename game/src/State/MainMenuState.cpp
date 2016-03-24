@@ -58,8 +58,8 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     playLevelButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind([&](sfg::Entry::PtrConst levelPathEntry)
     {
         getStateEngine().stopAndStartState
-            <level::LevelState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&>(
-            levelPathEntry->GetText(), m_resourcesManager, m_settingsManager
+            <level::LevelState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
+            levelPathEntry->GetText(), m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
         );
     }, playLevelEntry));
     playBox->PackEnd(playLevelButton, false, true);
