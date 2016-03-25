@@ -15,6 +15,7 @@ EntityTemplate::EntityTemplate(const sol::table& templateTable) :
     m_name(),
     m_friendlyName(),
     m_inheritedTemplate(),
+    m_abstract(false),
     m_parameters(),
     m_componentsTable()
 {
@@ -25,6 +26,9 @@ EntityTemplate::EntityTemplate(const sol::table& templateTable) :
         m_inheritedTemplate = templateTable.get<std::string>("inherits");
 
     m_componentsTable = templateTable.get<sol::table>("components");
+
+    if(templateTable.get<sol::object>("abstract").is<bool>())
+        m_abstract = templateTable.get<bool>("abstract");
 
     //Load the parameters
     if(templateTable.get<sol::object>("parameters").is<sol::table>())

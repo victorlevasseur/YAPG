@@ -81,6 +81,8 @@ public:
 
     std::string getFriendlyName() const { return m_friendlyName; }
 
+    bool isAbstract() const { return m_abstract; }
+
     const std::map<std::string, Parameter>& getParameters() const { return m_parameters; }
 
     const sol::table& getComponentsTable() const { return m_componentsTable; }
@@ -90,6 +92,8 @@ private:
     std::string m_friendlyName;
 
     std::string m_inheritedTemplate;
+
+    bool m_abstract;
 
     std::map<std::string, Parameter> m_parameters; ///< The parameters of the template
 

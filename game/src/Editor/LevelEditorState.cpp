@@ -522,9 +522,11 @@ void LevelEditorState::updateTemplatesList()
     for(auto& pair : templatesList)
     {
         const auto& entityTemplate = pair.second;
-
-        m_templatesNames.push_back(pair.first);
-        m_templatesListBox->AppendItem(entityTemplate.getFriendlyName());
+        if(!entityTemplate.isAbstract())
+        {
+            m_templatesNames.push_back(pair.first);
+            m_templatesListBox->AppendItem(entityTemplate.getFriendlyName());
+        }
     }
 }
 
