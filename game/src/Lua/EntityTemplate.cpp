@@ -88,6 +88,9 @@ void EntityTemplate::applyInheritance(LuaState& luaState)
 
 void EntityTemplate::initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, bool templateComponent) const
 {
+    if(isAbstract())
+        throw std::runtime_error("[Template/Error] Trying to instanciate \"" + getName() + "\", which is an abstract template!");
+
     //Add each components to the entity
     m_componentsTable.for_each([&](const sol::object& key, const sol::object& value) {
         std::string componentType = key.as<std::string>();
