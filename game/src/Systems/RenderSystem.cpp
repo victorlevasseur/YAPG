@@ -75,7 +75,7 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
             std::string oldAnimation = animatedSprite->getCurrentAnimation();
             animatedSprite->setCurrentAnimation(render.currentAnimation);
 
-            if(render.onAnimationChangedFunc.state())
+            if(render.onAnimationChangedFunc.valid())
                 render.onAnimationChangedFunc.call(lua::EntityHandle(entity), oldAnimation, render.currentAnimation);
         }
 
@@ -85,7 +85,7 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
         animatedSprite->setScale((render.flipped ? (-1) : (1)) * position.width, position.height);
 
         //Call the lua callback if the animation has just been restarted
-        if(animatedSprite->hadRestartedAnimation() && render.onAnimationEndFunc.state())
+        if(animatedSprite->hadRestartedAnimation() && render.onAnimationEndFunc.valid())
             render.onAnimationEndFunc.call(lua::EntityHandle(entity), render.currentAnimation);
 
         addToRenderingQueue(animatedSprite, sf::RenderStates::Default, position.z); //TODO: Get z position from RenderComponent

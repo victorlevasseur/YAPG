@@ -171,7 +171,7 @@ LuaState::LuaState() :
     std::cout << "[Lua/Note] All components registered." << std::endl;
 
     //Load yapg core libraries
-    m_luaState.open_file("scripts/core/array_tools.lua");
+    m_luaState.script_file("scripts/core/array_tools.lua");
     std::cout << "[Lua/Note] Scripting tools loaded." << std::endl;
 
     //Load templates
@@ -231,7 +231,7 @@ void LuaState::loadTemplates(const fs::path& path)
                 else if(fs::is_regular_file(e.path()))
                 {
                     std::string filePath = fs::canonical(e.path()).string();
-                    m_luaState.open_file(filePath);
+                    m_luaState.script_file(filePath);
 
                     m_templates.emplace(
                         m_luaState.get<sol::table>("entity_template").get<std::string>("name"),

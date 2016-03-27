@@ -54,7 +54,7 @@ public:
      */
     void registerCallback(StatesEnum forState, sol::function& callback)
     {
-        if(callback.state())
+        if(callback.valid())
             m_callbacks[forState] = callback;
     }
 
