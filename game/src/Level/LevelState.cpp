@@ -37,21 +37,6 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_level.LoadFromFile(path);
 }
 
-void LevelState::onStop()
-{
-
-}
-
-void LevelState::onPause()
-{
-
-}
-
-void LevelState::onUnpause()
-{
-
-}
-
 void LevelState::processEvent(sf::Event event, sf::RenderTarget &target)
 {
 
@@ -61,11 +46,6 @@ void LevelState::render(sf::RenderTarget& target)
 {
     target.clear(sf::Color(0, 180, 255));
     m_systemMgr.system<systems::RenderSystem>()->render(target);
-}
-
-void LevelState::doStart()
-{
-
 }
 
 void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)

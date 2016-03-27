@@ -60,27 +60,6 @@ LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::A
     newLevel();
 }
 
-void LevelEditorState::onStop()
-{
-    m_desktop.Remove(m_fileToolbar);
-    m_desktop.Remove(m_toolsToolbar);
-    m_desktop.Remove(m_toolsSettingsToolbar);
-}
-
-void LevelEditorState::onPause()
-{
-    m_fileToolbar->Show(false);
-    m_toolsToolbar->Show(false);
-    m_toolsSettingsToolbar->Show(false);
-}
-
-void LevelEditorState::onUnpause()
-{
-    m_fileToolbar->Show(true);
-    m_toolsToolbar->Show(true);
-    m_toolsSettingsToolbar->Show(true);
-}
-
 void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 {
     m_desktop.HandleEvent(event);
@@ -327,6 +306,27 @@ void LevelEditorState::doStart()
     m_desktop.Add(m_fileToolbar);
     m_desktop.Add(m_toolsToolbar);
     m_desktop.Add(m_toolsSettingsToolbar);
+}
+
+void LevelEditorState::doStop()
+{
+    m_desktop.Remove(m_fileToolbar);
+    m_desktop.Remove(m_toolsToolbar);
+    m_desktop.Remove(m_toolsSettingsToolbar);
+}
+
+void LevelEditorState::doPause()
+{
+    m_fileToolbar->Show(false);
+    m_toolsToolbar->Show(false);
+    m_toolsSettingsToolbar->Show(false);
+}
+
+void LevelEditorState::doUnpause()
+{
+    m_fileToolbar->Show(true);
+    m_toolsToolbar->Show(true);
+    m_toolsSettingsToolbar->Show(true);
 }
 
 void LevelEditorState::doUpdate(sf::Time dt, sf::RenderTarget &target)

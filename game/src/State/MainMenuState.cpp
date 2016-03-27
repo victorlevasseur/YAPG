@@ -204,33 +204,6 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     m_backgroundSound.setVolume(20.f);
 }
 
-void MainMenuState::onStop()
-{
-    m_backgroundSound.stop();
-
-    m_desktop.Remove(m_mainMenuWindow);
-    m_desktop.Remove(m_settingsWindow);
-}
-
-void MainMenuState::onPause()
-{
-    m_mainMenuWindow->Show(false); //Hide them to be able to show them again when unpaused
-    m_settingsWindow->Show(false);
-
-    m_desktop.Remove(m_mainMenuWindow);
-    m_desktop.Remove(m_settingsWindow);
-    m_desktop.Refresh();
-}
-
-void MainMenuState::onUnpause()
-{
-    m_mainMenuWindow->Show(true); //Show again the main menu when unpaused
-
-    m_desktop.Add(m_mainMenuWindow);
-    m_desktop.Add(m_settingsWindow);
-    m_desktop.Refresh();
-}
-
 void MainMenuState::processEvent(sf::Event event, sf::RenderTarget &target)
 {
     m_desktop.HandleEvent(event);
@@ -297,6 +270,33 @@ void MainMenuState::doStart()
 
     m_desktop.Add(m_mainMenuWindow);
     m_desktop.Add(m_settingsWindow);
+}
+
+void MainMenuState::doStop()
+{
+    m_backgroundSound.stop();
+
+    m_desktop.Remove(m_mainMenuWindow);
+    m_desktop.Remove(m_settingsWindow);
+}
+
+void MainMenuState::doPause()
+{
+    m_mainMenuWindow->Show(false); //Hide them to be able to show them again when unpaused
+    m_settingsWindow->Show(false);
+
+    m_desktop.Remove(m_mainMenuWindow);
+    m_desktop.Remove(m_settingsWindow);
+    m_desktop.Refresh();
+}
+
+void MainMenuState::doUnpause()
+{
+    m_mainMenuWindow->Show(true); //Show again the main menu when unpaused
+
+    m_desktop.Add(m_mainMenuWindow);
+    m_desktop.Add(m_settingsWindow);
+    m_desktop.Refresh();
 }
 
 void MainMenuState::doUpdate(sf::Time dt, sf::RenderTarget &target)

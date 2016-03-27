@@ -26,11 +26,11 @@ public:
 
     void onStart();
 
-    virtual void onStop() {};
+    void onStop();
 
-    virtual void onPause() {};
+    void onPause();
 
-    virtual void onUnpause() {};
+    void onUnpause();
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target) {};
 
@@ -40,6 +40,12 @@ public:
 
 protected:
     virtual void doStart() {};
+
+    virtual void doStop() {};
+
+    virtual void doPause() {};
+
+    virtual void doUnpause() {};
 
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target) {};
 

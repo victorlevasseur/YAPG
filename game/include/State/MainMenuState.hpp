@@ -29,18 +29,18 @@ class MainMenuState : public State
 public:
     MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
 
-    virtual void onStop();
-
-    virtual void onPause();
-
-    virtual void onUnpause();
-
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
     virtual void render(sf::RenderTarget& target);
 
 protected:
     virtual void doStart();
+
+    virtual void doStop();
+
+    virtual void doPause();
+
+    virtual void doUnpause();
 
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);
 

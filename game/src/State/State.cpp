@@ -17,6 +17,21 @@ void State::onStart()
     doStart();
 }
 
+void State::onStop()
+{
+    doStop();
+}
+
+void State::onPause()
+{
+    doPause();
+}
+
+void State::onUnpause()
+{
+    doUnpause();
+}
+
 void State::update(sf::Time dt, sf::RenderTarget &target)
 {
     m_timeSinceStart += dt;
