@@ -76,13 +76,25 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     });
     windowBox->PackEnd(editorButton, true, true);
 
+    auto settingsAboutBox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL);
+    settingsAboutBox->SetSpacing(5.f);
+    windowBox->PackEnd(settingsAboutBox, true, true);
+
     auto settingsButton = sfg::Button::Create("Settings...");
     settingsButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
         m_settingsWindow->Show(true);
         m_desktop.BringToFront(m_settingsWindow);
     });
-    windowBox->PackEnd(settingsButton, true, true);
+    settingsAboutBox->PackEnd(settingsButton, true, true);
+
+    auto aboutButton = sfg::Button::Create("About...");
+    aboutButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+    {
+        m_aboutDialog->Show(true);
+        m_desktop.BringToFront(m_aboutDialog);
+    });
+    settingsAboutBox->PackEnd(aboutButton, true, true);
 
     auto quitButton = sfg::Button::Create("Exit");
     quitButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
@@ -171,6 +183,33 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
         300.f - m_settingsWindow->GetAllocation().height/2.f
     ));
     m_settingsWindow->SetTitle("Settings");
+
+    //About dialog
+    //Settings window
+    m_aboutDialog = sfg::Window::Create(sfg::Window::TOPLEVEL|sfg::Window::SHADOW);
+    m_aboutDialog->SetTitle("About YAPG");
+    m_aboutDialog->Show(false);
+
+    {
+        //TODO: Instanciate about dialog's widgets
+        auto aboutBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
+        aboutBox->SetSpacing(5.f);
+        m_aboutDialog->Add(aboutBox);
+
+        aboutBox->PackEnd(sfg::Label::Create("YAPG - Yet Another Platformer Game\n\nDeveloped by Victor Levasseur\n\nLibraries used :\n - Entityx 1.2\n - Lua\n - SFGUI 0.3.0 (modified)\n - SFML\n - Sol 2.1"));
+
+        auto closeButton = sfg::Button::Create("Close");
+        closeButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+        {
+            m_aboutDialog->Show(false);
+        });
+        aboutBox->PackEnd(closeButton);
+    }
+
+    m_aboutDialog->SetPosition(sf::Vector2f(
+        512.f - m_aboutDialog->GetAllocation().width/2.f,
+        300.f - m_aboutDialog->GetAllocation().height/2.f
+    ));
 
     //Main menu animations
     // - The player
@@ -270,6 +309,7 @@ void MainMenuState::doStart()
 
     m_desktop.Add(m_mainMenuWindow);
     m_desktop.Add(m_settingsWindow);
+    m_desktop.Add(m_aboutDialog);
 }
 
 void MainMenuState::doStop()
@@ -278,15 +318,18 @@ void MainMenuState::doStop()
 
     m_desktop.Remove(m_mainMenuWindow);
     m_desktop.Remove(m_settingsWindow);
+    m_desktop.Remove(m_aboutDialog);
 }
 
 void MainMenuState::doPause()
 {
     m_mainMenuWindow->Show(false); //Hide them to be able to show them again when unpaused
     m_settingsWindow->Show(false);
+    m_aboutDialog->Show(false);
 
     m_desktop.Remove(m_mainMenuWindow);
     m_desktop.Remove(m_settingsWindow);
+    m_desktop.Remove(m_aboutDialog);
     m_desktop.Refresh();
 }
 
@@ -296,6 +339,7 @@ void MainMenuState::doUnpause()
 
     m_desktop.Add(m_mainMenuWindow);
     m_desktop.Add(m_settingsWindow);
+    m_desktop.Add(m_aboutDialog);
     m_desktop.Refresh();
 }
 

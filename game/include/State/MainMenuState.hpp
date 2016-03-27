@@ -66,9 +66,12 @@ private:
     sfg::SFGUI& m_sfgui;
     sfg::Desktop& m_desktop;
     sfg::Window::Ptr m_mainMenuWindow;
+    // - Settings window
     sfg::Window::Ptr m_settingsWindow;
     std::vector<PlayerKeysWidgets> m_playersKeysWidgets;
     sfg::Button::Ptr m_lastSelectedKeyButton;
+    // - About dialog
+    sfg::Window::Ptr m_aboutDialog;
 
     //Menu anim
     // - Player
