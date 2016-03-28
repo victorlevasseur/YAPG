@@ -25,7 +25,7 @@ public:
  * A receiver able to receive a single type of Message.
  * Used internally by the Receiver class.
  */
-template<class MessageType>
+template<typename MessageType>
 class SingleReceiver : public BaseReceiver
 {
 public:
@@ -42,7 +42,7 @@ public:
  *
  * This is the class that should be used by the other classes of the game.
  */
-template<class... MessageTypes>
+template<typename... MessageTypes>
 class Receiver : public SingleReceiver<MessageTypes>...
 {
 public:
@@ -53,11 +53,18 @@ private:
 
 };
 
+class Emitter
+{
+public:
+    template<typename MessageType, typename... Args>
+    void emit(Args... args);
+};
+
 class MessagingManager : public tools::Singleton<MessagingManager>
 {
     friend class tools::Singleton<MessagingManager>;
 
-    template<class MessageType>
+    template<typename MessageType>
     friend class SingleReceiver;
 
 public:
@@ -67,19 +74,19 @@ protected:
     MessagingManager() {};
 
 private:
-    template<class MessageType>
+    template<typename MessageType>
     void subscribe(SingleReceiver<MessageType>& receiver)
     {
         m_receivers[typeid(MessageType)].insert(&receiver);
     }
 
-    template<class MessageType>
+    template<typename MessageType>
     void unsubscribe(SingleReceiver<MessageType>& receiver)
     {
         m_receivers[typeid(MessageType)].erase(&receiver);
     }
 
-    template<class MessageType>
+    template<typename MessageType>
     void send(const MessageType& message)
     {
         for(auto it = m_receivers[typeid(MessageType)].begin(); it != m_receivers[typeid(MessageType)].end(); ++it)

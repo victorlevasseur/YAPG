@@ -10,7 +10,6 @@
 #include "Level/SerializedEntityGetter.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Lua/LuaState.hpp"
-#include "Messaging/Messaging.hpp"
 
 namespace level
 {
