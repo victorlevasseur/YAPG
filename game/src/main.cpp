@@ -9,6 +9,7 @@
 #endif
 
 #include "Lua/LuaState.hpp"
+#include "Messaging/MessagingManager.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
 #include "State/State.hpp"
@@ -20,7 +21,7 @@ namespace fs = boost::filesystem;
 
 int main(int argc, char** argv)
 {
-    
+
 #ifdef OS_LINUX
     //Init GTK
     gtk_init(&argc, &argv);
@@ -58,6 +59,8 @@ int main(int argc, char** argv)
     );
 
     windowManager.run();
+
+    messaging::MessagingManager::kill();
 
     return 0;
 }

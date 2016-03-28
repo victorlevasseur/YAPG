@@ -10,11 +10,12 @@
 #include "Level/SerializedEntityGetter.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Lua/LuaState.hpp"
+#include "Messaging/MessagingManager.hpp"
 
 namespace level
 {
 
-class Level
+class Level : public messaging::Receiver<messaging::TestMessage1, messaging::TestMessage3>
 {
 public:
     enum class LevelMode
@@ -39,6 +40,9 @@ public:
     lua::EntityHandle createNewEntityLua(const std::string& templateName);
 
     static void registerClass(lua::LuaState& luaState);
+
+    virtual void receive(const messaging::TestMessage1& test) {};
+    virtual void receive(const messaging::TestMessage3& test) {};
 
 private:
     lua::LuaState& m_luaState;
