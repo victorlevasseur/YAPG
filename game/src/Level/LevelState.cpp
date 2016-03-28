@@ -48,6 +48,14 @@ void LevelState::render(sf::RenderTarget& target)
     m_systemMgr.system<systems::RenderSystem>()->render(target);
 }
 
+void LevelState::receive(const messaging::AllPlayersFinishedMessage& message)
+{
+    getStateEngine().stopAndStartState
+    <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
+        m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+    );
+}
+
 void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 {
     m_systemMgr.update<systems::PlayerSystem>(dt.asSeconds());
@@ -57,14 +65,6 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
     m_systemMgr.update<systems::CustomBehaviorSystem>(dt.asSeconds());
     m_systemMgr.update<systems::RenderSystem>(dt.asSeconds());
     m_systemMgr.update<systems::FinishLineSystem>(dt.asSeconds());
-
-    if(m_systemMgr.system<systems::FinishLineSystem>()->haveAllPlayersFinished()) //TODO: Rework this with message system
-    {
-        getStateEngine().stopAndStartState
-        <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-            m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
-        );
-    }
 }
 
 }

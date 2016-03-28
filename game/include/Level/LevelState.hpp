@@ -10,6 +10,8 @@
 
 #include "Level/Level.hpp"
 #include "Lua/LuaState.hpp"
+#include "Messaging/LevelMessages.hpp"
+#include "Messaging/Messaging.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
 #include "State/State.hpp"
@@ -19,7 +21,7 @@ namespace state{ class StateEngine; }
 namespace level
 {
 
-class LevelState : public state::State
+class LevelState : public state::State, public messaging::Receiver<messaging::AllPlayersFinishedMessage>
 {
 public:
     LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
@@ -27,6 +29,8 @@ public:
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
     virtual void render(sf::RenderTarget& target);
+
+    virtual void receive(const messaging::AllPlayersFinishedMessage& message) override;
 
 protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);

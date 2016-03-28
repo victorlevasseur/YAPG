@@ -19,6 +19,8 @@ FinishLineSystem::FinishLineSystem() :
 
 void FinishLineSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
 {
+    bool wereAllPlayersFinished = m_allPlayersFinishedLevel;
+
     m_allPlayersFinishedLevel = false;
     es.each<c::HitboxComponent, c::FinishLineComponent>([&](entityx::Entity, c::HitboxComponent&, c::FinishLineComponent&)
     {
@@ -35,6 +37,7 @@ void FinishLineSystem::update(entityx::EntityManager &es, entityx::EventManager 
                 {
                     //The player has collided the finish line.
                     player.finishedLevel = true;
+                    emit<messaging::PlayerFinishedMessage>(player.playerNumber);
                 }
                 else
                 {
@@ -43,6 +46,9 @@ void FinishLineSystem::update(entityx::EntityManager &es, entityx::EventManager 
             }
         });
     });
+
+    if(!wereAllPlayersFinished && m_allPlayersFinishedLevel)
+        emit<messaging::AllPlayersFinishedMessage>();
 }
 
 bool FinishLineSystem::haveAllPlayersFinished() const

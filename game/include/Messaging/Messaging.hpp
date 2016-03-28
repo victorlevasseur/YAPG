@@ -67,6 +67,8 @@ class MessagingManager : public tools::Singleton<MessagingManager>
     template<typename MessageType>
     friend class SingleReceiver;
 
+    friend class Emitter;
+
 public:
     virtual ~MessagingManager() {};
 
@@ -100,6 +102,7 @@ private:
 
 }
 
+#include "Messaging/Emitter.inl"
 #include "Messaging/Receiver.inl"
 
 #endif

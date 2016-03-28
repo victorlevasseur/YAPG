@@ -3,12 +3,14 @@
 
 #include "entityx/entityx.h"
 
+#include "Messaging/LevelMessages.hpp"
+#include "Messaging/Messaging.hpp"
 #include "Tools/Observable.hpp"
 
 namespace systems
 {
 
-class FinishLineSystem : public entityx::System<FinishLineSystem>
+class FinishLineSystem : public entityx::System<FinishLineSystem>, public messaging::Emitter
 {
 public:
     FinishLineSystem();
