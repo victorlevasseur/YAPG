@@ -10,21 +10,7 @@ class Singleton
 public:
     static Derived& getInstance()
     {
-        if(!instance)
-        {
-            instance = new Derived();
-        }
-
-        return *instance;
-    }
-
-    static void kill()
-    {
-        if(instance)
-        {
-            delete instance;
-            instance = nullptr;
-        }
+        return instance;
     }
 
 protected:
@@ -32,11 +18,11 @@ protected:
 
 private:
 
-    static Derived* instance;
+    static Derived instance;
 };
 
 template<class Derived>
-Derived* Singleton<Derived>::instance = nullptr;
+Derived Singleton<Derived>::instance = Derived();
 
 }
 
