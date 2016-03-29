@@ -3,20 +3,20 @@
 
 #include "entityx/entityx.h"
 
-namespace systems{ class CollisionSystem; }
+#include "Messaging/Messaging.hpp"
 
 namespace systems
 {
 
-class PlatformerSystem : public entityx::System<PlatformerSystem>
+class PlatformerSystem : public entityx::System<PlatformerSystem>, public messaging::Emitter
 {
 public:
-    PlatformerSystem(CollisionSystem& collisionSystem);
+    PlatformerSystem();
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
 private:
-    CollisionSystem& m_collisionSystem;
+
 };
 
 }

@@ -27,7 +27,7 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_systemMgr.add<systems::RenderSystem>(resourcesManager.getTextures());
     m_systemMgr.add<systems::CustomBehaviorSystem>();
     m_systemMgr.add<systems::CollisionSystem>();
-    m_systemMgr.add<systems::PlatformerSystem>(*(m_systemMgr.system<systems::CollisionSystem>()));
+    m_systemMgr.add<systems::PlatformerSystem>();
     m_systemMgr.add<systems::HitboxUpdaterSystem>();
     m_systemMgr.add<systems::PlayerSystem>(settingsManager);
     m_systemMgr.add<systems::FinishLineSystem>();

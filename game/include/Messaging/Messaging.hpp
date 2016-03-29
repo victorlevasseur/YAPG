@@ -5,7 +5,6 @@
 #include <set>
 #include <typeindex>
 
-#include "Messaging/Message.hpp"
 #include "Tools/Singleton.hpp"
 namespace messaging
 {

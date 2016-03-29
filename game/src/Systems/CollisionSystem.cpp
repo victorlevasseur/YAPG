@@ -102,14 +102,14 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
     m_declaredCollisions.clear();
 }
 
-void CollisionSystem::declareCollision(entityx::Entity collider, entityx::Entity collidable)
+void CollisionSystem::receive(const ExtraSystemCollisionMessage& collisionMessage)
 {
     //Check if they are respectively the ColliderComponent and the CollidableComponent
-    if(collider.has_component<c::ColliderComponent>() && collidable.has_component<c::CollidableComponent>())
+    if(collisionMessage.collider.has_component<c::ColliderComponent>() && collisionMessage.collidable.has_component<c::CollidableComponent>())
     {
-        if(std::find(m_declaredCollisions.begin(), m_declaredCollisions.end(), std::make_pair(collider, collidable)) == m_declaredCollisions.end())
+        if(std::find(m_declaredCollisions.begin(), m_declaredCollisions.end(), std::make_pair(collisionMessage.collider, collisionMessage.collidable)) == m_declaredCollisions.end())
         {
-            m_declaredCollisions.push_back(std::make_pair(collider, collidable));
+            m_declaredCollisions.push_back(std::make_pair(collisionMessage.collider, collisionMessage.collidable));
         }
     }
 }

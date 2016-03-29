@@ -22,9 +22,8 @@ namespace e = entityx;
 namespace systems
 {
 
-PlatformerSystem::PlatformerSystem(CollisionSystem& collisionSystem) :
-    entityx::System<PlatformerSystem>(),
-    m_collisionSystem(collisionSystem)
+PlatformerSystem::PlatformerSystem() :
+    entityx::System<PlatformerSystem>()
 {
 
 }
@@ -273,7 +272,7 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
             auto collidedPlatforms = GetCollidingObstacles(polygon, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::All);
             for(auto& platform : collidedPlatforms)
             {
-                m_collisionSystem.declareCollision(entity, platform);
+                emit<ExtraSystemCollisionMessage>(entity, platform);
             }
         }
 
@@ -363,7 +362,7 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
             auto collidedPlatforms = GetCollidingObstacles(polygon, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::All);
             for(auto& platform : collidedPlatforms)
             {
-                m_collisionSystem.declareCollision(entity, platform);
+                emit<ExtraSystemCollisionMessage>(entity, platform);
             }
         }
 
