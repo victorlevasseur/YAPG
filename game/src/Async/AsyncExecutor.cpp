@@ -1,5 +1,7 @@
 #include "Async/AsyncExecutor.hpp"
 
+#include <iostream>
+
 namespace async
 {
 
@@ -15,7 +17,7 @@ void AsyncExecutor::update(sf::Time dt)
     for(auto it = m_pendingTasks.begin(); it != m_pendingTasks.end(); ++it)
     {
         //Test if its previous task is finished
-        if(m_pendingTasks.count(it->second.nextTo) == 0 || m_pendingTasks.at(it->second.nextTo).task->isFinished())
+        if(it->second.nextTo != NO_TASK && (m_pendingTasks.count(it->second.nextTo) == 0 || m_pendingTasks.at(it->second.nextTo).task->isFinished()))
         {
             it->second.nextTo = NO_TASK;
         }

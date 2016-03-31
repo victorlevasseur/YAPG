@@ -15,10 +15,11 @@ public:
 
     virtual void onStart();
 
-    virtual bool isFinished() const { return true; }
+    virtual bool isFinished() const { return m_finished; }
 
 private:
     std::function<void()> m_function;
+    bool m_finished;
 };
 
 }

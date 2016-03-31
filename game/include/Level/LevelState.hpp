@@ -8,6 +8,8 @@
 #include <SFGUI/Desktop.hpp>
 #include <SFGUI/SFGUI.hpp>
 
+#include "Async/AsyncExecutor.hpp"
+#include "Async/PunctualTask.hpp"
 #include "Level/Level.hpp"
 #include "Lua/LuaState.hpp"
 #include "Messaging/LevelMessages.hpp"
@@ -45,6 +47,8 @@ private:
     settings::SettingsManager& m_settingsManager;
     sfg::SFGUI& m_sfgui;
     sfg::Desktop& m_desktop;
+
+    async::AsyncExecutor m_asyncExecutor;
 };
 
 }

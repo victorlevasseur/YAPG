@@ -28,13 +28,13 @@ public:
     void update(sf::Time dt);
 
     template<typename TaskType, typename... Args>
-    typename std::enable_if<std::is_base_of<Task, TaskType>::value, TaskId>::typeTaskId
-    addNewTask(Args... args, sf::Time time, TaskId nextTo = NO_TASK)
+    typename std::enable_if<std::is_base_of<Task, TaskType>::value, TaskId>::type
+    addNewTask(Args... args, sf::Time t, TaskId nextTo = NO_TASK)
     {
         m_pendingTasks[m_nextId] = PendingTask{
-            std::make_unique<TaskType>(args...),
-            time,
-            nextTo
+            nextTo,
+            t,
+            std::make_unique<TaskType>(args...)
         };
 
         return m_nextId++;

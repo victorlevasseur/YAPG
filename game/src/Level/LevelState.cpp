@@ -1,5 +1,7 @@
 #include "Level/LevelState.hpp"
 
+#include <SFML/System/Time.hpp>
+
 #include "State/MainMenuState.hpp"
 #include "State/StateEngine.hpp"
 
@@ -22,7 +24,8 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
     m_sfgui(sfgui),
-    m_desktop(desktop)
+    m_desktop(desktop),
+    m_asyncExecutor()
 {
     m_systemMgr.add<systems::RenderSystem>(resourcesManager.getTextures());
     m_systemMgr.add<systems::CustomBehaviorSystem>();
@@ -50,9 +53,16 @@ void LevelState::render(sf::RenderTarget& target)
 
 void LevelState::receive(const messaging::AllPlayersFinishedMessage& message)
 {
-    getStateEngine().stopAndStartState
-    <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-        m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+    m_asyncExecutor.addNewTask<async::PunctualTask, std::function<void()>>
+    (
+        [&]()
+        {
+            getStateEngine().stopAndStartState
+            <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
+                m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+            );
+        },
+        sf::seconds(3.f)
     );
 }
 
@@ -65,6 +75,8 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
     m_systemMgr.update<systems::CustomBehaviorSystem>(dt.asSeconds());
     m_systemMgr.update<systems::RenderSystem>(dt.asSeconds());
     m_systemMgr.update<systems::FinishLineSystem>(dt.asSeconds());
+
+    m_asyncExecutor.update(dt);
 }
 
 }
