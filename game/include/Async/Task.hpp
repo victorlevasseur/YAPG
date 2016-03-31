@@ -3,29 +3,26 @@
 
 #include <functional>
 
+#include <SFML/System/Time.hpp>
+
 namespace async
 {
 
 class Task
 {
 public:
-    Task(
-        const std::function<void()>& startFunction,
-        float duration = 0.f,
-        const std::function<void(float)>& updateFunction = std::function<void(float)>(),
-        const std::function<void()>& endFunction = std::function<void()>());
+    Task();
 
-    float getDuration() const;
+    virtual void onStart() {};
+    virtual void onUpdate(sf::Time dt) {};
+    virtual void onEnd() {};
 
-    void onStart();
-    void onUpdate(float dt);
-    void onEnd();
+    virtual bool isFinished() const = 0;
 
 private:
     std::function<void()> m_startFunction;
     std::function<void(float)> m_updateFunction;
     std::function<void()> m_endFunction;
-    float m_duration;
 };
 
 }

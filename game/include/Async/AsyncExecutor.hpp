@@ -2,6 +2,11 @@
 #define YAPG_GAME_ASYNC_ASYNCEXECUTOR_H
 
 #include <map>
+#include <memory>
+
+#include <SFML/System/Time.hpp>
+
+#include "Async/Task.hpp"
 
 namespace async
 {
@@ -10,6 +15,7 @@ class AsyncExecutor
 {
 public:
     using TaskId = unsigned int;
+    static const TaskId NO_TASK = static_cast<TaskId>(-1);
 
     AsyncExecutor();
 
@@ -19,7 +25,18 @@ public:
     AsyncExecutor(AsyncExecutor&&) = delete;
     AsyncExecutor& operator=(AsyncExecutor&&) = delete;
 
+    void update(sf::Time dt);
+
 private:
+    struct PendingTask
+    {
+        TaskId nextTo; ///< If not noTask (-1), the task will be executed after the task registered by this id.
+        sf::Time t; ///< The duration to wait before executing the task.
+
+        std::unique_ptr<Task> task; ///< The task to execute
+    };
+
+    std::map<TaskId, PendingTask> m_pendingTasks;
 };
 
 }
