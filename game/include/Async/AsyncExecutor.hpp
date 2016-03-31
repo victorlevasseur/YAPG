@@ -27,6 +27,19 @@ public:
 
     void update(sf::Time dt);
 
+    template<typename TaskType, typename... Args>
+    typename std::enable_if<std::is_base_of<Task, TaskType>::value, TaskId>::typeTaskId
+    addNewTask(Args... args, sf::Time time, TaskId nextTo = NO_TASK)
+    {
+        m_pendingTasks[m_nextId] = PendingTask{
+            std::make_unique<TaskType>(args...),
+            time,
+            nextTo
+        };
+
+        return m_nextId++;
+    }
+
 private:
     struct PendingTask
     {
@@ -37,6 +50,7 @@ private:
     };
 
     std::map<TaskId, PendingTask> m_pendingTasks;
+    TaskId m_nextId;
 };
 
 }

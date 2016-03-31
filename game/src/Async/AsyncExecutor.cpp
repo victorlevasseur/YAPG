@@ -4,7 +4,8 @@ namespace async
 {
 
 AsyncExecutor::AsyncExecutor() :
-    m_pendingTasks()
+    m_pendingTasks(),
+    m_nextId(0)
 {
 
 }
