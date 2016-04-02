@@ -27,7 +27,7 @@ void StateEngine::stopStateAndUnpause()
         }
 
         //If there's still a state remaining, unpause it
-        if(m_states.size() > 1)
+        if(m_states.size() > 0)
         {
             m_states.top()->onUnpause();
         }

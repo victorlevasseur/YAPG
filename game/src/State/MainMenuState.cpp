@@ -57,7 +57,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     auto playLevelButton = sfg::Button::Create("Play it!");
     playLevelButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind([&](sfg::Entry::PtrConst levelPathEntry)
     {
-        getStateEngine().stopAndStartState
+        getStateEngine().pauseAndStartState
             <level::LevelState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
             levelPathEntry->GetText(), m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
         );
@@ -69,7 +69,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     auto editorButton = sfg::Button::Create("Level editor...");
     editorButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
-        getStateEngine().stopAndStartState
+        getStateEngine().pauseAndStartState
             <editor::LevelEditorState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
             m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
         );
@@ -323,6 +323,8 @@ void MainMenuState::doStop()
 
 void MainMenuState::doPause()
 {
+    m_backgroundSound.stop();
+
     m_mainMenuWindow->Show(false); //Hide them to be able to show them again when unpaused
     m_settingsWindow->Show(false);
     m_aboutDialog->Show(false);
@@ -335,12 +337,14 @@ void MainMenuState::doPause()
 
 void MainMenuState::doUnpause()
 {
-    m_mainMenuWindow->Show(true); //Show again the main menu when unpaused
+    m_backgroundSound.play();
 
     m_desktop.Add(m_mainMenuWindow);
     m_desktop.Add(m_settingsWindow);
     m_desktop.Add(m_aboutDialog);
     m_desktop.Refresh();
+
+    m_mainMenuWindow->Show(true); //Show again the main menu when unpaused
 }
 
 void MainMenuState::doUpdate(sf::Time dt, sf::RenderTarget &target)

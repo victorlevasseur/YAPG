@@ -57,10 +57,7 @@ void LevelState::receive(const messaging::AllPlayersFinishedMessage& message)
     (
         [&]()
         {
-            getStateEngine().stopAndStartState
-            <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-                m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
-            );
+            getStateEngine().stopStateAndUnpause();
         },
         sf::seconds(3.f)
     );

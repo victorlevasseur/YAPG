@@ -372,10 +372,7 @@ void LevelEditorState::initGUI()
         auto backButton = sfg::Button::Create("Return to menu");
         backButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
         {
-            getStateEngine().stopAndStartState
-            <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-                m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
-            );
+            getStateEngine().stopStateAndUnpause();
         });
         fileBox->PackEnd(backButton);
     }
