@@ -9,37 +9,6 @@
 namespace async
 {
 
-template<typename FunctionType, typename... Args>
-struct FunctionCaller
-{
-    static void call(FunctionType& function, Args... args)
-    {
-
-    }
-};
-
-template<typename... Args>
-struct FunctionCaller<std::function<void(Args...)>, Args...>
-{
-    using FunctionType = std::function<void(Args...)>;
-
-    static void call(FunctionType& function, Args... args)
-    {
-        function(std::forward(args)...);
-    }
-};
-
-template<typename... Args>
-struct FunctionCaller<sol::function, Args...>
-{
-    using FunctionType = sol::function;
-
-    static void call(FunctionType& function, Args... args)
-    {
-        function(std::forward(args)...);
-    }
-};
-
 template<typename StartFunctionType, typename EndFunctionType, typename UpdateFunctionType>
 class FixedDurationTask : public Task
 {
@@ -56,18 +25,18 @@ public:
 
     virtual void onStart()
     {
-        FunctionCaller<StartFunctionType>::call();
+        m_startFunction();
     }
 
     virtual void onUpdate(sf::Time dt)
     {
         m_timeSinceStart += dt;
-        FunctionCaller<UpdateFunctionType, sf::Time>::call(dt);
+        m_updateFunction(dt);
     }
 
     virtual void onEnd()
     {
-        FunctionCaller<EndFunctionType>::call();
+        m_endFunction();
     }
 
     virtual bool isFinished() const
