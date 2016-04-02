@@ -196,7 +196,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
         aboutBox->SetSpacing(5.f);
         m_aboutDialog->Add(aboutBox);
 
-        aboutBox->PackEnd(sfg::Label::Create("YAPG - Yet Another Platformer Game\n\nDeveloped by Victor Levasseur\n\nLibraries used :\n - Entityx 1.2\n - Lua\n - SFGUI 0.3.0 (modified)\n - SFML\n - Sol 2.1"));
+        aboutBox->PackEnd(sfg::Label::Create("YAPG - Yet Another Platformer Game\n\nDeveloped by Victor Levasseur\n\nLibraries used :\n - Entityx 1.2\n - Lua\n - SFGUI 0.3.0 (modified)\n - SFML\n - Sol 2.3"));
 
         auto closeButton = sfg::Button::Create("Close");
         closeButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()

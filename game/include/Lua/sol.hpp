@@ -20,8 +20,8 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // This file was generated with a script.
-// Generated 2016-03-25 15:05:09.950966 UTC
-// This header was generated with sol v2.1.0 (revision cd1e085)
+// Generated 2016-03-31 20:37:13.816874 UTC
+// This header was generated with sol v2.3.0 (revision c087ca3)
 // https://github.com/ThePhD/sol2
 
 #ifndef SOL_SINGLE_INCLUDE_HPP
@@ -37,9 +37,14 @@
 #include <string>
 
 namespace sol {
+namespace detail {
+struct direct_error_tag {};
+const auto direct_error = direct_error_tag{};
+} // detail
 class error : public std::runtime_error {
 public:
     error(const std::string& str): std::runtime_error("lua: error: " + str) {}
+    error(detail::direct_error_tag, const std::string& str) : std::runtime_error(str) {}
 };
 } // sol
 
@@ -64,7 +69,7 @@ using swallow = std::initializer_list<int>;
 } // detail
 
 template<typename... Args>
-struct types { typedef std::index_sequence_for<Args...> indices; static constexpr std::size_t size() { return sizeof...(Args); } }; 
+struct types { typedef std::make_index_sequence<sizeof...(Args)> indices; static constexpr std::size_t size() { return sizeof...(Args); } };
 namespace meta {
 namespace detail {
 template<typename... Args>
@@ -207,17 +212,17 @@ struct at_in_pack<I, Arg, Args...> : std::conditional<I == 0, Arg, at_in_pack_t<
 
 namespace meta_detail {
     template<std::size_t I, template<typename...> class Pred, typename... Ts>
-    struct count_if_pack {};
+    struct count_if_pack : std::integral_constant<std::size_t, 0> {};
     template<std::size_t I, template<typename...> class Pred, typename T, typename... Ts>
-    struct count_if_pack<I, Pred, T, Ts...> : std::conditional_t<sizeof...(Ts) == 0, 
+    struct count_if_pack<I, Pred, T, Ts...> : std::conditional_t<sizeof...(Ts) == 0,
         std::integral_constant<std::size_t, I + static_cast<std::size_t>(Pred<T>::value)>,
         count_if_pack<I + static_cast<std::size_t>(Pred<T>::value), Pred, Ts...>
     > { };
     template<std::size_t I, template<typename...> class Pred, typename... Ts>
-    struct count_if_2_pack {};
+    struct count_if_2_pack : std::integral_constant<std::size_t, 0> {};
     template<std::size_t I, template<typename...> class Pred, typename T, typename U, typename... Ts>
-    struct count_if_2_pack<I, Pred, T, U, Ts...> : std::conditional_t<sizeof...(Ts) == 0, 
-        std::integral_constant<std::size_t, I + static_cast<std::size_t>(Pred<T>::value)>, 
+    struct count_if_2_pack<I, Pred, T, U, Ts...> : std::conditional_t<sizeof...(Ts) == 0,
+        std::integral_constant<std::size_t, I + static_cast<std::size_t>(Pred<T>::value)>,
         count_if_2_pack<I + static_cast<std::size_t>(Pred<T>::value), Pred, Ts...>
     > { };
 } // meta_detail
@@ -303,6 +308,7 @@ template<typename T>
 struct Function : Bool<meta_detail::is_function_impl<T>::value> {};
 
 namespace meta_detail {
+
 template<typename Signature, bool b = has_deducible_signature<Signature>::value>
 struct fx_traits;
 
@@ -315,6 +321,7 @@ template<typename T, typename R, typename... Args>
 struct fx_traits<R(T::*)(Args...), false> {
     static const std::size_t arity = sizeof...(Args);
     static const bool is_member_function = true;
+    typedef T object_type;
     typedef std::tuple<Args...> args_tuple_type;
     typedef types<Args...> args_type;
     typedef R(T::* function_pointer_type)(Args...);
@@ -330,6 +337,7 @@ template<typename T, typename R, typename... Args>
 struct fx_traits<R(T::*)(Args...) const, false> {
     static const std::size_t arity = sizeof...(Args);
     static const bool is_member_function = true;
+    typedef T object_type;
     typedef std::tuple<Args...> args_tuple_type;
     typedef types<Args...> args_type;
     typedef R(T::* function_pointer_type)(Args...);
@@ -371,31 +379,16 @@ struct fx_traits<R(*)(Args...), false> {
     using arg = meta::tuple_element_t<i, args_tuple_type>;
 };
 
-} // meta_detail
-
-template<typename Signature>
-struct function_traits : meta_detail::fx_traits<std::decay_t<Signature>> {};
-
-template<typename Signature>
-using function_args_t = typename function_traits<Signature>::args_type;
-
-template<typename Signature>
-using function_signature_t = typename function_traits<Signature>::signature_type;
-
-template<typename Signature>
-using function_return_t = typename function_traits<Signature>::return_type;
-
-namespace meta_detail {
 template<typename Signature, bool b = std::is_member_object_pointer<Signature>::value>
-struct callable_traits : function_traits<Signature> {
+struct callable_traits : fx_traits<std::decay_t<Signature>> {
 
 };
 
-template<typename Signature>
-struct callable_traits<Signature, true> {
-    typedef typename remove_member_pointer<Signature>::type Arg;
-    typedef typename remove_member_pointer<Signature>::type R;
-    typedef Signature signature_type;
+template<typename R, typename T>
+struct callable_traits<R(T::*), true> {
+    typedef R Arg;
+    typedef T object_type;
+    using signature_type = R(T::*);
     static const bool is_member_function = false;
     static const std::size_t arity = 1;
     typedef std::tuple<Arg> args_tuple_type;
@@ -410,9 +403,16 @@ struct callable_traits<Signature, true> {
 } // meta_detail
 
 template<typename Signature>
-struct callable_traits : meta_detail::callable_traits<std::remove_volatile_t<Signature>> {
+struct bind_traits : meta_detail::callable_traits<std::remove_volatile_t<Signature>> {};
 
-};
+template<typename Signature>
+using function_args_t = typename bind_traits<Signature>::args_type;
+
+template<typename Signature>
+using function_signature_t = typename bind_traits<Signature>::signature_type;
+
+template<typename Signature>
+using function_return_t = typename bind_traits<Signature>::return_type;
 
 struct has_begin_end_impl {
     template<typename T, typename U = Unqualified<T>,
@@ -445,12 +445,16 @@ template <typename T>
 using is_string_constructible = Or<std::is_same<Unqualified<T>, const char*>, std::is_same<Unqualified<T>, char>, std::is_same<Unqualified<T>, std::string>, std::is_same<Unqualified<T>, std::initializer_list<char>>>;
 
 template <typename T>
-using is_c_str = Or<std::is_same<std::decay_t<Unqualified<T>>, char*>, std::is_same<Unqualified<T>, std::string>>;
+using is_c_str = Or<
+    std::is_same<std::decay_t<Unqualified<T>>, const char*>,
+    std::is_same<std::decay_t<Unqualified<T>>, char*>,
+    std::is_same<Unqualified<T>, std::string>
+>;
 
 namespace meta_detail {
 template <typename T, meta::DisableIf<meta::is_specialization_of<meta::Unqualified<T>, std::tuple>> = 0>
 decltype(auto) force_tuple(T&& x) {
-    return std::forward_as_tuple(x);
+    return std::forward_as_tuple(std::forward<T>(x));
 }
 
 template <typename T, meta::EnableIf<meta::is_specialization_of<meta::Unqualified<T>, std::tuple>> = 0>
@@ -461,13 +465,24 @@ decltype(auto) force_tuple(T&& x) {
 
 template <typename... X>
 decltype(auto) tuplefy(X&&... x ) {
-    return std::tuple_cat(meta_detail::force_tuple(x)...);
+    return std::tuple_cat(meta_detail::force_tuple(std::forward<X>(x))...);
 }
 } // meta
 namespace detail {
 template <std::size_t I, typename Tuple>
 decltype(auto) forward_get( Tuple&& tuple ) {
     return std::forward<meta::tuple_element_t<I, Tuple>>(std::get<I>(tuple));
+}
+
+template <std::size_t... I, typename Tuple>
+auto forward_tuple_impl( std::index_sequence<I...>, Tuple&& tuple ) -> decltype(std::tuple<decltype(forward_get<I>(tuple))...>(forward_get<I>(tuple)...)) {
+    return std::tuple<decltype(forward_get<I>(tuple))...>(std::move(std::get<I>(tuple))...);
+}
+
+template <typename Tuple>
+auto forward_tuple( Tuple&& tuple ) {
+    auto x = forward_tuple_impl(std::make_index_sequence<std::tuple_size<meta::Unqualified<Tuple>>::value>(), std::forward<Tuple>(tuple));
+    return x;
 }
 
 template<typename T>
@@ -555,7 +570,7 @@ inline T* ptr(T* val) {
 #define SOL_LUA_VERSION 500
 #else
 #define SOL_LUA_VERSION 502
-#endif // Lua Version 502, 501 || luajit, 500 
+#endif // Lua Version 502, 501 || luajit, 500
 
 #ifdef _MSC_VER
 #ifdef _DEBUG
@@ -1079,7 +1094,11 @@ inline int luaL_fileresult(lua_State *L, int stat, const char *fname) {
     }
     else {
         char buf[1024];
+#ifdef __GLIBC__
+        strerror_r(en, buf, 1024);
+#else
         strerror_s(buf, 1024, en);
+#endif
         lua_pushnil(L);
         if (fname)
             lua_pushfstring(L, "%s: %s", fname, buf);
@@ -1580,8 +1599,8 @@ namespace sol{
 # elif defined TR2_OPTIONAL_DISABLE_EMULATION_OF_TYPE_TRAITS
     // leave it: the user doesn't want it
 # else
-	template <typename T>
-	using is_trivially_destructible = std::has_trivial_destructor<T>;
+    template <typename T>
+    using is_trivially_destructible = std::has_trivial_destructor<T>;
 # endif
 
 # if (defined TR2_OPTIONAL_GCC_4_7_AND_HIGHER___)
@@ -1665,7 +1684,7 @@ struct has_overloaded_addressof
 {
   template <class X>
   constexpr static bool has_overload(...) { return false; }
-  
+
   template <class X, size_t S = sizeof(::std::declval<X&>().operator&()) >
   constexpr static bool has_overload(bool) { return true; }
 
@@ -1686,7 +1705,7 @@ T* static_addressof(T& ref)
 
 template <class U>
 U convert(U v) { return v; }
-  
+
 } // namespace detail
 
 constexpr struct trivial_init_t{} trivial_init{};
@@ -1790,11 +1809,11 @@ class optional : private OptionalBase<T>
 {
   static_assert( !std::is_same<typename std::decay<T>::type, nullopt_t>::value, "bad T" );
   static_assert( !std::is_same<typename std::decay<T>::type, in_place_t>::value, "bad T" );
-  
+
   constexpr bool initialized() const noexcept { return OptionalBase<T>::init_; }
   T* dataptr() {  return std::addressof(OptionalBase<T>::storage_.value_); }
   constexpr const T* dataptr() const { return detail_::static_addressof(OptionalBase<T>::storage_.value_); }
-  
+
 # if OPTIONAL_HAS_THIS_RVALUE_REFS == 1
   constexpr const T& contained_val() const& { return OptionalBase<T>::storage_.value_; }
 #   if OPTIONAL_HAS_MOVE_ACCESSORS == 1
@@ -1813,7 +1832,7 @@ class optional : private OptionalBase<T>
     if (initialized()) dataptr()->T::~T();
     OptionalBase<T>::init_ = false;
   }
-  
+
   template <class... Args>
   void initialize(Args&&... args) noexcept(noexcept(T(::std::forward<Args>(args)...)))
   {
@@ -1876,7 +1895,7 @@ public:
     clear();
     return *this;
   }
-  
+
   optional& operator=(const optional& rhs)
   {
     if      (initialized() == true  && rhs.initialized() == false) clear();
@@ -1884,7 +1903,7 @@ public:
     else if (initialized() == true  && rhs.initialized() == true)  contained_val() = *rhs;
     return *this;
   }
-  
+
   optional& operator=(optional&& rhs)
   noexcept(::std::is_nothrow_move_assignable<T>::value && ::std::is_nothrow_move_constructible<T>::value)
   {
@@ -1906,21 +1925,21 @@ public:
     else               { initialize(::std::forward<U>(v));  }
     return *this;
   }
-  
+
   template <class... Args>
   void emplace(Args&&... args)
   {
     clear();
     initialize(::std::forward<Args>(args)...);
   }
-  
+
   template <class U, class... Args>
   void emplace(::std::initializer_list<U> il, Args&&... args)
   {
     clear();
     initialize<U, Args...>(il, std::forward<Args>(args)...);
   }
-  
+
   // 20.5.4.4, Swap
   void swap(optional<T>& rhs) noexcept(::std::is_nothrow_move_constructible<T>::value && noexcept(::std::swap(::std::declval<T&>(), ::std::declval<T&>())))
   {
@@ -1930,29 +1949,29 @@ public:
   }
 
   // 20.5.4.5, Observers
-  
+
   explicit constexpr operator bool() const noexcept { return initialized(); }
-  
+
   constexpr T const* operator ->() const {
     return TR2_OPTIONAL_ASSERTED_EXPRESSION(initialized(), dataptr());
   }
-  
+
 # if OPTIONAL_HAS_MOVE_ACCESSORS == 1
 
   OPTIONAL_MUTABLE_CONSTEXPR T* operator ->() {
     assert (initialized());
     return dataptr();
   }
-  
+
   constexpr T const& operator *() const& {
     return TR2_OPTIONAL_ASSERTED_EXPRESSION(initialized(), contained_val());
   }
-  
+
   OPTIONAL_MUTABLE_CONSTEXPR T& operator *() & {
     assert (initialized());
     return contained_val();
   }
-  
+
   OPTIONAL_MUTABLE_CONSTEXPR T&& operator *() && {
     assert (initialized());
     return constexpr_move(contained_val());
@@ -1961,42 +1980,42 @@ public:
   constexpr T const& value() const& {
     return initialized() ? contained_val() : (throw bad_optional_access("bad optional access"), contained_val());
   }
-  
+
   OPTIONAL_MUTABLE_CONSTEXPR T& value() & {
     return initialized() ? contained_val() : (throw bad_optional_access("bad optional access"), contained_val());
   }
-  
+
   OPTIONAL_MUTABLE_CONSTEXPR T&& value() && {
     if (!initialized()) throw bad_optional_access("bad optional access");
-	return ::std::move(contained_val());
+    return ::std::move(contained_val());
   }
-  
+
 # else
 
   T* operator ->() {
     assert (initialized());
     return dataptr();
   }
-  
+
   constexpr T const& operator *() const {
     return TR2_OPTIONAL_ASSERTED_EXPRESSION(initialized(), contained_val());
   }
-  
+
   T& operator *() {
     assert (initialized());
     return contained_val();
   }
-  
+
   constexpr T const& value() const {
     return initialized() ? contained_val() : (throw bad_optional_access("bad optional access"), contained_val());
   }
-  
+
   T& value() {
     return initialized() ? contained_val() : (throw bad_optional_access("bad optional access"), contained_val());
   }
-  
+
 # endif
-  
+
 # if OPTIONAL_HAS_THIS_RVALUE_REFS == 1
 
   template <class V>
@@ -2004,7 +2023,7 @@ public:
   {
     return *this ? **this : detail_::convert<T>(constexpr_forward<V>(v));
   }
-  
+
 #   if OPTIONAL_HAS_MOVE_ACCESSORS == 1
 
   template <class V>
@@ -2014,17 +2033,17 @@ public:
   }
 
 #   else
- 
+
   template <class V>
   T value_or(V&& v) &&
   {
     return *this ? constexpr_move(const_cast<optional<T>&>(*this).contained_val()) : detail_::convert<T>(constexpr_forward<V>(v));
   }
-  
+
 #   endif
-  
+
 # else
-  
+
   template <class V>
   constexpr T value_or(V&& v) const
   {
@@ -2041,43 +2060,43 @@ class optional<T&>
   static_assert( !std::is_same<T, nullopt_t>::value, "bad T" );
   static_assert( !std::is_same<T, in_place_t>::value, "bad T" );
   T* ref;
-  
+
 public:
   typedef T& value_type;
 
   // 20.5.5.1, construction/destruction
   constexpr optional() noexcept : ref(nullptr) {}
-  
+
   constexpr optional(nullopt_t) noexcept : ref(nullptr) {}
-   
+
   constexpr optional(T& v) noexcept : ref(detail_::static_addressof(v)) {}
-  
+
   optional(T&&) = delete;
-  
+
   constexpr optional(const optional& rhs) noexcept : ref(rhs.ref) {}
-  
+
   explicit constexpr optional(in_place_t, T& v) noexcept : ref(detail_::static_addressof(v)) {}
-  
+
   explicit optional(in_place_t, T&&) = delete;
-  
+
   ~optional() = default;
-  
+
   // 20.5.5.2, mutation
   optional& operator=(nullopt_t) noexcept {
     ref = nullptr;
     return *this;
   }
-  
+
   // optional& operator=(const optional& rhs) noexcept {
     // ref = rhs.ref;
     // return *this;
   // }
-  
+
   // optional& operator=(optional&& rhs) noexcept {
     // ref = rhs.ref;
     // return *this;
   // }
-  
+
   template <typename U>
   auto operator=(U&& rhs) noexcept
   -> typename ::std::enable_if
@@ -2089,7 +2108,7 @@ public:
     ref = rhs.ref;
     return *this;
   }
-  
+
   template <typename U>
   auto operator=(U&& rhs) noexcept
   -> typename ::std::enable_if
@@ -2098,35 +2117,35 @@ public:
     optional&
   >::type
   = delete;
-  
+
   void emplace(T& v) noexcept {
     ref = detail_::static_addressof(v);
   }
-  
+
   void emplace(T&&) = delete;
-  
+
   void swap(optional<T&>& rhs) noexcept
   {
     ::std::swap(ref, rhs.ref);
   }
-    
+
   // 20.5.5.3, observers
   constexpr T* operator->() const {
     return TR2_OPTIONAL_ASSERTED_EXPRESSION(ref, ref);
   }
-  
+
   constexpr T& operator*() const {
     return TR2_OPTIONAL_ASSERTED_EXPRESSION(ref, *ref);
   }
-  
+
   constexpr T& value() const {
     return ref ? *ref : (throw bad_optional_access("bad optional access"), *ref);
   }
-  
+
   explicit constexpr operator bool() const noexcept {
     return ref != nullptr;
   }
-  
+
   template <class V>
   constexpr typename ::std::decay<T>::type value_or(V&& v) const
   {
@@ -2437,18 +2456,18 @@ namespace std
   {
     typedef typename hash<T>::result_type result_type;
     typedef sol::optional<T> argument_type;
-    
+
     constexpr result_type operator()(argument_type const& arg) const {
       return arg ? std::hash<T>{}(*arg) : result_type{};
     }
   };
-  
+
   template <typename T>
   struct hash<sol::optional<T&>>
   {
     typedef typename hash<T>::result_type result_type;
     typedef sol::optional<T&> argument_type;
-    
+
     constexpr result_type operator()(argument_type const& arg) const {
       return arg ? std::hash<T>{}(*arg) : result_type{};
     }
@@ -2537,6 +2556,8 @@ const nil_t nil {};
 inline bool operator==(nil_t, nil_t) { return true; }
 inline bool operator!=(nil_t, nil_t) { return false; }
 
+typedef std::add_lvalue_reference_t<std::remove_pointer_t<lua_CFunction>> lua_r_CFunction;
+
 template <typename T, typename = void>
 struct unique_usertype {};
 
@@ -2610,7 +2631,10 @@ enum class type : int {
 };
 
 inline int type_panic(lua_State* L, int index, type expected, type actual) {
-    return luaL_error(L, "stack index %d, expected %s, received %s", index, lua_typename(L, static_cast<int>(expected)), lua_typename(L, static_cast<int>(actual)));
+    return luaL_error(L, "stack index %d, expected %s, received %s", index,
+        expected == type::poly ? "anything" : lua_typename(L, static_cast<int>(expected)),
+        expected == type::poly ? "anything" : lua_typename(L, static_cast<int>(actual))
+    );
 }
 
 inline int no_panic(lua_State*, int, type, type) noexcept {
@@ -2643,6 +2667,7 @@ inline std::string type_name(lua_State*L, type t) {
 }
 
 class reference;
+class stack_reference;
 template<typename T>
 class usertype;
 template <bool>
@@ -2676,6 +2701,9 @@ template <>
 struct lua_type_of<nil_t> : std::integral_constant<type, type::nil> { };
 
 template <>
+struct lua_type_of<sol::error> : std::integral_constant<type, type::string> { };
+
+template <>
 struct lua_type_of<table> : std::integral_constant<type, type::table> { };
 
 template <>
@@ -2683,6 +2711,9 @@ struct lua_type_of<global_table> : std::integral_constant<type, type::table> { }
 
 template <>
 struct lua_type_of<reference> : std::integral_constant<type, type::poly> {};
+
+template <>
+struct lua_type_of<stack_reference> : std::integral_constant<type, type::poly> {};
 
 template <>
 struct lua_type_of<object> : std::integral_constant<type, type::poly> {};
@@ -2736,9 +2767,12 @@ template <typename T>
 struct lua_type_of<T, std::enable_if_t<std::is_enum<T>::value>> : std::integral_constant<type, type::number> {};
 
 template <typename T>
-struct is_lua_primitive : std::integral_constant<bool, 
+struct is_lua_primitive : std::integral_constant<bool,
     type::userdata != lua_type_of<meta::Unqualified<T>>::value
-    || std::is_base_of<reference, meta::Unqualified<T>>::value> { };
+    || std::is_base_of<reference, meta::Unqualified<T>>::value
+    || meta::is_specialization_of<meta::Unqualified<T>, std::tuple>::value
+    || meta::is_specialization_of<meta::Unqualified<T>, std::pair>::value
+> { };
 
 template <typename T>
 struct is_lua_primitive<T*> : std::true_type {};
@@ -2757,12 +2791,6 @@ struct is_proxy_primitive<std::reference_wrapper<T>> : std::true_type { };
 
 template <typename T>
 struct is_proxy_primitive<optional<T>> : std::true_type {};
-
-template <typename... Args>
-struct is_proxy_primitive<std::tuple<Args...>> : std::true_type { };
-
-template <typename A, typename B>
-struct is_proxy_primitive<std::pair<A, B>> : std::true_type { };
 
 template <typename T>
 struct is_unique_usertype : std::false_type {};
@@ -2918,6 +2946,103 @@ public:
 
 // beginning of sol\stack_core.hpp
 
+// beginning of sol\stack_reference.hpp
+
+namespace sol {
+class stack_reference {
+private:
+    lua_State* L = nullptr;
+    int index = 0;
+
+protected:
+
+public:
+    stack_reference() noexcept = default;
+    stack_reference(lua_State* L, int i) noexcept : L(L), index(lua_absindex(L, i)) {}
+    stack_reference(stack_reference&& o) noexcept = default;
+    stack_reference& operator=(stack_reference&&) noexcept = default;
+    stack_reference(const stack_reference&) noexcept = default;
+    stack_reference& operator=(const stack_reference&) noexcept = default;
+
+    int push() const noexcept {
+        lua_pushvalue(L, index);
+        return 1;
+    }
+
+    type get_type() const noexcept {
+        int result = lua_type(L, index);
+        return static_cast<type>(result);
+    }
+
+    lua_State* lua_state() const noexcept {
+        return L;
+    }
+};
+} // sol
+
+// end of sol\stack_reference.hpp
+
+// beginning of sol\bond.hpp
+
+namespace sol {
+
+template <typename T>
+struct bond_size : std::tuple_size<T> {};
+
+template <typename T>
+struct is_bondable : std::integral_constant<bool, (::sol::bond_size<T>::value > 0)> {};
+
+template <typename... Tn>
+struct bond_t : public std::tuple<std::add_lvalue_reference_t<Tn>...> {
+private:
+     typedef std::tuple<std::add_lvalue_reference_t<Tn>...> base_t;
+
+     template <typename T>
+     void set( std::false_type, T&& target ) {
+          std::get<0>( *this ) = std::forward<T>( target );
+     }
+
+     template <typename T>
+     void set( std::true_type, T&& target ) {
+          typedef bond_size<meta::Unqualified<T>> value_size;
+          typedef bond_size<std::tuple<Tn...>> tie_size;
+          typedef std::conditional_t<(value_size::value < tie_size::value), value_size, tie_size> indices_size;
+          typedef std::make_index_sequence<indices_size::value> indices;
+          set( indices(), std::forward<T>( target ) );
+     }
+
+     template <std::size_t... I, typename T>
+     void set( std::index_sequence<I...>, T&& target ) {
+          using std::get;
+          (void)detail::swallow{ 0,
+               ( get<I>(*this) = get<I>(target), 0 )...
+          , 0 };
+     }
+
+public:
+     using base_t::base_t;
+
+     template <typename T>
+     bond_t& operator= ( T&& value ) {
+          typedef is_bondable<meta::Unqualified<T>> bondable;
+          set( bondable(), std::forward<T>( value ) );
+          return *this;
+     }
+
+};
+
+template <typename... Tn>
+struct bond_size<::sol::bond_t<Tn...>> : ::std::tuple_size<::std::tuple<Tn...>> { };
+
+template <typename... Tn>
+inline bond_t<std::remove_reference_t<Tn>...> bond( Tn&&... argn ) {
+     return bond_t<std::remove_reference_t<Tn>...>( std::forward<Tn>( argn )... );
+}
+
+} // sol
+
+// end of sol\bond.hpp
+
 namespace sol {
 namespace detail {
 using special_destruct_func = void(*)(void*);
@@ -2943,10 +3068,10 @@ namespace stack {
 
 template<typename T, bool global = false, typename = void>
 struct field_getter;
-template<typename T, bool global = false, typename = void>
-struct field_setter;
 template <typename T, bool global = false, typename = void>
 struct probe_field_getter;
+template<typename T, bool global = false, typename = void>
+struct field_setter;
 template<typename T, typename = void>
 struct getter;
 template<typename T, typename = void>
@@ -2982,7 +3107,7 @@ struct strip<non_null<T>> {
 };
 template <typename T>
 using strip_t = typename strip<T>::type;
-const bool default_check_arguments = 
+const bool default_check_arguments =
 #ifdef SOL_CHECK_ARGUMENTS
 true;
 #else
@@ -3110,6 +3235,55 @@ void set_field(lua_State* L, Key&& key, Value&& value, int tableindex) {
 } // sol
 
 // end of sol\stack_core.hpp
+
+// beginning of sol\stack_proxy.hpp
+
+// beginning of sol\proxy_base.hpp
+
+namespace sol {
+template <typename Super>
+struct proxy_base {
+    operator std::string() const {
+        const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
+        return super.template get<std::string>();
+    }
+
+    template<typename T, meta::EnableIf<meta::Not<meta::is_string_constructible<T>>, is_proxy_primitive<meta::Unqualified<T>>> = 0>
+    operator T ( ) const {
+        const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
+        return super.template get<T>( );
+    }
+
+    template<typename T, meta::EnableIf<meta::Not<meta::is_string_constructible<T>>, meta::Not<is_proxy_primitive<meta::Unqualified<T>>>> = 0>
+    operator T& ( ) const {
+        const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
+        return super.template get<T&>( );
+    }
+};
+} // sol
+
+// end of sol\proxy_base.hpp
+
+namespace sol {
+struct stack_proxy : public proxy_base<stack_proxy> {
+private:
+    lua_State* L;
+    int index;
+
+public:
+    stack_proxy(lua_State* L, int index) : L(L), index(index) {}
+
+    template<typename T>
+    decltype(auto) get() const {
+        return stack::get<T>(L, stack_index());
+    }
+
+    lua_State* lua_state() const { return L; }
+    int stack_index() const { return index; }
+};
+} // sol
+
+// end of sol\stack_proxy.hpp
 
 // beginning of sol\stack_check.hpp
 
@@ -3514,6 +3688,9 @@ struct checker<nil_t, expected, C> {
     }
 };
 
+template <type expected, typename C>
+struct checker<nullopt_t, expected, C> : checker<nil_t> {};
+
 template <typename T, typename C>
 struct checker<T, type::poly, C> {
     template <typename Handler>
@@ -3532,7 +3709,7 @@ struct checker<T, type::lightuserdata, C> {
     template <typename Handler>
     static bool check (lua_State* L, int index, Handler&& handler) {
         type t = type_of(L, index);
-	   bool success = t == type::userdata || t == type::lightuserdata;
+        bool success = t == type::userdata || t == type::lightuserdata;
         if (!success) {
             // expected type, actual type
             handler(L, index, type::lightuserdata, t);
@@ -3577,12 +3754,12 @@ struct checker<T, type::userdata, C> {
         if (lua_getmetatable(L, index) == 0) {
              handler(L, index, type::userdata, indextype);
              return false;
-	   }
-	   if (stack_detail::check_metatable<U>(L))
+        }
+        if (stack_detail::check_metatable<U>(L))
             return true;
-	   if (stack_detail::check_metatable<U*>(L))
+        if (stack_detail::check_metatable<U*>(L))
             return true;
-	   if (stack_detail::check_metatable<unique_usertype<U>>(L))
+        if (stack_detail::check_metatable<unique_usertype<U>>(L))
             return true;
 #ifndef SOL_NO_EXCEPTIONS
         lua_getfield(L, -1, &detail::base_class_check_key()[0]);
@@ -3666,7 +3843,7 @@ struct checker<std::tuple<Args...>, type::poly, C> {
 
     template <typename Handler>
     static bool check(lua_State* L, int index, Handler&& handler) {
-        return apply(std::index_sequence_for<Args...>(), L, index, std::forward<Handler>(handler));
+        return apply(std::make_index_sequence<sizeof...(Args)>(), L, index, std::forward<Handler>(handler));
     }
 };
 
@@ -3750,6 +3927,13 @@ struct getter<T, std::enable_if_t<std::is_base_of<reference, T>::value>> {
 };
 
 template<>
+struct getter<stack_reference> {
+    static stack_reference get(lua_State* L, int index = -1) {
+        return stack_reference(L, index);
+    }
+};
+
+template<>
 struct getter<userdata_value> {
     static userdata_value get(lua_State* L, int index = -1) {
         return userdata_value( lua_touserdata(L, index) );
@@ -3796,7 +3980,14 @@ struct getter<const char*> {
 template<>
 struct getter<nil_t> {
     static nil_t get(lua_State*, int = -1) {
-        return nil_t{ };
+        return nil;
+    }
+};
+
+template<>
+struct getter<nullopt_t> {
+    static nullopt_t get(lua_State*, int = -1) {
+        return nullopt;
     }
 };
 
@@ -3922,7 +4113,7 @@ struct getter<std::tuple<Args...>> {
     }
 
     static decltype(auto) get(lua_State* L, int index = -1) {
-        return apply(std::index_sequence_for<Args...>(), L, index);
+        return apply(std::make_index_sequence<sizeof...(Args)>(), L, index);
     }
 };
 
@@ -4086,7 +4277,7 @@ struct pusher {
         // Basically, we store all user-data like this:
         // If it's a movable/copyable value (no std::ref(x)), then we store the pointer to the new
         // data in the first sizeof(T*) bytes, and then however many bytes it takes to
-        // do the actual object. Things that are std::ref or plain T* are stored as 
+        // do the actual object. Things that are std::ref or plain T* are stored as
         // just the sizeof(T*), and nothing else.
         T** pointerpointer = static_cast<T**>(lua_newuserdata(L, sizeof(T*) + sizeof(T)));
         T*& referencereference = *pointerpointer;
@@ -4122,7 +4313,7 @@ struct pusher<unique_usertype<T, Real>> {
         Real* mem = static_cast<Real*>(static_cast<void*>(fx + 1));
         *fx = detail::special_destruct<T, Real>;
         detail::default_construct::construct(mem, std::forward<Args>(args)...);
-	   *pref = std::addressof(detail::deref(*mem));
+        *pref = std::addressof(detail::deref(*mem));
         if (luaL_newmetatable(L, &usertype_traits<unique_usertype<T>>::metatable[0]) == 1) {
             set_field(L, "__gc", detail::unique_destruct<T>);
         }
@@ -4227,6 +4418,13 @@ struct pusher<T, std::enable_if_t<std::is_base_of<reference, T>::value>> {
 };
 
 template<>
+struct pusher<stack_reference> {
+    static int push(lua_State*, const stack_reference& ref) {
+        return ref.push();
+    }
+};
+
+template<>
 struct pusher<bool> {
     static int push(lua_State* L, bool b) {
         lua_pushboolean(L, b);
@@ -4320,7 +4518,7 @@ struct pusher<std::tuple<Args...>> {
     template <std::size_t... I, typename T>
     static int push(std::index_sequence<I...>, lua_State* L, T&& t) {
         int pushcount = 0;
-        (void)detail::swallow{ 0, (pushcount += stack::push(L, 
+        (void)detail::swallow{ 0, (pushcount += stack::push(L,
               detail::forward_get<I>(t)
         ), 0)... };
         return pushcount;
@@ -4339,6 +4537,24 @@ struct pusher<std::pair<A, B>> {
         int pushcount = stack::push(L, detail::forward_get<0>(t));
         pushcount += stack::push(L, detail::forward_get<1>(t));
         return pushcount;
+    }
+};
+
+template<typename O>
+struct pusher<optional<O>> {
+    template <typename T>
+    static int push(lua_State* L, T&& t) {
+        if (t == nullopt) {
+            return stack::push(L, nullopt);
+        }
+        return stack::push(L, t.value());
+    }
+};
+
+template<>
+struct pusher<nullopt_t> {
+    static int push(lua_State* L, nullopt_t) {
+        return stack::push(L, nil);
     }
 };
 } // stack
@@ -4397,27 +4613,40 @@ struct field_getter {
 template <typename... Args, bool b, typename C>
 struct field_getter<std::tuple<Args...>, b, C> {
     template <std::size_t... I, typename Keys>
-    void apply(std::index_sequence<I...>, lua_State* L, Keys&& keys, int tableindex) {
-        void(detail::swallow{ (get_field<I < 1 && b>(L, detail::forward_get<I>(keys), tableindex), 0)... });
+    void apply(std::index_sequence<0, I...>, lua_State* L, Keys&& keys, int tableindex) {
+        get_field<b>(L, detail::forward_get<0>(keys), tableindex);
+        void(detail::swallow{ (get_field<false>(L, detail::forward_get<I>(keys)), 0)... });
         reference saved(L, -1);
         lua_pop(L, static_cast<int>(sizeof...(I)));
         saved.push();
     }
 
     template <typename Keys>
-    void get(lua_State* L, Keys&& keys, int tableindex = -2) {
-        tableindex = lua_absindex(L, tableindex);
-        apply(std::index_sequence_for<Args...>(), L, std::forward<Keys>(keys), tableindex);
+    void get(lua_State* L, Keys&& keys) {
+        apply(std::make_index_sequence<sizeof...(Args)>(), L, std::forward<Keys>(keys), lua_absindex(L, -1));
+    }
+
+    template <typename Keys>
+    void get(lua_State* L, Keys&& keys, int tableindex) {
+        apply(std::make_index_sequence<sizeof...(Args)>(), L, std::forward<Keys>(keys), tableindex);
     }
 };
 
 template <typename A, typename B, bool b, typename C>
 struct field_getter<std::pair<A, B>, b, C> {
     template <typename Keys>
-    void get(lua_State* L, Keys&& keys, int tableindex = -2) {
-        tableindex = lua_absindex(L, tableindex);
+    void get(lua_State* L, Keys&& keys, int tableindex) {
         get_field<b>(L, detail::forward_get<0>(keys), tableindex);
-        get_field<false>(L, detail::forward_get<1>(keys), tableindex + 1);
+        get_field<false>(L, detail::forward_get<1>(keys));
+        reference saved(L, -1);
+        lua_pop(L, static_cast<int>(2));
+        saved.push();
+    }
+
+    template <typename Keys>
+    void get(lua_State* L, Keys&& keys) {
+        get_field<b>(L, detail::forward_get<0>(keys));
+        get_field<false>(L, detail::forward_get<1>(keys));
         reference saved(L, -1);
         lua_pop(L, static_cast<int>(2));
         saved.push();
@@ -4488,6 +4717,36 @@ struct field_setter<T, false, std::enable_if_t<std::is_integral<T>::value>> {
     }
 };
 #endif // Lua 5.3.x
+
+template <typename... Args, bool b, typename C>
+struct field_setter<std::tuple<Args...>, b, C> {
+    template <bool g, std::size_t I, typename Key, typename Value>
+    void apply(std::index_sequence<I>, lua_State* L, Key&& keys, Value&& value, int tableindex) {
+        I > 0 ?
+            set_field<g>(L, detail::forward_get<I>(keys), std::forward<Value>(value)) :
+            set_field<g>(L, detail::forward_get<I>(keys), std::forward<Value>(value), tableindex);
+    }
+
+    template <bool g, std::size_t I0, std::size_t I1, std::size_t... I, typename Keys, typename Value>
+    void apply(std::index_sequence<I0, I1, I...>, lua_State* L, Keys&& keys, Value&& value, int tableindex) {
+        get_field<g>(L, detail::forward_get<I0>(keys), tableindex);
+        apply<false>(std::index_sequence<I1, I...>(), L, std::forward<Keys>(keys), std::forward<Value>(value), -1);
+    }
+
+    template <typename Keys, typename Value>
+    void set(lua_State* L, Keys&& keys, Value&& value, int tableindex = -3) {
+        apply<b>(std::make_index_sequence<sizeof...(Args)>(), L, std::forward<Keys>(keys), std::forward<Value>(value), tableindex);
+    }
+};
+
+template <typename A, typename B, bool b, typename C>
+struct field_setter<std::pair<A, B>, b, C> {
+    template <typename Keys, typename Value>
+    void set(lua_State* L, Keys&& keys, Value&& value, int tableindex = -1) {
+        get_field<b>(L, detail::forward_get<0>(keys), tableindex);
+        set_field<false>(L, detail::forward_get<1>(keys), std::forward<Value>(value));
+    }
+};
 } // stack
 } // sol
 
@@ -4501,8 +4760,27 @@ template <typename T, bool b, typename>
 struct probe_field_getter {
     template <typename Key>
     probe get(lua_State* L, Key&& key, int tableindex = -2) {
+        if (!b && !maybe_indexable(L, tableindex)) {
+            return probe(false, 0);
+        }
         get_field<b>(L, std::forward<Key>(key), tableindex);
-	   return probe(!check<nil_t>(L), 1);
+        return probe(!check<nil_t>(L), 1);
+    }
+};
+
+template <typename A, typename B, bool b, typename C>
+struct probe_field_getter<std::pair<A, B>, b, C> {
+    template <typename Keys>
+    probe get(lua_State* L, Keys&& keys, int tableindex = -2) {
+        if (!b && !maybe_indexable(L, tableindex)) {
+            return probe(false, 0);
+        }
+        get_field<b>(L, std::get<0>(keys), tableindex);
+        if (!maybe_indexable(L)) {
+            return probe(false, 1);
+        }
+        get_field<false>(L, std::get<1>(keys), tableindex);
+        return probe(!check<nil_t>(L), 2);
     }
 };
 
@@ -4520,11 +4798,14 @@ struct probe_field_getter<std::tuple<Args...>, b, C> {
         if (!maybe_indexable(L)) {
             return probe(false, sofar);
         }
-        return apply(std::index_sequence<I1, In...>(), sofar + 1, L, std::forward<Keys>(keys), tableindex);
+        return apply(std::index_sequence<I1, In...>(), sofar + 1, L, std::forward<Keys>(keys), -1);
     }
 
     template <typename Keys>
     probe get(lua_State* L, Keys&& keys, int tableindex = -2) {
+        if (!b && !maybe_indexable(L, tableindex)) {
+            return probe(false, 0);
+        }
         return apply(std::index_sequence_for<Args...>(), 1, L, std::forward<Keys>(keys), tableindex);
     }
 };
@@ -4634,18 +4915,18 @@ inline void call_from_top(types<void> tr, types<Args...> ta, lua_State* L, Fx&& 
     call<check_args>(tr, ta, L, static_cast<int>(lua_gettop(L) - sizeof...(Args)), std::forward<Fx>(fx), std::forward<FxArgs>(args)...);
 }
 
-template<bool check_args = stack_detail::default_check_arguments, typename... Args, typename Fx, typename... FxArgs>
+template<int additionalpop = 0, bool check_args = stack_detail::default_check_arguments, typename... Args, typename Fx, typename... FxArgs>
 inline int call_into_lua(types<void> tr, types<Args...> ta, Fx&& fx, lua_State* L, int start, FxArgs&&... fxargs) {
     call<check_args>(tr, ta, L, start, fx, std::forward<FxArgs>(fxargs)...);
-    int nargs = static_cast<int>(sizeof...(Args));
+    int nargs = static_cast<int>(sizeof...(Args)) + additionalpop;
     lua_pop(L, nargs);
     return 0;
 }
 
-template<bool check_args = stack_detail::default_check_arguments, typename Ret0, typename... Ret, typename... Args, typename Fx, typename... FxArgs, typename = std::enable_if_t<meta::Not<std::is_void<Ret0>>::value>>
+template<int additionalpop = 0, bool check_args = stack_detail::default_check_arguments, typename Ret0, typename... Ret, typename... Args, typename Fx, typename... FxArgs, typename = std::enable_if_t<meta::Not<std::is_void<Ret0>>::value>>
 inline int call_into_lua(types<Ret0, Ret...>, types<Args...> ta, Fx&& fx, lua_State* L, int start, FxArgs&&... fxargs) {
     decltype(auto) r = call<check_args>(types<meta::return_type_t<Ret0, Ret...>>(), ta, L, start, fx, std::forward<FxArgs>(fxargs)...);
-    int nargs = static_cast<int>(sizeof...(Args));
+    int nargs = static_cast<int>(sizeof...(Args)) + additionalpop;
     lua_pop(L, nargs);
     return push(L, std::forward<decltype(r)>(r));
 }
@@ -4798,31 +5079,7 @@ inline auto resolve(F&& f) -> decltype(detail::resolve_i(types<Sig...>(), std::f
 
 // beginning of sol\function_result.hpp
 
-// beginning of sol\proxy_base.hpp
-
-namespace sol {
-template <typename Super>
-struct proxy_base {
-    operator std::string() const {
-        const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
-        return super.template get<std::string>();
-    }
-
-    template<typename T, meta::EnableIf<meta::Not<meta::is_string_constructible<T>>, is_proxy_primitive<meta::Unqualified<T>>> = 0>
-    operator T ( ) const {
-        const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
-        return super.template get<T>( );
-    }
-
-    template<typename T, meta::EnableIf<meta::Not<meta::is_string_constructible<T>>, meta::Not<is_proxy_primitive<meta::Unqualified<T>>>> = 0>
-    operator T& ( ) const {
-        const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
-        return super.template get<T&>( );
-    }
-};
-} // sol
-
-// end of sol\proxy_base.hpp
+#include <limits>
 
 namespace sol {
 struct function_result : public proxy_base<function_result> {
@@ -4834,7 +5091,7 @@ private:
 public:
     function_result() = default;
     function_result(lua_State* L, int index = -1, int returncount = 0): L(L), index(index), returncount(returncount) {
-        
+
     }
     function_result(const function_result&) = default;
     function_result& operator=(const function_result&) = default;
@@ -4864,10 +5121,21 @@ public:
         return stack::get<T>(L, index);
     }
 
+    lua_State* lua_state() const { return L; };
+    int stack_index() const { return index; };
+
     ~function_result() {
         lua_pop(L, returncount);
     }
 };
+
+template <>
+struct bond_size<function_result> : std::integral_constant<std::size_t, std::numeric_limits<std::size_t>::max()> {};
+
+template <std::size_t I>
+stack_proxy get(const function_result& fr) {
+    return stack_proxy(fr.lua_state(), static_cast<int>(fr.stack_index() + I));
+}
 } // sol
 
 // end of sol\function_result.hpp
@@ -4898,7 +5166,7 @@ inline decltype(auto) cleanup_key() {
 
 template<typename T, typename Func, typename = void>
 struct functor {
-    typedef meta::callable_traits<Func> traits_type;
+    typedef meta::bind_traits<Func> traits_type;
     typedef typename traits_type::args_type args_type;
     typedef typename traits_type::return_type return_type;
     static const std::size_t arity = traits_type::arity;
@@ -4933,7 +5201,7 @@ struct functor {
 
 template<typename T, typename Func>
 struct functor<T, Func, std::enable_if_t<std::is_member_object_pointer<Func>::value>> {
-    typedef meta::callable_traits<Func> traits_type;
+    typedef meta::bind_traits<Func> traits_type;
     typedef typename traits_type::args_type args_type;
     typedef typename traits_type::return_type return_type;
     static const std::size_t arity = traits_type::arity;
@@ -4966,7 +5234,7 @@ struct functor<T, Func, std::enable_if_t<std::is_member_object_pointer<Func>::va
 
 template<typename T, typename Func>
 struct functor<T, Func, std::enable_if_t<std::is_function<Func>::value || std::is_class<Func>::value>> {
-    typedef meta::callable_traits<Func> traits_type;
+    typedef meta::bind_traits<Func> traits_type;
     typedef meta::pop_front_type_t<typename traits_type::args_type> args_type;
     typedef typename traits_type::return_type return_type;
     static const std::size_t arity = traits_type::arity;
@@ -5095,14 +5363,80 @@ inline void free_function_cleanup(lua_State* L) {
 
 // end of sol\function_types_core.hpp
 
-// beginning of sol\function_types_static.hpp
+// beginning of sol\function_types_templated.hpp
+
+namespace sol {
+namespace function_detail {
+    template <typename F, F fx>
+    inline int call_wrapper_variable(std::false_type, lua_State* L) {
+        typedef meta::bind_traits<meta::Unqualified<F>> traits_type;
+        typedef typename traits_type::args_type args_type;
+        typedef meta::tuple_types<typename traits_type::return_type> return_type;
+        return stack::call_into_lua(return_type(), args_type(), fx, L, 1);
+    }
+
+    template <typename V, V variable>
+    inline int call_wrapper_variable(std::true_type, lua_State* L) {
+        typedef meta::bind_traits<meta::Unqualified<V>> traits_type;
+        typedef typename traits_type::object_type T;
+        typedef typename traits_type::return_type R;
+        auto& mem = stack::get<T>(L, 1);
+        switch (lua_gettop(L)) {
+        case 1:
+            lua_pop(L, 1);
+            stack::push(L, (mem.*variable));
+            return 1;
+        case 2:
+            (mem.*variable) = stack::get<R>(L, 2);
+            lua_pop(L, 2);
+            return 0;
+        default:
+            return luaL_error(L, "incorrect number of arguments to member variable function call");
+        }
+    }
+
+    template <typename F, F fx>
+    inline int call_wrapper_function(std::false_type, lua_State* L) {
+        return call_wrapper_variable<F, fx>(std::is_member_object_pointer<F>(), L);
+    }
+
+    template <typename F, F fx>
+    inline int call_wrapper_function(std::true_type, lua_State* L) {
+        typedef meta::bind_traits<meta::Unqualified<F>> traits_type;
+        typedef typename traits_type::object_type T;
+        typedef typename traits_type::args_type args_type;
+        typedef typename traits_type::return_type return_type;
+        typedef meta::tuple_types<return_type> return_type_list;
+        auto mfx = [&](auto&&... args) -> typename traits_type::return_type {
+            auto& member = stack::get<T>(L, 1);
+            return (member.*fx)(std::forward<decltype(args)>(args)...);
+        };
+        int n = stack::call_into_lua<1>(return_type_list(), args_type(), mfx, L, 2);
+        return n;
+    }
+
+    template <typename F, F fx>
+    inline int call_wrapper_entry(lua_State* L) {
+        return call_wrapper_function<F, fx>(std::is_member_function_pointer<meta::Unqualified<F>>(), L);
+    }
+} // function_detail
+
+template <typename F, F fx>
+inline int c_call(lua_State* L) {
+    return detail::c_trampoline(L, function_detail::call_wrapper_entry<F, fx>);
+}
+} // sol
+
+// end of sol\function_types_templated.hpp
+
+// beginning of sol\function_types_basic.hpp
 
 namespace sol {
 namespace function_detail {
 template<typename Function>
 struct upvalue_free_function {
     typedef std::remove_pointer_t<std::decay_t<Function>> function_type;
-    typedef meta::function_traits<function_type> traits_type;
+    typedef meta::bind_traits<function_type> traits_type;
 
     static int real_call(lua_State* L) {
         auto udata = stack::stack_detail::get_as_upvalues<function_type*>(L);
@@ -5123,14 +5457,19 @@ struct upvalue_free_function {
 template<typename T, typename Function>
 struct upvalue_member_function {
     typedef std::remove_pointer_t<std::decay_t<Function>> function_type;
-    typedef meta::function_traits<function_type> traits_type;
+    typedef meta::bind_traits<function_type> traits_type;
 
     static int real_call(lua_State* L) {
+        // Layout:
+        // idx 1...n: verbatim data of member function pointer
+        // idx n + 1: is the object's void pointer
+        // We don't need to store the size, because the other side is templated
+        // with the same member function pointer type
         auto memberdata = stack::stack_detail::get_as_upvalues<function_type>(L, 1);
         auto objdata = stack::stack_detail::get_as_upvalues<T*>(L, memberdata.second);
         function_type& memfx = memberdata.first;
-        T& item = *objdata.first;
-        auto fx = [&item, &memfx](auto&&... args) -> typename traits_type::return_type { 
+        auto& item = *objdata.first;
+        auto fx = [&item, &memfx](auto&&... args) -> typename traits_type::return_type {
             return (item.*memfx)(std::forward<decltype(args)>(args)...);
         };
         return stack::call_into_lua(meta::tuple_types<typename traits_type::return_type>(), typename traits_type::args_type(), fx, L, 1);
@@ -5146,18 +5485,92 @@ struct upvalue_member_function {
 };
 
 template<typename T, typename Function>
-struct upvalue_this_member_function {
+struct upvalue_member_variable {
     typedef std::remove_pointer_t<std::decay_t<Function>> function_type;
-    typedef meta::function_traits<function_type> traits_type;
+    typedef meta::bind_traits<function_type> traits_type;
 
     static int real_call(lua_State* L) {
+        // Layout:
+        // idx 1...n: verbatim data of member variable pointer
+        // idx n + 1: is the object's void pointer
+        // We don't need to store the size, because the other side is templated
+        // with the same member function pointer type
+        auto memberdata = stack::stack_detail::get_as_upvalues<function_type>(L, 1);
+        auto objdata = stack::stack_detail::get_as_upvalues<T*>(L, memberdata.second);
+        auto& mem = *objdata.first;
+        function_type& var = memberdata.first;
+        switch (lua_gettop(L)) {
+        case 0:
+            stack::push(L, (mem.*var));
+            return 1;
+        case 1:
+            (mem.*var) = stack::get<typename traits_type::return_type>(L, 1);
+            lua_pop(L, 1);
+            return 0;
+        default:
+            return luaL_error(L, "sol: incorrect number of arguments to member variable function");
+        }
+    }
+
+    static int call (lua_State* L) {
+        return detail::static_trampoline<(&real_call)>(L);
+    }
+
+    int operator()(lua_State* L) {
+        return call(L);
+    }
+};
+
+template<typename T, typename Function>
+struct upvalue_this_member_function {
+    typedef std::remove_pointer_t<std::decay_t<Function>> function_type;
+    typedef meta::bind_traits<function_type> traits_type;
+
+    static int real_call(lua_State* L) {
+        // Layout:
+        // idx 1...n: verbatim data of member variable pointer
         auto memberdata = stack::stack_detail::get_as_upvalues<function_type>(L, 1);
         function_type& memfx = memberdata.first;
-        auto fx = [&memfx](lua_State* L, auto&&... args) -> typename traits_type::return_type { 
-            T& item = stack::get<T>(L, 1);
+        auto fx = [&memfx](lua_State* L, auto&&... args) -> typename traits_type::return_type {
+            auto& item = stack::get<T>(L, 1);
             return (item.*memfx)(std::forward<decltype(args)>(args)...);
         };
-        return stack::call_into_lua(meta::tuple_types<typename traits_type::return_type>(), typename traits_type::args_type(), fx, L, 2, L);
+        int n = stack::call_into_lua<1>(meta::tuple_types<typename traits_type::return_type>(), typename traits_type::args_type(), fx, L, 2, L);
+        return n;
+    }
+
+    static int call (lua_State* L) {
+        return detail::static_trampoline<(&real_call)>(L);
+    }
+
+    int operator()(lua_State* L) {
+        return call(L);
+    }
+};
+
+template<typename T, typename Function>
+struct upvalue_this_member_variable {
+    typedef std::remove_pointer_t<std::decay_t<Function>> function_type;
+    typedef meta::bind_traits<function_type> traits_type;
+
+    static int real_call(lua_State* L) {
+        // Layout:
+        // idx 1...n: verbatim data of member variable pointer
+        auto memberdata = stack::stack_detail::get_as_upvalues<function_type>(L, 1);
+        auto& mem = stack::get<T>(L, 1);
+        function_type& var = memberdata.first;
+        switch (lua_gettop(L)) {
+        case 1:
+            lua_pop(L, 1);
+            stack::push(L, (mem.*var));
+            return 1;
+        case 2:
+            (mem.*var) = stack::get<typename traits_type::return_type>(L, 2);
+            lua_pop(L, 2);
+            return 0;
+        default:
+            return luaL_error(L, "sol: incorrect number of arguments to member variable function");
+        }
     }
 
     static int call (lua_State* L) {
@@ -5171,7 +5584,7 @@ struct upvalue_this_member_function {
 } // function_detail
 } // sol
 
-// end of sol\function_types_static.hpp
+// end of sol\function_types_basic.hpp
 
 // beginning of sol\function_types_allocator.hpp
 
@@ -5249,9 +5662,6 @@ struct usertype_function : public usertype_function_core<Function, Tp> {
 
     int prelude(lua_State* L) {
         this->fx.item = detail::ptr(stack::get<T>(L, 1));
-        if(this->fx.item == nullptr) {
-            return luaL_error(L, "sol: userdata for function call is null: are you using the wrong syntax? (use item:function/variable(...) syntax)");
-        }
         return static_cast<base_t&>(*this)(meta::tuple_types<return_type>(), args_type(), Index<2>(), L);
     }
 
@@ -5274,9 +5684,6 @@ struct usertype_variable_function : public usertype_function_core<Function, Tp> 
     int prelude(lua_State* L) {
         int argcount = lua_gettop(L);
         this->fx.item = stack::get<T*>(L, 1);
-        if(this->fx.item == nullptr) {
-            return luaL_error(L, "sol: userdata for member variable is null");
-        }
         switch(argcount) {
         case 2:
             return static_cast<base_t&>(*this)(meta::tuple_types<return_type>(), types<>(), Index<2>(), L);
@@ -5329,7 +5736,7 @@ namespace sol {
 namespace function_detail {
 namespace internals {
 template <typename T>
-struct overload_traits : meta::function_traits<T> {};
+struct overload_traits : meta::bind_traits<T> {};
 
 template <typename T, typename Func, typename X>
 struct overload_traits<functor<T, Func, X>> {
@@ -5365,7 +5772,7 @@ inline int overload_match_arity(types<Fx, Fxs...>, std::index_sequence<I, In...>
 
 template <typename... Functions, typename Match, typename... Args>
 inline int overload_match_arity(Match&& matchfx, lua_State* L, int fxarity, int start, Args&&... args) {
-    return internals::overload_match_arity(types<Functions...>(), std::index_sequence_for<Functions...>(), std::index_sequence<>(), std::forward<Match>(matchfx), L, fxarity,  start, std::forward<Args>(args)...);
+    return internals::overload_match_arity(types<Functions...>(), std::make_index_sequence<sizeof...(Functions)>(), std::index_sequence<>(), std::forward<Match>(matchfx), L, fxarity,  start, std::forward<Args>(args)...);
 }
 
 template <typename... Functions, typename Match, typename... Args>
@@ -5377,7 +5784,7 @@ inline int overload_match(Match&& matchfx, lua_State* L, int start, Args&&... ar
 template <typename... Functions>
 struct overloaded_function : base_function {
     typedef std::tuple<Functions...> overload_list;
-    typedef std::index_sequence_for<Functions...> indices;
+    typedef std::make_index_sequence<sizeof...(Functions)> indices;
     overload_list overloads;
 
     overloaded_function(overload_list set)
@@ -5391,7 +5798,7 @@ struct overloaded_function : base_function {
     template <typename Fx, std::size_t I, typename... R, typename... Args>
     int call(types<Fx>, Index<I>, types<R...> r, types<Args...> a, lua_State* L, int, int start) {
         auto& func = std::get<I>(overloads);
-        return stack::call_into_lua<false>(r, a, func, L, start);
+        return stack::call_into_lua<0, false>(r, a, func, L, start);
     }
 
     virtual int operator()(lua_State* L) override {
@@ -5403,16 +5810,16 @@ struct overloaded_function : base_function {
 template <typename T, typename... Functions>
 struct usertype_overloaded_function : base_function {
     typedef std::tuple<functor<T, std::remove_pointer_t<std::decay_t<Functions>>>...> overload_list;
-    typedef std::index_sequence_for<Functions...> indices;
+    typedef std::make_index_sequence<sizeof...(Functions)> indices;
     overload_list overloads;
-    
+
     usertype_overloaded_function(std::tuple<Functions...> set) : overloads(std::move(set)) {}
 
     template <typename Fx, std::size_t I, typename... R, typename... Args>
     int call(types<Fx>, Index<I>, types<R...> r, types<Args...> a, lua_State* L, int, int start) {
         auto& func = std::get<I>(overloads);
         func.item = detail::ptr(stack::get<T>(L, 1));
-        return stack::call_into_lua<false>(r, a, func, L, start);
+        return stack::call_into_lua<0, false>(r, a, func, L, start);
     }
 
     virtual int operator()(lua_State* L) override {
@@ -5444,7 +5851,7 @@ struct constructor_match {
     template <typename Fx, std::size_t I, typename... R, typename... Args>
     int operator()(types<Fx>, Index<I>, types<R...> r, types<Args...> a, lua_State* L, int, int start) const {
         default_construct func{};
-        return stack::call_into_lua<false>(r, a, func, L, start, obj);
+        return stack::call_into_lua<0, false>(r, a, func, L, start, obj);
     }
 };
 } // detail
@@ -5468,7 +5875,7 @@ inline int construct(lua_State* L) {
     referencepointer = obj;
     reference userdataref(L, -1);
     userdataref.pop();
-        
+
     construct<T, TypeLists...>(detail::constructor_match<T>(obj), L, argcount, 1 + static_cast<int>(syntax));
 
     userdataref.push();
@@ -5493,7 +5900,7 @@ inline int destruct(lua_State* L) {
 template <typename T, typename... Functions>
 struct usertype_constructor_function : base_function {
     typedef std::tuple<Functions...> overload_list;
-    typedef std::index_sequence_for<Functions...> indices;
+    typedef std::make_index_sequence<sizeof...(Functions)> indices;
     overload_list overloads;
 
     usertype_constructor_function(overload_list set) : overloads(std::move(set)) {}
@@ -5525,7 +5932,7 @@ struct usertype_constructor_function : base_function {
             return luaL_error(L, err.c_str());
         }
         lua_setmetatable(L, -2);
-            
+
         return 1;
     }
 
@@ -5546,8 +5953,9 @@ struct usertype_constructor_function : base_function {
 
 namespace sol {
 namespace function_detail {
-template<typename Function>
+template<typename Func>
 struct functor_function : public base_function {
+    typedef meta::Unwrapped<meta::Unqualified<Func>> Function;
     typedef decltype(&Function::operator()) function_type;
     typedef meta::function_return_t<function_type> return_type;
     typedef meta::function_args_t<function_type> args_types;
@@ -5566,48 +5974,17 @@ struct functor_function : public base_function {
     }
 };
 
-template<typename Function, typename T>
-struct this_member_function : public base_function {
-    typedef std::remove_pointer_t<std::decay_t<Function>> function_type;
-    typedef meta::function_return_t<function_type> return_type;
-    typedef meta::function_args_t<function_type> args_types;
-    struct functor {
-        function_type invocation;
-
-        template<typename... Args>
-        functor(Args&&... args): invocation(std::forward<Args>(args)...) {}
-
-        template<typename... Args>
-        return_type operator()(lua_State* L, Args&&... args) {
-            auto& mem = detail::unwrap(stack::get<T&>(L, 1));
-            return (mem.*invocation)(std::forward<Args>(args)...);
-        }
-    } fx;
-
-    template<typename... Args>
-    this_member_function(Args&&... args): fx(std::forward<Args>(args)...) {}
-
-    int call(lua_State* L) {
-        return stack::call_into_lua(meta::tuple_types<return_type>(), args_types(), fx, L, 2, L);
-    }
-
-    virtual int operator()(lua_State* L) override {
-        auto f = [&](lua_State* L) -> int { return this->call(L);};
-        return detail::trampoline(L, f);
-    }
-};
-
-template<typename Function, typename T>
+template<typename T, typename Function>
 struct member_function : public base_function {
     typedef std::remove_pointer_t<std::decay_t<Function>> function_type;
     typedef meta::function_return_t<function_type> return_type;
     typedef meta::function_args_t<function_type> args_types;
     struct functor {
-        T member;
         function_type invocation;
+        T member;
 
-        template<typename Tm, typename... Args>
-        functor(Tm&& m, Args&&... args): member(std::forward<Tm>(m)), invocation(std::forward<Args>(args)...) {}
+        template<typename F, typename... Args>
+        functor(F&& f, Args&&... args): invocation(std::forward<F>(f)), member(std::forward<Args>(args)...) {}
 
         template<typename... Args>
         return_type operator()(Args&&... args) {
@@ -5616,11 +5993,44 @@ struct member_function : public base_function {
         }
     } fx;
 
-    template<typename Tm, typename... Args>
-    member_function(Tm&& m, Args&&... args): fx(std::forward<Tm>(m), std::forward<Args>(args)...) {}
+    template<typename F, typename... Args>
+    member_function(F&& f, Args&&... args) : fx(std::forward<F>(f), std::forward<Args>(args)...) {}
 
     int call(lua_State* L) {
         return stack::call_into_lua(meta::tuple_types<return_type>(), args_types(), fx, L, 1);
+    }
+
+    virtual int operator()(lua_State* L) override {
+        auto f = [&](lua_State* L) -> int { return this->call(L);};
+        return detail::trampoline(L, f);
+    }
+};
+
+template<typename T, typename Function>
+struct member_variable : public base_function {
+    typedef std::remove_pointer_t<std::decay_t<Function>> function_type;
+    typedef typename meta::bind_traits<function_type>::return_type return_type;
+    typedef typename meta::bind_traits<function_type>::args_type args_types;
+    function_type var;
+    T member;
+
+    template<typename Fx, typename... Args>
+    member_variable(Fx&& fx, Args&&... args): var(std::forward<Fx>(fx)), member(std::forward<Args>(args)...) {}
+
+    int call(lua_State* L) {
+        auto& mem = detail::unwrap(detail::deref(member));
+        switch (lua_gettop(L)) {
+        case 0: {
+            stack::push(L, (mem.*var));
+            return 1;
+        }
+        case 1:
+            (mem.*var) = stack::get<return_type>(L, 1);
+            lua_pop(L, 1);
+            return 0;
+        default:
+            return luaL_error(L, "sol: incorrect number of arguments to member variable function");
+        }
     }
 
     virtual int operator()(lua_State* L) override {
@@ -5633,23 +6043,210 @@ struct member_function : public base_function {
 
 // end of sol\function_types_member.hpp
 
+namespace sol {
+
+template <typename Sig, typename... Ps>
+struct function_arguments {
+    std::tuple<Ps...> params;
+    template <typename... Args>
+    function_arguments(Args&&... args) : params(std::forward<Args>(args)...) {}
+};
+
+template <typename Sig = function_sig<>, typename... Args>
+function_arguments<Sig, Args...> function_args( Args&&... args ) {
+    return function_arguments<Sig, Args...>(std::forward<Args>(args)...);
+}
+
+namespace stack {
+template<typename... Sigs>
+struct pusher<function_sig<Sigs...>> {
+    template <typename... Sig, typename Fx, typename... Args>
+    static void select_convertible(std::false_type, types<Sig...>, lua_State* L, Fx&& fx, Args&&... args) {
+        typedef std::remove_pointer_t<std::decay_t<Fx>> clean_fx;
+        std::unique_ptr<function_detail::base_function> sptr = std::make_unique<function_detail::functor_function<clean_fx>>(std::forward<Fx>(fx), std::forward<Args>(args)...);
+        set_fx(L, std::move(sptr));
+    }
+
+    template <typename R, typename... A, typename Fx, typename... Args>
+    static void select_convertible(std::true_type, types<R(A...)>, lua_State* L, Fx&& fx, Args&&... args) {
+        using fx_ptr_t = R(*)(A...);
+        fx_ptr_t fxptr = detail::unwrap(std::forward<Fx>(fx));
+        select_function(std::true_type(), L, fxptr, std::forward<Args>(args)...);
+    }
+
+    template <typename R, typename... A, typename Fx, typename... Args>
+    static void select_convertible(types<R(A...)> t, lua_State* L, Fx&& fx, Args&&... args) {
+        typedef std::decay_t<meta::Unwrapped<meta::Unqualified<Fx>>> raw_fx_t;
+        typedef R(* fx_ptr_t)(A...);
+        typedef std::is_convertible<raw_fx_t, fx_ptr_t> is_convertible;
+        select_convertible(is_convertible(), t, L, std::forward<Fx>(fx), std::forward<Args>(args)...);
+    }
+
+    template <typename Fx, typename... Args>
+    static void select_convertible(types<>, lua_State* L, Fx&& fx, Args&&... args) {
+        typedef meta::function_signature_t<meta::Unwrapped<meta::Unqualified<Fx>>> Sig;
+        select_convertible(types<Sig>(), L, std::forward<Fx>(fx), std::forward<Args>(args)...);
+    }
+
+    template <typename Fx, typename T, typename... Args>
+    static void select_reference_member_variable(std::false_type, lua_State* L, Fx&& fx, T&& obj, Args&&... args) {
+        typedef std::remove_pointer_t<std::decay_t<Fx>> clean_fx;
+        std::unique_ptr<function_detail::base_function> sptr = std::make_unique<function_detail::member_variable<meta::Unqualified<T>, clean_fx>>(std::forward<Fx>(fx), std::forward<T>(obj), std::forward<Args>(args)... );
+        set_fx(L, std::move(sptr));
+    }
+
+    template <typename Fx, typename T, typename... Args>
+    static void select_reference_member_variable(std::true_type, lua_State* L, Fx&& fx, T&& obj, Args&&... args) {
+        typedef std::decay_t<Fx> dFx;
+        dFx memfxptr(std::forward<Fx>(fx));
+        auto userptr = detail::ptr(std::forward<T>(obj), std::forward<Args>(args)...);
+        lua_CFunction freefunc = &function_detail::upvalue_member_variable<std::decay_t<decltype(*userptr)>, meta::Unqualified<Fx>>::call;
+
+        int upvalues = stack::stack_detail::push_as_upvalues(L, memfxptr);
+        upvalues += stack::push(L, light_userdata_value(static_cast<void*>(userptr)));
+        stack::push(L, c_closure(freefunc, upvalues));
+    }
+
+    template <typename Fx, typename... Args>
+    static void select_member_variable(std::false_type, lua_State* L, Fx&& fx, Args&&... args) {
+        select_convertible(types<Sigs...>(), L, std::forward<Fx>(fx), std::forward<Args>(args)...);
+    }
+
+    template <typename Fx, typename T, typename... Args>
+    static void select_member_variable(std::true_type, lua_State* L, Fx&& fx, T&& obj, Args&&... args) {
+        typedef meta::Bool<meta::is_specialization_of<meta::Unqualified<T>, std::reference_wrapper>::value || std::is_pointer<T>::value> is_reference;
+        select_reference_member_variable(is_reference(), L, std::forward<Fx>(fx), std::forward<T>(obj), std::forward<Args>(args)...);
+    }
+
+    template <typename Fx, typename... Args>
+    static void select_member_variable(std::true_type, lua_State* L, Fx&& fx) {
+        typedef typename meta::bind_traits<meta::Unqualified<Fx>>::object_type C;
+        lua_CFunction freefunc = &function_detail::upvalue_this_member_variable<C, Fx>::call;
+        int upvalues = stack::stack_detail::push_as_upvalues(L, fx);
+        stack::push(L, c_closure(freefunc, upvalues));
+    }
+
+    template <typename Fx, typename T, typename... Args>
+    static void select_reference_member_function(std::false_type, lua_State* L, Fx&& fx, T&& obj, Args&&... args) {
+        typedef std::remove_pointer_t<std::decay_t<Fx>> clean_fx;
+        std::unique_ptr<function_detail::base_function> sptr = std::make_unique<function_detail::member_function<meta::Unwrapped<meta::Unqualified<T>>, clean_fx>>(std::forward<Fx>(fx), std::forward<T>(obj), std::forward<Args>(args)... );
+        set_fx(L, std::move(sptr));
+    }
+
+    template <typename Fx, typename T, typename... Args>
+    static void select_reference_member_function(std::true_type, lua_State* L, Fx&& fx, T&& obj, Args&&... args) {
+        typedef std::decay_t<Fx> dFx;
+        dFx memfxptr(std::forward<Fx>(fx));
+        auto userptr = detail::ptr(std::forward<T>(obj), std::forward<Args>(args)...);
+        lua_CFunction freefunc = &function_detail::upvalue_member_function<std::decay_t<decltype(*userptr)>, meta::Unqualified<Fx>>::call;
+
+        int upvalues = stack::stack_detail::push_as_upvalues(L, memfxptr);
+        upvalues += stack::push(L, light_userdata_value(static_cast<void*>(userptr)));
+        stack::push(L, c_closure(freefunc, upvalues));
+    }
+
+    template <typename Fx, typename... Args>
+    static void select_member_function(std::false_type, lua_State* L, Fx&& fx, Args&&... args) {
+        select_member_variable(std::is_member_object_pointer<meta::Unqualified<Fx>>(), L, std::forward<Fx>(fx), std::forward<Args>(args)...);
+    }
+
+    template <typename Fx, typename T, typename... Args>
+    static void select_member_function(std::true_type, lua_State* L, Fx&& fx, T&& obj, Args&&... args) {
+        typedef meta::Bool<meta::is_specialization_of<meta::Unqualified<T>, std::reference_wrapper>::value || std::is_pointer<T>::value> is_reference;
+        select_reference_member_function(is_reference(), L, std::forward<Fx>(fx), std::forward<T>(obj), std::forward<Args>(args)...);
+    }
+
+    template <typename Fx, typename... Args>
+    static void select_member_function(std::true_type, lua_State* L, Fx&& fx) {
+        typedef typename meta::bind_traits<meta::Unqualified<Fx>>::object_type C;
+        lua_CFunction freefunc = &function_detail::upvalue_this_member_function<C, Fx>::call;
+        int upvalues = stack::stack_detail::push_as_upvalues(L, fx);
+        stack::push(L, c_closure(freefunc, upvalues));
+    }
+
+    template <typename Fx, typename... Args>
+    static void select_function(std::false_type, lua_State* L, Fx&& fx, Args&&... args) {
+        select_member_function(std::is_member_function_pointer<meta::Unqualified<Fx>>(), L, std::forward<Fx>(fx), std::forward<Args>(args)...);
+    }
+
+    template <typename Fx, typename... Args>
+    static void select_function(std::true_type, lua_State* L, Fx&& fx, Args&&... args) {
+        std::decay_t<Fx> target(std::forward<Fx>(fx), std::forward<Args>(args)...);
+        lua_CFunction freefunc = &function_detail::upvalue_free_function<Fx>::call;
+
+        int upvalues = stack::stack_detail::push_as_upvalues(L, target);
+        stack::push(L, freefunc, upvalues);
+    }
+
+    static void select_function(std::true_type, lua_State* L, lua_CFunction f) {
+        stack::push(L, f);
+    }
+
+    template <typename Fx, typename... Args>
+    static void select(lua_State* L, Fx&& fx, Args&&... args) {
+        select_function(std::is_function<meta::Unqualified<Fx>>(), L, std::forward<Fx>(fx), std::forward<Args>(args)...);
+    }
+
+    static void set_fx(lua_State* L, std::unique_ptr<function_detail::base_function> luafunc) {
+        function_detail::base_function* target = luafunc.release();
+        void* targetdata = static_cast<void*>(target);
+        lua_CFunction freefunc = function_detail::call;
+
+        stack::push(L, userdata_value(targetdata));
+        function_detail::free_function_cleanup(L);
+        lua_setmetatable(L, -2);
+        stack::push(L, freefunc, 1);
+    }
+
+    template<typename... Args>
+    static int push(lua_State* L, Args&&... args) {
+        // Set will always place one thing (function) on the stack
+        select(L, std::forward<Args>(args)...);
+        return 1;
+    }
+};
+
+template<typename T, typename... Args>
+struct pusher<function_arguments<T, Args...>> {
+    template <std::size_t... I, typename FP>
+    static int push_func(std::index_sequence<I...>, lua_State* L, FP&& fp) {
+        return stack::push<T>(L, detail::forward_get<I>(fp.params)...);
+    }
+
+    template <typename FP>
+    static int push(lua_State* L, FP&& fp) {
+        return push_func(std::make_index_sequence<sizeof...(Args)>(), L, std::forward<FP>(fp));
+    }
+};
+
+template<typename Signature>
+struct pusher<std::function<Signature>> {
+    static int push(lua_State* L, std::function<Signature> fx) {
+        return pusher<function_sig<>>{}.push(L, std::move(fx));
+    }
+};
+
+template<typename... Functions>
+struct pusher<overload_set<Functions...>> {
+    static int push(lua_State* L, overload_set<Functions...>&& set) {
+        pusher<function_sig<>>{}.set_fx(L, std::make_unique<function_detail::overloaded_function<Functions...>>(std::move(set.set)));
+        return 1;
+    }
+
+    static int push(lua_State* L, const overload_set<Functions...>& set) {
+        pusher<function_sig<>>{}.set_fx(L, std::make_unique<function_detail::overloaded_function<Functions...>>(set.set));
+        return 1;
+    }
+};
+
+} // stack
+} // sol
+
 // end of sol\function_types.hpp
 
 #include <cstdint>
 
 namespace sol {
-template <typename Sig, typename... Functions>
-struct function_packer { 
-    std::tuple<Functions...> set;
-    template <typename... Args>
-    function_packer(Args&&... args) : set(std::forward<Args>(args)...) {}
-};
-
-template <typename Sig, typename... Args>
-function_packer<Sig, Args...> function_pack( Args&&... args ) { 
-    return function_packer<Sig, Args...>(std::forward<Args>(args)...);
-}
-
 class function : public reference {
 private:
     void luacall( std::ptrdiff_t argcount, std::ptrdiff_t resultcount ) const {
@@ -5684,7 +6281,7 @@ private:
 
 public:
     using reference::reference;
-    
+
     template<typename... Args>
     function_result operator()( Args&&... args ) const {
         return call<>( std::forward<Args>( args )... );
@@ -5699,183 +6296,14 @@ public:
     decltype(auto) call( Args&&... args ) const {
         push( );
         int pushcount = stack::multi_push( lua_state( ), std::forward<Args>( args )... );
-        return invoke( types<Ret...>( ), std::index_sequence_for<Ret...>(), pushcount );
+        return invoke( types<Ret...>( ), std::make_index_sequence<sizeof...(Ret)>(), pushcount );
     }
 };
 
 namespace stack {
-template<typename... Sigs>
-struct pusher<function_sig<Sigs...>> {
-
-    template<typename R, typename... Args, typename Fx, typename = std::result_of_t<Fx(Args...)>>
-    static void set_memfx(types<R(Args...)> t, lua_State* L, Fx&& fx) {
-        typedef std::decay_t<meta::Unwrapped<meta::Unqualified<Fx>>> raw_fx_t;
-        typedef R(* fx_ptr_t)(Args...);
-        typedef std::is_convertible<raw_fx_t, fx_ptr_t> is_convertible;
-        set_isconvertible_fx(is_convertible(), t, L, std::forward<Fx>(fx));
-    }
-
-    template<typename Fx>
-    static void set_memfx(types<>, lua_State* L, Fx&& fx) {
-        typedef meta::Unwrapped<meta::Unqualified<Fx>> fx_t;
-        set(L, &fx_t::operator(), std::forward<Fx>(fx));
-    }
-
-    template<typename... Args, typename R>
-    static void set(lua_State* L, R fxptr(Args...)){
-        set_fx(std::false_type(), L, fxptr);
-    }
-
-    template<typename Sig>
-    static void set(lua_State* L, Sig* fxptr){
-        set_fx(std::false_type(), L, fxptr);
-    }
-
-    template<typename... Args, typename R, typename C>
-    static void set(lua_State* L, R (C::*memfxptr)(Args...)) {
-        // Layout:
-        // idx 1...n: verbatim data of member function pointer
-        lua_CFunction freefunc = &function_detail::upvalue_this_member_function<C, R(C::*)(Args...)>::call;
-        int upvalues = stack::stack_detail::push_as_upvalues(L, memfxptr);
-        stack::push(L, freefunc, upvalues);
-    }
-
-    template<typename Sig, typename C>
-    static void set(lua_State* L, Sig C::* memfxptr) {
-        // Layout:
-        // idx 1...n: verbatim data of member function pointer
-        lua_CFunction freefunc = &function_detail::upvalue_this_member_function<C, Sig C::*>::call;
-        int upvalues = stack::stack_detail::push_as_upvalues(L, memfxptr);
-        stack::push(L, freefunc, upvalues);
-    }
-
-    template<typename... Args, typename R, typename C, typename T>
-    static void set(lua_State* L, R (C::*memfxptr)(Args...), T&& obj) {
-        typedef meta::Bool<meta::is_specialization_of<meta::Unqualified<T>, std::reference_wrapper>::value || std::is_pointer<T>::value> is_reference;
-        set_reference_fx(is_reference(), L, memfxptr, std::forward<T>(obj));
-    }
-
-    template<typename Sig, typename C, typename T>
-    static void set(lua_State* L, Sig C::* memfxptr, T&& obj) {
-        typedef meta::Bool<meta::is_specialization_of<meta::Unqualified<T>, std::reference_wrapper>::value || std::is_pointer<T>::value> is_reference;
-        set_reference_fx(is_reference(), L, memfxptr, std::forward<T>(obj));
-    }
-
-    template<typename... Sig, typename Fx>
-    static void set(lua_State* L, Fx&& fx) {
-        set_memfx(types<Sig...>(), L, std::forward<Fx>(fx));
-    }
-
-    template<typename Fx, typename R, typename... Args>
-    static void set_isconvertible_fx(std::true_type, types<R(Args...)>, lua_State* L, Fx&& fx) {
-        using fx_ptr_t = R(*)(Args...);
-        fx_ptr_t fxptr = detail::unwrap(std::forward<Fx>(fx));
-        set(L, fxptr);
-    }
-
-    template<typename Fx, typename R, typename... Args>
-    static void set_isconvertible_fx(std::false_type, types<R(Args...)>, lua_State* L, Fx&& fx) {
-        typedef meta::Unwrapped<std::decay_t<Fx>> fx_t;
-        std::unique_ptr<function_detail::base_function> sptr = std::make_unique<function_detail::functor_function<fx_t>>(std::forward<Fx>(fx));
-        set_fx(L, std::move(sptr));
-    }
-
-    template<typename Fx, typename T>
-    static void set_reference_fx(std::true_type, lua_State* L, Fx&& fx, T&& obj) {
-        set_fx(std::true_type(), L, std::forward<Fx>(fx), std::forward<T>(obj));
-    }
-
-    template<typename Fx, typename T>
-    static void set_reference_fx(std::false_type, lua_State* L, Fx&& fx, T&& obj) {
-        typedef std::remove_pointer_t<std::decay_t<Fx>> clean_fx;
-        std::unique_ptr<function_detail::base_function> sptr = std::make_unique<function_detail::member_function<clean_fx, meta::Unqualified<T>>>(std::forward<T>(obj), std::forward<Fx>(fx));
-        return set_fx(L, std::move(sptr));
-    }
-
-    template<typename Fx, typename T>
-    static void set_fx(std::true_type, lua_State* L, Fx&& fx, T&& obj) {
-        // Layout:
-        // idx 1...n: verbatim data of member function pointer
-        // idx n + 1: is the object's void pointer
-        // We don't need to store the size, because the other side is templated
-        // with the same member function pointer type
-        typedef std::decay_t<Fx> dFx;
-        typedef meta::Unqualified<Fx> uFx;
-        dFx memfxptr(std::forward<Fx>(fx));
-        auto userptr = detail::ptr(obj);
-        void* userobjdata = static_cast<void*>(userptr);
-        lua_CFunction freefunc = &function_detail::upvalue_member_function<std::decay_t<decltype(*userptr)>, uFx>::call;
-
-        int upvalues = stack::stack_detail::push_as_upvalues(L, memfxptr);
-        upvalues += stack::push(L, userobjdata);
-        
-        stack::push(L, freefunc, upvalues);
-    }
-
-    template<typename Fx>
-    static void set_fx(std::false_type, lua_State* L, Fx&& fx) {
-        std::decay_t<Fx> target(std::forward<Fx>(fx));
-        lua_CFunction freefunc = &function_detail::upvalue_free_function<Fx>::call;
-
-        int upvalues = stack::stack_detail::push_as_upvalues(L, target);
-        stack::push(L, freefunc, upvalues);
-    }
-
-    static void set_fx(lua_State* L, std::unique_ptr<function_detail::base_function> luafunc) {
-        function_detail::base_function* target = luafunc.release();
-        void* targetdata = static_cast<void*>(target);
-        lua_CFunction freefunc = function_detail::call;
-
-        stack::push(L, userdata_value(targetdata));
-        function_detail::free_function_cleanup(L);
-        lua_setmetatable(L, -2);
-        stack::push(L, freefunc, 1);
-    }
-
-    template<typename... Args>
-    static int push(lua_State* L, Args&&... args) {
-        // Set will always place one thing (function) on the stack
-        set<Sigs...>(L, std::forward<Args>(args)...);
-        return 1;
-    }
-};
-
-template<typename T, typename... Args>
-struct pusher<function_packer<T, Args...>> {
-    template <std::size_t... I, typename FP>
-    static int push_func(std::index_sequence<I...>, lua_State* L, FP&& fp) {
-        return stack::push<T>(L, detail::forward_get<I>(fp.set)...);
-    }
-
-    template <typename FP>
-    static int push(lua_State* L, FP&& fp) {
-        return push_func(std::index_sequence_for<Args...>(), L, std::forward<FP>(fp));
-    }
-};
-
-template<typename Signature>
-struct pusher<std::function<Signature>> {
-    static int push(lua_State* L, std::function<Signature> fx) {
-        return pusher<function_sig<>>{}.push(L, std::move(fx));
-    }
-};
-
-template<typename... Functions>
-struct pusher<overload_set<Functions...>> {
-    static int push(lua_State* L, overload_set<Functions...>&& set) {
-        pusher<function_sig<>>{}.set_fx(L, std::make_unique<function_detail::overloaded_function<Functions...>>(std::move(set.set)));
-        return 1;
-    }
-
-    static int push(lua_State* L, const overload_set<Functions...>& set) {
-        pusher<function_sig<>>{}.set_fx(L, std::make_unique<function_detail::overloaded_function<Functions...>>(set.set));
-        return 1;
-    }
-};
-
 template<typename Signature>
 struct getter<std::function<Signature>> {
-    typedef meta::function_traits<Signature> fx_t;
+    typedef meta::bind_traits<Signature> fx_t;
     typedef typename fx_t::args_type args_types;
     typedef meta::tuple_types<typename fx_t::return_type> return_types;
 
@@ -5924,10 +6352,44 @@ private:
     int popcount;
     call_status err;
 
+    template <typename T>
+    decltype(auto) tagged_get( types<sol::optional<T>> ) const {
+        if (!valid()) {
+            return sol::optional<T>(nullopt);
+        }
+        return stack::get<sol::optional<T>>(L, index);
+    }
+
+    template <typename T>
+    decltype(auto) tagged_get( types<T> ) const {
+#ifdef SOL_CHECK_ARGUMENTS
+        if (!valid()) {
+            type_panic(L, index, type_of(L, index), type::none);
+        }
+#endif // Check Argument Safety
+        return stack::get<T>(L, index);
+    }
+
+    sol::optional<sol::error> tagged_get( types<sol::optional<sol::error>> ) const {
+        if (valid()) {
+            return nullopt;
+        }
+        return sol::error(detail::direct_error, stack::get<std::string>(L, index));
+    }
+
+    sol::error tagged_get( types<sol::error> ) const {
+#ifdef SOL_CHECK_ARGUMENTS
+        if (valid()) {
+            type_panic(L, index, type_of(L, index), type::none);
+        }
+#endif // Check Argument Safety
+        return sol::error(detail::direct_error, stack::get<std::string>(L, index));
+    }
+
 public:
     protected_function_result() = default;
     protected_function_result(lua_State* L, int index = -1, int returncount = 0, int popcount = 0, call_status error = call_status::ok): L(L), index(index), returncount(returncount), popcount(popcount), err(error) {
-        
+
     }
     protected_function_result(const protected_function_result&) = default;
     protected_function_result& operator=(const protected_function_result&) = default;
@@ -5963,40 +6425,29 @@ public:
     }
 
     bool valid() const {
-        return error() == call_status::ok;
+        return error() == call_status::ok || error() == call_status::yielded;
     }
 
     template<typename T>
     T get() const {
-        return stack::get<T>(L, index);
+        return tagged_get(types<meta::Unqualified<T>>());
     }
+
+    lua_State* lua_state() const { return L; };
+    int stack_index() const { return index; };
 
     ~protected_function_result() {
         stack::remove(L, index, popcount);
     }
 };
 
-struct protected_result {
-private:
-    protected_function_result result;
+template <>
+struct bond_size<protected_function_result> : std::integral_constant<std::size_t, std::numeric_limits<std::size_t>::max()> {};
 
-public:
-    template <typename... Args>
-    protected_result( Args&&... args ) : result(std::forward<Args>(args)...) {
-    }
-
-    bool valid() const { 
-        return result.valid(); 
-    }
-
-    explicit operator bool () const {
-        return valid();
-    }
-
-    protected_function_result& operator* () {
-        return result;
-    }
-};
+template <std::size_t I>
+stack_proxy get(const protected_function_result& fr) {
+    return stack_proxy(fr.lua_state(), static_cast<int>(fr.stack_index() + I));
+}
 } // sol
 
 // end of sol\protected_function_result.hpp
@@ -6057,7 +6508,7 @@ private:
     }
 
     protected_function_result invoke(types<>, std::index_sequence<>, std::ptrdiff_t n, handler& h) const {
-        bool handlerpushed = error_handler.valid();
+        //bool handlerpushed = error_handler.valid();
         int stacksize = lua_gettop(lua_state());
         int firstreturn = std::max(1, stacksize - static_cast<int>(n) - 1);
         int returncount = 0;
@@ -6078,7 +6529,7 @@ private:
 #endif // No Exceptions
             code = static_cast<call_status>(luacall(n, LUA_MULTRET, h));
             int poststacksize = lua_gettop(lua_state());
-            returncount = poststacksize - firstreturn;
+            returncount = poststacksize - (stacksize - 1);
 #ifndef SOL_NO_EXCEPTIONS
         }
         // Handle C++ errors thrown from C++ functions bound inside of lua
@@ -6098,7 +6549,7 @@ private:
             return protected_function_result(lua_state(), firstreturn, 0, 1, call_status::runtime);
         }
 #endif // No Exceptions
-        return protected_function_result(lua_state(), firstreturn + ( handlerpushed ? 0 : 1 ), returncount, returncount, code);
+        return protected_function_result(lua_state(), firstreturn, returncount, returncount, code);
     }
 
 public:
@@ -6128,7 +6579,7 @@ public:
         handler h(error_handler);
         push();
         int pushcount = stack::multi_push(lua_state(), std::forward<Args>(args)...);
-        return invoke(types<Ret...>(), std::index_sequence_for<Ret...>(), pushcount, h);
+        return invoke(types<Ret...>(), std::make_index_sequence<sizeof...(Ret)>(), pushcount, h);
     }
 };
 } // sol
@@ -6143,12 +6594,12 @@ private:
 
     template<typename T, std::size_t... I>
     decltype(auto) tuple_get(std::index_sequence<I...>) const {
-        return tbl.template traverse_get<T>( std::get<I>(key)... );
+        return tbl.template traverse_get<T>(std::get<I>(key)...);
     }
 
     template<std::size_t... I, typename T>
     void tuple_set(std::index_sequence<I...>, T&& value) const {
-        tbl.traverse_set( std::get<I>(key)..., std::forward<T>(value) );
+        tbl.traverse_set(std::get<I>(key)..., std::forward<T>(value));
     }
 
 public:
@@ -6203,8 +6654,8 @@ public:
 
     bool valid () const {
         auto p = stack::probe_get_field<std::is_same<meta::Unqualified<Table>, global_table>::value>(tbl.lua_state(), key);
-	   lua_pop(tbl.lua_state(), p.levels);
-	   return p;
+        lua_pop(tbl.lua_state(), p.levels);
+        return p;
     }
 };
 
@@ -6252,9 +6703,8 @@ namespace stack {
 template <typename Table, typename Key>
 struct pusher<proxy<Table, Key>> {
     static int push (lua_State*, const proxy<Table, Key>& p) {
-	   sol::reference r = p;
-	   r.push();
-        return 1;
+        sol::reference r = p;
+        return r.push();
     }
 };
 } // stack
@@ -6270,7 +6720,7 @@ struct pusher<proxy<Table, Key>> {
     #ifdef _MSC_VER
         #define SOL_DEPRECATED __declspec(deprecated)
     #elif __GNUC__
-        #define SOL_DEPRECATED __attribute__((deprecated)) 
+        #define SOL_DEPRECATED __attribute__((deprecated))
     #else
         #define SOL_DEPRECATED [[deprecated]]
     #endif // compilers
@@ -6532,7 +6982,7 @@ private:
     template<typename Fx>
     std::unique_ptr<function_detail::base_function> make_function(const std::string&, Fx&& func) {
         typedef meta::Unqualified<Fx> Fxu;
-        typedef meta::tuple_element_t<0, typename meta::function_traits<Fxu>::args_tuple_type> Arg0;
+        typedef meta::tuple_element_t<0, typename meta::bind_traits<Fxu>::args_tuple_type> Arg0;
         typedef meta::Unqualified<std::remove_pointer_t<Arg0>> Argu;
         static_assert(std::is_base_of<Argu, T>::value, "Any non-member-function must have a first argument which is covariant with the desired usertype.");
         typedef std::decay_t<Fxu> function_type;
@@ -6549,6 +6999,41 @@ private:
         metafunctiontable.push_back({ name.c_str(), constructfunc });
     }
 
+    template<std::size_t N, typename... Args>
+    void build_function(std::string funcname, lua_CFunction direct) {
+        functionnames.push_back(std::move(funcname));
+        std::string& name = functionnames.back();
+
+        // Insert bubble to keep with compile-time argument count (simpler and cheaper to do)
+        functions.push_back(nullptr);
+
+        auto metamethodfind = std::find(meta_function_names.begin(), meta_function_names.end(), name);
+        if (metamethodfind != meta_function_names.end()) {
+             metafunctiontable.push_back({ name.c_str(), function_detail::usertype_call<N> });
+             meta_function metafunction = static_cast<meta_function>(metamethodfind - meta_function_names.begin());
+             switch (metafunction) {
+             case meta_function::garbage_collect:
+                  destructfuncname = name.c_str();
+                  destructfunc = function_detail::usertype_call<N>;
+                  return;
+             case meta_function::index:
+                  indexfunc = functions.back().get();
+                  needsindexfunction = true;
+                  break;
+             case meta_function::new_index:
+                  newindexfunc = functions.back().get();
+                  break;
+             case meta_function::construct:
+                  constructfunc = function_detail::usertype_call<N>;
+                  break;
+             default:
+                  break;
+             }
+             return;
+        }
+        functiontable.push_back({ name.c_str(), direct });
+    }
+
     template<std::size_t N>
     void build_function(std::string funcname, destructor_wrapper<void>) {
         auto metamethodfind = std::find(meta_function_names.begin(), meta_function_names.end(), funcname);
@@ -6557,13 +7042,13 @@ private:
         meta_function metafunction = static_cast<meta_function>(metamethodfind - meta_function_names.begin());
         if (metafunction != meta_function::garbage_collect)
             throw error("cannot set destructor to anything but the metamethod \"__gc\"");
-            
+
         functionnames.push_back(std::move(funcname));
         std::string& name = functionnames.back();
         destructfunc = function_detail::destruct<T>;
         destructfuncname = name.c_str();
         // Insert bubble to stay with the compile-time count
-        functions.push_back(nullptr);    
+        functions.push_back(nullptr);
     }
 
     template<std::size_t N, typename Fx>
@@ -6688,7 +7173,7 @@ private:
     }
 
     template<typename... Args>
-    usertype(usertype_detail::verified_tag, Args&&... args) : indexfunc(nullptr), newindexfunc(nullptr), constructfunc(nullptr), 
+    usertype(usertype_detail::verified_tag, Args&&... args) : indexfunc(nullptr), newindexfunc(nullptr), constructfunc(nullptr),
     destructfunc(nullptr), functiongcfunc(nullptr), needsindexfunction(false), baseclasscheck(nullptr), baseclasscast(nullptr) {
         functionnames.reserve(sizeof...(args)+3);
         functiontable.reserve(sizeof...(args)+3);
@@ -6710,7 +7195,7 @@ public:
 
     template<typename... Args, typename... CArgs>
     usertype(constructors<CArgs...> constructorlist, Args&&... args) : usertype(usertype_detail::verified, "new", constructorlist, "__gc", default_destructor, std::forward<Args>(args)...) {
-            
+
     }
 
     int push(lua_State* L) {
@@ -6778,6 +7263,9 @@ public:
         tableidx = lua_gettop(ref.lua_state());
         stack::push(ref.lua_state(), nil);
         this->operator++();
+        if (idx == -1) {
+            return;
+        }
         --idx;
     }
 
@@ -6831,6 +7319,11 @@ public:
 // end of sol\table_iterator.hpp
 
 namespace sol {
+namespace detail {
+template <std::size_t n>
+struct clean { lua_State* L; clean(lua_State* L) : L(L) {} ~clean() { lua_pop(L, static_cast<int>(n)); } };
+struct ref_clean { lua_State* L; int& n; ref_clean(lua_State* L, int& n) : L(L), n(n) {} ~ref_clean() { lua_pop(L, static_cast<int>(n)); } };
+}
 template <bool top_level>
 class table_core : public reference {
     friend class state;
@@ -6865,26 +7358,26 @@ class table_core : public reference {
     }
 
     template<typename Ret0, typename Ret1, typename... Ret, std::size_t... I, typename Keys>
-    auto tuple_get( types<Ret0, Ret1, Ret...>, std::index_sequence<I...>, Keys&& keys ) const
+    auto tuple_get( types<Ret0, Ret1, Ret...>, std::index_sequence<0, 1, I...>, Keys&& keys ) const
     -> decltype(stack::pop<std::tuple<Ret0, Ret1, Ret...>>(nullptr)){
-        auto pp = stack::push_pop<is_global<meta::tuple_element_t<I, Keys>...>::value>(*this);
-        int tableindex = lua_gettop(lua_state());
-        void(detail::swallow{ ( stack::get_field<top_level>(lua_state(), detail::forward_get<I>(keys), tableindex), 0)... });
-        return stack::pop<std::tuple<Ret0, Ret1, Ret...>>( lua_state() );
+        typedef decltype(stack::pop<std::tuple<Ret0, Ret1, Ret...>>(nullptr)) Tup;
+        return Tup(
+            traverse_get_optional<top_level, Ret0>(meta::is_specialization_of<meta::Unqualified<Ret0>, sol::optional>(), detail::forward_get<0>(keys)),
+            traverse_get_optional<top_level, Ret1>(meta::is_specialization_of<meta::Unqualified<Ret1>, sol::optional>(), detail::forward_get<1>(keys)),
+            traverse_get_optional<top_level, Ret>(meta::is_specialization_of<meta::Unqualified<Ret>, sol::optional>(), detail::forward_get<I>(keys))...
+        );
     }
 
     template<typename Ret, std::size_t I, typename Keys>
     decltype(auto) tuple_get( types<Ret>, std::index_sequence<I>, Keys&& keys ) const {
-        auto pp = stack::push_pop<is_global<meta::tuple_element_t<I, Keys>>::value>(*this);
-        stack::get_field<top_level>( lua_state( ), detail::forward_get<I>(keys));
-        return stack::pop<Ret>( lua_state( ) );
+        return traverse_get_optional<top_level, Ret>( meta::is_specialization_of<meta::Unqualified<Ret>, sol::optional>(), detail::forward_get<I>(keys) );
     }
 
     template<typename Pairs, std::size_t... I>
     void tuple_set( std::index_sequence<I...>, Pairs&& pairs ) {
-        auto pp = stack::push_pop<is_global<decltype(detail::forward_get<I>(pairs))...>::value>(*this);
-        void(detail::swallow{ (stack::set_field<top_level>(lua_state(), 
-		   detail::forward_get<I * 2>(pairs),
+        auto pp = stack::push_pop<top_level && (is_global<decltype(detail::forward_get<I * 2>(pairs))...>::value)>(*this);
+        void(detail::swallow{ (stack::set_field<top_level>(lua_state(),
+            detail::forward_get<I * 2>(pairs),
             detail::forward_get<I * 2 + 1>(pairs)
         ), 0)... });
     }
@@ -6899,6 +7392,37 @@ class table_core : public reference {
     decltype(auto) traverse_get_deep( Key&& key, Keys&&... keys ) const {
         stack::get_field<global>( lua_state( ), std::forward<Key>( key ) );
         return traverse_get_deep<false, T>(std::forward<Keys>(keys)...);
+    }
+
+    template <bool global, typename T, std::size_t I, typename Key>
+    decltype(auto) traverse_get_deep_optional( int& popcount, Key&& key ) const {
+        auto p = stack::probe_get_field<global>(lua_state(), std::forward<Key>(key), -1);
+        popcount += p.levels;
+        if (!p.success)
+            return T(nullopt);
+        return stack::get<T>( lua_state( ) );
+    }
+
+    template <bool global, typename T, std::size_t I, typename Key, typename... Keys>
+    decltype(auto) traverse_get_deep_optional( int& popcount, Key&& key, Keys&&... keys ) const {
+        auto p = I > 0 ? stack::probe_get_field<global>(lua_state(), std::forward<Key>(key), - 1) : stack::probe_get_field<global>( lua_state( ), std::forward<Key>( key ) );
+        popcount += p.levels;
+        if (!p.success)
+            return T(nullopt);
+        return traverse_get_deep_optional<false, T, I + 1>(popcount, std::forward<Keys>(keys)...);
+    }
+
+    template <bool global, typename T, typename... Keys>
+    decltype(auto) traverse_get_optional( std::false_type, Keys&&... keys ) const {
+        detail::clean<sizeof...(Keys)> c(lua_state());
+        return traverse_get_deep<top_level, T>(std::forward<Keys>(keys)...);
+    }
+
+    template <bool global, typename T, typename... Keys>
+    decltype(auto) traverse_get_optional( std::true_type, Keys&&... keys ) const {
+        int popcount = 0;
+        detail::ref_clean c(lua_state(), popcount);
+        return traverse_get_deep_optional<top_level, T, 0>(popcount, std::forward<Keys>(keys)...);
     }
 
     template <bool global, typename Key, typename Value>
@@ -6939,14 +7463,34 @@ public:
 
     template<typename... Ret, typename... Keys>
     decltype(auto) get( Keys&&... keys ) const {
-        return tuple_get( types<Ret...>( ), std::index_sequence_for<Ret...>( ), std::forward_as_tuple(std::forward<Keys>(keys)...));
+        static_assert(sizeof...(Keys) == sizeof...(Ret), "number of keys and number of return types do not match");
+        auto pp = stack::push_pop<is_global<Keys...>::value>(*this);
+        return tuple_get( types<Ret...>( ), std::make_index_sequence<sizeof...(Ret)>( ), std::forward_as_tuple(std::forward<Keys>(keys)...));
+    }
+
+    template<typename T, typename Key>
+    decltype(auto) get_or(Key&& key, T&& otherwise) const {
+        typedef decltype(get<T>("")) U;
+        sol::optional<U> option = get<sol::optional<U>>(std::forward<Key>(key));
+        if (option) {
+            return static_cast<U>(option.value());
+        }
+        return static_cast<U>(std::forward<T>(otherwise));
+    }
+
+    template<typename T, typename Key, typename D>
+    decltype(auto) get_or(Key&& key, D&& otherwise) const {
+        sol::optional<T> option = get<sol::optional<T>>(std::forward<Key>(key));
+        if (option) {
+            return static_cast<T>(option.value());
+        }
+        return static_cast<T>(std::forward<D>(otherwise));
     }
 
     template <typename T, typename... Keys>
     decltype(auto) traverse_get( Keys&&... keys ) const {
         auto pp = stack::push_pop<is_global<Keys...>::value>(*this);
-        struct clean { lua_State* L; clean(lua_State* L) : L(L) {} ~clean() { lua_pop(L, static_cast<int>(sizeof...(Keys))); } } c(lua_state());
-        return traverse_get_deep<top_level, T>(std::forward<Keys>(keys)...);
+        return traverse_get_optional<top_level, T>(meta::is_specialization_of<meta::Unqualified<T>, sol::optional>(), std::forward<Keys>(keys)...);
     }
 
     template <typename... Keys>
@@ -7004,6 +7548,10 @@ public:
         return lua_rawlen(lua_state(), -1);
     }
 
+    bool empty() const {
+        return cbegin() == cend();
+    }
+
     template<typename T>
     proxy<table_core&, T> operator[]( T&& key ) & {
         return proxy<table_core&, T>( *this, std::forward<T>( key ) );
@@ -7019,45 +7567,15 @@ public:
         return proxy<table_core, T>( *this, std::forward<T>( key ) );
     }
 
-    template<typename... Args, typename R, typename Key>
-    table_core& set_function( Key&& key, R fun_ptr( Args... ) ) {
-        set_resolved_function( std::forward<Key>( key ), fun_ptr );
+    template<typename Sig, typename Key, typename... Args>
+    table_core& set_function( Key&& key, Args&&... args ) {
+        set_fx( types<Sig>( ), std::forward<Key>( key ), std::forward<Args>( args )... );
         return *this;
     }
 
-    template<typename Sig, typename Key>
-    table_core& set_function( Key&& key, Sig* fun_ptr ) {
-        set_resolved_function( std::forward<Key>( key ), fun_ptr );
-        return *this;
-    }
-
-    template<typename... Args, typename R, typename C, typename T, typename Key>
-    table_core& set_function( Key&& key, R( C::*mem_ptr )( Args... ), T&& obj ) {
-        set_resolved_function( std::forward<Key>( key ), mem_ptr, std::forward<T>( obj ) );
-        return *this;
-    }
-
-    template<typename Sig, typename C, typename T, typename Key>
-    table_core& set_function( Key&& key, Sig C::* mem_ptr, T&& obj ) {
-        set_resolved_function( std::forward<Key>( key ), mem_ptr, std::forward<T>( obj ) );
-        return *this;
-    }
-
-    template<typename... Args, typename R, typename C, typename Key>
-    table_core& set_function( Key&& key, R( C::*mem_ptr )( Args... ) ) {
-        set_resolved_function( std::forward<Key>( key ), mem_ptr );
-        return *this;
-    }
-
-    template<typename Sig, typename C, typename Key>
-    table_core& set_function( Key&& key, Sig C::* mem_ptr ) {
-        set_resolved_function( std::forward<Key>( key ), mem_ptr );
-        return *this;
-    }
-
-    template<typename... Sig, typename Fx, typename Key>
-    table_core& set_function( Key&& key, Fx&& fx ) {
-        set_fx( types<Sig...>( ), std::forward<Key>( key ), std::forward<Fx>( fx ) );
+    template<typename Key, typename... Args>
+    table_core& set_function( Key&& key, Args&&... args ) {
+        set_fx( types<>( ), std::forward<Key>( key ), std::forward<Args>( args )... );
         return *this;
     }
 
@@ -7072,16 +7590,14 @@ private:
         set(std::forward<Key>(key), std::forward<Fx>(fx));
     }
 
-    template<typename Fx, typename Key, meta::DisableIf<meta::is_specialization_of<meta::Unqualified<Fx>, overload_set>> = 0>
-    void set_fx( types<>, Key&& key, Fx&& fx ) {
-        typedef meta::Unwrapped<meta::Unqualified<Fx>> fx_t;
-        typedef decltype( &fx_t::operator() ) Sig;
-        set_fx( types<meta::function_signature_t<Sig>>( ), std::forward<Key>( key ), std::forward<Fx>( fx ) );
+    template<typename Fx, typename Key, typename... Args, meta::DisableIf<meta::is_specialization_of<meta::Unqualified<Fx>, overload_set>> = 0>
+    void set_fx( types<>, Key&& key, Fx&& fx, Args&&... args ) {
+        set(std::forward<Key>(key), function_args(std::forward<Fx>(fx), std::forward<Args>(args)...));
     }
 
     template<typename... Sig, typename... Args, typename Key>
     void set_resolved_function( Key&& key, Args&&... args ) {
-        set(std::forward<Key>(key), function_pack<function_sig<Sig...>>(std::forward<Args>(args)...));
+        set(std::forward<Key>(key), function_args<function_sig<Sig...>>(std::forward<Args>(args)...));
     }
 
 public:
@@ -7115,7 +7631,7 @@ public:
     table create(int narr, int nrec, Key&& key, Value&& value, Args&&... args) {
         return create(lua_state(), narr, nrec, std::forward<Key>(key), std::forward<Value>(value), std::forward<Args>(args)...);
     }
-    
+
     template <typename Name>
     table create(Name&& name, int narr = 0, int nrec = 0) {
         table x = create(lua_state(), narr, nrec);
@@ -7133,7 +7649,13 @@ public:
     template <typename... Args>
     table create_with(Args&&... args) {
         return create_with(lua_state(), std::forward<Args>(args)...);
-    }  
+    }
+
+    template <typename Name, typename... Args>
+    table create_named(Name&& name, Args&&... args) {
+        static const int narr = static_cast<int>(meta::count_if_2_pack<std::is_integral, Args...>::value);
+        return create(std::forward<Name>(name), narr, sizeof...(Args) / 2 - narr, std::forward<Args>(args)...);
+    }
 };
 } // sol
 
@@ -7213,12 +7735,14 @@ public:
                 luaL_requiref(L, "package", luaopen_package, 1);
                 lua_pop(L, 1);
                 break;
-#if SOL_LUA_VERSION > 501
+#if !defined(SOL_LUAJIT)
             case lib::coroutine:
+#if SOL_LUA_VERSION > 501
                 luaL_requiref(L, "coroutine", luaopen_coroutine, 1);
                 lua_pop(L, 1);
-                break;
 #endif // Lua 5.2+ only
+                break;
+#endif // Not LuaJIT
             case lib::string:
                 luaL_requiref(L, "string", luaopen_string, 1);
                 lua_pop(L, 1);
@@ -7232,7 +7756,7 @@ public:
                 lua_pop(L, 1);
                 break;
             case lib::bit32:
-#if SOL_LUA_VERSION > 510
+#if SOL_LUA_VERSION > 501
                 luaL_requiref(L, "bit32", luaopen_bit32, 1);
                 lua_pop(L, 1);
 #else
@@ -7251,6 +7775,7 @@ public:
                 lua_pop(L, 1);
                 break;
             case lib::count:
+            default:
                 break;
             }
         }
@@ -7299,6 +7824,16 @@ public:
     template<typename... Args, typename... Keys>
     decltype(auto) get(Keys&&... keys) const {
         return global.get<Args...>(std::forward<Keys>(keys)...);
+    }
+
+    template<typename T, typename Key>
+    decltype(auto) get_or(Key&& key, T&& otherwise) const {
+        return global.get_or(std::forward<Key>(key), std::forward<T>(otherwise));
+    }
+
+    template<typename T, typename Key, typename D>
+    decltype(auto) get_or(Key&& key, D&& otherwise) const {
+        return global.get_or<T>(std::forward<Key>(key), std::forward<D>(otherwise));
     }
 
     template<typename... Args>
@@ -7362,45 +7897,15 @@ public:
         return global[std::forward<T>(key)];
     }
 
-    template<typename... Args, typename R, typename Key>
-    state_view& set_function(Key&& key, R fun_ptr(Args...)){
-        global.set_function(std::forward<Key>(key), fun_ptr);
+    template<typename Sig, typename... Args, typename Key>
+    state_view& set_function(Key&& key, Args&&... args) {
+        global.set_function<Sig>(std::forward<Key>(key), std::forward<Args>(args)...);
         return *this;
     }
 
-    template<typename Sig, typename Key>
-    state_view& set_function(Key&& key, Sig* fun_ptr){
-        global.set_function(std::forward<Key>(key), fun_ptr);
-        return *this;
-    }
-
-    template<typename... Args, typename R, typename C, typename Key>
-    state_view& set_function(Key&& key, R (C::*mem_ptr)(Args...)) {
-        global.set_function(std::forward<Key>(key), mem_ptr);
-        return *this;
-    }
-
-    template<typename Sig, typename C, typename Key>
-    state_view& set_function(Key&& key, Sig C::* mem_ptr) {
-        global.set_function(std::forward<Key>(key), mem_ptr);
-        return *this;
-    }
-
-    template<typename... Args, typename R, typename C, typename T, typename Key>
-    state_view& set_function(Key&& key, R (C::*mem_ptr)(Args...), T&& obj) {
-        global.set_function(std::forward<Key>(key), mem_ptr, std::forward<T>(obj));
-        return *this;
-    }
-
-    template<typename Sig, typename C, typename T, typename Key>
-    state_view& set_function(Key&& key, Sig C::* mem_ptr, T&& obj) {
-        global.set_function(std::forward<Key>(key), mem_ptr, std::forward<T>(obj));
-        return *this;
-    }
-
-    template<typename... Sig, typename Fx, typename Key>
-    state_view& set_function(Key&& key, Fx&& fx) {
-        global.set_function<Sig...>(std::forward<Key>(key), std::forward<Fx>(fx));
+    template<typename... Args, typename Key>
+    state_view& set_function(Key&& key, Args&&... args) {
+        global.set_function(std::forward<Key>(key), std::forward<Args>(args)...);
         return *this;
     }
 
@@ -7412,6 +7917,13 @@ public:
     template <typename Name, typename Key, typename Value, typename... Args>
     table create_table(Name&& name, int narr, int nrec, Key&& key, Value&& value, Args&&... args) {
         return global.create(std::forward<Name>(name), narr, nrec, std::forward<Key>(key), std::forward<Value>(value), std::forward<Args>(args)...);
+    }
+
+    template <typename Name, typename... Args>
+    table create_named_table(Name&& name, Args&&... args) {
+        table x = global.create_with(std::forward<Args>(args)...);
+        global.set(std::forward<Name>(name), x);
+        return x;
     }
 
     table create_table(int narr = 0, int nrec = 0) {
@@ -7562,7 +8074,7 @@ public:
     }
 
     bool runnable () const noexcept {
-        return valid() 
+        return valid()
             && (status() == call_status::yielded);
     }
 
@@ -7584,7 +8096,7 @@ public:
     decltype(auto) call( Args&&... args ) {
         push();
         int pushcount = stack::multi_push( lua_state(), std::forward<Args>( args )... );
-        return invoke( types<Ret...>( ), std::index_sequence_for<Ret...>(), pushcount );
+        return invoke( types<Ret...>( ), std::make_index_sequence<sizeof...(Ret)>(), pushcount );
     }
 };
 }
