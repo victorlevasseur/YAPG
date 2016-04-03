@@ -32,6 +32,12 @@ void PlayerSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
             platformer.wantsToGoRight = sf::Keyboard::isKeyPressed(playerKeys.rightKey);
             platformer.wantsToJump = sf::Keyboard::isKeyPressed(playerKeys.jumpKey);
         }
+        else
+        {
+            platformer.wantsToGoLeft = false;
+            platformer.wantsToGoRight = false;
+            platformer.wantsToJump = false;
+        }
     });
 }
 
