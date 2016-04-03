@@ -40,6 +40,7 @@ protected:
 private:
     lua::LuaState m_luaState;
 
+    std::string m_path;
     level::Level m_level;
     entityx::SystemManager m_systemMgr;
 

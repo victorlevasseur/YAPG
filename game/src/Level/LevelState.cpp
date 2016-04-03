@@ -19,6 +19,7 @@ namespace level
 LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop) :
     state::State(stateEngine),
     m_luaState(),
+    m_path(path),
     m_level(m_luaState),
     m_systemMgr(m_level.getEntityManager(), m_level.getEventManager()),
     m_resourcesManager(resourcesManager),
