@@ -41,4 +41,12 @@ void PlayerSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
     });
 }
 
+void PlayerSystem::receive(const PlayerFallingDeathMessage& msg)
+{
+    //TODO: Launch death callback
+
+    //TODO: Temporary, will let the callback do it in the future
+    entityx::Entity(msg.player).destroy();
+}
+
 }

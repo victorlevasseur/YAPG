@@ -14,6 +14,11 @@ struct AllPlayersFinishedMessage
 
 };
 
+struct AllPlayersLostMessage
+{
+
+};
+
 }
 
 #endif

@@ -1,5 +1,6 @@
 #include "Systems/PlatformerSystem.hpp"
 
+#include <limits>
 #include <vector>
 
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -11,6 +12,7 @@
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PositionComponent.hpp"
 #include "Systems/CollisionSystem.hpp"
+#include "Systems/PlayerSystem.hpp"
 #include "Tools/Polygon.hpp"
 
 namespace c = components;
@@ -178,10 +180,24 @@ void ResetPolygonPosition(e::Entity entity, tools::Polygon &poly)
     poly.ComputeGlobalEdges();
 }
 
+float getLowestPlatformY(entityx::EntityManager &es)
+{
+    float maxYPos = std::numeric_limits<float>::lowest();
+    es.each<c::PositionComponent, c::PlatformComponent>([&](entityx::Entity, c::PositionComponent& position, c::PlatformComponent&)
+    {
+        if(position.y + position.height > maxYPos)
+            maxYPos = position.y + position.height;
+    });
+
+    return maxYPos;
+}
+
 }
 
 void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
 {
+    float lowestPlatformYPos = getLowestPlatformY(es);
+
     es.each<c::PositionComponent, c::PlatformerComponent, c::HitboxComponent>([&](
         entityx::Entity entity,
         c::PositionComponent& position,
@@ -439,6 +455,13 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
             platformer.directionStateCallbacks.setState(c::PlatformerComponent::Left);
         }
         platformer.directionStateCallbacks.callIfNeeded(lua::EntityHandle(entity));
+
+        //Check if the player has remaining platforms under it
+        if(position.y - 200.f > lowestPlatformYPos)
+        {
+            //The player can't recover, send a Death message
+            emit<PlayerFallingDeathMessage>(entity);
+        }
     });
 }
 
