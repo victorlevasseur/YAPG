@@ -2,9 +2,9 @@
 
 #include <SFML/System/Time.hpp>
 
+#include "Level/LevelSuccessState.hpp"
 #include "State/MainMenuState.hpp"
 #include "State/StateEngine.hpp"
-
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/CustomBehaviorSystem.hpp"
 #include "Systems/FinishLineSystem.hpp"
@@ -57,9 +57,12 @@ void LevelState::receive(const messaging::AllPlayersFinishedMessage& message)
     (
         [&]()
         {
-            getStateEngine().stopStateAndUnpause();
+            getStateEngine().stopAndStartState
+            <level::LevelSuccessState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
+                m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+            );
         },
-        sf::seconds(3.f)
+        sf::seconds(2.f)
     );
 }
 
