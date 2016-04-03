@@ -51,6 +51,7 @@ int main(int argc, char** argv)
     //SFGUI
     sfg::SFGUI sfgui;
     sfg::Desktop desktop;
+    desktop.LoadThemeFromFile("assets/menu/widgets.theme");
 
     stateEngine.stopAndStartState
     <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(

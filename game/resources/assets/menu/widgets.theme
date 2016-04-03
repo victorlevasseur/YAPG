@@ -1,0 +1,40 @@
+Window {
+    BackgroundColor: #77aad9ff;
+    BorderColor: #6996c0ff;
+    TitleBackgroundColor: #6691b9ff;
+    Color: #000000ff;
+}
+
+Button,Entry {
+    Color: #000000ff;
+    BackgroundColor: #5f88aeff;
+    BorderColor: #6996c0ff;
+}
+
+Button:PRELIGHT {
+    Color: #000000ff;
+    BackgroundColor: #6996c0ff;
+}
+
+Button:ACTIVE {
+    Color: #000000ff;
+    BackgroundColor: #77aad9ff;
+}
+
+Label {
+    Color: #000000ff;
+}
+
+RadioButton {
+    Color: #000000ff;
+    BackgroundColor: #5f88aeff;
+    CheckColor: #000000ff;
+}
+
+RadioButton:PRELIGHT {
+    BackgroundColor: #6996c0ff;
+}
+
+RadioButton:ACTIVE {
+    BackgroundColor: #77aad9ff;
+}
