@@ -2,6 +2,7 @@
 
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PlayerComponent.hpp"
+#include "Messaging/LevelMessages.hpp"
 #include "Settings/SettingsManager.hpp"
 #include "Settings/KeySettings.hpp"
 
@@ -20,8 +21,11 @@ PlayerSystem::PlayerSystem(const settings::SettingsManager& settingsManager) :
 
 void PlayerSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
 {
+    bool hasOnePlayerAlive = false;
+
     es.each<c::PlayerComponent, c::PlatformerComponent>([&](entityx::Entity entity, c::PlayerComponent& player, c::PlatformerComponent& platformer)
     {
+        hasOnePlayerAlive = true;
         //Get the keys associated to the player
         const settings::KeySettings::PlayerKeys& playerKeys =
             m_settingsManager.getKeySettings().getPlayerKeys(player.playerNumber);
@@ -39,6 +43,9 @@ void PlayerSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
             platformer.wantsToJump = false;
         }
     });
+
+    if(!hasOnePlayerAlive)
+        emit<messaging::AllPlayersLostMessage>();
 }
 
 void PlayerSystem::receive(const PlayerFallingDeathMessage& msg)

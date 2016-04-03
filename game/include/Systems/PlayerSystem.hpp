@@ -15,7 +15,7 @@ struct PlayerFallingDeathMessage
     entityx::Entity player;
 };
 
-class PlayerSystem : public entityx::System<PlayerSystem>, public messaging::Receiver<PlayerFallingDeathMessage>
+class PlayerSystem : public entityx::System<PlayerSystem>, public messaging::Emitter, public messaging::Receiver<PlayerFallingDeathMessage>
 {
 public:
     PlayerSystem(const settings::SettingsManager& settingsManager);

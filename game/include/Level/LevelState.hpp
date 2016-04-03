@@ -23,7 +23,7 @@ namespace state{ class StateEngine; }
 namespace level
 {
 
-class LevelState : public state::State, public messaging::Receiver<messaging::AllPlayersFinishedMessage>
+class LevelState : public state::State, public messaging::Receiver<messaging::AllPlayersFinishedMessage, messaging::AllPlayersLostMessage>
 {
 public:
     LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
@@ -33,6 +33,7 @@ public:
     virtual void render(sf::RenderTarget& target);
 
     virtual void receive(const messaging::AllPlayersFinishedMessage& message) override;
+    virtual void receive(const messaging::AllPlayersLostMessage& message) override;
 
 protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);

@@ -34,6 +34,7 @@ LevelFailureState::LevelFailureState(state::StateEngine& stateEngine, const std:
     //GUI init
     m_window = sfg::Window::Create(sfg::Window::BACKGROUND|sfg::Window::SHADOW);
     auto box = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
+    box->SetSpacing(5.f);
 
     auto retryButton = sfg::Button::Create("Retry");
     retryButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
@@ -43,6 +44,8 @@ LevelFailureState::LevelFailureState(state::StateEngine& stateEngine, const std:
             m_levelPath, m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
         );
     });
+
+    box->PackEnd(retryButton);
 
     auto returnButton = sfg::Button::Create("Return to main menu");
     returnButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()

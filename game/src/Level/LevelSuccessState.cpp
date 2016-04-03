@@ -31,6 +31,8 @@ LevelSuccessState::LevelSuccessState(state::StateEngine& stateEngine, resources:
     //GUI init
     m_window = sfg::Window::Create(sfg::Window::BACKGROUND|sfg::Window::SHADOW);
     auto box = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
+    box->SetSpacing(5.f);
+
     auto returnButton = sfg::Button::Create("Return to main menu");
     returnButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {

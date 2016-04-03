@@ -2,6 +2,7 @@
 
 #include <SFML/System/Time.hpp>
 
+#include "Level/LevelFailureState.hpp"
 #include "Level/LevelSuccessState.hpp"
 #include "State/MainMenuState.hpp"
 #include "State/StateEngine.hpp"
@@ -64,6 +65,14 @@ void LevelState::receive(const messaging::AllPlayersFinishedMessage& message)
             );
         },
         sf::seconds(2.f)
+    );
+}
+
+void LevelState::receive(const messaging::AllPlayersLostMessage& message)
+{
+    getStateEngine().stopAndStartState
+    <level::LevelFailureState, const std::string&, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
+        m_path, m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
     );
 }
 
