@@ -51,11 +51,15 @@ LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::A
     m_mouseOffsetToSelected(),
     m_dragging(false),
     m_draggingView(false),
-    m_mousePosBeforeDrag()
+    m_mousePosBeforeDrag(),
+    m_spawnSprite(),
+    m_spawnTexture(resourcesManager.getTextures().requestResource("editor/spawn.png"))
 {
     initSystemManager();
     initGUI();
     updateTemplatesList();
+
+    m_spawnSprite.setTexture(*m_spawnTexture);
 
     newLevel();
 }
@@ -260,6 +264,11 @@ void LevelEditorState::render(sf::RenderTarget& target)
     target.setView(m_levelView);
     m_systemMgr->system<systems::RenderSystem>()->render(target);
 
+    //Draw the spawn position
+    m_spawnSprite.setPosition(m_level.getSpawnPosition());
+    target.draw(m_spawnSprite);
+
+    //Draw the selection box (or insertion box)
     if(getEditionMode() == EditionMode::Insertion)
     {
         sf::RectangleShape ghostRect(m_templateSize

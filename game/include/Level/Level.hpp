@@ -28,6 +28,8 @@ public:
     void LoadFromFile(const std::string& path);
     void SaveToFile(const std::string& path);
 
+    sf::Vector2f getSpawnPosition() const { return m_spawnPosition; }
+
     const entityx::EventManager& getEventManager() const { return m_eventMgr; }
     entityx::EventManager& getEventManager() { return m_eventMgr; }
 

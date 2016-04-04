@@ -7,6 +7,8 @@
 
 #include "entityx/entityx.h"
 
+#include <SFML/Graphics/Sprite.hpp>
+
 #include <SFGUI/Box.hpp>
 #include <SFGUI/Desktop.hpp>
 #include <SFGUI/Label.hpp>
@@ -119,6 +121,10 @@ private:
     //Move the view stuff
     bool m_draggingView;
     sf::Vector2i m_mousePosBeforeDrag;
+
+    //Spawn position
+    sf::Sprite m_spawnSprite;
+    std::shared_ptr<sf::Texture> m_spawnTexture;
 };
 
 }
