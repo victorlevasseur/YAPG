@@ -21,11 +21,19 @@ Button:ACTIVE {
     BackgroundColor: #77aad9ff;
 }
 
+ComboBox:PRELIGHT {
+    BackgroundColor: #6691b9ff;
+}
+
+ComboBox:ACTIVE {
+    BackgroundColor: #6691b9ff;
+}
+
 Label {
     Color: #000000ff;
 }
 
-ListBox {
+ComboBox, ListBox {
     Color: #000000ff;
     HighlightedColor: #6996c0ff;
     SelectedColor: #77aad9ff;
