@@ -57,6 +57,7 @@ private:
     {
         Insertion,
         Modify,
+        SpawnConfig,
         Unknown
     };
 
@@ -96,11 +97,13 @@ private:
     sfg::Window::Ptr m_toolsToolbar;
         sfg::RadioButton::Ptr m_insertionTool;
         sfg::RadioButton::Ptr m_modifyTool;
+        sfg::RadioButton::Ptr m_spawnConfigTool;
     sfg::Window::Ptr m_toolsSettingsToolbar;
         sfg::ListBox::Ptr m_templatesListBox;
         std::vector<std::string> m_templatesNames;
         sfg::ScrolledWindow::Ptr m_propertiesScrolled;
         std::unique_ptr<PropertiesManager> m_propertiesManager;
+        sfg::Box::Ptr m_spawnConfigBox;
 
     level::Level m_level;
     std::string m_filepath;

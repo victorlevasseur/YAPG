@@ -29,6 +29,7 @@ public:
     void SaveToFile(const std::string& path);
 
     sf::Vector2f getSpawnPosition() const { return m_spawnPosition; }
+    void setSpawnPosition(sf::Vector2f spawnPosition) { m_spawnPosition = spawnPosition; }
 
     const entityx::EventManager& getEventManager() const { return m_eventMgr; }
     entityx::EventManager& getEventManager() { return m_eventMgr; }

@@ -230,6 +230,17 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             m_selectedEntity.destroy();
         }
     }
+    else if(getEditionMode() == EditionMode::SpawnConfig)
+    {
+        if(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+        {
+            if(isMouseNotOnWidgets(sf::Vector2i(event.mouseMove.x, event.mouseMove.y), target))
+            {
+                sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), m_levelView);
+                m_level.setSpawnPosition(mousePosition);
+            }
+        }
+    }
 
     //View dragging
     if(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right)
@@ -406,10 +417,12 @@ void LevelEditorState::initGUI()
 
     m_insertionTool = sfg::RadioButton::Create("Insert new entities", radioGroup);
     m_modifyTool = sfg::RadioButton::Create("Modify placed entities", radioGroup);
+    m_spawnConfigTool = sfg::RadioButton::Create("Set spawn configuration", radioGroup);
 
     m_insertionTool->SetActive(true);
     toolsBox->PackEnd(m_insertionTool);
     toolsBox->PackEnd(m_modifyTool);
+    toolsBox->PackEnd(m_spawnConfigTool);
 
     //TEMPLATES TOOLBAR
     m_toolsSettingsToolbar = sfg::Window::Create(sfg::Window::BACKGROUND|sfg::Window::TITLEBAR);
@@ -433,15 +446,24 @@ void LevelEditorState::initGUI()
     m_propertiesScrolled->Show(false);
     toolsSettingsBox->PackEnd(m_propertiesScrolled);
 
+    m_spawnConfigBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
+    m_spawnConfigBox->Show(false);
+    toolsSettingsBox->PackEnd(m_spawnConfigBox);
+    {
+        m_spawnConfigBox->PackEnd(sfg::Label::Create("Left click on the level to\nset the spawn position."));
+    }
+
     //END OF TOOLS TOOLBAR
     auto enableCorrectToolSettings = [&](std::weak_ptr<sfg::Widget> toEnable, sf::String title)
     {
         m_templatesListBox->Show(false);
         m_propertiesScrolled->Show(false);
+        m_spawnConfigBox->Show(false);
 
         m_toolsSettingsToolbar->SetTitle(title);
 
-        toEnable.lock()->Show(true);
+        if(toEnable.lock())
+            toEnable.lock()->Show(true);
     };
 
     m_insertionTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
@@ -450,6 +472,10 @@ void LevelEditorState::initGUI()
 
     m_modifyTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
         std::bind(enableCorrectToolSettings, m_propertiesScrolled, "Properties")
+    );
+
+    m_spawnConfigTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
+        std::bind(enableCorrectToolSettings, m_spawnConfigBox, "Spawn configuration")
     );
 
     //Init the properties manager
@@ -515,6 +541,8 @@ LevelEditorState::EditionMode LevelEditorState::getEditionMode() const
         return EditionMode::Insertion;
     else if(m_modifyTool->IsActive())
         return EditionMode::Modify;
+    else if(m_spawnConfigTool->IsActive())
+        return EditionMode::SpawnConfig;
     return EditionMode::Unknown;
 }
 
