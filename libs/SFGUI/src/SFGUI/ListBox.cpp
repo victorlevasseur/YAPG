@@ -250,6 +250,12 @@ void ListBox::RemoveFromSelection( IndexType index ) {
 	Invalidate();
 }
 
+void ListBox::ClearSelection() {
+	m_selected_items.clear();
+
+	Invalidate();
+}
+
 bool ListBox::IsItemSelected(IndexType index) const {
 	return m_selected_items.find( index ) != m_selected_items.end();
 }

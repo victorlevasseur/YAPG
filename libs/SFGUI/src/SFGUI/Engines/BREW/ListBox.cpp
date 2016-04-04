@@ -14,9 +14,7 @@ std::unique_ptr<RenderQueue> BREW::CreateListBoxDrawable( std::shared_ptr<const 
     auto highlighted_color = GetProperty<sf::Color>( "HighlightedColor", listbox );
     auto selected_color = GetProperty<sf::Color>( "SelectedColor", listbox );
 	auto text_color = GetProperty<sf::Color>( "Color", listbox );
-	auto cursor_color = GetProperty<sf::Color>( "Color", listbox );
 	auto text_padding = GetProperty<float>( "Padding", listbox );
-	auto cursor_thickness = GetProperty<float>( "Thickness", listbox );
 	auto border_width = GetProperty<float>( "BorderWidth", listbox );
 	auto border_color_shift = GetProperty<int>( "BorderColorShift", listbox );
 	const auto& font_name = GetProperty<std::string>( "FontName", listbox );
@@ -39,7 +37,7 @@ std::unique_ptr<RenderQueue> BREW::CreateListBoxDrawable( std::shared_ptr<const 
 
     // Items.
     sf::Vector2f itemPosition = sf::Vector2f( border_width + text_padding, border_width + text_padding );
-    for( std::size_t i = listbox->GetFirstDisplayedItemIndex();
+    for( ListBox::IndexType i = listbox->GetFirstDisplayedItemIndex();
         i < std::min(listbox->GetFirstDisplayedItemIndex() + listbox->GetMaxDisplayedItemsCount(), listbox->GetItemsCount());
         ++i ) {
         auto& itemText = listbox->GetDisplayedItemText( i );
@@ -49,6 +47,7 @@ std::unique_ptr<RenderQueue> BREW::CreateListBoxDrawable( std::shared_ptr<const 
 
         sf::Text text( itemText, *font, font_size );
         text.setPosition(itemPosition);
+        text.setColor(text_color);
 
         if( listbox->IsItemSelected( i ) ) {
             queue->Add(

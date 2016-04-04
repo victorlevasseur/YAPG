@@ -64,6 +64,7 @@ class SFGUI_API ListBox : public Container {
 		void SetSelection( std::initializer_list<IndexType> indices );
 		void AppendToSelection( IndexType index );
 		void RemoveFromSelection( IndexType index );
+		void ClearSelection();
 
 		bool IsItemSelected( IndexType index ) const;
         IndexType GetSelectedItemsCount() const;
