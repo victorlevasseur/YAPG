@@ -40,6 +40,7 @@ LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::A
     m_templatesNames(),
     m_propertiesScrolled(),
     m_propertiesManager(nullptr),
+    m_playerTemplatesNames(),
     m_level(m_luaState, level::Level::LevelMode::EditMode),
     m_filepath(),
     m_systemMgr(nullptr),
@@ -440,6 +441,7 @@ void LevelEditorState::initGUI()
     m_toolsSettingsToolbar->Add(toolsSettingsBox);
 
     m_templatesListBox = sfg::ListBox::Create();
+    m_templatesListBox->SetItemTextPolicy(sfg::ListBox::ItemTextPolicy::SHRINK);
     toolsSettingsBox->PackEnd(m_templatesListBox);
 
     m_propertiesScrolled = sfg::ScrolledWindow::Create();
@@ -447,10 +449,28 @@ void LevelEditorState::initGUI()
     toolsSettingsBox->PackEnd(m_propertiesScrolled);
 
     m_spawnConfigBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
+    m_spawnConfigBox->SetSpacing(5.f);
     m_spawnConfigBox->Show(false);
     toolsSettingsBox->PackEnd(m_spawnConfigBox);
     {
-        m_spawnConfigBox->PackEnd(sfg::Label::Create("Left click on the level to\nset the spawn position."));
+        m_spawnConfigBox->PackEnd(sfg::Label::Create("Left click on the level to\nset the spawn position."), false, true);
+
+        m_spawnConfigTable = sfg::Table::Create();
+        m_spawnConfigBox->PackEnd(m_spawnConfigTable, false, true);
+
+        m_spawnConfigTable->Attach(sfg::Label::Create("Player template: "), sf::Rect<sf::Uint32>(0u, 0u, 1u, 1u), sfg::Table::FILL, sfg::Table::FILL);
+
+        m_playerTemplateComboBox = sfg::ComboBox::Create();
+        m_playerTemplateComboBox->GetSignal(sfg::ComboBox::OnSelect).Connect([&]()
+        {
+            //Set the player template
+            std::string newPlayerTemplate = m_playerTemplatesNames[m_playerTemplateComboBox->GetSelectedItem()];
+            if(m_level.getPlayersTemplates().size() < 1)
+                m_level.getPlayersTemplates().push_back(newPlayerTemplate);
+            else
+                m_level.getPlayersTemplates()[0] = newPlayerTemplate;
+        });
+        m_spawnConfigTable->Attach(m_playerTemplateComboBox, sf::Rect<sf::Uint32>(1u, 0u, 1u, 1u), sfg::Table::EXPAND|sfg::Table::FILL, sfg::Table::FILL);
     }
 
     //END OF TOOLS TOOLBAR
@@ -501,6 +521,7 @@ void LevelEditorState::newLevel()
     m_filepath = std::string();
 
     m_filepathLabel->SetText("(not saved yet)");
+    updateGuiFromLevel();
 }
 
 void LevelEditorState::openLevel()
@@ -512,6 +533,7 @@ void LevelEditorState::openLevel()
         m_filepath = fileDialog.getFilename();
 
         m_filepathLabel->SetText(m_filepath);
+        updateGuiFromLevel();
     }
 }
 
@@ -535,6 +557,19 @@ void LevelEditorState::saveAsLevel()
     }
 }
 
+void LevelEditorState::updateGuiFromLevel()
+{
+    m_playerTemplateComboBox->SelectItem(0);
+    if(m_level.getPlayersTemplates().size() > 0)
+    {
+        auto it = std::find(m_playerTemplatesNames.cbegin(), m_playerTemplatesNames.cend(), m_level.getPlayersTemplates()[0]);
+        if(it != m_playerTemplatesNames.cend())
+        {
+            m_playerTemplateComboBox->SelectItem(std::distance(m_playerTemplatesNames.cbegin(), it));
+        }
+    }
+}
+
 LevelEditorState::EditionMode LevelEditorState::getEditionMode() const
 {
     if(m_insertionTool->IsActive())
@@ -550,7 +585,11 @@ void LevelEditorState::updateTemplatesList()
 {
     //Clear all buttons
     m_templatesListBox->Clear();
+    m_playerTemplateComboBox->Clear();
+    m_playerTemplateComboBox->AppendItem("No player!");
     m_templatesNames.clear();
+    m_playerTemplatesNames.clear();
+    m_playerTemplatesNames.push_back("");
 
     auto& templatesList = m_luaState.getTemplates();
     for(auto& pair : templatesList)
@@ -558,8 +597,17 @@ void LevelEditorState::updateTemplatesList()
         const auto& entityTemplate = pair.second;
         if(!entityTemplate.isAbstract())
         {
-            m_templatesNames.push_back(pair.first);
-            m_templatesListBox->AppendItem(entityTemplate.getFriendlyName());
+            //If it's a player, add it to the player templates list
+            if(entityTemplate.isPlayer())
+            {
+                m_playerTemplatesNames.push_back(pair.first);
+                m_playerTemplateComboBox->AppendItem(entityTemplate.getFriendlyName());
+            }
+            else //If not, add it to the general template list
+            {
+                m_templatesNames.push_back(pair.first);
+                m_templatesListBox->AppendItem(entityTemplate.getFriendlyName());
+            }
         }
     }
 }

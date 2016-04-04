@@ -179,4 +179,9 @@ void EntityTemplate::saveEntity(entityx::Entity entity, const level::SerializedE
     }
 }
 
+bool EntityTemplate::isPlayer() const
+{
+    return getComponentsTable().get<sol::object>("Player").is<sol::table>();
+}
+
 }

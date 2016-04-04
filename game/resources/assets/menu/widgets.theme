@@ -5,7 +5,7 @@ Window {
     Color: #000000ff;
 }
 
-Button,Entry,ListBox {
+Button,Entry,ListBox,ComboBox {
     Color: #000000ff;
     BackgroundColor: #5f88aeff;
     BorderColor: #6996c0ff;

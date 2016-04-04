@@ -83,6 +83,8 @@ public:
 
     bool isAbstract() const { return m_abstract; }
 
+    bool isPlayer() const;
+
     const std::map<std::string, Parameter>& getParameters() const { return m_parameters; }
 
     const sol::table& getComponentsTable() const { return m_componentsTable; }

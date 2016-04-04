@@ -10,6 +10,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 
 #include <SFGUI/Box.hpp>
+#include <SFGUI/ComboBox.hpp>
 #include <SFGUI/Desktop.hpp>
 #include <SFGUI/Label.hpp>
 #include <SFGUI/ListBox.hpp>
@@ -69,6 +70,8 @@ private:
     void saveLevel();
     void saveAsLevel();
 
+    void updateGuiFromLevel();
+
     EditionMode getEditionMode() const;
 
     void updateTemplatesList();
@@ -104,6 +107,9 @@ private:
         sfg::ScrolledWindow::Ptr m_propertiesScrolled;
         std::unique_ptr<PropertiesManager> m_propertiesManager;
         sfg::Box::Ptr m_spawnConfigBox;
+            sfg::Table::Ptr m_spawnConfigTable;
+            sfg::ComboBox::Ptr m_playerTemplateComboBox;
+            std::vector<std::string> m_playerTemplatesNames;
 
     level::Level m_level;
     std::string m_filepath;
