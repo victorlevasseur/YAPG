@@ -5,7 +5,7 @@ Window {
     Color: #000000ff;
 }
 
-Button,Entry {
+Button,Entry,ListBox {
     Color: #000000ff;
     BackgroundColor: #5f88aeff;
     BorderColor: #6996c0ff;
@@ -25,6 +25,21 @@ Label {
     Color: #000000ff;
 }
 
+ListBox {
+    Color: #000000ff;
+    HighlightedColor: #6996c0ff;
+    SelectedColor: #77aad9ff;
+}
+
+Notebook {
+    BackgroundColor: #77aad9ff;
+    BorderColor: #6996c0ff;
+    BackgroundColorDark: #6691b9ff;
+    BackgroundColorPrelight: #6996c0ff;
+
+    Color: #000000ff;
+}
+
 RadioButton {
     Color: #000000ff;
     BackgroundColor: #5f88aeff;
@@ -37,4 +52,12 @@ RadioButton:PRELIGHT {
 
 RadioButton:ACTIVE {
     BackgroundColor: #77aad9ff;
+}
+
+Scrollbar {
+    StepperArrowColor: #000000ff;
+    StepperBackgroundColor: #5f88aeff;
+    SliderColor: #5f88aeff;
+    TroughColor: #77aad9ff;
+    BorderColor: #6996c0ff;
 }
