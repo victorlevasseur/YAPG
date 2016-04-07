@@ -395,5 +395,11 @@
                 <y>612</y>
             </parameters>
         </object>
+        <object id="66" template="kenney_frog">
+            <parameters>
+                <x>729</x>
+                <y>418</y>
+            </parameters>
+        </object>
     </objects>
 </level>
