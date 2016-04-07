@@ -1,5 +1,5 @@
 <level>
-    <spawn_position x="120" y="80"/>
+    <spawn_position x="162" y="152"/>
     <players max_player="1">
         <player entity_template="kenney_player1"/>
     </players>
@@ -387,6 +387,12 @@
             <parameters>
                 <x>640</x>
                 <y>224</y>
+            </parameters>
+        </object>
+        <object id="65" template="kenney_slime_green">
+            <parameters>
+                <x>479</x>
+                <y>612</y>
             </parameters>
         </object>
     </objects>
