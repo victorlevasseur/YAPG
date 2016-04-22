@@ -14,11 +14,11 @@ namespace lua
 std::map<std::string, std::type_index> EntityHandle::componentsTypeIndex =
         std::map<std::string, std::type_index>();
 
-std::map<std::string, std::function<void*(EntityHandle*)>> EntityHandle::componentsGetters =
-        std::map<std::string, std::function<void*(EntityHandle*)>>();
+std::map<std::string, std::function<components::Component*(EntityHandle*)>> EntityHandle::componentsGetters =
+        std::map<std::string, std::function<components::Component*(EntityHandle*)>>();
 
-std::map<std::string, std::function<const void*(const EntityHandle*)>> EntityHandle::componentsGettersConst =
-        std::map<std::string, std::function<const void*(const EntityHandle*)>>();
+std::map<std::string, std::function<const components::Component*(const EntityHandle*)>> EntityHandle::componentsGettersConst =
+        std::map<std::string, std::function<const components::Component*(const EntityHandle*)>>();
 
 std::map<std::string, std::function<bool(const EntityHandle*)>> EntityHandle::componentsCheckers =
         std::map<std::string, std::function<bool(const EntityHandle*)>>();
@@ -66,6 +66,21 @@ void EntityHandle::saveAttributeToXml(const std::string& componentName, const st
 bool EntityHandle::hasComponent(const std::string& componentName) const
 {
     return componentsCheckers.at(componentName)(this);
+}
+
+components::Component* EntityHandle::getComponentPtrForLua(const std::string& componentName)
+{
+    return getComponentPtr(componentName);
+}
+
+components::Component* EntityHandle::getComponentPtr(const std::string& componentName)
+{
+    return componentsGetters.at(componentName)(this);
+}
+
+const components::Component* EntityHandle::getComponentPtr(const std::string& componentName) const
+{
+    return componentsGettersConst.at(componentName)(this);
 }
 
 boost::any EntityHandle::getAttributeAsAny(const std::string& componentName, const std::string& attributeName) const
@@ -160,6 +175,7 @@ void EntityHandle::registerClass(LuaState &state)
     state.getState().new_usertype<EntityHandle>("entity_handle",
         "remove_entity", &EntityHandle::removeEntity,
         "has_component", &EntityHandle::hasComponent,
+        "get_component", &EntityHandle::getComponentPtrForLua,
         "get_attribute", &EntityHandle::getAttributeAsAny,
         "set_attribute", &EntityHandle::setAttributeAsAny,
         "get_table_attribute", &EntityHandle::getAttributeAsLuaTable,
@@ -167,16 +183,6 @@ void EntityHandle::registerClass(LuaState &state)
         "get_custom_data", &EntityHandle::getCustomData,
         "write_to_console", &EntityHandle::writeToConsole
     );
-}
-
-void* EntityHandle::getComponentPtr(const std::string& componentName)
-{
-    return componentsGetters.at(componentName)(this);
-}
-
-const void* EntityHandle::getComponentPtr(const std::string& componentName) const
-{
-    return componentsGettersConst.at(componentName)(this);
 }
 
 }

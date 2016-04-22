@@ -2,7 +2,7 @@ namespace lua
 {
 
 template<class C>
-void* EntityHandle::doGetComponentPtr()
+components::Component* EntityHandle::doGetComponentPtr()
 {
     if(m_entity.has_component<C>())
     {
@@ -13,7 +13,7 @@ void* EntityHandle::doGetComponentPtr()
 }
 
 template<class C>
-const void* EntityHandle::doGetComponentPtrConst() const
+const components::Component* EntityHandle::doGetComponentPtrConst() const
 {
     if(m_entity.has_component<C>())
     {

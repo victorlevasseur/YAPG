@@ -8,6 +8,7 @@
 
 #include "entityx/entityx.h"
 
+#include "Components/Component.hpp"
 #include "Lua/sol.hpp"
 #include "Meta/Metadata.hpp"
 
@@ -48,6 +49,9 @@ public:
     void saveAttributeToXml(const std::string& componentName, const std::string& attributeName, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const;
 
     bool hasComponent(const std::string& componentName) const;
+    components::Component* getComponentPtrForLua(const std::string& componentName);
+    components::Component* getComponentPtr(const std::string& componentName);
+    const components::Component* getComponentPtr(const std::string& componentName) const;
 
     boost::any getAttributeAsAny(const std::string& componentName, const std::string& attributeName) const;
     void setAttributeAsAny(const std::string& componentName, const std::string& attributeName, const boost::any& value);
@@ -69,14 +73,11 @@ public:
 
 private:
 
-    void* getComponentPtr(const std::string& componentName);
-    const void* getComponentPtr(const std::string& componentName) const;
+    template<class C>
+    components::Component* doGetComponentPtr();
 
     template<class C>
-    void* doGetComponentPtr();
-
-    template<class C>
-    const void* doGetComponentPtrConst() const;
+    const components::Component* doGetComponentPtrConst() const;
 
     template<class C>
     bool doHasComponent() const;
@@ -84,8 +85,8 @@ private:
     entityx::Entity m_entity;
 
     static std::map<std::string, std::type_index> componentsTypeIndex;
-    static std::map<std::string, std::function<void*(EntityHandle*)>> componentsGetters;
-    static std::map<std::string, std::function<const void*(const EntityHandle*)>> componentsGettersConst;
+    static std::map<std::string, std::function<components::Component*(EntityHandle*)>> componentsGetters;
+    static std::map<std::string, std::function<const components::Component*(const EntityHandle*)>> componentsGettersConst;
     static std::map<std::string, std::function<bool(const EntityHandle*)>> componentsCheckers;
 };
 
