@@ -25,22 +25,22 @@ entity_template = {
         },
         ["Platformer"] = {
             on_idle = function(entity)
-                entity:set_attribute("Render", "current_animation", string_value("idle&jump"))
+                entity.render.current_animation = "idle&jump"
             end,
             on_start_walking = function(entity)
-                entity:set_attribute("Render", "current_animation", string_value("walking"))
+                entity.render.current_animation = "walking"
             end,
             on_start_jumping = function(entity)
-                entity:set_attribute("Render", "current_animation", string_value("idle&jump"))
+                entity.render.current_animation = "idle&jump"
             end,
             on_start_falling = function(entity)
-                entity:set_attribute("Render", "current_animation", string_value("idle&jump"))
+                entity.render.current_animation = "idle&jump"
             end,
             on_turn_right = function(entity)
-                entity:set_attribute("Render", "flipped", bool_value(true))
+                entity.render.flipped = true
             end,
             on_turn_left = function(entity)
-                entity:set_attribute("Render", "flipped", bool_value(false))
+                entity.render.flipped = false
             end,
             acceleration = 10000000,
             deceleration = 10000000,
@@ -51,17 +51,17 @@ entity_template = {
                 if(entity:get_custom_data():has_value("old_pos_x")) then
                     local old_pos_x = as_float(entity:get_custom_data():get_value("old_pos_x"))
 
-                    if(old_pos_x == as_float(entity:get_attribute("Position", "x"))) then
+                    if(old_pos_x == entity.position.x) then
                         local go_left = as_bool(entity:get_custom_data():get_value("go_left"))
                         entity:get_custom_data():set_value("go_left", bool_value(not go_left))
                     end
                 end
 
                 local go_left = as_bool(entity:get_custom_data():get_value("go_left"))
-                entity:set_attribute("Platformer", "wants_to_go_left", bool_value(go_left))
-                entity:set_attribute("Platformer", "wants_to_go_right", bool_value(not go_left))
+                entity.platformer.wants_to_go_left = go_left
+                entity.platformer.wants_to_go_right = not go_left
 
-                entity:get_custom_data():set_value("old_pos_x", entity:get_attribute("Position", "x"))
+                entity:get_custom_data():set_value("old_pos_x", float_value(entity.position.x))
             end,
         },
         ["CustomData"] = {

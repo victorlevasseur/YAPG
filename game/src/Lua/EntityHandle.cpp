@@ -3,7 +3,16 @@
 #include <iostream>
 
 #include "Components/Component.hpp"
+#include "Components/CollidableComponent.hpp"
+#include "Components/ColliderComponent.hpp"
+#include "Components/CustomBehaviorComponent.hpp"
 #include "Components/CustomDataComponent.hpp"
+#include "Components/FinishLineComponent.hpp"
+#include "Components/HealthComponent.hpp"
+#include "Components/HitboxComponent.hpp"
+#include "Components/PlatformComponent.hpp"
+#include "Components/PlatformerComponent.hpp"
+#include "Components/PlayerComponent.hpp"
 #include "Components/PositionComponent.hpp"
 #include "Components/RenderComponent.hpp"
 #include "Lua/LuaState.hpp"
@@ -66,11 +75,6 @@ void EntityHandle::saveAttributeToXml(const std::string& componentName, const st
 bool EntityHandle::hasComponent(const std::string& componentName) const
 {
     return componentsCheckers.at(componentName)(this);
-}
-
-components::Component* EntityHandle::getComponentPtrForLua(const std::string& componentName)
-{
-    return getComponentPtr(componentName);
 }
 
 components::Component* EntityHandle::getComponentPtr(const std::string& componentName)
@@ -174,8 +178,17 @@ void EntityHandle::registerClass(LuaState &state)
 {
     state.getState().new_usertype<EntityHandle>("entity_handle",
         "remove_entity", &EntityHandle::removeEntity,
-        "has_component", &EntityHandle::hasComponent,
-        "get_component", &EntityHandle::getComponentPtrForLua,
+        "collidable", sol::property(&EntityHandle::doGetComponentPtrForLua<components::CollidableComponent>),
+        "collider", sol::property(&EntityHandle::doGetComponentPtrForLua<components::ColliderComponent>),
+        "custom_behavior", sol::property(&EntityHandle::doGetComponentPtrForLua<components::CustomBehaviorComponent>),
+        "finish_line", sol::property(&EntityHandle::doGetComponentPtrForLua<components::FinishLineComponent>),
+        "health", sol::property(&EntityHandle::doGetComponentPtrForLua<components::HealthComponent>),
+        "hitbox", sol::property(&EntityHandle::doGetComponentPtrForLua<components::HitboxComponent>),
+        "platform", sol::property(&EntityHandle::doGetComponentPtrForLua<components::PlatformComponent>),
+        "platformer", sol::property(&EntityHandle::doGetComponentPtrForLua<components::PlatformerComponent>),
+        "player", sol::property(&EntityHandle::doGetComponentPtrForLua<components::PlayerComponent>),
+        "position", sol::property(&EntityHandle::doGetComponentPtrForLua<components::PositionComponent>),
+        "render", sol::property(&EntityHandle::doGetComponentPtrForLua<components::RenderComponent>),
         "get_attribute", &EntityHandle::getAttributeAsAny,
         "set_attribute", &EntityHandle::setAttributeAsAny,
         "get_table_attribute", &EntityHandle::getAttributeAsLuaTable,

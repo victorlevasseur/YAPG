@@ -16,15 +16,14 @@ entity_template = {
         ["Collidable"] = {
             on_collision_begin = function(entity, other)
                 -- Test if the block has not been hit and if the collision is made with a player
-                if as_string(entity:get_attribute("Render", "current_animation")) == "normal" and other:has_component("Player") then
-
+                if entity.render.current_animation == "normal" and other.player ~= nil then
                     -- Get some useful positions (the Y bottom coord of the block and the Y top coord of the player's HITBOX)
-                    local block_bottom_pos = as_float(entity:get_attribute("Position", "y")) + as_float(entity:get_attribute("Position", "height"))
-                    local player_top_hitbox_pos = as_float(other:get_attribute("Position", "y")) + as_polygon(other:get_attribute("Hitbox", "polygon")):get_local_bounding_box().top
+                    local block_bottom_pos = entity.position.y + entity.position.height
+                    local player_top_hitbox_pos = other.position.y + other.hitbox.polygon:get_local_bounding_box().top
 
                     -- Test if the player hit the block from under
                     if player_top_hitbox_pos >= block_bottom_pos then
-                        entity:set_attribute("Render", "current_animation", string_value("hit"))
+                        entity.render.current_animation = "hit"
                     end
                 end
             end,

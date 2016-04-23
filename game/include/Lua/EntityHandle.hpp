@@ -49,7 +49,6 @@ public:
     void saveAttributeToXml(const std::string& componentName, const std::string& attributeName, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const;
 
     bool hasComponent(const std::string& componentName) const;
-    components::Component* getComponentPtrForLua(const std::string& componentName);
     components::Component* getComponentPtr(const std::string& componentName);
     const components::Component* getComponentPtr(const std::string& componentName) const;
 
@@ -72,6 +71,9 @@ public:
     static void declareComponent(const std::string& componentName);
 
 private:
+
+    template<class C>
+    C* doGetComponentPtrForLua();
 
     template<class C>
     components::Component* doGetComponentPtr();

@@ -2,6 +2,16 @@ namespace lua
 {
 
 template<class C>
+C* EntityHandle::doGetComponentPtrForLua()
+{
+    if(m_entity.has_component<C>())
+    {
+        return m_entity.component<C>().get();
+    }
+    return nullptr;
+}
+
+template<class C>
 components::Component* EntityHandle::doGetComponentPtr()
 {
     if(m_entity.has_component<C>())
