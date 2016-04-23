@@ -33,18 +33,29 @@ void PlatformComponent::registerComponent(lua::LuaState& state)
             const sol::object& platformTypeLua = luaObject.as<sol::table>().get<sol::object>("platform_type");
             if(platformTypeLua.is<std::string>())
             {
-                if(platformTypeLua.as<std::string>() == "Platform")
-                    platform->platformType = PlatformComponent::Platform;
-                else if(platformTypeLua.as<std::string>() == "Jumpthru")
-                    platform->platformType = PlatformComponent::Jumpthru;
+                platform->setPlatformTypeAsString(platformTypeLua.as<std::string>());
             }
         });
 
     lua::EntityHandle::declareComponent<PlatformComponent>("Platform");
 
-    state.getState().new_usertype<PlatformComponent>("platform_component" //TODO: Replace the name here
-        //TODO: Register the properties here
+    state.getState().new_usertype<PlatformComponent>("platform_component",
+        "activated", &PlatformComponent::activated,
+        "platform_type", sol::property(&PlatformComponent::getPlatformTypeAsString, &PlatformComponent::setPlatformTypeAsString)
     );
+}
+
+std::string PlatformComponent::getPlatformTypeAsString() const
+{
+    return platformType == PlatformComponent::Platform ? "Platform" : "Jumpthru";
+}
+
+void PlatformComponent::setPlatformTypeAsString(const std::string str)
+{
+    if(str == "Platform")
+        platformType = PlatformComponent::Platform;
+    else if(str == "Jumpthru")
+        platformType = PlatformComponent::Jumpthru;
 }
 
 std::ostream& operator<<(std::ostream& stream, const PlatformComponent& component)

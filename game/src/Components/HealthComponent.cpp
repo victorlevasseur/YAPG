@@ -29,8 +29,9 @@ void HealthComponent::registerComponent(lua::LuaState& state)
 
     lua::EntityHandle::declareComponent<HealthComponent>("Health");
 
-    state.getState().new_usertype<HealthComponent>("health_component" //TODO: Replace the name here
-        //TODO: Register the properties here
+    state.getState().new_usertype<HealthComponent>("health_component",
+        "health", &HealthComponent::health,
+        "max_health", &HealthComponent::maxHealth
     );
 }
 

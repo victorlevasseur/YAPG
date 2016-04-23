@@ -39,7 +39,13 @@ void PositionComponent::registerComponent(lua::LuaState& state)
     lua::EntityHandle::declareComponent<PositionComponent>("Position");
 
     //Register to lua
-    state.getState().new_usertype<PositionComponent>("position_component");
+    state.getState().new_usertype<PositionComponent>("position_component",
+        "x", &PositionComponent::x,
+        "y", &PositionComponent::y,
+        "z", &PositionComponent::z,
+        "width", &PositionComponent::width,
+        "height", &PositionComponent::height
+    );
 }
 
 std::ostream& operator<<(std::ostream& stream, const PositionComponent& component)

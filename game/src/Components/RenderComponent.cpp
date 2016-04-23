@@ -37,8 +37,13 @@ void RenderComponent::registerComponent(lua::LuaState& state)
 
     lua::EntityHandle::declareComponent<RenderComponent>("Render");
 
-    state.getState().new_usertype<RenderComponent>("render_component" //TODO: Replace the name here
-        //TODO: Register the properties here
+    state.getState().new_usertype<RenderComponent>("render_component",
+        "texture", &RenderComponent::textureName,
+        "current_animation", &RenderComponent::currentAnimation,
+        "animations", &RenderComponent::animations,
+        "flipped", &RenderComponent::flipped,
+        "on_animation_changed", &RenderComponent::onAnimationChangedFunc,
+        "on_animation_end", &RenderComponent::onAnimationEndFunc
     );
 }
 

@@ -70,8 +70,22 @@ void PlatformerComponent::registerComponent(lua::LuaState& state)
 
     lua::EntityHandle::declareComponent<PlatformerComponent>("Platformer");
 
-    state.getState().new_usertype<PlatformerComponent>("platformer_component" //TODO: Replace the name here
-        //TODO: Register the properties here
+    state.getState().new_usertype<PlatformerComponent>("platformer_component",
+        "max_walking_speed", &PlatformerComponent::maxSpeed,
+        "max_jumping_speed", &PlatformerComponent::maxJumpingSpeed,
+        "max_falling_speed", &PlatformerComponent::maxFallingSpeed,
+        "acceleration", &PlatformerComponent::acceleration,
+        "deceleration", &PlatformerComponent::deceleration,
+        "gravity", &PlatformerComponent::gravity,
+        "wants_to_jump", &PlatformerComponent::wantsToJump,
+        "wants_to_go_left", &PlatformerComponent::wantsToGoLeft,
+        "wants_to_go_right", &PlatformerComponent::wantsToGoRight,
+        "on_idle", &PlatformerComponent::onIdleFunc,
+        "on_start_walking", &PlatformerComponent::onWalkingFunc,
+        "on_start_jumping", &PlatformerComponent::onJumpingFunc,
+        "on_start_falling", &PlatformerComponent::onFallingFunc,
+        "on_turn_right", &PlatformerComponent::onTurnRightFunc,
+        "on_turn_left", &PlatformerComponent::onTurnLeftFunc
     );
 }
 

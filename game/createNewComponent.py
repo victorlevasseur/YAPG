@@ -57,7 +57,7 @@ void {0}Component::registerComponent(lua::LuaState& state)
 
     lua::EntityHandle::declareComponent<{0}Component>("{0}");
 
-    state.getState().new_usertype<{0}Component>("{1}_component" //TODO: Replace the name here
+    state.getState().new_usertype<{0}Component>("{1}_component"
         //TODO: Register the properties here
     );
 }}

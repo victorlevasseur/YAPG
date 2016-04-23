@@ -30,8 +30,10 @@ void CollidableComponent::registerComponent(lua::LuaState& state)
 
     lua::EntityHandle::declareComponent<CollidableComponent>("Collidable");
 
-    state.getState().new_usertype<CollidableComponent>("collidable_component" //TODO: Replace the name here
-        //TODO: Register the properties here
+    state.getState().new_usertype<CollidableComponent>("collidable_component",
+        "on_collision_begin", &CollidableComponent::onCollisionBegin,
+        "collides", &CollidableComponent::collides,
+        "on_collision_end", &CollidableComponent::onCollisionEnd
     );
 }
 

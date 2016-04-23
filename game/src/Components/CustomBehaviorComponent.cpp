@@ -29,7 +29,9 @@ void CustomBehaviorComponent::registerComponent(lua::LuaState& state)
 
     lua::EntityHandle::declareComponent<CustomBehaviorComponent>("CustomBehavior");
 
-    state.getState().new_usertype<CustomBehaviorComponent>("custom_behavior_component");
+    state.getState().new_usertype<CustomBehaviorComponent>("custom_behavior_component",
+        "on_update", &CustomBehaviorComponent::updateFunction
+    );
 }
 
 std::ostream& operator<<(std::ostream& stream, const CustomBehaviorComponent& component)

@@ -28,8 +28,8 @@ void HitboxComponent::registerComponent(lua::LuaState& state)
 
     lua::EntityHandle::declareComponent<HitboxComponent>("Hitbox");
 
-    state.getState().new_usertype<HitboxComponent>("hitbox_component" //TODO: Replace the name here
-        //TODO: Register the properties here
+    state.getState().new_usertype<HitboxComponent>("hitbox_component",
+        "polygon", &HitboxComponent::m_polygon
     );
 }
 

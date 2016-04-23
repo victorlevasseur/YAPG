@@ -24,6 +24,9 @@ public:
 
     static void registerComponent(lua::LuaState& state);
 
+    std::string getPlatformTypeAsString() const;
+    void setPlatformTypeAsString(const std::string str);
+
     bool activated;
     PlatformType platformType;
     int layer;

@@ -30,8 +30,9 @@ void PlayerComponent::registerComponent(lua::LuaState& state)
 
     lua::EntityHandle::declareComponent<PlayerComponent>("Player");
 
-    state.getState().new_usertype<PlayerComponent>("player_component" //TODO: Replace the name here
-        //TODO: Register the properties here
+    state.getState().new_usertype<PlayerComponent>("player_component",
+        "player_number", sol::readonly(&PlayerComponent::playerNumber),
+        "finished_level", &PlayerComponent::finishedLevel
     );
 }
 
