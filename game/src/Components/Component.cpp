@@ -33,47 +33,47 @@ void Component::loadFromLua(const sol::object& luaTable, const level::Serialized
 
 void Component::assignComponent(entityx::Entity entity, const std::string &component, const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)
 {
-    if(component == "Position")
+    if(component == "position")
     {
         entity.assign<PositionComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
-    else if(component == "CustomBehavior")
+    else if(component == "custom_behavior")
     {
         entity.assign<CustomBehaviorComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
-    else if(component == "Hitbox")
+    else if(component == "hitbox")
     {
         entity.assign<HitboxComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
-    else if(component == "Platform")
+    else if(component == "platform")
     {
         entity.assign<PlatformComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
-    else if(component == "Platformer")
+    else if(component == "platformer")
     {
         entity.assign<PlatformerComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
-    else if(component == "Player")
+    else if(component == "player")
     {
         entity.assign<PlayerComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
-    else if(component == "Render")
+    else if(component == "render")
     {
         entity.assign<RenderComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
-    else if(component == "CustomData")
+    else if(component == "custom_data")
     {
         //Don't do anything, it's managed by initializeEntity from EntityTemplate
     }
-    else if(component == "Collidable")
+    else if(component == "collidable")
     {
         entity.assign<CollidableComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
-    else if(component == "Collider")
+    else if(component == "collider")
     {
         entity.assign<ColliderComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
-    else if(component == "FinishLine")
+    else if(component == "finish_line")
     {
         entity.assign<FinishLineComponent>().get()->loadFromLua(luaTable, entityGetter);
     }

@@ -100,11 +100,11 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
 
     //Add the CustomData component (special case!)
     entity.assign<components::CustomDataComponent>();
-    if(m_componentsTable.get<sol::object>("CustomData").is<sol::table>())
+    if(m_componentsTable.get<sol::object>("custom_data").is<sol::table>())
     {
         //If the template has CustomDataComponent defined, it means that he needs to predefine some values
         entity.component<components::CustomDataComponent>()->loadFromLua(
-            m_componentsTable.get<sol::object>("CustomData"),
+            m_componentsTable.get<sol::object>("custom_data"),
             entityGetter
         );
     }

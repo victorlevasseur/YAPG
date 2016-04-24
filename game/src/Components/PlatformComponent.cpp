@@ -37,7 +37,7 @@ void PlatformComponent::registerComponent(lua::LuaState& state)
             }
         });
 
-    lua::EntityHandle::declareComponent<PlatformComponent>("Platform");
+    lua::EntityHandle::declareComponent<PlatformComponent>("platform");
 
     state.getState().new_usertype<PlatformComponent>("platform_component",
         "activated", &PlatformComponent::activated,

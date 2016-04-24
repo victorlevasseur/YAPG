@@ -27,7 +27,7 @@ void CustomBehaviorComponent::registerComponent(lua::LuaState& state)
     meta::MetadataStore::registerClass<CustomBehaviorComponent>("CustomBehaviorComponent")
         .declareAttribute<sol::function>("on_update", &CustomBehaviorComponent::updateFunction);
 
-    lua::EntityHandle::declareComponent<CustomBehaviorComponent>("CustomBehavior");
+    lua::EntityHandle::declareComponent<CustomBehaviorComponent>("custom_behavior");
 
     state.getState().new_usertype<CustomBehaviorComponent>("custom_behavior_component",
         "on_update", &CustomBehaviorComponent::updateFunction

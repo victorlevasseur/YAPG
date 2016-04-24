@@ -35,7 +35,7 @@ void RenderComponent::registerComponent(lua::LuaState& state)
         .declareAttribute("on_animation_changed", &RenderComponent::onAnimationChangedFunc)
         .declareAttribute("on_animation_end", &RenderComponent::onAnimationEndFunc);
 
-    lua::EntityHandle::declareComponent<RenderComponent>("Render");
+    lua::EntityHandle::declareComponent<RenderComponent>("render");
 
     state.getState().new_usertype<RenderComponent>("render_component",
         "texture", &RenderComponent::textureName,

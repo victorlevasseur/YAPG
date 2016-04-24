@@ -28,7 +28,7 @@ void PlayerComponent::registerComponent(lua::LuaState& state)
     meta::MetadataStore::registerClass<PlayerComponent>("PlayerComponent")
         .declareAttribute("player_number", &PlayerComponent::playerNumber, false, true, false);
 
-    lua::EntityHandle::declareComponent<PlayerComponent>("Player");
+    lua::EntityHandle::declareComponent<PlayerComponent>("player");
 
     state.getState().new_usertype<PlayerComponent>("player_component",
         "player_number", sol::readonly(&PlayerComponent::playerNumber),

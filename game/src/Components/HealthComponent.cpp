@@ -27,7 +27,7 @@ void HealthComponent::registerComponent(lua::LuaState& state)
         .declareAttribute("health", &HealthComponent::health)
         .declareAttribute("max_health", &HealthComponent::maxHealth);
 
-    lua::EntityHandle::declareComponent<HealthComponent>("Health");
+    lua::EntityHandle::declareComponent<HealthComponent>("health");
 
     state.getState().new_usertype<HealthComponent>("health_component",
         "health", &HealthComponent::health,

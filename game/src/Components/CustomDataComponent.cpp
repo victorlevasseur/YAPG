@@ -52,7 +52,7 @@ void CustomDataComponent::registerComponent(lua::LuaState& state)
             }
         });
 
-    lua::EntityHandle::declareComponent<CustomDataComponent>("CustomData");
+    lua::EntityHandle::declareComponent<CustomDataComponent>("custom_data");
 
     state.getState().new_usertype<CustomDataComponent>("data_component",
         "has_value", &CustomDataComponent::hasValue,

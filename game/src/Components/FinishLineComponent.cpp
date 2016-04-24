@@ -25,7 +25,7 @@ void FinishLineComponent::registerComponent(lua::LuaState& state)
 {
     meta::MetadataStore::registerClass<FinishLineComponent>();
 
-    lua::EntityHandle::declareComponent<FinishLineComponent>("FinishLine");
+    lua::EntityHandle::declareComponent<FinishLineComponent>("finish_line");
 
     state.getState().new_usertype<FinishLineComponent>("finishline_component" //TODO: Replace the name here
         //TODO: Register the properties here

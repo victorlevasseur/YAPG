@@ -5,7 +5,7 @@ entity_template = {
     inherits = "kenney_block_grass",
 
     components = {
-        ["Render"] = {
+        ["render"] = {
             current_animation = "default",
             animations = {
                 ["default"] = {

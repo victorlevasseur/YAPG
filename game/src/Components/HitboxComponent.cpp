@@ -26,7 +26,7 @@ void HitboxComponent::registerComponent(lua::LuaState& state)
     meta::MetadataStore::registerClass<HitboxComponent>("HitboxComponent")
         .declareAttribute("polygon", &HitboxComponent::m_polygon);
 
-    lua::EntityHandle::declareComponent<HitboxComponent>("Hitbox");
+    lua::EntityHandle::declareComponent<HitboxComponent>("hitbox");
 
     state.getState().new_usertype<HitboxComponent>("hitbox_component",
         "polygon", &HitboxComponent::m_polygon

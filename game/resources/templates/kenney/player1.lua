@@ -5,25 +5,25 @@ entity_template = {
     parameters = {
         x = {
             name = "X position",
-            component = "Position",
+            component = "position",
             attribute = "x",
         },
         y = {
             name = "Y position",
-            component = "Position",
+            component = "position",
             attribute = "y",
         },
     },
 
     components = {
-        ["Position"] = {
+        ["position"] = {
             x = 0,
             y = 0,
             z = 100,
             width = 64,
             height = 128
         },
-        ["Platformer"] = {
+        ["platformer"] = {
             on_idle = function(entity)
                 render(entity).current_animation = "idle"
             end,
@@ -43,10 +43,10 @@ entity_template = {
                 render(entity).flipped = true
             end,
         },
-        ["Player"] = {
+        ["player"] = {
 
         },
-        ["Hitbox"] = {
+        ["hitbox"] = {
             polygon = {
                 points = {
                     {
@@ -68,10 +68,10 @@ entity_template = {
                 }
             }
         },
-        ["Collider"] = {
+        ["collider"] = {
 
         },
-        ["Render"] = {
+        ["render"] = {
             texture = "spritesheet_complete.png",
             current_animation = "idle",
             animations = {

@@ -7,13 +7,13 @@ entity_template = {
     parameters = {
         initial_state = {
             name = "Initial state (normal or hit)",
-            component = "Render",
+            component = "render",
             attribute = "current_animation",
         },
     },
 
     components = {
-        ["Collidable"] = {
+        ["collidable"] = {
             on_collision_begin = function(entity, other)
                 -- Test if the block has not been hit and if the collision is made with a player
                 if render(entity).current_animation == "normal" and player(other) ~= nil then
@@ -28,7 +28,7 @@ entity_template = {
                 end
             end,
         },
-        ["Render"] = {
+        ["render"] = {
             current_animation = "normal",
             animations = {
                 ["normal"] = {

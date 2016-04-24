@@ -81,9 +81,9 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             {
                 //Get the template, its width and height (just to check it's available!)
                 const lua::EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
-                if(selectedTemplate.getComponentsTable().get<sol::object>("Position").is<sol::table>())
+                if(selectedTemplate.getComponentsTable().get<sol::object>("position").is<sol::table>())
                 {
-                    sol::table positionComponent = selectedTemplate.getComponentsTable().get<sol::object>("Position").as<sol::table>();
+                    sol::table positionComponent = selectedTemplate.getComponentsTable().get<sol::object>("position").as<sol::table>();
 
                     if(positionComponent.get<sol::object>("width").is<float>() && positionComponent.get<sol::object>("height").is<float>())
                     {
@@ -105,9 +105,9 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
                 {
                     //Get the template, its width and height
                     const lua::EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
-                    if(selectedTemplate.getComponentsTable().get<sol::object>("Position").is<sol::table>())
+                    if(selectedTemplate.getComponentsTable().get<sol::object>("position").is<sol::table>())
                     {
-                        sol::table positionComponent = selectedTemplate.getComponentsTable().get<sol::object>("Position").as<sol::table>();
+                        sol::table positionComponent = selectedTemplate.getComponentsTable().get<sol::object>("position").as<sol::table>();
 
                         if(positionComponent.get<sol::object>("width").is<float>() && positionComponent.get<sol::object>("height").is<float>())
                         {

@@ -5,25 +5,25 @@ entity_template = {
     parameters = {
         x = {
             name = "X position",
-            component = "Position",
+            component = "position",
             attribute = "x",
         },
         y = {
             name = "Y position",
-            component = "Position",
+            component = "position",
             attribute = "y",
         },
     },
 
     components = {
-        ["Position"] = {
+        ["position"] = {
             x = 0,
             y = 0,
             z = 100,
             width = 64,
             height = 64
         },
-        ["Platformer"] = {
+        ["platformer"] = {
             on_idle = function(entity)
                 render(entity).current_animation = "idle&jump"
             end,
@@ -46,7 +46,7 @@ entity_template = {
             deceleration = 10000000,
             max_walking_speed = 100,
         },
-        ["CustomBehavior"] = {
+        ["custom_behavior"] = {
             on_update = function(entity, dt)
                 if(entity:get_custom_data():has_value("old_pos_x")) then
                     local old_pos_x = as_float(entity:get_custom_data():get_value("old_pos_x"))
@@ -64,10 +64,10 @@ entity_template = {
                 entity:get_custom_data():set_value("old_pos_x", float_value(position(entity).x))
             end,
         },
-        ["CustomData"] = {
+        ["custom_data"] = {
             go_left = bool_value(true)
         },
-        ["Hitbox"] = {
+        ["hitbox"] = {
             polygon = {
                 points = {
                     {
@@ -89,7 +89,7 @@ entity_template = {
                 }
             }
         },
-        ["Render"] = {
+        ["render"] = {
             texture = "spritesheet_complete.png",
             current_animation = "idle&jump",
             animations = {

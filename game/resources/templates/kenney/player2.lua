@@ -4,7 +4,7 @@ entity_template = {
     inherits = "kenney_player1",
 
     components = {
-        ["Render"] = {
+        ["render"] = {
             animations = {
                 ["idle"] = {
                     total_duration = 1,

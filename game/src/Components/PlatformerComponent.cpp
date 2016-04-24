@@ -68,7 +68,7 @@ void PlatformerComponent::registerComponent(lua::LuaState& state)
             c->directionStateCallbacks.registerCallback(Direction::Left, c->onTurnLeftFunc);
         });
 
-    lua::EntityHandle::declareComponent<PlatformerComponent>("Platformer");
+    lua::EntityHandle::declareComponent<PlatformerComponent>("platformer");
 
     state.getState().new_usertype<PlatformerComponent>("platformer_component",
         "max_walking_speed", &PlatformerComponent::maxSpeed,

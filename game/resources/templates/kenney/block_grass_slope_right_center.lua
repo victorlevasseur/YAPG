@@ -5,29 +5,29 @@ entity_template = {
     parameters = {
         x = {
             name = "X position",
-            component = "Position",
+            component = "position",
             type = "number",
             attribute = "x",
         },
         y = {
             name = "Y position",
-            component = "Position",
+            component = "position",
             type = "number",
             attribute = "y",
         },
     },
 
     components = {
-        ["Position"] = {
+        ["position"] = {
             x = 0,
             y = 0,
             width = 64,
             height = 64
         },
-        ["Platform"] = {
+        ["platform"] = {
 
         },
-        ["Hitbox"] = {
+        ["hitbox"] = {
             polygon = {
                 points = {
                     {
@@ -49,7 +49,7 @@ entity_template = {
                 }
             }
         },
-        ["Render"] = {
+        ["render"] = {
             texture = "spritesheet_complete.png",
             current_animation = "default",
             animations = {

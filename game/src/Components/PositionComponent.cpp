@@ -36,7 +36,7 @@ void PositionComponent::registerComponent(lua::LuaState& state)
         .declareAttribute<float>("width", &PositionComponent::width)
         .declareAttribute<float>("height", &PositionComponent::height);
 
-    lua::EntityHandle::declareComponent<PositionComponent>("Position");
+    lua::EntityHandle::declareComponent<PositionComponent>("position");
 
     //Register to lua
     state.getState().new_usertype<PositionComponent>("position_component",

@@ -25,7 +25,7 @@ void ColliderComponent::registerComponent(lua::LuaState& state)
 {
     meta::MetadataStore::registerClass<ColliderComponent>();
 
-    lua::EntityHandle::declareComponent<ColliderComponent>("Collider");
+    lua::EntityHandle::declareComponent<ColliderComponent>("collider");
 
     state.getState().new_usertype<ColliderComponent>("collider_component" //TODO: Replace the name here
         //TODO: Register the properties here
