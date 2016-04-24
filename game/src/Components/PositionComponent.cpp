@@ -46,6 +46,7 @@ void PositionComponent::registerComponent(lua::LuaState& state)
         "width", &PositionComponent::width,
         "height", &PositionComponent::height
     );
+    state.declareComponentGetter<PositionComponent>("position");
 }
 
 std::ostream& operator<<(std::ostream& stream, const PositionComponent& component)

@@ -43,6 +43,7 @@ void PlatformComponent::registerComponent(lua::LuaState& state)
         "activated", &PlatformComponent::activated,
         "platform_type", sol::property(&PlatformComponent::getPlatformTypeAsString, &PlatformComponent::setPlatformTypeAsString)
     );
+    state.declareComponentGetter<PlatformComponent>("platform");
 }
 
 std::string PlatformComponent::getPlatformTypeAsString() const

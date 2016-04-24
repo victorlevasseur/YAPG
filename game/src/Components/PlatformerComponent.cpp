@@ -87,6 +87,7 @@ void PlatformerComponent::registerComponent(lua::LuaState& state)
         "on_turn_right", &PlatformerComponent::onTurnRightFunc,
         "on_turn_left", &PlatformerComponent::onTurnLeftFunc
     );
+    state.declareComponentGetter<PlatformerComponent>("platformer");
 }
 
 std::ostream& operator<<(std::ostream& stream, const PlatformerComponent& component)

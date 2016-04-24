@@ -31,6 +31,7 @@ void HitboxComponent::registerComponent(lua::LuaState& state)
     state.getState().new_usertype<HitboxComponent>("hitbox_component",
         "polygon", &HitboxComponent::m_polygon
     );
+    state.declareComponentGetter<HitboxComponent>("hitbox");
 }
 
 std::ostream& operator<<(std::ostream& stream, const HitboxComponent& component)

@@ -30,6 +30,7 @@ void ColliderComponent::registerComponent(lua::LuaState& state)
     state.getState().new_usertype<ColliderComponent>("collider_component" //TODO: Replace the name here
         //TODO: Register the properties here
     );
+    state.declareComponentGetter<ColliderComponent>("collider");
 }
 
 std::ostream& operator<<(std::ostream& stream, const ColliderComponent& component)

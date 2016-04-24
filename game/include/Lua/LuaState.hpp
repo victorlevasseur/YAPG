@@ -28,6 +28,9 @@ public:
     template<class T>
     void declareAnyConvertibleType(const std::string& typeName);
 
+    template<class T>
+    void declareComponentGetter(const std::string& componentLuaName);
+
     /**
      * Merge the two tables into a single one.
      * None of the two table are overriden.

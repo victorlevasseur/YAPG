@@ -45,6 +45,7 @@ void RenderComponent::registerComponent(lua::LuaState& state)
         "on_animation_changed", &RenderComponent::onAnimationChangedFunc,
         "on_animation_end", &RenderComponent::onAnimationEndFunc
     );
+    state.declareComponentGetter<RenderComponent>("render");
 }
 
 std::ostream& operator<<(std::ostream& stream, const RenderComponent& component)

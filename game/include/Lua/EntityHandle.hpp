@@ -70,10 +70,10 @@ public:
     template<class C>
     static void declareComponent(const std::string& componentName);
 
-private:
-
     template<class C>
-    C* doGetComponentPtrForLua();
+    static C* doGetComponentPtrForLua(EntityHandle entity);
+
+private:
 
     template<class C>
     components::Component* doGetComponentPtr();

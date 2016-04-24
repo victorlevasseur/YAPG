@@ -30,6 +30,7 @@ void FinishLineComponent::registerComponent(lua::LuaState& state)
     state.getState().new_usertype<FinishLineComponent>("finishline_component" //TODO: Replace the name here
         //TODO: Register the properties here
     );
+    state.declareComponentGetter<FinishLineComponent>("finish_line");
 }
 
 std::ostream& operator<<(std::ostream& stream, const FinishLineComponent& component)

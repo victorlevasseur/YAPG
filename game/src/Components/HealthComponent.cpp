@@ -33,6 +33,7 @@ void HealthComponent::registerComponent(lua::LuaState& state)
         "health", &HealthComponent::health,
         "max_health", &HealthComponent::maxHealth
     );
+    state.declareComponentGetter<HealthComponent>("health");
 }
 
 std::ostream& operator<<(std::ostream& stream, const HealthComponent& component)

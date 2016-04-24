@@ -25,22 +25,22 @@ entity_template = {
         },
         ["Platformer"] = {
             on_idle = function(entity)
-                entity.render.current_animation = "idle"
+                render(entity).current_animation = "idle"
             end,
             on_start_walking = function(entity)
-                entity.render.current_animation = "walking"
+                render(entity).current_animation = "walking"
             end,
             on_start_jumping = function(entity)
-                entity.render.current_animation = "jump"
+                render(entity).current_animation = "jump"
             end,
             on_start_falling = function(entity)
-                entity.render.current_animation = "jump"
+                render(entity).current_animation = "jump"
             end,
             on_turn_right = function(entity)
-                entity.render.flipped = false
+                render(entity).flipped = false
             end,
             on_turn_left = function(entity)
-                entity.render.flipped = true
+                render(entity).flipped = true
             end,
         },
         ["Player"] = {

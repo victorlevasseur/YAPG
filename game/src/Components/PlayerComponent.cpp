@@ -34,6 +34,7 @@ void PlayerComponent::registerComponent(lua::LuaState& state)
         "player_number", sol::readonly(&PlayerComponent::playerNumber),
         "finished_level", &PlayerComponent::finishedLevel
     );
+    state.declareComponentGetter<PlayerComponent>("player");
 }
 
 std::ostream& operator<<(std::ostream& stream, const PlayerComponent& component)

@@ -35,6 +35,7 @@ void CollidableComponent::registerComponent(lua::LuaState& state)
         "collides", &CollidableComponent::collides,
         "on_collision_end", &CollidableComponent::onCollisionEnd
     );
+    state.declareComponentGetter<CollidableComponent>("collidable");
 }
 
 std::ostream& operator<<(std::ostream& stream, const CollidableComponent& component)

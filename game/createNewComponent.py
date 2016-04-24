@@ -60,6 +60,7 @@ void {0}Component::registerComponent(lua::LuaState& state)
     state.getState().new_usertype<{0}Component>("{1}_component"
         //TODO: Register the properties here
     );
+    state.declareComponentGetter<{0}Component>("{1}");
 }}
 
 std::ostream& operator<<(std::ostream& stream, const {0}Component& component)
