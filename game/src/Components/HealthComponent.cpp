@@ -30,7 +30,7 @@ void HealthComponent::registerComponent(lua::LuaState& state)
     lua::EntityHandle::declareComponent<HealthComponent>("health");
 
     state.getState().new_usertype<HealthComponent>("health_component",
-        "health", &HealthComponent::health,
+        "health", sol::readonly(&HealthComponent::health),
         "max_health", &HealthComponent::maxHealth
     );
     state.declareComponentGetter<HealthComponent>("health");

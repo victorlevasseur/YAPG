@@ -55,7 +55,7 @@ void {0}Component::registerComponent(lua::LuaState& state)
 {{
     meta::MetadataStore::registerClass<{0}Component>();
 
-    lua::EntityHandle::declareComponent<{0}Component>("{0}");
+    lua::EntityHandle::declareComponent<{0}Component>("{1}");
 
     state.getState().new_usertype<{0}Component>("{1}_component"
         //TODO: Register the properties here

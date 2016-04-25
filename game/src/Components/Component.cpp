@@ -4,6 +4,7 @@
 #include "Components/ColliderComponent.hpp"
 #include "Components/CustomBehaviorComponent.hpp"
 #include "Components/FinishLineComponent.hpp"
+#include "Components/HealthComponent.hpp"
 #include "Components/HitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
@@ -76,6 +77,10 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
     else if(component == "finish_line")
     {
         entity.assign<FinishLineComponent>().get()->loadFromLua(luaTable, entityGetter);
+    }
+    else if(component == "health")
+    {
+        entity.assign<HealthComponent>().get()->loadFromLua(luaTable, entityGetter);
     }
     else
     {
