@@ -46,6 +46,10 @@ entity_template = {
         ["player"] = {
 
         },
+        ["health"] = {
+            health = 1,
+            max_health = 1
+        },
         ["hitbox"] = {
             polygon = {
                 points = {

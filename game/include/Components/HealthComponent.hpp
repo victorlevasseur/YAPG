@@ -18,6 +18,8 @@ public:
 
     static void registerComponent(lua::LuaState& state);
 
+    void kill();
+
     float health;
     float maxHealth;
 };

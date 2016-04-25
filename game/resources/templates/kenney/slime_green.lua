@@ -67,6 +67,10 @@ entity_template = {
         ["custom_data"] = {
             go_left = bool_value(true)
         },
+        ["health"] = {
+            health = 1,
+            max_health = 1,
+        },
         ["hitbox"] = {
             polygon = {
                 points = {
@@ -88,6 +92,22 @@ entity_template = {
                     },
                 }
             }
+        },
+        ["collidable"] = {
+            on_collision_begin = function(entity, other)
+                if(player(other) ~= nil and health(other) ~= nil) then
+                    --If the slime collided with a player
+                    local player_bottom_hitbox_pos = position(other).y + hitbox(other).polygon:get_local_bounding_box().top + hitbox(other).polygon:get_local_bounding_box().height
+                    local slime_top_hitbox_pos = position(entity).y + hitbox(entity).polygon:get_local_bounding_box().top
+                    if(player_bottom_hitbox_pos - 6 <= slime_top_hitbox_pos) then
+                        --The player hit the slime on the top, kill myself (slime)
+                        health(entity):kill()
+                    else
+                        -- The slime touched the player on its side or top, kill the player. TODO: Only remove PV
+                        health(other):kill()
+                    end
+                end
+            end,
         },
         ["render"] = {
             texture = "spritesheet_complete.png",

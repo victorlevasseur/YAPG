@@ -31,9 +31,16 @@ void HealthComponent::registerComponent(lua::LuaState& state)
 
     state.getState().new_usertype<HealthComponent>("health_component",
         "health", sol::readonly(&HealthComponent::health),
-        "max_health", &HealthComponent::maxHealth
+        "max_health", &HealthComponent::maxHealth,
+        "kill", &HealthComponent::kill
     );
     state.declareComponentGetter<HealthComponent>("health");
+}
+
+void HealthComponent::kill()
+{
+    health = 0;
+    //TODO: Send a HealthChangedMessage
 }
 
 std::ostream& operator<<(std::ostream& stream, const HealthComponent& component)

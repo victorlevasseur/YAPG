@@ -9,6 +9,7 @@
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/CustomBehaviorSystem.hpp"
 #include "Systems/FinishLineSystem.hpp"
+#include "Systems/HealthSystem.hpp"
 #include "Systems/HitboxUpdaterSystem.hpp"
 #include "Systems/PlatformerSystem.hpp"
 #include "Systems/PlayerSystem.hpp"
@@ -36,6 +37,7 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_systemMgr.add<systems::HitboxUpdaterSystem>();
     m_systemMgr.add<systems::PlayerSystem>(settingsManager);
     m_systemMgr.add<systems::FinishLineSystem>();
+    m_systemMgr.add<systems::HealthSystem>(settingsManager);
 
     m_systemMgr.configure();
 
@@ -85,6 +87,7 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
     m_systemMgr.update<systems::CustomBehaviorSystem>(dt.asSeconds());
     m_systemMgr.update<systems::RenderSystem>(dt.asSeconds());
     m_systemMgr.update<systems::FinishLineSystem>(dt.asSeconds());
+    m_systemMgr.update<systems::HealthSystem>(dt.asSeconds());
 
     m_asyncExecutor.update(dt);
 }

@@ -52,8 +52,6 @@ sf::FloatRect Polygon::GetLocalBoundingBox() const
         bottomRightMax.y = std::max(vertex.y, bottomRightMax.y);
     }
 
-    std::cout << topLeftMax.x << ";" << topLeftMax.y << std::endl;
-
     return sf::FloatRect(topLeftMax, bottomRightMax - topLeftMax);
 }
 
