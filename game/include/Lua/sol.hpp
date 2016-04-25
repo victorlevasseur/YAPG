@@ -20,8 +20,8 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // This file was generated with a script.
-// Generated 2016-04-18 12:32:34.379024 UTC
-// This header was generated with sol v2.4.0 (revision 96da27d)
+// Generated 2016-04-24 21:40:35.332425 UTC
+// This header was generated with sol v2.5.0 (revision 2531f2f)
 // https://github.com/ThePhD/sol2
 
 #ifndef SOL_SINGLE_INCLUDE_HPP
@@ -215,6 +215,12 @@ namespace meta_detail {
 template<typename T, typename... Args>
 struct index_in_pack : meta_detail::index_in_pack<0, T, Args...> { };
 
+template<typename T, typename List>
+struct index_in : meta_detail::index_in_pack<0, T, List> { };
+
+template<typename T, typename... Args>
+struct index_in<T, types<Args...>> : meta_detail::index_in_pack<0, T, Args...> { };
+
 template<std::size_t I, typename... Args>
 struct at_in_pack {};
 
@@ -333,12 +339,16 @@ template <std::size_t I, typename T>
 using void_tuple_element_t = typename void_tuple_element<I, T>::type;
 
 template<typename Signature, bool b = has_deducible_signature<Signature>::value>
-struct fx_traits;
+struct fx_traits {
+    static const bool is_member_function = false;
+    typedef std::tuple<> args_tuple_type;
+    typedef types<> args_type;
+    template<std::size_t i>
+    using arg_at = void_tuple_element_t<i, args_tuple_type>;
+};
 
 template<typename Signature>
-struct fx_traits<Signature, true> : fx_traits<decltype(&Signature::operator()), false> {
-
-};
+struct fx_traits<Signature, true> : fx_traits<decltype(&Signature::operator()), false> {};
 
 template<typename T, typename R, typename... Args>
 struct fx_traits<R(T::*)(Args...), false> {
@@ -2576,6 +2586,9 @@ inline int c_trampoline(lua_State* L, lua_CFunction f) {
 }
 #endif // Exceptions vs. No Exceptions
 struct empty { void operator()() {} };
+
+template <typename T>
+struct unique_usertype {};
 } // detail
 struct nil_t {};
 const nil_t nil {};
@@ -2586,8 +2599,52 @@ inline bool operator!=(nil_t, nil_t) { return false; }
 
 typedef std::remove_pointer_t<lua_CFunction> lua_r_CFunction;
 
-template <typename T, typename = void>
-struct unique_usertype {};
+template <typename T>
+struct unique_usertype_traits {
+    typedef T type;
+    typedef T actual_type;
+    static const bool value = false;
+
+    template <typename U>
+    static bool is_null(U&&) {
+        return false;
+    }
+
+    template <typename U>
+    static auto get(U&& value) {
+        return std::addressof(detail::deref(value));
+    }
+};
+
+template <typename T>
+struct unique_usertype_traits<std::shared_ptr<T>> {
+    typedef T type;
+    typedef std::shared_ptr<T> actual_type;
+    static const bool value = true;
+
+    static bool is_null(const actual_type& value) {
+        return value == nullptr;
+    }
+
+    static type* get(const actual_type& p) {
+        return p.get();
+    }
+};
+
+template <typename T, typename D>
+struct unique_usertype_traits<std::unique_ptr<T, D>> {
+    typedef T type;
+    typedef std::unique_ptr<T, D> actual_type;
+    static const bool value = true;
+
+    static bool is_null(const actual_type& value) {
+        return value == nullptr;
+    }
+
+    static type* get(const actual_type& p) {
+        return p.get();
+    }
+};
 
 template <typename T>
 struct non_null {};
@@ -2650,13 +2707,21 @@ enum class call_status : int {
 };
 
 enum class thread_status : int {
-    normal        = LUA_OK,
-    yielded       = LUA_YIELD,
-    error_runtime = LUA_ERRRUN,
-    error_memory  = LUA_ERRMEM,
-    error_gc      = LUA_ERRGCMM,
-    error_handler = LUA_ERRERR,
+    ok      = LUA_OK,
+    yielded = LUA_YIELD,
+    runtime = LUA_ERRRUN,
+    memory  = LUA_ERRMEM,
+    gc      = LUA_ERRGCMM,
+    handler = LUA_ERRERR,
     dead,
+};
+
+enum class load_status : int {
+    ok        = LUA_OK,
+    syntax    = LUA_ERRSYNTAX,
+    memory    = LUA_ERRMEM,
+    gc        = LUA_ERRGCMM,
+    file      = LUA_ERRFILE,
 };
 
 enum class type : int {
@@ -2925,7 +2990,7 @@ template <typename T>
 struct is_proxy_primitive : is_lua_primitive<T> { };
 
 template <typename T>
-struct is_unique_usertype : std::false_type {};
+struct is_unique_usertype : std::integral_constant<bool, unique_usertype_traits<T>::value> {};
 
 template <typename T>
 struct is_transparent_argument : std::false_type {};
@@ -2970,6 +3035,10 @@ public:
         return 1;
     }
 
+    void pop(int n = 1) const noexcept {
+        lua_pop(lua_state( ), n);
+    }
+
     int stack_index () const noexcept {
         return index;
     }
@@ -2981,6 +3050,11 @@ public:
 
     lua_State* lua_state() const noexcept {
         return L;
+    }
+
+    bool valid () const noexcept {
+        type t = get_type();
+        return t != type::nil && t != type::none;
     }
 };
 } // sol
@@ -3155,18 +3229,18 @@ public:
 
 // beginning of sol\stack_core.hpp
 
-// beginning of sol\bond.hpp
+// beginning of sol\tie.hpp
 
 namespace sol {
 
 template <typename T>
-struct bond_size : std::tuple_size<T> {};
+struct tie_size : std::tuple_size<T> {};
 
 template <typename T>
-struct is_bondable : std::integral_constant<bool, (::sol::bond_size<T>::value > 0)> {};
+struct is_tieable : std::integral_constant<bool, (::sol::tie_size<T>::value > 0)> {};
 
 template <typename... Tn>
-struct bond_t : public std::tuple<std::add_lvalue_reference_t<Tn>...> {
+struct tie_t : public std::tuple<std::add_lvalue_reference_t<Tn>...> {
 private:
      typedef std::tuple<std::add_lvalue_reference_t<Tn>...> base_t;
 
@@ -3177,8 +3251,8 @@ private:
 
      template <typename T>
      void set( std::true_type, T&& target ) {
-          typedef bond_size<meta::Unqualified<T>> value_size;
-          typedef bond_size<std::tuple<Tn...>> tie_size;
+          typedef tie_size<meta::Unqualified<T>> value_size;
+          typedef tie_size<std::tuple<Tn...>> tie_size;
           typedef std::conditional_t<(value_size::value < tie_size::value), value_size, tie_size> indices_size;
           typedef std::make_index_sequence<indices_size::value> indices;
           set( indices(), std::forward<T>( target ) );
@@ -3196,8 +3270,8 @@ public:
      using base_t::base_t;
 
      template <typename T>
-     bond_t& operator= ( T&& value ) {
-          typedef is_bondable<meta::Unqualified<T>> bondable;
+     tie_t& operator= ( T&& value ) {
+          typedef is_tieable<meta::Unqualified<T>> bondable;
           set( bondable(), std::forward<T>( value ) );
           return *this;
      }
@@ -3205,16 +3279,20 @@ public:
 };
 
 template <typename... Tn>
-struct bond_size<::sol::bond_t<Tn...>> : ::std::tuple_size<::std::tuple<Tn...>> { };
+struct tie_size<::sol::tie_t<Tn...>> : ::std::tuple_size<::std::tuple<Tn...>> { };
 
+namespace adl_barrier_detail {
 template <typename... Tn>
-inline bond_t<std::remove_reference_t<Tn>...> bond( Tn&&... argn ) {
-     return bond_t<std::remove_reference_t<Tn>...>( std::forward<Tn>( argn )... );
+inline tie_t<std::remove_reference_t<Tn>...> tie(Tn&&... argn) {
+    return tie_t<std::remove_reference_t<Tn>...>(std::forward<Tn>(argn)...);
 }
+}
+
+using namespace adl_barrier_detail;
 
 } // sol
 
-// end of sol\bond.hpp
+// end of sol\tie.hpp
 
 namespace sol {
 namespace detail {
@@ -3421,76 +3499,6 @@ void set_field(lua_State* L, Key&& key, Value&& value, int tableindex) {
 
 // end of sol\stack_core.hpp
 
-// beginning of sol\stack_proxy.hpp
-
-// beginning of sol\proxy_base.hpp
-
-namespace sol {
-template <typename Super>
-struct proxy_base {
-    operator std::string() const {
-        const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
-        return super.template get<std::string>();
-    }
-
-    template<typename T, meta::EnableIf<meta::Not<meta::is_string_constructible<T>>, is_proxy_primitive<meta::Unqualified<T>>> = 0>
-    operator T ( ) const {
-        const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
-        return super.template get<T>( );
-    }
-
-    template<typename T, meta::EnableIf<meta::Not<meta::is_string_constructible<T>>, meta::Not<is_proxy_primitive<meta::Unqualified<T>>>> = 0>
-    operator T& ( ) const {
-        const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
-        return super.template get<T&>( );
-    }
-};
-} // sol
-
-// end of sol\proxy_base.hpp
-
-namespace sol {
-struct stack_proxy : public proxy_base<stack_proxy> {
-private:
-    lua_State* L;
-    int index;
-
-public:
-    stack_proxy(lua_State* L, int index) : L(L), index(index) {}
-
-    template<typename T>
-    decltype(auto) get() const {
-        return stack::get<T>(L, stack_index());
-    }
-
-    int push () const {
-        lua_pushvalue(L, index);
-        return 1;
-    }
-
-    lua_State* lua_state() const { return L; }
-    int stack_index() const { return index; }
-};
-
-namespace stack {
-template <>
-struct getter<stack_proxy> {
-    static stack_proxy get(lua_State* L, int index = -1) {
-        return stack_proxy(L, index);
-    }
-};
-
-template <>
-struct pusher<stack_proxy> {
-    static int push(lua_State*, const stack_proxy& ref) {
-        return ref.push();
-    }
-};
-} // stack
-} // sol
-
-// end of sol\stack_proxy.hpp
-
 // beginning of sol\stack_check.hpp
 
 // beginning of sol\usertype_traits.hpp
@@ -3506,28 +3514,23 @@ struct pusher<stack_proxy> {
 
 namespace sol {
 namespace detail {
-#ifndef SOL_NO_RTTI
 #ifdef _MSC_VER
+#ifndef SOL_NO_RTTI
 inline std::string get_type_name(const std::type_info& id) {
-    return id.name();
-}
-
-#elif defined(__GNUC__) || defined(__clang__)
-inline std::string get_type_name(const std::type_info& id) {
-    int status;
-    char* unmangled = abi::__cxa_demangle(id.name(), 0, 0, &status);
-    std::string realname = unmangled;
-    std::free(unmangled);
+    std::string realname = id.name();
+    const static std::array<std::string, 2> removals = { { "struct ", "class " } };
+    for (std::size_t r = 0; r < removals.size(); ++r) {
+        auto found = realname.find(removals[r]);
+        while (found != std::string::npos) {
+            realname.erase(found, removals[r].size());
+            found = realname.find(removals[r]);
+        }
+    }
     return realname;
 }
-
-#else
-#error Compiler not supported for demangling
-#endif // compilers
-#else
-#ifdef _MSC_VER
+#endif // No RTII
 template <typename T>
-inline std::string get_type_name() {
+inline std::string ctti_get_type_name() {
     std::string name = __FUNCSIG__;
     std::size_t start = name.find("get_type_name");
     if (start == std::string::npos)
@@ -3544,29 +3547,13 @@ inline std::string get_type_name() {
         name.replace(0, 6, "", 0);
     if (name.find("class", 0) == 0)
         name.replace(0, 5, "", 0);
-    while (name.size() > 0 && std::isblank(name.front())) name.erase(name.begin(), ++name.begin());
-    while (name.size() > 0 && std::isblank(name.back())) name.erase(--name.end(), name.end());
+    while (!name.empty() && std::isblank(name.front())) name.erase(name.begin(), ++name.begin());
+    while (!name.empty() && std::isblank(name.back())) name.erase(--name.end(), name.end());
     return name;
 }
-
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) || defined(__clang__)
 template <typename T>
-inline std::string get_type_name() {
-    std::string name = __PRETTY_FUNCTION__;
-    std::size_t start = name.find_first_of('=');
-    std::size_t end = name.find_last_of(';');
-    if (end == std::string::npos)
-        end = name.size();
-    if (start == std::string::npos)
-        start = 0;
-    if (start < name.size() - 1)
-        start += 2;
-    name = name.substr(start, end - start);
-    return name;
-}
-#elif defined(__clang__)
-template <typename T>
-inline std::string get_type_name() {
+inline std::string ctti_get_type_name() {
     std::string name = __PRETTY_FUNCTION__;
     std::size_t start = name.find_last_of('[');
     start = name.find_first_of('=', start);
@@ -3578,44 +3565,66 @@ inline std::string get_type_name() {
     if (start < name.size() - 1)
         start += 1;
     name = name.substr(start, end - start);
+    start = name.find(";");
+    if (start != std::string::npos) {
+        name.erase(start, name.length());
+    }
+    while (!name.empty() && std::isblank(name.front())) name.erase(name.begin(), ++name.begin());
+    while (!name.empty() && std::isblank(name.back())) name.erase(--name.end(), name.end());
     return name;
 }
+#ifndef SOL_NO_RTTI
+#if defined(__clang__)
+inline std::string get_type_name(const std::type_info& id) {
+    int status;
+    char* unmangled = abi::__cxa_demangle(id.name(), 0, 0, &status);
+    std::string realname = unmangled;
+    std::free(unmangled);
+    return realname;
+}
+#elif defined(__GNUC__)
+inline std::string get_type_name(const std::type_info& id) {
+    int status;
+    char* unmangled = abi::__cxa_demangle(id.name(), 0, 0, &status);
+    std::string realname = unmangled;
+    std::free(unmangled);
+    return realname;
+}
+#endif // g++ || clang++
+#endif // No RTII
 #else
 #error Compiler not supported for demangling
 #endif // compilers
-#endif // No Runtime Type information
 
 template <typename T>
 inline std::string demangle_once() {
 #ifndef SOL_NO_RTTI
     std::string realname = get_type_name(typeid(T));
 #else
-    std::string realname = get_type_name<T>();
+    std::string realname = ctti_get_type_name<T>();
 #endif // No Runtime Type Information
-    const static std::array<std::string, 2> removals = {{ "struct ", "class " }};
-    const static std::array<std::string, 2> replacements = {{ "::", "_" }};
-    for(std::size_t r = 0; r < removals.size(); ++r) {
-        auto found = realname.find(removals[r]);
-        while(found != std::string::npos) {
-            realname.erase(found, removals[r].size());
-            found = realname.find(removals[r]);
-       }
-    }
+    return realname;
+}
 
-    for(std::size_t r = 0; r < replacements.size(); r+=2) {
-        auto found = realname.find(replacements[r]);
-        while(found != std::string::npos) {
-            realname.replace(found, replacements[r].size(), replacements[r + 1]);
-            found = realname.find(replacements[r], found);
-        }
+template <typename T>
+inline std::string short_demangle_once() {
+    std::string realname = ctti_get_type_name<T>();
+    std::size_t idx = realname.find_last_of(":`'\"{}[]|-)(*^&!@#$%`~", std::string::npos, 23);
+    if (idx != std::string::npos) {
+        realname.erase(0, realname.length() < idx ? realname.length() : idx + 1);
     }
-
     return realname;
 }
 
 template <typename T>
 inline std::string demangle() {
     static const std::string d = demangle_once<T>();
+    return d;
+}
+
+template <typename T>
+inline std::string short_demangle() {
+    static const std::string d = short_demangle_once<T>();
     return d;
 }
 } // detail
@@ -3628,13 +3637,17 @@ namespace sol {
 template<typename T>
 struct usertype_traits {
     static const std::string name;
+    static const std::string qualified_name;
     static const std::string metatable;
     static const std::string variable_metatable;
     static const std::string gc_table;
 };
 
 template<typename T>
-const std::string usertype_traits<T>::name = detail::demangle<T>();
+const std::string usertype_traits<T>::name = detail::short_demangle<T>();
+
+template<typename T>
+const std::string usertype_traits<T>::qualified_name = detail::demangle<T>();
 
 template<typename T>
 const std::string usertype_traits<T>::metatable = std::string("sol.").append(detail::demangle<T>());
@@ -4010,6 +4023,20 @@ struct checker<T*, type::userdata, C> {
     }
 };
 
+template <typename C>
+struct checker<userdata_value, type::userdata, C> {
+    template <typename Handler>
+    static bool check(lua_State* L, int index, Handler&& handler) {
+        type t = type_of(L, index);
+        bool success = t == type::userdata || t == type::lightuserdata;
+        if (!success) {
+            // expected type, actual type
+            handler(L, index, type::lightuserdata, t);
+        }
+        return success;
+    }
+};
+
 template <typename T, typename C>
 struct checker<T, type::userdata, C> {
     template <typename U, typename Handler>
@@ -4027,7 +4054,7 @@ struct checker<T, type::userdata, C> {
             return true;
         if (stack_detail::check_metatable<U*>(L))
             return true;
-        if (stack_detail::check_metatable<unique_usertype<U>>(L))
+        if (stack_detail::check_metatable<detail::unique_usertype<U>>(L))
             return true;
 #ifndef SOL_NO_EXCEPTIONS
         lua_getfield(L, -1, &detail::base_class_check_key()[0]);
@@ -4069,27 +4096,11 @@ struct checker<T, type::userdata, C> {
     }
 };
 
-template<typename T, typename Real, typename C>
-struct checker<unique_usertype<T, Real>, type::userdata, C> {
+template<typename T>
+struct checker<T, type::userdata, std::enable_if_t<is_unique_usertype<T>::value>> {
     template <typename Handler>
     static bool check(lua_State* L, int index, Handler&& handler) {
-        return checker<T, type::userdata, C>{}.check(L, index, std::forward<Handler>(handler));
-    }
-};
-
-template<typename T, typename C>
-struct checker<std::shared_ptr<T>, type::userdata, C> {
-    template <typename Handler>
-    static bool check(lua_State* L, int index, Handler&& handler) {
-        return checker<unique_usertype<T, std::shared_ptr<T>>, type::userdata, C>{}.check(L, index, std::forward<Handler>(handler));
-    }
-};
-
-template<typename T, typename D, typename C>
-struct checker<std::unique_ptr<T, D>, type::userdata, C> {
-    template <typename Handler>
-    static bool check(lua_State* L, int index, Handler&& handler) {
-        return checker<unique_usertype<T, std::unique_ptr<T, D>>, type::userdata, C>{}.check(L, index, std::forward<Handler>(handler));
+        return checker<typename unique_usertype_traits<T>::type, type::userdata>{}.check(L, index, std::forward<Handler>(handler));
     }
 };
 
@@ -4144,8 +4155,12 @@ namespace sol {
     template <typename... Functions>
     struct overload_set {
         std::tuple<Functions...> set;
-        template <typename... Args>
-        overload_set (Args&&... args) : set(std::forward<Args>(args)...) {}
+        template <typename Arg, typename... Args, meta::DisableIf<std::is_same<overload_set, meta::Unqualified<Arg>>> = 0>
+        overload_set (Arg&& arg, Args&&... args) : set(std::forward<Arg>(arg), std::forward<Args>(args)...) {}
+        overload_set(const overload_set&) = default;
+        overload_set(overload_set&&) = default;
+        overload_set& operator=(const overload_set&) = default;
+        overload_set& operator=(overload_set&&) = default;
     };
 
     template <typename... Args>
@@ -4346,16 +4361,6 @@ struct getter<T*> {
     }
 };
 
-template<typename T, typename Real>
-struct getter<unique_usertype<T, Real>> {
-    static Real& get(lua_State* L, int index = -1) {
-        T** pref = static_cast<T**>(lua_touserdata(L, index));
-        detail::special_destruct_func* fx = static_cast<detail::special_destruct_func*>(static_cast<void*>(pref + 1));
-        Real* mem = static_cast<Real*>(static_cast<void*>(fx + 1));
-        return *mem;
-    }
-};
-
 template<typename T>
 struct getter<non_null<T*>> {
     static T* get(lua_State* L, int index = -1) {
@@ -4371,16 +4376,15 @@ struct getter<T&> {
 };
 
 template<typename T>
-struct getter<std::shared_ptr<T>> {
-    static std::shared_ptr<T>& get(lua_State* L, int index = -1) {
-        return getter<unique_usertype<T, std::shared_ptr<T>>>::get(L, index);
-    }
-};
-
-template<typename T, typename D>
-struct getter<std::unique_ptr<T, D>> {
-    static std::unique_ptr<T, D>& get(lua_State* L, int index = -1) {
-        return getter<unique_usertype<T, std::unique_ptr<T, D>>>::get(L, index);
+struct getter<T, std::enable_if_t<is_unique_usertype<T>::value>> {
+    typedef typename unique_usertype_traits<T>::type P;
+    typedef typename unique_usertype_traits<T>::actual_type Real;
+    
+    static Real& get(lua_State* L, int index = -1) {
+        P** pref = static_cast<P**>(lua_touserdata(L, index));
+        detail::special_destruct_func* fx = static_cast<detail::special_destruct_func*>(static_cast<void*>(pref + 1));
+        Real* mem = static_cast<Real*>(static_cast<void*>(fx + 1));
+        return *mem;
     }
 };
 
@@ -4572,7 +4576,7 @@ struct pusher {
         referencereference = allocationtarget;
         std::allocator<T> alloc{};
         alloc.construct(allocationtarget, std::forward<Args>(args)...);
-        luaL_getmetatable(L, &usertype_traits<T>::metatable[0]);
+        luaL_newmetatable(L, &usertype_traits<T>::metatable[0]);
         lua_setmetatable(L, -2);
         return 1;
     }
@@ -4599,49 +4603,36 @@ struct pusher<T*> {
     }
 };
 
-template<typename T, typename Real>
-struct pusher<unique_usertype<T, Real>> {
+template<typename T>
+struct pusher<T, std::enable_if_t<is_unique_usertype<T>::value>> {
+    typedef typename unique_usertype_traits<T>::type P;
+    typedef typename unique_usertype_traits<T>::actual_type Real;
+
+    template <typename Arg, meta::EnableIf<std::is_base_of<Real, meta::Unqualified<Arg>>> = 0>
+    static int push(lua_State* L, Arg&& arg) {
+        if (unique_usertype_traits<T>::is_null(arg))
+            return stack::push(L, nil);
+        return push_deep(L, std::forward<Arg>(arg));
+    }
+
+    template <typename Arg0, typename Arg1, typename... Args>
+    static int push(lua_State* L, Arg0&& arg0, Arg0&& arg1, Args&&... args) {
+        return push_deep(L, std::forward<Arg0>(arg0), std::forward<Arg1>(arg1), std::forward<Args>(args)...);
+    }
+
     template <typename... Args>
-    static int push(lua_State* L, Args&&... args) {
-        T** pref = static_cast<T**>(lua_newuserdata(L, sizeof(T*) + sizeof(detail::special_destruct_func) + sizeof(Real)));
+    static int push_deep(lua_State* L, Args&&... args) {
+        P** pref = static_cast<P**>(lua_newuserdata(L, sizeof(P*) + sizeof(detail::special_destruct_func) + sizeof(Real)));
         detail::special_destruct_func* fx = static_cast<detail::special_destruct_func*>(static_cast<void*>(pref + 1));
         Real* mem = static_cast<Real*>(static_cast<void*>(fx + 1));
-        *fx = detail::special_destruct<T, Real>;
+        *fx = detail::special_destruct<P, Real>;
         detail::default_construct::construct(mem, std::forward<Args>(args)...);
-        *pref = std::addressof(detail::deref(*mem));
-        if (luaL_newmetatable(L, &usertype_traits<unique_usertype<T>>::metatable[0]) == 1) {
-            set_field(L, "__gc", detail::unique_destruct<T>);
+        *pref = unique_usertype_traits<T>::get(*mem);
+        if (luaL_newmetatable(L, &usertype_traits<detail::unique_usertype<P>>::metatable[0]) == 1) {
+            set_field(L, "__gc", detail::unique_destruct<P>);
         }
         lua_setmetatable(L, -2);
         return 1;
-    }
-};
-
-template<typename T>
-struct pusher<T, std::enable_if_t<is_unique_usertype<T>::value>> {
-    template <typename... Args>
-    static int push(lua_State* L, Args&&... args) {
-        typedef typename is_unique_usertype<T>::metatable_type meta_type;
-        return stack::push<unique_usertype<meta_type, T>>(L, std::forward<Args>(args)...);
-    }
-};
-
-template<typename T, typename D>
-struct pusher<std::unique_ptr<T, D>> {
-    static int push(lua_State* L, std::unique_ptr<T, D> obj) {
-        if (obj == nullptr)
-            return stack::push(L, nil);
-        return stack::push<unique_usertype<T, std::unique_ptr<T, D>>>(L, std::move(obj));
-    }
-};
-
-template<typename T>
-struct pusher<std::shared_ptr<T>> {
-    template <typename S>
-    static int push(lua_State* L, S&& s) {
-        if (s == nullptr)
-            return stack::push(L, nil);
-        return stack::push<unique_usertype<T, std::shared_ptr<T>>>(L, std::forward<S>(s));
     }
 };
 
@@ -5301,219 +5292,37 @@ inline void luajit_exception_off(lua_State* L) {
 
 // beginning of sol\variadic_args.hpp
 
-namespace sol {
-struct variadic_args {
-private:
-    lua_State* L;
-    int index;
-    int stacktop;
-
-public:
-    variadic_args() = default;
-    variadic_args(lua_State* L, int index = -1): L(L), index(lua_absindex(L, index)), stacktop(lua_gettop(L)) {}
-    variadic_args(const variadic_args&) = default;
-    variadic_args& operator=(const variadic_args&) = default;
-    variadic_args(variadic_args&& o) : L(o.L), index(o.index), stacktop(o.stacktop) {
-        // Must be manual, otherwise destructor will screw us
-        // return count being 0 is enough to keep things clean
-        // but will be thorough
-        o.L = nullptr;
-        o.index = 0;
-        o.stacktop = 0;
-    }
-    variadic_args& operator=(variadic_args&& o) {
-        L = o.L;
-        index = o.index;
-        stacktop = o.stacktop;
-        // Must be manual, otherwise destructor will screw us
-        // return count being 0 is enough to keep things clean
-        // but will be thorough
-        o.L = nullptr;
-        o.index = 0;
-        o.stacktop = 0;
-        return *this;
-    }
-
-    int push () const {
-        int pushcount = 0;
-        for (int i = index; i <= stacktop; ++i) {
-            lua_pushvalue(L, i);
-            pushcount += 1;
-        }
-        return pushcount;
-    }
-
-    template<typename T>
-    decltype(auto) get(int start = 0) const {
-        return stack::get<T>(L, index + start);
-    }
-
-    stack_proxy operator[](int start) const {
-        return stack_proxy(L, index + start);
-    }
-
-    lua_State* lua_state() const { return L; };
-    int stack_index() const { return index; };
-    int leftover_count() const { return stacktop - (index - 1); }
-    int top() const { return stacktop; }
-};
-
-namespace stack {
-template <>
-struct getter<variadic_args> {
-    static variadic_args get(lua_State* L, int index = -1) {
-        return variadic_args(L, index);
-    }
-};
-
-template <>
-struct pusher<variadic_args> {
-    static int push(lua_State*, const variadic_args& ref) {
-        return ref.push();
-    }
-};
-} // stack
-} // sol
-
-// end of sol\variadic_args.hpp
-
-namespace sol {
-template <typename base_t>
-class basic_object : public base_t {
-private:
-    template<typename T>
-    decltype(auto) as_stack(std::true_type) const {
-        return stack::get<T>(lua_state(), base_t::stack_index());
-    }
-
-    template<typename T>
-    decltype(auto) as_stack(std::false_type) const {
-        base_t::push();
-        return stack::pop<T>(lua_state());
-    }
-
-    template<typename T>
-    bool is_stack(std::true_type) const {
-        return stack::check<T>(lua_state(), base_t::stack_index(), no_panic);
-    }
-
-    template<typename T>
-    bool is_stack(std::false_type) const {
-        auto pp = stack::push_pop(*this);
-        return stack::check<T>(lua_state(), -1, no_panic);
-    }
-
-public:
-    using base_t::base_t;
-    using base_t::lua_state;
-
-    template<typename T>
-    decltype(auto) as() const {
-        return as_stack<T>( std::is_same<base_t, stack_reference>() );
-    }
-
-    template<typename T>
-    bool is() const {
-        if (!base_t::valid())
-            return false;
-        return is_stack<T>(std::is_same<base_t, stack_reference>());
-    }
-};
-
-inline bool operator==(const object& lhs, const nil_t&) {
-    return !lhs.valid();
-}
-
-inline bool operator==(const nil_t&, const object& rhs) {
-    return !rhs.valid();
-}
-
-inline bool operator!=(const object& lhs, const nil_t&) {
-    return lhs.valid();
-}
-
-inline bool operator!=(const nil_t&, const object& rhs) {
-    return rhs.valid();
-}
-} // sol
-
-// end of sol\object.hpp
+// beginning of sol\stack_proxy.hpp
 
 // beginning of sol\function.hpp
 
-// beginning of sol\resolve.hpp
+// beginning of sol\function_result.hpp
+
+// beginning of sol\proxy_base.hpp
 
 namespace sol {
-namespace detail {
-template<typename R, typename... Args, typename F, typename = std::result_of_t<meta::Unqualified<F>(Args...)>>
-inline auto resolve_i(types<R(Args...)>, F&&) -> R(meta::Unqualified<F>::*)(Args...) {
-    using Sig = R(Args...);
-    typedef meta::Unqualified<F> Fu;
-    return static_cast<Sig Fu::*>(&Fu::operator());
-}
+template <typename Super>
+struct proxy_base {
+    operator std::string() const {
+        const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
+        return super.template get<std::string>();
+    }
 
-template<typename F, typename U = meta::Unqualified<F>>
-inline auto resolve_f(std::true_type, F&& f)
--> decltype(resolve_i(types<meta::function_signature_t<decltype(&U::operator())>>(), std::forward<F>(f))) {
-    return resolve_i(types<meta::function_signature_t<decltype(&U::operator())>>(), std::forward<F>(f));
-}
+    template<typename T, meta::EnableIf<meta::Not<meta::is_string_constructible<T>>, is_proxy_primitive<meta::Unqualified<T>>> = 0>
+    operator T ( ) const {
+        const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
+        return super.template get<T>( );
+    }
 
-template<typename F>
-inline void resolve_f(std::false_type, F&&) {
-    static_assert(meta::has_deducible_signature<F>::value,
-                    "Cannot use no-template-parameter call with an overloaded functor: specify the signature");
-}
-
-template<typename F, typename U = meta::Unqualified<F>>
-inline auto resolve_i(types<>, F&& f) -> decltype(resolve_f(meta::has_deducible_signature<U>(), std::forward<F>(f))) {
-    return resolve_f(meta::has_deducible_signature<U> {}, std::forward<F>(f));
-}
-
-template<typename... Args, typename F, typename R = std::result_of_t<F&(Args...)>>
-inline auto resolve_i(types<Args...>, F&& f) -> decltype( resolve_i(types<R(Args...)>(), std::forward<F>(f))) {
-    return resolve_i(types<R(Args...)>(), std::forward<F>(f));
-}
-
-template<typename Sig, typename C>
-inline Sig C::* resolve_v(std::false_type, Sig C::* mem_func_ptr) {
-    return mem_func_ptr;
-}
-
-template<typename Sig, typename C>
-inline Sig C::* resolve_v(std::true_type, Sig C::* mem_variable_ptr) {
-    return mem_variable_ptr;
-}
-} // detail
-
-template<typename... Args, typename R>
-inline auto resolve(R fun_ptr(Args...)) -> R(*)(Args...) {
-    return fun_ptr;
-}
-
-template<typename Sig>
-inline Sig* resolve(Sig* fun_ptr) {
-    return fun_ptr;
-}
-
-template<typename... Args, typename R, typename C>
-inline auto resolve(R(C::*mem_ptr)(Args...)) -> R(C::*)(Args...) {
-    return mem_ptr;
-}
-
-template<typename Sig, typename C>
-inline Sig C::* resolve(Sig C::* mem_ptr) {
-    return detail::resolve_v(std::is_member_object_pointer<Sig C::*>(), mem_ptr);
-}
-
-template<typename... Sig, typename F>
-inline auto resolve(F&& f) -> decltype(detail::resolve_i(types<Sig...>(), std::forward<F>(f))) {
-    return detail::resolve_i(types<Sig...>(), std::forward<F>(f));
-}
+    template<typename T, meta::EnableIf<meta::Not<meta::is_string_constructible<T>>, meta::Not<is_proxy_primitive<meta::Unqualified<T>>>> = 0>
+    operator T& ( ) const {
+        const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
+        return super.template get<T&>( );
+    }
+};
 } // sol
 
-// end of sol\resolve.hpp
-
-// beginning of sol\function_result.hpp
+// end of sol\proxy_base.hpp
 
 #include <cstdint>
 
@@ -5564,14 +5373,6 @@ public:
         lua_pop(L, returncount);
     }
 };
-
-template <>
-struct bond_size<function_result> : std::integral_constant<std::size_t, SIZE_MAX> {};
-
-template <std::size_t I>
-stack_proxy get(const function_result& fr) {
-    return stack_proxy(fr.lua_state(), static_cast<int>(fr.stack_index() + I));
-}
 } // sol
 
 // end of sol\function_result.hpp
@@ -5705,10 +5506,40 @@ inline decltype(auto) cleanup_key() {
 template<typename T, typename Func, typename = void>
 struct functor {
     typedef meta::bind_traits<Func> traits_type;
+    typedef typename traits_type::args_type args_type;
+    typedef typename traits_type::return_type return_type;
+    typedef std::conditional_t<std::is_pointer<Func>::value || std::is_class<Func>::value, Func, std::add_pointer_t<Func>> function_type;
+    static const std::size_t arity = traits_type::arity;
+    static const bool is_free = true;
+    function_type invocation;
+
+    template<typename... Args>
+    functor(Args&&... args): invocation(std::forward<Args>(args)...) {}
+
+    template<typename... Args>
+    void call(types<void>, Args&&... args) {
+        invocation(std::forward<Args>(args)...);
+    }
+
+    template<typename Ret, typename... Args>
+    Ret call(types<Ret>, Args&&... args) {
+        return invocation(std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    auto operator()(Args&&... args) -> decltype(std::declval<functor>().call(types<return_type>{}, std::forward<Args>(args)...)) {
+        return this->call(types<return_type>(), std::forward<Args>(args)...);
+    }
+};
+
+template<typename T, typename Func>
+struct functor<T, Func, std::enable_if_t<!std::is_member_pointer<Func>::value && std::is_base_of<T, meta::Unqualified<typename meta::bind_traits<Func>::template arg_at<0>>>::value>> {
+    typedef meta::bind_traits<Func> traits_type;
     typedef meta::pop_front_type_t<typename traits_type::args_type> args_type;
     typedef typename traits_type::return_type return_type;
-    typedef meta::tuple_element_t<0, typename traits_type::args_tuple_type> Arg0;
     typedef std::conditional_t<std::is_pointer<Func>::value || std::is_class<Func>::value, Func, std::add_pointer_t<Func>> function_type;
+    static const std::size_t arity = traits_type::arity - 1;
+    static const bool is_free = false;
     T* item;
     function_type invocation;
 
@@ -5741,6 +5572,8 @@ struct functor<T, member_property<RSig, WSig>, C> {
     typedef member_property<RSig, WSig> function_type;
     typedef meta::Not<std::is_void<RSig>> can_read;
     typedef meta::Not<std::is_void<WSig>> can_write;
+    static const bool is_free = false;
+
     T* item;
     function_type invocation;
 
@@ -5772,6 +5605,7 @@ struct functor<T, Func, std::enable_if_t<std::is_member_object_pointer<Func>::va
     static const std::size_t arity = traits_type::arity;
     typedef std::true_type can_read;
     typedef std::true_type can_write;
+    static const bool is_free = false;
 
     T* item;
     Func invocation;
@@ -5802,6 +5636,7 @@ struct functor<T, Func, std::enable_if_t<std::is_member_function_pointer<Func>::
     typedef typename traits_type::args_type args_type;
     typedef typename traits_type::return_type return_type;
     static const std::size_t arity = traits_type::arity;
+    static const bool is_free = false;
 
     T* item;
     Func invocation;
@@ -6334,13 +6169,16 @@ namespace sol {
 namespace function_detail {
 namespace internals {
 template <typename T>
-struct overload_traits : meta::bind_traits<T> {};
+struct overload_traits : meta::bind_traits<T> {
+    static const std::size_t boost = 0;
+};
 
 template <typename T, typename Func, typename X>
 struct overload_traits<functor<T, Func, X>> {
     typedef typename functor<T, Func, X>::args_type args_type;
     typedef typename functor<T, Func, X>::return_type return_type;
     static const std::size_t arity = functor<T, Func, X>::arity;
+    static const std::size_t boost = static_cast<std::size_t>(functor<T, Func, X>::is_free);
 };
 
 template <std::size_t... M, typename Match, typename... Args>
@@ -6349,20 +6187,24 @@ inline int overload_match_arity(types<>, std::index_sequence<>, std::index_seque
 }
 
 template <typename Fx, typename... Fxs, std::size_t I, std::size_t... In, std::size_t... M, typename Match, typename... Args>
-inline int overload_match_arity(types<Fx, Fxs...>, std::index_sequence<I, In...>, std::index_sequence<M...>, Match&& matchfx, lua_State* L, int fxarity, int start, Args&&... args) {
+inline int overload_match_arity(types<Fx, Fxs...>, std::index_sequence<I, In...>, std::index_sequence<M...>, Match&& matchfx, lua_State* L, int nfxarity, int start, Args&&... args) {
     typedef overload_traits<meta::Unqualified<Fx>> traits;
     typedef meta::tuple_types<typename traits::return_type> return_types;
     typedef typename traits::args_type args_type;
     typedef typename args_type::indices args_indices;
+    typedef meta::index_in<this_state, args_type> state_index;
+    typedef meta::index_in<variadic_args, args_type> va_pack_index;
+    static const std::size_t arity = traits::arity - static_cast<std::size_t>(state_index::value != SIZE_MAX) - static_cast<std::size_t>(va_pack_index::value != SIZE_MAX);
+    int fxarity = traits::boost + nfxarity;
     // compile-time eliminate any functions that we know ahead of time are of improper arity
-    if (meta::find_in_pack_v<index_value<traits::arity>, index_value<M>...>::value) {
-        return overload_match_arity(types<Fxs...>(), std::index_sequence<In...>(), std::index_sequence<M...>(), std::forward<Match>(matchfx), L, fxarity, start, std::forward<Args>(args)...);
+    if (meta::find_in_pack_v<index_value<arity>, index_value<M>...>::value) {
+        return overload_match_arity(types<Fxs...>(), std::index_sequence<In...>(), std::index_sequence<M...>(), std::forward<Match>(matchfx), L, nfxarity, start, std::forward<Args>(args)...);
     }
-    if (traits::arity != fxarity) {
-        return overload_match_arity(types<Fxs...>(), std::index_sequence<In...>(), std::index_sequence<traits::arity, M...>(), std::forward<Match>(matchfx), L, fxarity, start, std::forward<Args>(args)...);
+    if (arity != fxarity) {
+        return overload_match_arity(types<Fxs...>(), std::index_sequence<In...>(), std::index_sequence<arity, M...>(), std::forward<Match>(matchfx), L, nfxarity, start, std::forward<Args>(args)...);
     }
-    if (!stack::stack_detail::check_types<true>().check(args_type(), args_indices(), L, start, no_panic)) {
-        return overload_match_arity(types<Fxs...>(), std::index_sequence<In...>(), std::index_sequence<M...>(), std::forward<Match>(matchfx), L, fxarity, start, std::forward<Args>(args)...);
+    if (!stack::stack_detail::check_types<true>().check(args_type(), args_indices(), L, start - traits::boost, no_panic)) {
+        return overload_match_arity(types<Fxs...>(), std::index_sequence<In...>(), std::index_sequence<M...>(), std::forward<Match>(matchfx), L, nfxarity, start, std::forward<Args>(args)...);
     }
     return matchfx(types<Fx>(), index_value<I>(), return_types(), args_type(), L, fxarity, start, std::forward<Args>(args)...);
 }
@@ -6413,11 +6255,17 @@ struct usertype_overloaded_function : base_function {
     
     usertype_overloaded_function(std::tuple<Functions...> set) : overloads(std::move(set)) {}
 
-    template <typename Fx, std::size_t I, typename... R, typename... Args>
+    template <typename Fx, std::size_t I, typename... R, typename... Args, meta::DisableIf<meta::Bool<Fx::is_free>> = 0>
     int call(types<Fx>, index_value<I>, types<R...> r, types<Args...> a, lua_State* L, int, int start) {
         auto& func = std::get<I>(overloads);
         func.item = detail::ptr(stack::get<T>(L, 1));
         return stack::call_into_lua<0, false>(r, a, L, start, func);
+    }
+
+    template <typename Fx, std::size_t I, typename... R, typename... Args, meta::EnableIf<meta::Bool<Fx::is_free>> = 0>
+    int call(types<Fx>, index_value<I>, types<R...> r, types<Args...> a, lua_State* L, int, int start) {
+        auto& func = std::get<I>(overloads);
+        return stack::call_into_lua<0, false>(r, a, L, start - 1, func);
     }
 
     virtual int operator()(lua_State* L) override {
@@ -6678,6 +6526,78 @@ struct member_variable : public base_function {
 } // sol
 
 // end of sol\function_types_member.hpp
+
+// beginning of sol\resolve.hpp
+
+namespace sol {
+namespace detail {
+template<typename R, typename... Args, typename F, typename = std::result_of_t<meta::Unqualified<F>(Args...)>>
+inline auto resolve_i(types<R(Args...)>, F&&) -> R(meta::Unqualified<F>::*)(Args...) {
+    using Sig = R(Args...);
+    typedef meta::Unqualified<F> Fu;
+    return static_cast<Sig Fu::*>(&Fu::operator());
+}
+
+template<typename F, typename U = meta::Unqualified<F>>
+inline auto resolve_f(std::true_type, F&& f)
+-> decltype(resolve_i(types<meta::function_signature_t<decltype(&U::operator())>>(), std::forward<F>(f))) {
+    return resolve_i(types<meta::function_signature_t<decltype(&U::operator())>>(), std::forward<F>(f));
+}
+
+template<typename F>
+inline void resolve_f(std::false_type, F&&) {
+    static_assert(meta::has_deducible_signature<F>::value,
+                    "Cannot use no-template-parameter call with an overloaded functor: specify the signature");
+}
+
+template<typename F, typename U = meta::Unqualified<F>>
+inline auto resolve_i(types<>, F&& f) -> decltype(resolve_f(meta::has_deducible_signature<U>(), std::forward<F>(f))) {
+    return resolve_f(meta::has_deducible_signature<U> {}, std::forward<F>(f));
+}
+
+template<typename... Args, typename F, typename R = std::result_of_t<F&(Args...)>>
+inline auto resolve_i(types<Args...>, F&& f) -> decltype( resolve_i(types<R(Args...)>(), std::forward<F>(f))) {
+    return resolve_i(types<R(Args...)>(), std::forward<F>(f));
+}
+
+template<typename Sig, typename C>
+inline Sig C::* resolve_v(std::false_type, Sig C::* mem_func_ptr) {
+    return mem_func_ptr;
+}
+
+template<typename Sig, typename C>
+inline Sig C::* resolve_v(std::true_type, Sig C::* mem_variable_ptr) {
+    return mem_variable_ptr;
+}
+} // detail
+
+template<typename... Args, typename R>
+inline auto resolve(R fun_ptr(Args...)) -> R(*)(Args...) {
+    return fun_ptr;
+}
+
+template<typename Sig>
+inline Sig* resolve(Sig* fun_ptr) {
+    return fun_ptr;
+}
+
+template<typename... Args, typename R, typename C>
+inline auto resolve(R(C::*mem_ptr)(Args...)) -> R(C::*)(Args...) {
+    return mem_ptr;
+}
+
+template<typename Sig, typename C>
+inline Sig C::* resolve(Sig C::* mem_ptr) {
+    return detail::resolve_v(std::is_member_object_pointer<Sig C::*>(), mem_ptr);
+}
+
+template<typename... Sig, typename F>
+inline auto resolve(F&& f) -> decltype(detail::resolve_i(types<Sig...>(), std::forward<F>(f))) {
+    return detail::resolve_i(types<Sig...>(), std::forward<F>(f));
+}
+} // sol
+
+// end of sol\resolve.hpp
 
 namespace sol {
 template <typename Sig, typename... Ps>
@@ -7053,7 +6973,7 @@ private:
 
 public:
     protected_function_result() = default;
-    protected_function_result(lua_State* L, int index = -1, int returncount = 0, int popcount = 0, call_status error = call_status::ok): L(L), index(index), returncount(returncount), popcount(popcount), err(error) {
+    protected_function_result(lua_State* L, int index = -1, int returncount = 0, int popcount = 0, call_status err = call_status::ok): L(L), index(index), returncount(returncount), popcount(popcount), err(err) {
         
     }
     protected_function_result(const protected_function_result&) = default;
@@ -7105,14 +7025,6 @@ public:
         stack::remove(L, index, popcount);
     }
 };
-
-template <>
-struct bond_size<protected_function_result> : std::integral_constant<std::size_t, SIZE_MAX> {};
-
-template <std::size_t I>
-stack_proxy get(const protected_function_result& fr) {
-    return stack_proxy(fr.lua_state(), static_cast<int>(fr.stack_index() + I));
-}
 } // sol
 
 // end of sol\protected_function_result.hpp
@@ -7225,7 +7137,9 @@ public:
     basic_protected_function& operator=(const basic_protected_function&) = default;
     basic_protected_function(basic_protected_function&& ) = default;
     basic_protected_function& operator=(basic_protected_function&& ) = default;
-    basic_protected_function(lua_State* L, int index = -1): base_t(L, index), error_handler(get_default_handler()) {
+    basic_protected_function(const basic_function<base_t>& b) : base_t(b) {}
+    basic_protected_function(basic_function<base_t>&& b) : base_t(std::move(b)) {}
+    basic_protected_function(lua_State* L, int index = -1) : base_t(L, index), error_handler(get_default_handler()) {
 #ifdef SOL_CHECK_ARGUMENTS
         stack::check<basic_protected_function>(L, index, type_panic);
 #endif // Safety
@@ -7252,6 +7166,347 @@ public:
 } // sol
 
 // end of sol\protected_function.hpp
+
+namespace sol {
+struct stack_proxy : public proxy_base<stack_proxy> {
+private:
+    lua_State* L;
+    int index;
+
+public:
+    stack_proxy() : L(nullptr), index(0){}
+    stack_proxy(lua_State* L, int index) : L(L), index(index) {}
+
+    template<typename T>
+    decltype(auto) get() const {
+        return stack::get<T>(L, stack_index());
+    }
+
+    int push () const {
+        lua_pushvalue(L, index);
+        return 1;
+    }
+
+    lua_State* lua_state() const { return L; }
+    int stack_index() const { return index; }
+
+    template<typename... Ret, typename... Args>
+    decltype(auto) call(Args&&... args) {
+        return get<function>().template call<Ret...>(std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    decltype(auto) operator()(Args&&... args) {
+        return call<>(std::forward<Args>(args)...);
+    }
+};
+
+namespace stack {
+template <>
+struct getter<stack_proxy> {
+    static stack_proxy get(lua_State* L, int index = -1) {
+        return stack_proxy(L, index);
+    }
+};
+
+template <>
+struct pusher<stack_proxy> {
+    static int push(lua_State*, const stack_proxy& ref) {
+        return ref.push();
+    }
+};
+} // stack
+
+template <>
+struct tie_size<function_result> : std::integral_constant<std::size_t, SIZE_MAX> {};
+
+template <std::size_t I>
+stack_proxy get(const function_result& fr) {
+    return stack_proxy(fr.lua_state(), static_cast<int>(fr.stack_index() + I));
+}
+
+template <>
+struct tie_size<protected_function_result> : std::integral_constant<std::size_t, SIZE_MAX> {};
+
+template <std::size_t I>
+stack_proxy get(const protected_function_result& fr) {
+    return stack_proxy(fr.lua_state(), static_cast<int>(fr.stack_index() + I));
+}
+} // sol
+
+// end of sol\stack_proxy.hpp
+
+#include <limits>
+#include <iterator>
+
+namespace sol {
+    template <bool is_const>
+    struct va_iterator : std::iterator<std::random_access_iterator_tag, std::conditional_t<is_const, const stack_proxy, stack_proxy>, std::ptrdiff_t, std::conditional_t<is_const, const stack_proxy*, stack_proxy*>, std::conditional_t<is_const, const stack_proxy, stack_proxy>> {
+        typedef std::iterator<std::random_access_iterator_tag, std::conditional_t<is_const, const stack_proxy, stack_proxy>, std::ptrdiff_t, std::conditional_t<is_const, const stack_proxy*, stack_proxy*>, std::conditional_t<is_const, const stack_proxy, stack_proxy>> base_t;
+        typedef typename base_t::reference reference;
+        typedef typename base_t::pointer pointer;
+        typedef typename base_t::value_type value_type;
+        typedef typename base_t::difference_type difference_type;
+        typedef typename base_t::iterator_category iterator_category;
+        lua_State* L;
+        int index;
+        int stacktop;
+        stack_proxy sp;
+
+        va_iterator() : L(nullptr), index(std::numeric_limits<int>::max()), stacktop(std::numeric_limits<int>::max()) {}
+        va_iterator(lua_State* L, int index, int stacktop) : L(L), index(index), stacktop(stacktop), sp(L, index) {}
+
+        reference operator*() {
+            return stack_proxy(L, index);
+        }
+
+        pointer operator->() {
+            sp = stack_proxy(L, index);
+            return &sp;
+        }
+
+        va_iterator& operator++ () {
+            ++index;
+            return *this;
+        }
+
+        va_iterator operator++ (int) {
+            auto r = *this;
+            this->operator ++();
+            return r;
+        }
+
+        va_iterator& operator-- () {
+            --index;
+            return *this;
+        }
+
+        va_iterator operator-- (int) {
+            auto r = *this;
+            this->operator --();
+            return r;
+        }
+
+        va_iterator& operator+= (difference_type idx) {
+            index += static_cast<int>(idx);
+            return *this;
+        }
+
+        va_iterator& operator-= (difference_type idx) {
+            index -= static_cast<int>(idx);
+            return *this;
+        }
+
+        difference_type operator- (const va_iterator& r) const {
+            return index - r.index;
+        }
+
+        va_iterator operator+ (difference_type idx) const {
+            va_iterator r = *this;
+            r += idx;
+            return r;
+        }
+
+        reference operator[](difference_type idx) {
+            return stack_proxy(L, index + static_cast<int>(idx));
+        }
+
+        bool operator==(const va_iterator& r) const {
+            if (stacktop == std::numeric_limits<int>::max()) {
+                return r.index == r.stacktop;
+            }
+            else if (r.stacktop == std::numeric_limits<int>::max()) {
+                return index == stacktop;
+            }
+            return index == r.index;
+        }
+
+        bool operator != (const va_iterator& r) const {
+            return !(this->operator==(r));
+        }
+
+        bool operator < (const va_iterator& r) const {
+            return index < r.index;
+        }
+
+        bool operator > (const va_iterator& r) const {
+            return index > r.index;
+        }
+
+        bool operator <= (const va_iterator& r) const {
+            return index <= r.index;
+        }
+
+        bool operator >= (const va_iterator& r) const {
+            return index >= r.index;
+        }
+    };
+    
+    template <bool is_const>
+    inline va_iterator<is_const> operator+(typename va_iterator<is_const>::difference_type n, const va_iterator<is_const>& r) {
+        return r + n;
+    }
+
+struct variadic_args {
+private:
+    lua_State* L;
+    int index;
+    int stacktop;
+
+public:
+    typedef stack_proxy reference_type;
+    typedef stack_proxy value_type;
+    typedef stack_proxy* pointer;
+    typedef std::ptrdiff_t difference_type;
+    typedef std::size_t size_type;
+    typedef va_iterator<false> iterator;
+    typedef va_iterator<true> const_iterator;
+    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+
+    variadic_args() = default;
+    variadic_args(lua_State* L, int index = -1): L(L), index(lua_absindex(L, index)), stacktop(lua_gettop(L)) {}
+    variadic_args(const variadic_args&) = default;
+    variadic_args& operator=(const variadic_args&) = default;
+    variadic_args(variadic_args&& o) : L(o.L), index(o.index), stacktop(o.stacktop) {
+        // Must be manual, otherwise destructor will screw us
+        // return count being 0 is enough to keep things clean
+        // but will be thorough
+        o.L = nullptr;
+        o.index = 0;
+        o.stacktop = 0;
+    }
+    variadic_args& operator=(variadic_args&& o) {
+        L = o.L;
+        index = o.index;
+        stacktop = o.stacktop;
+        // Must be manual, otherwise destructor will screw us
+        // return count being 0 is enough to keep things clean
+        // but will be thorough
+        o.L = nullptr;
+        o.index = 0;
+        o.stacktop = 0;
+        return *this;
+    }
+
+    iterator begin() { return iterator(L, index, stacktop + 1); }
+    iterator end() { return iterator(L, stacktop + 1, stacktop + 1); }
+    const_iterator begin() const { return const_iterator(L, index, stacktop + 1); }
+    const_iterator end() const { return const_iterator(L, stacktop + 1, stacktop + 1); }
+    const_iterator cbegin() const { return begin(); }
+    const_iterator cend() const { return end(); }
+
+    reverse_iterator rbegin() { return std::reverse_iterator<iterator>(begin()); }
+    reverse_iterator rend() { return std::reverse_iterator<iterator>(end()); }
+    const_reverse_iterator rbegin() const { return std::reverse_iterator<const_iterator>(begin()); }
+    const_reverse_iterator rend() const { return std::reverse_iterator<const_iterator>(end()); }
+    const_reverse_iterator crbegin() const { return std::reverse_iterator<const_iterator>(cbegin()); }
+    const_reverse_iterator crend() const { return std::reverse_iterator<const_iterator>(cend()); }
+
+    int push () const {
+        int pushcount = 0;
+        for (int i = index; i <= stacktop; ++i) {
+            lua_pushvalue(L, i);
+            pushcount += 1;
+        }
+        return pushcount;
+    }
+
+    template<typename T>
+    decltype(auto) get(difference_type start = 0) const {
+        return stack::get<T>(L, index + static_cast<int>(start));
+    }
+
+    stack_proxy operator[](difference_type start) const {
+        return stack_proxy(L, index + static_cast<int>(start));
+    }
+
+    lua_State* lua_state() const { return L; };
+    int stack_index() const { return index; };
+    int leftover_count() const { return stacktop - (index - 1); }
+    int top() const { return stacktop; }
+};
+
+namespace stack {
+template <>
+struct getter<variadic_args> {
+    static variadic_args get(lua_State* L, int index = -1) {
+        return variadic_args(L, index);
+    }
+};
+
+template <>
+struct pusher<variadic_args> {
+    static int push(lua_State*, const variadic_args& ref) {
+        return ref.push();
+    }
+};
+} // stack
+} // sol
+
+// end of sol\variadic_args.hpp
+
+namespace sol {
+template <typename base_t>
+class basic_object : public base_t {
+private:
+    template<typename T>
+    decltype(auto) as_stack(std::true_type) const {
+        return stack::get<T>(lua_state(), base_t::stack_index());
+    }
+
+    template<typename T>
+    decltype(auto) as_stack(std::false_type) const {
+        base_t::push();
+        return stack::pop<T>(lua_state());
+    }
+
+    template<typename T>
+    bool is_stack(std::true_type) const {
+        return stack::check<T>(lua_state(), base_t::stack_index(), no_panic);
+    }
+
+    template<typename T>
+    bool is_stack(std::false_type) const {
+        auto pp = stack::push_pop(*this);
+        return stack::check<T>(lua_state(), -1, no_panic);
+    }
+
+public:
+    using base_t::base_t;
+    using base_t::lua_state;
+
+    template<typename T>
+    decltype(auto) as() const {
+        return as_stack<T>( std::is_same<base_t, stack_reference>() );
+    }
+
+    template<typename T>
+    bool is() const {
+        if (!base_t::valid())
+            return false;
+        return is_stack<T>(std::is_same<base_t, stack_reference>());
+    }
+};
+
+inline bool operator==(const object& lhs, const nil_t&) {
+    return !lhs.valid();
+}
+
+inline bool operator==(const nil_t&, const object& rhs) {
+    return !rhs.valid();
+}
+
+inline bool operator!=(const object& lhs, const nil_t&) {
+    return lhs.valid();
+}
+
+inline bool operator!=(const nil_t&, const object& rhs) {
+    return rhs.valid();
+}
+} // sol
+
+// end of sol\object.hpp
 
 namespace sol {
 template<typename Table, typename Key>
@@ -7842,6 +8097,7 @@ private:
     template<typename... Args>
     usertype(usertype_detail::verified_tag, Args&&... args) : indexfunc(nullptr), newindexfunc(nullptr), constructfunc(nullptr), 
     destructfunc(nullptr), functiongcfunc(nullptr), needsindexfunction(false), baseclasscheck(nullptr), baseclasscast(nullptr) {
+        static_assert((sizeof...(Args) % 2) == 0, "Incorrect argument count to usertype creation: not in pairs. Might be missing name, function/property/variable, comma");
         functionnames.reserve(sizeof...(args)+3);
         functiontable.reserve(sizeof...(args)+3);
         metafunctiontable.reserve(sizeof...(args)+3);
@@ -7869,7 +8125,7 @@ public:
         // push pointer tables first,
         usertype_detail::push_metatable<T*, usertype_detail::stage::refmeta>(L, needsindexfunction, functions, functiontable, metafunctiontable, baseclasscheck, baseclasscast);
         lua_pop(L, 1);
-        usertype_detail::push_metatable<unique_usertype<T>, usertype_detail::stage::uniquemeta>(L, needsindexfunction, functions, functiontable, metafunctiontable, baseclasscheck, baseclasscast);
+        usertype_detail::push_metatable<detail::unique_usertype<T>, usertype_detail::stage::uniquemeta>(L, needsindexfunction, functions, functiontable, metafunctiontable, baseclasscheck, baseclasscast);
         lua_pop(L, 1);
         // but leave the regular T table on last
         // so it can be linked to a type for usage with `.new(...)` or `:new(...)`
@@ -7894,8 +8150,6 @@ struct pusher<usertype<T>> {
 // end of sol\usertype.hpp
 
 // beginning of sol\table_iterator.hpp
-
-#include <iterator>
 
 namespace sol {
 
@@ -8342,6 +8596,119 @@ namespace sol {
 
 // end of sol\table.hpp
 
+// beginning of sol\load_result.hpp
+
+namespace sol {
+    struct load_result : public proxy_base<load_result> {
+    private:
+        lua_State* L;
+        int index;
+        int returncount;
+        int popcount;
+        load_status err;
+
+        template <typename T>
+        decltype(auto) tagged_get(types<sol::optional<T>>) const {
+            if (!valid()) {
+                return sol::optional<T>(nullopt);
+            }
+            return stack::get<sol::optional<T>>(L, index);
+        }
+
+        template <typename T>
+        decltype(auto) tagged_get(types<T>) const {
+#ifdef SOL_CHECK_ARGUMENTS
+            if (!valid()) {
+                type_panic(L, index, type_of(L, index), type::none);
+            }
+#endif // Check Argument Safety
+            return stack::get<T>(L, index);
+        }
+
+        sol::optional<sol::error> tagged_get(types<sol::optional<sol::error>>) const {
+            if (valid()) {
+                return nullopt;
+            }
+            return sol::error(detail::direct_error, stack::get<std::string>(L, index));
+        }
+
+        sol::error tagged_get(types<sol::error>) const {
+#ifdef SOL_CHECK_ARGUMENTS
+            if (valid()) {
+                type_panic(L, index, type_of(L, index), type::none);
+            }
+#endif // Check Argument Safety
+            return sol::error(detail::direct_error, stack::get<std::string>(L, index));
+        }
+
+    public:
+        load_result() = default;
+        load_result(lua_State* L, int index = -1, int returncount = 0, int popcount = 0, load_status err = load_status::ok) : L(L), index(index), returncount(returncount), popcount(popcount), err(err) {
+
+        }
+        load_result(const load_result&) = default;
+        load_result& operator=(const load_result&) = default;
+        load_result(load_result&& o) : L(o.L), index(o.index), returncount(o.returncount), popcount(o.popcount), err(o.err) {
+            // Must be manual, otherwise destructor will screw us
+            // return count being 0 is enough to keep things clean
+            // but will be thorough
+            o.L = nullptr;
+            o.index = 0;
+            o.returncount = 0;
+            o.popcount = 0;
+            o.err = load_status::syntax;
+        }
+        load_result& operator=(load_result&& o) {
+            L = o.L;
+            index = o.index;
+            returncount = o.returncount;
+            popcount = o.popcount;
+            err = o.err;
+            // Must be manual, otherwise destructor will screw us
+            // return count being 0 is enough to keep things clean
+            // but will be thorough
+            o.L = nullptr;
+            o.index = 0;
+            o.returncount = 0;
+            o.popcount = 0;
+            o.err = load_status::syntax;
+            return *this;
+        }
+
+        load_status error() const {
+            return err;
+        }
+
+        bool valid() const {
+            return error() == load_status::ok;
+        }
+
+        template<typename T>
+        T get() const {
+            return tagged_get(types<meta::Unqualified<T>>());
+        }
+
+        template<typename... Ret, typename... Args>
+        decltype(auto) call(Args&&... args) {
+            return get<function>().template call<Ret...>(std::forward<Args>(args)...);
+        }
+
+        template<typename... Args>
+        decltype(auto) operator()(Args&&... args) {
+            return call<>(std::forward<Args>(args)...);
+        }
+
+        lua_State* lua_state() const { return L; };
+        int stack_index() const { return index; };
+
+        ~load_result() {
+            stack::remove(L, index, popcount);
+        }
+    };
+} // sol
+
+// end of sol\load_result.hpp
+
 namespace sol {
 enum class lib : char {
     base,
@@ -8444,12 +8811,12 @@ public:
                 luaL_requiref(L, "debug", luaopen_debug, 1);
                 lua_pop(L, 1);
                 break;
-		  case lib::ffi:
+            case lib::ffi:
 #ifdef SOL_LUAJIT
                 luaL_requiref(L, "ffi", luaopen_ffi, 1);
 #endif
                 break;
-		  case lib::jit:
+            case lib::jit:
 #ifdef SOL_LUAJIT
                 luaL_requiref(L, "jit", luaopen_jit, 1);
 #endif
@@ -8471,6 +8838,16 @@ public:
         if(luaL_dofile(L, filename.c_str())) {
             lua_error(L);
         }
+    }
+
+    load_result load(const std::string& code) {
+        load_status x = static_cast<load_status>(luaL_loadstring(L, code.c_str()));
+        return load_result(L, -1, 1, 1, x);
+    }
+
+    load_result load_file(const std::string& filename) {
+        load_status x = static_cast<load_status>(luaL_loadfile(L, filename.c_str()));
+        return load_result(L, -1, 1, 1, x);
     }
 
     iterator begin () const {
@@ -8707,7 +9084,7 @@ public:
     thread_status status () const {
         lua_State* lthread = thread_state();
         thread_status lstat = static_cast<thread_status>(lua_status(lthread));
-        if (lstat != thread_status::normal && lua_gettop(lthread) == 0) {
+        if (lstat != thread_status::ok && lua_gettop(lthread) == 0) {
             // No thing on the thread's stack means its dead
             return thread_status::dead;
         }

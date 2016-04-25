@@ -87,6 +87,14 @@ private:
     //Menu music
     std::shared_ptr<sf::SoundBuffer> m_backgroundSoundBuffer;
     sf::Sound m_backgroundSound;
+
+    //Menu logos
+    std::vector<std::shared_ptr<sf::Texture>> m_logosTextures;
+    sf::Sprite m_boostLogo;
+    sf::Sprite m_entityxLogo;
+    sf::Sprite m_sfguiLogo;
+    sf::Sprite m_sfmlLogo;
+    sf::Sprite m_solLogo;
 };
 
 }

@@ -39,7 +39,19 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     m_groundTexture(m_resourcesManager.getTextures().requestResource("menu/ground.png")),
     m_groundSprite(*m_groundTexture),
     m_backgroundSoundBuffer(m_resourcesManager.getSounds().requestResource("menu/bensound-clearday.ogg")),
-    m_backgroundSound(*m_backgroundSoundBuffer)
+    m_backgroundSound(*m_backgroundSoundBuffer),
+    m_logosTextures{
+        m_resourcesManager.getTextures().requestResource("credits/boost.png"),
+        m_resourcesManager.getTextures().requestResource("credits/entityx.png"),
+        m_resourcesManager.getTextures().requestResource("credits/sfgui.png"),
+        m_resourcesManager.getTextures().requestResource("credits/sfml.png"),
+        m_resourcesManager.getTextures().requestResource("credits/sol.png")
+    },
+    m_boostLogo(*m_logosTextures[0]),
+    m_entityxLogo(*m_logosTextures[1]),
+    m_sfguiLogo(*m_logosTextures[2]),
+    m_sfmlLogo(*m_logosTextures[3]),
+    m_solLogo(*m_logosTextures[4])
 {
     //Logo
     m_logoSprite.setOrigin(m_logoSprite.getLocalBounds().width/2.f, m_logoSprite.getLocalBounds().height/2.f);
@@ -196,7 +208,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
         aboutBox->SetSpacing(5.f);
         m_aboutDialog->Add(aboutBox);
 
-        aboutBox->PackEnd(sfg::Label::Create("YAPG - Yet Another Platformer Game\n\nDeveloped by Victor Levasseur\n\nLibraries used :\n - Entityx 1.2\n - Lua\n - SFGUI 0.3.0 (modified)\n - SFML\n - Sol 2.3"));
+        aboutBox->PackEnd(sfg::Label::Create("YAPG - Yet Another Platformer Game\n\nDeveloped by Victor Levasseur\n\nLibraries used :\n - Entityx 1.2\n - Lua\n - SFGUI 0.3.0 (modified)\n - SFML\n - Sol 2.5\n - Boost"));
 
         auto closeButton = sfg::Button::Create("Close");
         closeButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
@@ -241,6 +253,13 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     //Sound init
     m_backgroundSound.setLoop(true);
     m_backgroundSound.setVolume(20.f);
+
+    //Libs logos
+    m_boostLogo.setPosition(sf::Vector2f(90.f, 650.f));
+    m_entityxLogo.setPosition(sf::Vector2f(260.f, 650.f));
+    m_sfguiLogo.setPosition(sf::Vector2f(420.f, 650.f));
+    m_sfmlLogo.setPosition(sf::Vector2f(590.f, 650.f));
+    m_solLogo.setPosition(sf::Vector2f(760.f, 600.f));
 }
 
 void MainMenuState::processEvent(sf::Event event, sf::RenderTarget &target)
@@ -297,6 +316,12 @@ void MainMenuState::render(sf::RenderTarget& target)
     target.draw(m_logoSprite);
     target.draw(m_groundSprite);
     target.draw(m_playerSprite);
+
+    target.draw(m_boostLogo);
+    target.draw(m_entityxLogo);
+    target.draw(m_sfguiLogo);
+    target.draw(m_sfmlLogo);
+    target.draw(m_solLogo);
 
     m_sfgui.Display(dynamic_cast<sf::RenderWindow&>(target));
 }
