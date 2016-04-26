@@ -56,7 +56,7 @@ class Emitter
 {
 public:
     template<typename MessageType, typename... Args>
-    void emit(Args... args);
+    static void emit(Args... args);
 };
 
 class MessagingManager : public tools::Singleton<MessagingManager>
