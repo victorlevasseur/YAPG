@@ -73,6 +73,8 @@ public:
     template<class C>
     static C* doGetComponentPtrForLua(EntityHandle entity);
 
+    operator entityx::Entity() { return m_entity; }
+
 private:
 
     template<class C>

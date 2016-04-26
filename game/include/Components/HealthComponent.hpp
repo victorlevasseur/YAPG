@@ -2,13 +2,15 @@
 #define YAPG_GAME_COMPONENTS_HEALTHCOMPONENT_H
 
 #include "Components/Component.hpp"
+#include "Lua/EntityHandle.hpp"
 #include "Lua/LuaState.hpp"
+#include "Messaging/Messaging.hpp"
 #include "Meta/Metadata.hpp"
 
 namespace components
 {
 
-class HealthComponent : public Component
+class HealthComponent : public Component, public messaging::Emitter
 {
 public:
     HealthComponent();
@@ -18,7 +20,7 @@ public:
 
     static void registerComponent(lua::LuaState& state);
 
-    void kill();
+    static void kill(lua::EntityHandle entity);
 
     float health;
     float maxHealth;

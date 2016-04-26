@@ -43,31 +43,30 @@ void HealthSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
     //Test for entities beyond level's limits
     es.each<c::PositionComponent, c::HealthComponent>([&](entityx::Entity entity, c::PositionComponent& position, c::HealthComponent& health)
     {
+        if(health.health <= 0)
+            return;
+
         if(position.y > 200.f + lowestPlatformPos)
         {
-            health.kill();
+            c::HealthComponent::kill(entity);
         }
     });
+}
 
-    //Test for dead entities (health <= 0)
-    es.each<c::PositionComponent, c::HealthComponent>([&](entityx::Entity entity, c::PositionComponent& position, c::HealthComponent& health)
+void HealthSystem::receive(const HealthKillMessage& msg)
+{
+    entityx::Entity(msg.entityToKill).component<c::HealthComponent>()->health = 0;
+    m_alreadyDeadEntities.push_back(entityx::Entity(msg.entityToKill));
+
+    //TODO: Call the death callback or destroy the entity if no callback.
+    if(false)
     {
-        if(health.health <= 0 && std::find(m_alreadyDeadEntities.cbegin(), m_alreadyDeadEntities.cend(), entity) == m_alreadyDeadEntities.cend())
-        {
-            //TODO: Call the death callback or destroy the entity if no callback.
-            if(false)
-            {
 
-            }
-            else
-            {
-                entity.destroy();
-            }
-
-            //Remember the entity so as not to call the death callback again...
-            m_alreadyDeadEntities.push_back(entity);
-        }
-    });
+    }
+    else
+    {
+        entityx::Entity(msg.entityToKill).destroy();
+    }
 }
 
 }

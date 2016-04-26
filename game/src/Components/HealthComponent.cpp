@@ -1,6 +1,6 @@
 #include "Components/HealthComponent.hpp"
 
-#include "Lua/EntityHandle.hpp"
+#include "Systems/HealthSystem.hpp"
 
 namespace components
 {
@@ -37,10 +37,9 @@ void HealthComponent::registerComponent(lua::LuaState& state)
     state.declareComponentGetter<HealthComponent>("health");
 }
 
-void HealthComponent::kill()
+void HealthComponent::kill(lua::EntityHandle entity)
 {
-    health = 0;
-    //TODO: Send a HealthChangedMessage
+    emit<systems::HealthKillMessage>(entity);
 }
 
 std::ostream& operator<<(std::ostream& stream, const HealthComponent& component)
