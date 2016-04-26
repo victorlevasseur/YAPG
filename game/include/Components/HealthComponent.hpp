@@ -22,6 +22,7 @@ public:
 
     static void kill(lua::EntityHandle entity);
     static void loosePV(lua::EntityHandle entity, float pv);
+    static void gainPV(lua::EntityHandle entity, float pv);
 
     float health;
     float maxHealth;

@@ -86,4 +86,16 @@ void HealthSystem::receive(const HealthLoosePVMessage& msg)
     //TODO: Set a invincibility period
 }
 
+void HealthSystem::receive(const HealthGainPVMessage& msg)
+{
+    if(!entityx::Entity(msg.entity).has_component<c::HealthComponent>())
+        return;
+
+    auto healthComp = entityx::Entity(msg.entity).component<c::HealthComponent>();
+    healthComp->health += msg.pv;
+    healthComp->health = std::min(healthComp->health, healthComp->maxHealth);
+
+    //TODO: Call the gain PV callback
+}
+
 }

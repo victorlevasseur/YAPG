@@ -35,6 +35,7 @@ void HealthComponent::registerComponent(lua::LuaState& state)
     );
     state.getState().set_function("health_kill", &HealthComponent::kill);
     state.getState().set_function("health_loose_pv", &HealthComponent::loosePV);
+    state.getState().set_function("health_gain_pv", &HealthComponent::gainPV);
     state.declareComponentGetter<HealthComponent>("health");
 }
 
@@ -46,6 +47,11 @@ void HealthComponent::kill(lua::EntityHandle entity)
 void HealthComponent::loosePV(lua::EntityHandle entity, float pv)
 {
     emit<systems::HealthLoosePVMessage>(entity, pv);
+}
+
+void HealthComponent::gainPV(lua::EntityHandle entity, float pv)
+{
+    emit<systems::HealthGainPVMessage>(entity, pv);
 }
 
 std::ostream& operator<<(std::ostream& stream, const HealthComponent& component)

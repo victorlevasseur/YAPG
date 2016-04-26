@@ -21,7 +21,13 @@ struct HealthLoosePVMessage
     float pv;
 };
 
-class HealthSystem : public entityx::System<HealthSystem>, public messaging::Receiver<HealthKillMessage, HealthLoosePVMessage>
+struct HealthGainPVMessage
+{
+    entityx::Entity entity;
+    float pv;
+};
+
+class HealthSystem : public entityx::System<HealthSystem>, public messaging::Receiver<HealthKillMessage, HealthLoosePVMessage, HealthGainPVMessage>
 {
 public:
 
@@ -31,6 +37,7 @@ public:
 
     virtual void receive(const HealthKillMessage& msg);
     virtual void receive(const HealthLoosePVMessage& msg);
+    virtual void receive(const HealthGainPVMessage& msg);
 
 private:
     const settings::SettingsManager& m_settingsManager;
