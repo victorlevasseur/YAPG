@@ -55,6 +55,9 @@ void HealthSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
 
 void HealthSystem::receive(const HealthKillMessage& msg)
 {
+    if(!entityx::Entity(msg.entityToKill).has_component<c::HealthComponent>())
+        return;
+        
     entityx::Entity(msg.entityToKill).component<c::HealthComponent>()->health = 0;
     m_alreadyDeadEntities.push_back(entityx::Entity(msg.entityToKill));
 

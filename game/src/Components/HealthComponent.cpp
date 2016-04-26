@@ -31,9 +31,9 @@ void HealthComponent::registerComponent(lua::LuaState& state)
 
     state.getState().new_usertype<HealthComponent>("health_component",
         "health", sol::readonly(&HealthComponent::health),
-        "max_health", &HealthComponent::maxHealth,
-        "kill", &HealthComponent::kill
+        "max_health", &HealthComponent::maxHealth
     );
+    state.getState().set_function("health_kill", &HealthComponent::kill);
     state.declareComponentGetter<HealthComponent>("health");
 }
 
