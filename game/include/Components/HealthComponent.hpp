@@ -21,6 +21,7 @@ public:
     static void registerComponent(lua::LuaState& state);
 
     static void kill(lua::EntityHandle entity);
+    static void loosePV(lua::EntityHandle entity, float pv);
 
     float health;
     float maxHealth;

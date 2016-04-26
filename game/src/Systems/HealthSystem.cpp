@@ -57,7 +57,7 @@ void HealthSystem::receive(const HealthKillMessage& msg)
 {
     if(!entityx::Entity(msg.entityToKill).has_component<c::HealthComponent>())
         return;
-        
+
     entityx::Entity(msg.entityToKill).component<c::HealthComponent>()->health = 0;
     m_alreadyDeadEntities.push_back(entityx::Entity(msg.entityToKill));
 
@@ -70,6 +70,20 @@ void HealthSystem::receive(const HealthKillMessage& msg)
     {
         entityx::Entity(msg.entityToKill).destroy();
     }
+}
+
+void HealthSystem::receive(const HealthLoosePVMessage& msg)
+{
+    if(!entityx::Entity(msg.entity).has_component<c::HealthComponent>())
+        return;
+
+    entityx::Entity(msg.entity).component<c::HealthComponent>()->health -= msg.pv;
+    if(entityx::Entity(msg.entity).component<c::HealthComponent>()->health <= 0)
+        c::HealthComponent::kill(msg.entity);
+
+    //TODO: Call the loose PV callback
+
+    //TODO: Set a invincibility period
 }
 
 }

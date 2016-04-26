@@ -15,7 +15,13 @@ struct HealthKillMessage
     entityx::Entity entityToKill;
 };
 
-class HealthSystem : public entityx::System<HealthSystem>, public messaging::Receiver<HealthKillMessage>
+struct HealthLoosePVMessage
+{
+    entityx::Entity entity;
+    float pv;
+};
+
+class HealthSystem : public entityx::System<HealthSystem>, public messaging::Receiver<HealthKillMessage, HealthLoosePVMessage>
 {
 public:
 
@@ -24,6 +30,7 @@ public:
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
     virtual void receive(const HealthKillMessage& msg);
+    virtual void receive(const HealthLoosePVMessage& msg);
 
 private:
     const settings::SettingsManager& m_settingsManager;

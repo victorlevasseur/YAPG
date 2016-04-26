@@ -47,8 +47,8 @@ entity_template = {
 
         },
         ["health"] = {
-            health = 1,
-            max_health = 1
+            health = 2,
+            max_health = 2
         },
         ["hitbox"] = {
             polygon = {

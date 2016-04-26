@@ -34,12 +34,18 @@ void HealthComponent::registerComponent(lua::LuaState& state)
         "max_health", &HealthComponent::maxHealth
     );
     state.getState().set_function("health_kill", &HealthComponent::kill);
+    state.getState().set_function("health_loose_pv", &HealthComponent::loosePV);
     state.declareComponentGetter<HealthComponent>("health");
 }
 
 void HealthComponent::kill(lua::EntityHandle entity)
 {
     emit<systems::HealthKillMessage>(entity);
+}
+
+void HealthComponent::loosePV(lua::EntityHandle entity, float pv)
+{
+    emit<systems::HealthLoosePVMessage>(entity, pv);
 }
 
 std::ostream& operator<<(std::ostream& stream, const HealthComponent& component)

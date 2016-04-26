@@ -103,8 +103,8 @@ entity_template = {
                         --The player hit the slime on the top, kill myself (slime)
                         health_kill(entity)
                     else
-                        -- The slime touched the player on its side or top, kill the player. TODO: Only remove PV
-                        health_kill(other)
+                        -- The slime touched the player on its side or top, kill the player.
+                        health_loose_pv(other, 1)
                     end
                 end
             end,
