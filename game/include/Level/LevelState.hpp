@@ -1,9 +1,13 @@
 #ifndef YAPG_GAME_STATE_LEVELSTATE_H
 #define YAPG_GAME_STATE_LEVELSTATE_H
 
+#include <chrono>
 #include <string>
 
 #include "entityx/entityx.h"
+
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 #include <SFGUI/Desktop.hpp>
 #include <SFGUI/SFGUI.hpp>
@@ -49,6 +53,13 @@ private:
     settings::SettingsManager& m_settingsManager;
     sfg::SFGUI& m_sfgui;
     sfg::Desktop& m_desktop;
+
+    void updatePerfText();
+
+    std::shared_ptr<sf::Font> m_font;
+    sf::Text m_perfText;
+    std::chrono::duration<double, std::milli> m_lastUpdateDuration;
+    std::chrono::duration<double, std::milli> m_lastRenderDuration;
 
     async::AsyncExecutor m_asyncExecutor;
 };

@@ -1,5 +1,7 @@
 #include "Level/LevelState.hpp"
 
+#include <sstream>
+
 #include <SFML/System/Time.hpp>
 
 #include "Level/LevelFailureState.hpp"
@@ -28,13 +30,17 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_settingsManager(settingsManager),
     m_sfgui(sfgui),
     m_desktop(desktop),
+    m_font(resourcesManager.getFonts().requestResource("LiberationSans.ttf")),
+    m_perfText("update: -.----\nrender: -.----", *m_font, 14),
+    m_lastUpdateDuration(),
+    m_lastRenderDuration(),
     m_asyncExecutor()
 {
+    m_systemMgr.add<systems::HitboxUpdaterSystem>();
     m_systemMgr.add<systems::RenderSystem>(resourcesManager.getTextures());
     m_systemMgr.add<systems::CustomBehaviorSystem>();
     m_systemMgr.add<systems::CollisionSystem>();
     m_systemMgr.add<systems::PlatformerSystem>();
-    m_systemMgr.add<systems::HitboxUpdaterSystem>();
     m_systemMgr.add<systems::PlayerSystem>(settingsManager);
     m_systemMgr.add<systems::FinishLineSystem>();
     m_systemMgr.add<systems::HealthSystem>(settingsManager);
@@ -42,6 +48,11 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_systemMgr.configure();
 
     m_level.LoadFromFile(path);
+
+    m_perfText.setPosition(sf::Vector2f(10.f, 10.f));
+
+    m_systemMgr.system<systems::HitboxUpdaterSystem>()->initWithExistingEntities(m_level.getEntityManager());
+    m_systemMgr.system<systems::HitboxUpdaterSystem>()->getQuadTrees().printContent();
 }
 
 void LevelState::processEvent(sf::Event event, sf::RenderTarget &target)
@@ -51,8 +62,15 @@ void LevelState::processEvent(sf::Event event, sf::RenderTarget &target)
 
 void LevelState::render(sf::RenderTarget& target)
 {
+    auto timeBefore = std::chrono::high_resolution_clock::now();
+
     target.clear(sf::Color(0, 180, 255));
     m_systemMgr.system<systems::RenderSystem>()->render(target);
+    target.draw(m_perfText);
+
+    auto timeAfter = std::chrono::high_resolution_clock::now();
+    m_lastRenderDuration = timeAfter - timeBefore;
+    updatePerfText();
 }
 
 void LevelState::receive(const messaging::AllPlayersFinishedMessage& message)
@@ -80,6 +98,8 @@ void LevelState::receive(const messaging::AllPlayersLostMessage& message)
 
 void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 {
+    auto timeBefore = std::chrono::high_resolution_clock::now();
+
     m_systemMgr.update<systems::PlayerSystem>(dt.asSeconds());
     m_systemMgr.update<systems::HitboxUpdaterSystem>(dt.asSeconds());
     m_systemMgr.update<systems::PlatformerSystem>(dt.asSeconds());
@@ -90,6 +110,20 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
     m_systemMgr.update<systems::HealthSystem>(dt.asSeconds());
 
     m_asyncExecutor.update(dt);
+
+    auto timeAfter = std::chrono::high_resolution_clock::now();
+    m_lastUpdateDuration = timeAfter - timeBefore;
+    updatePerfText();
+
+}
+
+void LevelState::updatePerfText()
+{
+    std::ostringstream os;
+    os << "update: " << m_lastUpdateDuration.count() << " ms" << std::endl;
+    os << "render: " << m_lastRenderDuration.count() << " ms";
+
+    m_perfText.setString(os.str());
 }
 
 }

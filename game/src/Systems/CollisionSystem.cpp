@@ -17,9 +17,10 @@ namespace systems
 
 CollisionSystem::CollisionSystem() :
     m_entitiesInCollision(),
-    m_declaredCollisions()
+    m_declaredCollisions(),
+    m_quadtree(500.f, 500.f, 16, 8)
 {
-
+    
 }
 
 void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
