@@ -134,6 +134,32 @@ public:
         }
     }
 
+    void getObjectsIntersectingAABB(sf::FloatRect AABB, std::set<Object>& result) const
+    {
+        if(!AABB.intersects(m_area))
+            return;
+
+        if(!m_northEast)
+        {
+            for(auto objectId : m_leafs)
+            {
+                if(m_objectsCollection->get().count(objectId) == 0)
+                    continue;
+
+                Object object = m_objectsCollection->get()[objectId];
+                if(AABB.intersects(AABBGetter::getAABB(object)))
+                    result.insert(object);
+            }
+        }
+        else
+        {
+            m_northWest->getObjectsIntersectingAABB(AABB, result);
+            m_northEast->getObjectsIntersectingAABB(AABB, result);
+            m_southWest->getObjectsIntersectingAABB(AABB, result);
+            m_southEast->getObjectsIntersectingAABB(AABB, result);
+        }
+    }
+
     void printContent(int spaces) const
     {
         std::cout << std::string(spaces, ' ') << "Quadtree ("

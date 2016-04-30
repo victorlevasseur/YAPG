@@ -105,6 +105,23 @@ public:
         return m_objectsCollection->contains(value);
     }
 
+    std::set<Object> getObjectsIntersectingAABB(sf::FloatRect AABB) const
+    {
+        std::set<Object> objects;
+
+        sf::Rect<std::ptrdiff_t> gridIndexes = getGridIndexesFromAABB(AABB);
+        for(std::ptrdiff_t xIndex = gridIndexes.left; xIndex < gridIndexes.left + gridIndexes.width; ++xIndex)
+        {
+            for(std::ptrdiff_t yIndex = gridIndexes.top; yIndex < gridIndexes.top + gridIndexes.height; ++yIndex)
+            {
+                if(m_quadtrees.count(std::make_pair(xIndex, yIndex)) == 1)
+                    m_quadtrees.at(std::make_pair(xIndex, yIndex)).getObjectsIntersectingAABB(AABB, objects);
+            }
+        }
+
+        return objects;
+    }
+
     void printContent()
     {
         std::cout << "Content of the Grid:" << std::endl;
@@ -136,7 +153,7 @@ private:
         return m_quadtrees.at(std::make_pair(xIndex, yIndex));
     }
 
-    sf::Rect<std::ptrdiff_t> getGridIndexesFromAABB(sf::FloatRect AABB)
+    sf::Rect<std::ptrdiff_t> getGridIndexesFromAABB(sf::FloatRect AABB) const
     {
         return sf::Rect<std::ptrdiff_t>(
             static_cast<std::ptrdiff_t>(std::floor(AABB.left / m_gridWidth)),

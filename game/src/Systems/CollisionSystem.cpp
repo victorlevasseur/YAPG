@@ -33,20 +33,19 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
     {
         sf::FloatRect boundingBox(position.x, position.y, position.width, position.height);
 
-        es.each<c::PositionComponent, c::HitboxComponent, c::CollidableComponent>([&](
-            entityx::Entity entity2,
-            c::PositionComponent& position2,
-            c::HitboxComponent& hitbox2,
-            c::CollidableComponent& collidable2)
+        auto collisionCandidates = m_quadtreesGrid.getObjectsIntersectingAABB(boundingBox);
+        for(entityx::Entity entity2 : collisionCandidates)
         {
-            if(entity == entity2)
-                return;
+            if(!entity || !entity2 || !entity2.has_component<c::CollidableComponent>() || entity == entity2)
+                continue;
+
+            auto hitbox2 = entity2.component<c::HitboxComponent>();
+            auto collidable2 = entity2.component<c::CollidableComponent>();
 
             auto collisionPairIt = std::find(m_entitiesInCollision.begin(), m_entitiesInCollision.end(), std::make_pair(entity, entity2));
-            sf::FloatRect boundingBox2(position2.x, position2.y, position2.width, position2.height);
+            //sf::FloatRect boundingBox2(position2.x, position2.y, position2.width, position2.height);
 
-            if((!boundingBox.intersects(boundingBox2) ||
-                !PolygonCollision(hitbox.getHitbox(), hitbox2.getHitbox())) &&
+            if((!PolygonCollision(hitbox.getHitbox(), hitbox2->getHitbox())) &&
                 std::find(m_declaredCollisions.begin(), m_declaredCollisions.end(), std::make_pair(entity, entity2)) == m_declaredCollisions.end())
             {
                 //No collision (or no more collision)
@@ -54,8 +53,8 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
                 //If the pair (collider, collidable) was colliding before, remove it from the entities colliding and call on_end_collision
                 if(collisionPairIt != m_entitiesInCollision.end())
                 {
-                    if(collidable2.onCollisionEnd.valid())
-                        collidable2.onCollisionEnd.call(lua::EntityHandle(entity2), lua::EntityHandle(entity));
+                    if(collidable2->onCollisionEnd.valid())
+                        collidable2->onCollisionEnd.call(lua::EntityHandle(entity2), lua::EntityHandle(entity));
 
                     //If the collider also has a CollidableComponent, call the callback on it too
                     if(entity.has_component<c::CollidableComponent>())
@@ -73,8 +72,8 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
                 if(collisionPairIt == m_entitiesInCollision.end())
                 {
                     m_entitiesInCollision.push_back(std::make_pair(entity, entity2));
-                    if(collidable2.onCollisionBegin.valid())
-                        collidable2.onCollisionBegin.call(lua::EntityHandle(entity2), lua::EntityHandle(entity));
+                    if(collidable2->onCollisionBegin.valid())
+                        collidable2->onCollisionBegin.call(lua::EntityHandle(entity2), lua::EntityHandle(entity));
 
                     //If the collider also has a CollidableComponent, call the callback on it too
                     if(entity.has_component<c::CollidableComponent>())
@@ -86,8 +85,8 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
                 else
                 {
                     //Collision still happening, call collides callback
-                    if(collidable2.collides.valid())
-                        collidable2.collides.call(lua::EntityHandle(entity2), lua::EntityHandle(entity));
+                    if(collidable2->collides.valid())
+                        collidable2->collides.call(lua::EntityHandle(entity2), lua::EntityHandle(entity));
 
                     //If the collider also has a CollidableComponent, call the callback on it too
                     if(entity.has_component<c::CollidableComponent>())
@@ -97,7 +96,7 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
                     }
                 }
             }
-        });
+        }
     });
 
     m_declaredCollisions.clear();

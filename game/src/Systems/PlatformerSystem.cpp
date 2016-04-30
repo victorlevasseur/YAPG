@@ -41,7 +41,7 @@ void MovePolygon(tools::Polygon &poly, float dx, float dy)
     poly.ComputeGlobalEdges();
 }
 
-std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, entityx::Entity object, float maxMoveLength, int types = c::PlatformComponent::All)
+std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const HitboxUpdaterSystem::InfiniteQuadTreesGrid& quadtreesGrid, entityx::Entity object, float maxMoveLength, int types = c::PlatformComponent::All)
 {
     std::vector<e::Entity> potentialObstacles;
 
@@ -57,13 +57,17 @@ std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, entityx::Enti
     objectBoundingBox.width = cBox->width + 2*maxMoveLength;
     objectBoundingBox.height = cBox->height + 2*maxMoveLength;
 
-    for(e::Entity obstacle : es.entities_with_components<c::PlatformComponent, c::PositionComponent, c::HitboxComponent>())
+    auto collisionCandidates = quadtreesGrid.getObjectsIntersectingAABB(objectBoundingBox);
+    for(e::Entity obstacle : collisionCandidates)
     {
-        entityx::ComponentHandle<c::PositionComponent> obstacleCBox = obstacle.component<c::PositionComponent>();
-        entityx::ComponentHandle<c::PlatformComponent> obstacleCObs = obstacle.component<c::PlatformComponent>();
-        sf::FloatRect obstacleBoundingBox(obstacleCBox->x, obstacleCBox->y, obstacleCBox->width, obstacleCBox->height);
+        if(!obstacle)
+            continue;
+        if(!obstacle.has_component<c::PositionComponent>() || !obstacle.has_component<c::PlatformComponent>())
+            continue;
 
-        if((obstacle.id() != object.id()) && (cPhysic->layer == obstacleCObs->layer) && ((types & obstacleCObs->platformType) != 0) && objectBoundingBox.intersects(obstacleBoundingBox))
+        entityx::ComponentHandle<c::PlatformComponent> obstacleCObs = obstacle.component<c::PlatformComponent>();
+
+        if((obstacle.id() != object.id()) && (cPhysic->layer == obstacleCObs->layer) && ((types & obstacleCObs->platformType) != 0))
             potentialObstacles.push_back(obstacle);
     }
 
@@ -246,7 +250,7 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         MovePolygon(polygon, requestedXMove, 0.f);
 
         //Get all potential obstacle
-        std::vector<entityx::Entity> potentialObstacles = GetPotentialObstacles(es, entity, std::max(platformer.currentSpeed * dt, platformer.maxFallingSpeed * dt));
+        std::vector<entityx::Entity> potentialObstacles = GetPotentialObstacles(es, m_quadtreesGrid, entity, std::max(platformer.currentSpeed * dt, platformer.maxFallingSpeed * dt));
 
         //Update position according to the floor movements
         std::vector<entityx::Entity> overlappingJumpthrus = GetCollidingObstacles(polygon, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::Jumpthru);
