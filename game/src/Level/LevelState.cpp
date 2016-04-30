@@ -51,7 +51,8 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
 
     m_perfText.setPosition(sf::Vector2f(10.f, 10.f));
 
-    m_systemMgr.system<systems::HitboxUpdaterSystem>()->initWithExistingEntities(m_level.getEntityManager());
+    //First update to register the object
+    m_systemMgr.update<systems::HitboxUpdaterSystem>(0);
     m_systemMgr.system<systems::HitboxUpdaterSystem>()->getQuadTrees().printContent();
 }
 

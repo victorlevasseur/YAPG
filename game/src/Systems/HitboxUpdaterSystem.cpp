@@ -26,9 +26,6 @@ void HitboxUpdaterSystem::initWithExistingEntities(entityx::EntityManager &es)
 
 void HitboxUpdaterSystem::configure(entityx::EventManager &event_manager)
 {
-    event_manager.subscribe<entityx::ComponentAddedEvent<c::PositionComponent>>(*this);
-    event_manager.subscribe<entityx::ComponentAddedEvent<c::HitboxComponent>>(*this);
-
     event_manager.subscribe<entityx::ComponentRemovedEvent<c::PositionComponent>>(*this);
     event_manager.subscribe<entityx::ComponentRemovedEvent<c::HitboxComponent>>(*this);
     event_manager.subscribe<entityx::EntityDestroyedEvent>(*this);
@@ -41,28 +38,20 @@ void HitboxUpdaterSystem::update(entityx::EntityManager &es, entityx::EventManag
         c::PositionComponent& position,
         c::HitboxComponent& hitbox)
     {
-        if(hitbox.getHitbox().GetOrigin() == sf::Vector2f(position.x, position.y))
+        if(hitbox.getHitbox().GetOrigin() != sf::Vector2f(position.x, position.y))
         {
-            return;
+            hitbox.getHitbox().SetOrigin(sf::Vector2f(position.x, position.y));
+            hitbox.getHitbox().ComputeGlobalVertices();
+            hitbox.getHitbox().ComputeGlobalEdges();
+            hitbox.getHitbox().ComputeGlobalCenter();
         }
 
-        hitbox.getHitbox().SetOrigin(sf::Vector2f(position.x, position.y));
-        hitbox.getHitbox().ComputeGlobalVertices();
-        hitbox.getHitbox().ComputeGlobalEdges();
-        hitbox.getHitbox().ComputeGlobalCenter();
-
-        m_quadtreesGrid.update(entity);
+        if(hitbox.getHitbox().GetOrigin() != sf::Vector2f(position.x, position.y)
+            || !m_quadtreesGrid.contains(entity))
+        {
+            m_quadtreesGrid.update(entity);
+        }
     });
-}
-
-void HitboxUpdaterSystem::receive(const entityx::ComponentAddedEvent<components::PositionComponent>& event)
-{
-    //tryToAddEntityToQuadTree(event.entity);
-}
-
-void HitboxUpdaterSystem::receive(const entityx::ComponentAddedEvent<components::HitboxComponent>& event)
-{
-    //tryToAddEntityToQuadTree(event.entity);
 }
 
 void HitboxUpdaterSystem::receive(const entityx::ComponentRemovedEvent<components::PositionComponent>& event)

@@ -99,6 +99,11 @@ public:
         m_objectsCollection->get().erase(m_objectsCollection->getKeyOf(value));
     }
 
+    bool contains(const Object& value)
+    {
+        return m_objectsCollection->contains(value);
+    }
+
     void printContent()
     {
         std::cout << "Content of the Grid:" << std::endl;

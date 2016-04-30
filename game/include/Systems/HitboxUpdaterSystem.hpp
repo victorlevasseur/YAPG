@@ -39,8 +39,6 @@ public:
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
-    void receive(const entityx::ComponentAddedEvent<components::PositionComponent>& event);
-    void receive(const entityx::ComponentAddedEvent<components::HitboxComponent>& event);
     void receive(const entityx::ComponentRemovedEvent<components::PositionComponent>& event);
     void receive(const entityx::ComponentRemovedEvent<components::HitboxComponent>& event);
     void receive(const entityx::EntityDestroyedEvent& event);
