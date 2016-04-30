@@ -37,10 +37,12 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_asyncExecutor()
 {
     m_systemMgr.add<systems::HitboxUpdaterSystem>();
+    auto& quadtreesGrid = m_systemMgr.system<systems::HitboxUpdaterSystem>()->getQuadTrees();
+
     m_systemMgr.add<systems::RenderSystem>(resourcesManager.getTextures());
     m_systemMgr.add<systems::CustomBehaviorSystem>();
-    m_systemMgr.add<systems::CollisionSystem>();
-    m_systemMgr.add<systems::PlatformerSystem>();
+    m_systemMgr.add<systems::CollisionSystem>(quadtreesGrid);
+    m_systemMgr.add<systems::PlatformerSystem>(quadtreesGrid);
     m_systemMgr.add<systems::PlayerSystem>(settingsManager);
     m_systemMgr.add<systems::FinishLineSystem>();
     m_systemMgr.add<systems::HealthSystem>(settingsManager);

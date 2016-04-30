@@ -1,6 +1,7 @@
 #ifndef YAPG_GAME_TOOLS_INFINITEQUADTREESGRID_H
 #define YAPG_GAME_TOOLS_INFINITEQUADTREESGRID_H
 
+#include <cmath>
 #include <iostream>
 #include <map>
 
@@ -41,9 +42,9 @@ public:
         m_objectsCollection->get()[newId] = value;
 
         sf::Rect<std::ptrdiff_t> gridIndexes = getGridIndexesFromAABB(AABBGetter::getAABB(value));
-        for(std::ptrdiff_t xIndex = gridIndexes.left; xIndex <= gridIndexes.left + gridIndexes.width; ++xIndex)
+        for(std::ptrdiff_t xIndex = gridIndexes.left; xIndex < gridIndexes.left + gridIndexes.width; ++xIndex)
         {
-            for(std::ptrdiff_t yIndex = gridIndexes.top; yIndex <= gridIndexes.top + gridIndexes.height; ++yIndex)
+            for(std::ptrdiff_t yIndex = gridIndexes.top; yIndex < gridIndexes.top + gridIndexes.height; ++yIndex)
             {
                 safeAt(xIndex, yIndex).insert(value);
             }
@@ -66,9 +67,9 @@ public:
 
         //Create the non-existing quadtrees if needed
         sf::Rect<std::ptrdiff_t> gridIndexes = getGridIndexesFromAABB(AABBGetter::getAABB(value));
-        for(std::ptrdiff_t xIndex = gridIndexes.left; xIndex <= gridIndexes.left + gridIndexes.width; ++xIndex)
+        for(std::ptrdiff_t xIndex = gridIndexes.left; xIndex < gridIndexes.left + gridIndexes.width; ++xIndex)
         {
-            for(std::ptrdiff_t yIndex = gridIndexes.top; yIndex <= gridIndexes.top + gridIndexes.height; ++yIndex)
+            for(std::ptrdiff_t yIndex = gridIndexes.top; yIndex < gridIndexes.top + gridIndexes.height; ++yIndex)
             {
                 safeAt(xIndex, yIndex).update(value); //This will create the quadtrees if needed.
             }
@@ -88,9 +89,9 @@ public:
         }
 
         sf::Rect<std::ptrdiff_t> gridIndexes = getGridIndexesFromAABB(AABBGetter::getAABB(value));
-        for(std::ptrdiff_t xIndex = gridIndexes.left; xIndex <= gridIndexes.left + gridIndexes.width; ++xIndex)
+        for(std::ptrdiff_t xIndex = gridIndexes.left; xIndex < gridIndexes.left + gridIndexes.width; ++xIndex)
         {
-            for(std::ptrdiff_t yIndex = gridIndexes.top; yIndex <= gridIndexes.top + gridIndexes.height; ++yIndex)
+            for(std::ptrdiff_t yIndex = gridIndexes.top; yIndex < gridIndexes.top + gridIndexes.height; ++yIndex)
             {
                 safeAt(xIndex, yIndex).erase(value);
             }
@@ -138,10 +139,10 @@ private:
     sf::Rect<std::ptrdiff_t> getGridIndexesFromAABB(sf::FloatRect AABB)
     {
         return sf::Rect<std::ptrdiff_t>(
-            static_cast<std::ptrdiff_t>(AABB.left / m_gridWidth),
-            static_cast<std::ptrdiff_t>(AABB.top / m_gridHeight),
-            static_cast<std::ptrdiff_t>((AABB.left + AABB.width) / m_gridWidth) - static_cast<std::ptrdiff_t>(AABB.left / m_gridWidth),
-            static_cast<std::ptrdiff_t>((AABB.top + AABB.height) / m_gridHeight) - static_cast<std::ptrdiff_t>(AABB.top / m_gridHeight)
+            static_cast<std::ptrdiff_t>(std::floor(AABB.left / m_gridWidth)),
+            static_cast<std::ptrdiff_t>(std::floor(AABB.top / m_gridHeight)),
+            static_cast<std::ptrdiff_t>(std::ceil((AABB.left + AABB.width) / m_gridWidth)) - static_cast<std::ptrdiff_t>(std::floor(AABB.left / m_gridWidth)),
+            static_cast<std::ptrdiff_t>(std::ceil((AABB.top + AABB.height) / m_gridHeight)) - static_cast<std::ptrdiff_t>(std::floor(AABB.top / m_gridHeight))
         );
     }
 

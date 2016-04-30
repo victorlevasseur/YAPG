@@ -24,8 +24,9 @@ namespace e = entityx;
 namespace systems
 {
 
-PlatformerSystem::PlatformerSystem() :
-    entityx::System<PlatformerSystem>()
+PlatformerSystem::PlatformerSystem(HitboxUpdaterSystem::InfiniteQuadTreesGrid& quadtreesGrid) :
+    entityx::System<PlatformerSystem>(),
+    m_quadtreesGrid(quadtreesGrid)
 {
 
 }

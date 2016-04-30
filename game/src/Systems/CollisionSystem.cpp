@@ -15,12 +15,12 @@ namespace c = components;
 namespace systems
 {
 
-CollisionSystem::CollisionSystem() :
+CollisionSystem::CollisionSystem(HitboxUpdaterSystem::InfiniteQuadTreesGrid& quadtreesGrid) :
     m_entitiesInCollision(),
     m_declaredCollisions(),
-    m_quadtree(500.f, 500.f, 16, 8)
+    m_quadtreesGrid(quadtreesGrid)
 {
-    
+
 }
 
 void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)

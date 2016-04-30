@@ -28,6 +28,8 @@ struct EntityAABBGetter
 class HitboxUpdaterSystem : public entityx::System<HitboxUpdaterSystem>, public entityx::Receiver<HitboxUpdaterSystem>
 {
 public:
+    using InfiniteQuadTreesGrid = tools::InfiniteQuadTreesGrid<entityx::Entity, EntityAABBGetter>;
+
     HitboxUpdaterSystem();
 
     /**
@@ -50,7 +52,7 @@ private:
     void tryToAddEntityToQuadTree(entityx::Entity entity);
     void tryToRemoveEntityFromQuadTree(entityx::Entity entity);
 
-    tools::InfiniteQuadTreesGrid<entityx::Entity, EntityAABBGetter> m_quadtreesGrid;
+    InfiniteQuadTreesGrid m_quadtreesGrid;
 };
 
 }

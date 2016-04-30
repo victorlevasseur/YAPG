@@ -4,6 +4,7 @@
 #include "entityx/entityx.h"
 
 #include "Messaging/Messaging.hpp"
+#include "Systems/HitboxUpdaterSystem.hpp"
 
 namespace systems
 {
@@ -11,12 +12,12 @@ namespace systems
 class PlatformerSystem : public entityx::System<PlatformerSystem>, public messaging::Emitter
 {
 public:
-    PlatformerSystem();
+    PlatformerSystem(HitboxUpdaterSystem::InfiniteQuadTreesGrid& quadtreesGrid);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
 private:
-
+    HitboxUpdaterSystem::InfiniteQuadTreesGrid& m_quadtreesGrid;
 };
 
 }

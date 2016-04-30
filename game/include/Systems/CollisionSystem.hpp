@@ -9,6 +9,7 @@
 #include "entityx/entityx.h"
 
 #include "Messaging/Messaging.hpp"
+#include "Systems/HitboxUpdaterSystem.hpp"
 #include "Tools/InfiniteQuadTreesGrid.hpp"
 
 namespace systems
@@ -29,7 +30,7 @@ struct ExtraSystemCollisionMessage
 class CollisionSystem : public entityx::System<CollisionSystem>, public messaging::Receiver<ExtraSystemCollisionMessage>
 {
 public:
-    CollisionSystem();
+    CollisionSystem(HitboxUpdaterSystem::InfiniteQuadTreesGrid& quadtreesGrid);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
@@ -42,7 +43,7 @@ private:
 
     std::vector<std::pair<entityx::Entity, entityx::Entity>> m_declaredCollisions; ///< Stores collision declared using the declareCollision(...) method (the PlatformerSystem use it)
 
-    tools::InfiniteQuadTreesGrid<sf::Vector2f> m_quadtree; //Just for the test
+    HitboxUpdaterSystem::InfiniteQuadTreesGrid& m_quadtreesGrid;
 };
 
 }
