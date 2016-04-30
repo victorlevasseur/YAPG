@@ -175,16 +175,13 @@ private:
         for(const ObjectId& objectId : m_leafs)
         {
             const Object& object = m_objectsCollection->get().at(objectId);
-            sf::FloatRect AABB = AABBGetter::getAABB(object);
 
-            if(AABB.intersects(m_northWest->m_area))
-                m_northWest->m_leafs.insert(objectId);
-            if(AABB.intersects(m_northEast->m_area))
-                m_northEast->m_leafs.insert(objectId);
-            if(AABB.intersects(m_southWest->m_area))
-                m_southWest->m_leafs.insert(objectId);
-            if(AABB.intersects(m_southEast->m_area))
-                m_southEast->m_leafs.insert(objectId);
+            m_objectsCollection->getAssignments()[objectId].erase(this);
+
+            m_northWest->insert(object);
+            m_northEast->insert(object);
+            m_southWest->insert(object);
+            m_southEast->insert(object);
         }
 
         m_leafs.clear();

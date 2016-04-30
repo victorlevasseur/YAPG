@@ -74,7 +74,9 @@ public:
             }
         }
 
-        for(auto& quadtree : m_objectsCollection->getAssignments()[m_objectsCollection->getKeyOf(value)])
+        auto previousQuadtrees = m_objectsCollection->getAssignments()[m_objectsCollection->getKeyOf(value)];
+        //Make a copy. Avoids undefined behavior if the list of assigned quadtress changes during updates
+        for(auto& quadtree : previousQuadtrees)
             quadtree->update(value);
     }
 
