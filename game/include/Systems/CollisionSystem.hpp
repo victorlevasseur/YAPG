@@ -30,7 +30,7 @@ struct ExtraSystemCollisionMessage
 class CollisionSystem : public entityx::System<CollisionSystem>, public messaging::Receiver<ExtraSystemCollisionMessage>
 {
 public:
-    CollisionSystem(HitboxUpdaterSystem::InfiniteQuadTreesGrid& quadtreesGrid);
+    CollisionSystem(tools::EntitySpatialGrid& quadtreesGrid);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
@@ -43,7 +43,7 @@ private:
 
     std::vector<std::pair<entityx::Entity, entityx::Entity>> m_declaredCollisions; ///< Stores collision declared using the declareCollision(...) method (the PlatformerSystem use it)
 
-    HitboxUpdaterSystem::InfiniteQuadTreesGrid& m_quadtreesGrid;
+    tools::EntitySpatialGrid& m_quadtreesGrid;
 };
 
 }

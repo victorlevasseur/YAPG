@@ -24,7 +24,7 @@ namespace e = entityx;
 namespace systems
 {
 
-PlatformerSystem::PlatformerSystem(HitboxUpdaterSystem::InfiniteQuadTreesGrid& quadtreesGrid) :
+PlatformerSystem::PlatformerSystem(tools::EntitySpatialGrid& quadtreesGrid) :
     entityx::System<PlatformerSystem>(),
     m_quadtreesGrid(quadtreesGrid)
 {
@@ -41,7 +41,7 @@ void MovePolygon(tools::Polygon &poly, float dx, float dy)
     poly.ComputeGlobalEdges();
 }
 
-std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const HitboxUpdaterSystem::InfiniteQuadTreesGrid& quadtreesGrid, entityx::Entity object, float maxMoveLength, int types = c::PlatformComponent::All)
+std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const tools::EntitySpatialGrid& quadtreesGrid, entityx::Entity object, float maxMoveLength, int types = c::PlatformComponent::All)
 {
     std::vector<e::Entity> potentialObstacles;
 

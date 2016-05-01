@@ -18,7 +18,7 @@ namespace c = components;
 namespace systems
 {
 
-RenderSystem::RenderSystem(resources::TexturesManager& texturesManager, bool disableViewManage, bool debugHitboxDraw) :
+RenderSystem::RenderSystem(resources::TexturesManager& texturesManager, tools::EntitySpatialGrid* grid, bool disableViewManage, bool debugHitboxDraw) :
     entityx::System<RenderSystem>(),
     m_noViewManage(disableViewManage),
     m_renderingQueue(),
@@ -28,7 +28,8 @@ RenderSystem::RenderSystem(resources::TexturesManager& texturesManager, bool dis
     m_lastGroundEntity(),
     m_animatedSprites(),
     m_texturesManager(texturesManager),
-    m_debugHitboxDraw(debugHitboxDraw)
+    m_debugHitboxDraw(debugHitboxDraw),
+    m_grid(grid)
 {
 
 }
@@ -56,7 +57,7 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
         });
     }
 
-    es.each<c::PositionComponent, c::RenderComponent>([&](entityx::Entity entity, c::PositionComponent& position, c::RenderComponent& render) {
+    auto drawFunc = [&](entityx::Entity entity, c::PositionComponent& position, c::RenderComponent& render) {
         if(m_animatedSprites.count(entity) == 0)
         {
             //Create the animated sprite if it doesn't exist
@@ -89,7 +90,30 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
             render.onAnimationEndFunc.call(lua::EntityHandle(entity), render.currentAnimation);
 
         addToRenderingQueue(animatedSprite, sf::RenderStates::Default, position.z); //TODO: Get z position from RenderComponent
-    });
+    };
+
+    if(m_grid)
+    {
+        sf::FloatRect viewAABB(
+            m_renderingView.getCenter().x - 1024.f/2.f,
+            m_renderingView.getCenter().y - 768.f/2.f,
+            1024.f,
+            768.f
+        );
+
+        std::set<entityx::Entity> entitiesToDraw = m_grid->getEntitiesIntersectingAABB(viewAABB);
+        for(entityx::Entity entity : entitiesToDraw)
+        {
+            if(entity.has_component<c::PositionComponent>() && entity.has_component<c::RenderComponent>())
+            {
+                drawFunc(entity, *(entity.component<c::PositionComponent>().get()), *(entity.component<c::RenderComponent>().get()));
+            }
+        }
+    }
+    else
+    {
+        es.each<c::PositionComponent, c::RenderComponent>(drawFunc);
+    }
 
     if(!m_noViewManage)
     {

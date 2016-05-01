@@ -38,12 +38,12 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_asyncExecutor()
 {
     m_systemMgr.add<systems::HitboxUpdaterSystem>();
-    auto& quadtreesGrid = m_systemMgr.system<systems::HitboxUpdaterSystem>()->getQuadTrees();
+    auto& grid = m_systemMgr.system<systems::HitboxUpdaterSystem>()->getQuadTrees();
 
-    m_systemMgr.add<systems::RenderSystem>(resourcesManager.getTextures());
+    m_systemMgr.add<systems::RenderSystem>(resourcesManager.getTextures(), &grid);
     m_systemMgr.add<systems::CustomBehaviorSystem>();
-    m_systemMgr.add<systems::CollisionSystem>(quadtreesGrid);
-    m_systemMgr.add<systems::PlatformerSystem>(quadtreesGrid);
+    m_systemMgr.add<systems::CollisionSystem>(grid);
+    m_systemMgr.add<systems::PlatformerSystem>(grid);
     m_systemMgr.add<systems::PlayerSystem>(settingsManager);
     m_systemMgr.add<systems::FinishLineSystem>();
     m_systemMgr.add<systems::HealthSystem>(settingsManager);
@@ -53,6 +53,8 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_level.LoadFromFile(path);
 
     m_perfText.setPosition(sf::Vector2f(10.f, 10.f));
+    m_perfText.setColor(sf::Color::Black);
+    m_gridText.setColor(sf::Color::Black);
 
     //First update to register the object
     m_systemMgr.update<systems::HitboxUpdaterSystem>(0);

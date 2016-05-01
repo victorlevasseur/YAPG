@@ -15,7 +15,7 @@ namespace c = components;
 namespace systems
 {
 
-CollisionSystem::CollisionSystem(HitboxUpdaterSystem::InfiniteQuadTreesGrid& quadtreesGrid) :
+CollisionSystem::CollisionSystem(tools::EntitySpatialGrid& quadtreesGrid) :
     m_entitiesInCollision(),
     m_declaredCollisions(),
     m_quadtreesGrid(quadtreesGrid)

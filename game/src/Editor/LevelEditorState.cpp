@@ -510,7 +510,7 @@ void LevelEditorState::initSystemManager()
 {
     m_systemMgr.reset(new entityx::SystemManager(m_level.getEntityManager(), m_level.getEventManager()));
 
-    m_systemMgr->add<systems::RenderSystem>(m_resourcesManager.getTextures(), true);
+    m_systemMgr->add<systems::RenderSystem>(m_resourcesManager.getTextures(), nullptr, true);
 
     m_systemMgr->configure();
 }

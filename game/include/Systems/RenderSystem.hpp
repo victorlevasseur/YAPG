@@ -12,6 +12,8 @@
 
 #include "Animation/AnimatedSprite.hpp"
 #include "Resources/ResourcesManager.hpp"
+#include "Systems/HitboxUpdaterSystem.hpp"
+#include "Tools/EntitySpatialGrid.hpp"
 
 namespace systems
 {
@@ -26,7 +28,7 @@ public:
         float z;
     };
 
-    RenderSystem(resources::TexturesManager& texturesManager, bool disableViewManage = false, bool debugHitboxDraw = false);
+    RenderSystem(resources::TexturesManager& texturesManager, tools::EntitySpatialGrid* grid = nullptr, bool disableViewManage = false, bool debugHitboxDraw = false);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
@@ -49,6 +51,8 @@ private:
 
     resources::TexturesManager& m_texturesManager;
     bool m_debugHitboxDraw;
+
+    tools::EntitySpatialGrid* m_grid;
 };
 
 }

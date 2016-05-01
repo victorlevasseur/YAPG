@@ -12,12 +12,12 @@ namespace systems
 class PlatformerSystem : public entityx::System<PlatformerSystem>, public messaging::Emitter
 {
 public:
-    PlatformerSystem(HitboxUpdaterSystem::InfiniteQuadTreesGrid& quadtreesGrid);
+    PlatformerSystem(tools::EntitySpatialGrid& quadtreesGrid);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
 private:
-    HitboxUpdaterSystem::InfiniteQuadTreesGrid& m_quadtreesGrid;
+    tools::EntitySpatialGrid& m_quadtreesGrid;
 };
 
 }
