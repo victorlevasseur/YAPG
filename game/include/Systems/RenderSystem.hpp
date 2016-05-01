@@ -28,18 +28,19 @@ public:
         float z;
     };
 
-    RenderSystem(resources::TexturesManager& texturesManager, tools::EntitySpatialGrid* grid = nullptr, bool disableViewManage = false, bool debugHitboxDraw = false);
+    RenderSystem(resources::TexturesManager& texturesManager, tools::EntitySpatialGrid& grid, bool cameraFollowPlayers = true, bool debugHitboxDraw = false);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
     void render(sf::RenderTarget& target);
 
     sf::View getView() const { return m_renderingView; }
+    void setView(sf::View view) { m_renderingView = view; m_viewInit = true; }
 
 private:
     void addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, sf::RenderStates states, float z);
 
-    bool m_noViewManage;
+    bool m_cameraFollowPlayers;
 
     std::list<Renderable> m_renderingQueue;
     bool m_viewInit;
@@ -52,7 +53,7 @@ private:
     resources::TexturesManager& m_texturesManager;
     bool m_debugHitboxDraw;
 
-    tools::EntitySpatialGrid* m_grid;
+    tools::EntitySpatialGrid& m_grid;
 };
 
 }

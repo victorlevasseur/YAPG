@@ -18,9 +18,9 @@ namespace c = components;
 namespace systems
 {
 
-RenderSystem::RenderSystem(resources::TexturesManager& texturesManager, tools::EntitySpatialGrid* grid, bool disableViewManage, bool debugHitboxDraw) :
+RenderSystem::RenderSystem(resources::TexturesManager& texturesManager, tools::EntitySpatialGrid& grid, bool cameraFollowPlayers, bool debugHitboxDraw) :
     entityx::System<RenderSystem>(),
-    m_noViewManage(disableViewManage),
+    m_cameraFollowPlayers(cameraFollowPlayers),
     m_renderingQueue(),
     m_viewInit(false),
     m_renderingView(),
@@ -92,30 +92,23 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
         addToRenderingQueue(animatedSprite, sf::RenderStates::Default, position.z); //TODO: Get z position from RenderComponent
     };
 
-    if(m_grid)
-    {
-        sf::FloatRect viewAABB(
-            m_renderingView.getCenter().x - 1024.f/2.f,
-            m_renderingView.getCenter().y - 768.f/2.f,
-            1024.f,
-            768.f
-        );
+    sf::FloatRect viewAABB(
+        m_renderingView.getCenter().x - 1024.f/2.f,
+        m_renderingView.getCenter().y - 768.f/2.f,
+        1024.f,
+        768.f
+    );
 
-        std::set<entityx::Entity> entitiesToDraw = m_grid->getEntitiesIntersectingAABB(viewAABB);
-        for(entityx::Entity entity : entitiesToDraw)
+    std::set<entityx::Entity> entitiesToDraw = m_grid.getEntitiesIntersectingAABB(viewAABB);
+    for(entityx::Entity entity : entitiesToDraw)
+    {
+        if(entity.has_component<c::PositionComponent>() && entity.has_component<c::RenderComponent>())
         {
-            if(entity.has_component<c::PositionComponent>() && entity.has_component<c::RenderComponent>())
-            {
-                drawFunc(entity, *(entity.component<c::PositionComponent>().get()), *(entity.component<c::RenderComponent>().get()));
-            }
+            drawFunc(entity, *(entity.component<c::PositionComponent>().get()), *(entity.component<c::RenderComponent>().get()));
         }
     }
-    else
-    {
-        es.each<c::PositionComponent, c::RenderComponent>(drawFunc);
-    }
 
-    if(!m_noViewManage)
+    if(m_cameraFollowPlayers)
     {
         //Update the camera
         es.each<c::PlayerComponent, c::PlatformerComponent, c::PositionComponent>([&](entityx::Entity entity, c::PlayerComponent& player, c::PlatformerComponent& platformer, c::PositionComponent& position) {
@@ -166,16 +159,14 @@ void RenderSystem::render(sf::RenderTarget& target)
 
     sf::View oldView = target.getView();
 
-    if(!m_noViewManage)
-        target.setView(m_renderingView);
+    target.setView(m_renderingView);
 
     for(auto it = m_renderingQueue.cbegin(); it != m_renderingQueue.cend(); ++it)
     {
         target.draw(*(it->drawable), it->states);
     }
 
-    if(!m_noViewManage)
-        target.setView(oldView);
+    target.setView(oldView);
 }
 
 void RenderSystem::addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, sf::RenderStates states, float z)

@@ -10,6 +10,7 @@
 #include "State/StateEngine.hpp"
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/CustomBehaviorSystem.hpp"
+#include "Systems/EntityGridSystem.hpp"
 #include "Systems/FinishLineSystem.hpp"
 #include "Systems/HealthSystem.hpp"
 #include "Systems/HitboxUpdaterSystem.hpp"
@@ -37,10 +38,11 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_gridText("", *m_font, 16),
     m_asyncExecutor()
 {
-    m_systemMgr.add<systems::HitboxUpdaterSystem>();
-    auto& grid = m_systemMgr.system<systems::HitboxUpdaterSystem>()->getQuadTrees();
+    m_systemMgr.add<systems::EntityGridSystem>();
+    auto& grid = m_systemMgr.system<systems::EntityGridSystem>()->getGrid();
 
-    m_systemMgr.add<systems::RenderSystem>(resourcesManager.getTextures(), &grid);
+    m_systemMgr.add<systems::HitboxUpdaterSystem>();
+    m_systemMgr.add<systems::RenderSystem>(resourcesManager.getTextures(), grid);
     m_systemMgr.add<systems::CustomBehaviorSystem>();
     m_systemMgr.add<systems::CollisionSystem>(grid);
     m_systemMgr.add<systems::PlatformerSystem>(grid);
@@ -57,7 +59,7 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_gridText.setColor(sf::Color::Black);
 
     //First update to register the object
-    m_systemMgr.update<systems::HitboxUpdaterSystem>(0);
+    m_systemMgr.update<systems::EntityGridSystem>(0);
 }
 
 void LevelState::processEvent(sf::Event event, sf::RenderTarget &target)
@@ -76,7 +78,7 @@ void LevelState::render(sf::RenderTarget& target)
     // DEBUG CODE TO OBSERVE THE GRID INDEXATION
     sf::View oldView = target.getView();
     target.setView(m_systemMgr.system<systems::RenderSystem>()->getView());
-    m_systemMgr.system<systems::HitboxUpdaterSystem>()->getQuadTrees().debugDraw(target, m_gridText);
+    m_systemMgr.system<systems::EntityGridSystem>()->getGrid().debugDraw(target, m_gridText);
     target.setView(oldView);
     // END OF DEBUG CODE
 
@@ -113,6 +115,7 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
     auto timeBefore = std::chrono::high_resolution_clock::now();
 
     m_systemMgr.update<systems::PlayerSystem>(dt.asSeconds());
+    m_systemMgr.update<systems::EntityGridSystem>(dt.asSeconds());
     m_systemMgr.update<systems::HitboxUpdaterSystem>(dt.asSeconds());
     m_systemMgr.update<systems::PlatformerSystem>(dt.asSeconds());
     m_systemMgr.update<systems::CollisionSystem>(dt.asSeconds());

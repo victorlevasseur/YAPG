@@ -4,7 +4,7 @@
 #include "entityx/entityx.h"
 
 #include "Messaging/Messaging.hpp"
-#include "Systems/HitboxUpdaterSystem.hpp"
+#include "Tools/EntitySpatialGrid.hpp"
 
 namespace systems
 {

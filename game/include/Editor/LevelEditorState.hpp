@@ -85,13 +85,14 @@ private:
 
     sf::Vector2f getInsertionPosition(sf::Vector2f position, float entityWidth, float entityHeight, entityx::Entity ignore = entityx::Entity());
 
+    sf::View getLevelView() const;
+
     resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;
 
     lua::LuaState m_luaState;
 
     sf::View m_guiView;
-    sf::View m_levelView;
 
     sfg::SFGUI& m_sfgui;
     sfg::Desktop& m_desktop;

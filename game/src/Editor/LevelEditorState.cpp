@@ -18,6 +18,7 @@
 #include "NativeGui/TextBoxWindow.hpp"
 #include "State/MainMenuState.hpp"
 #include "State/StateEngine.hpp"
+#include "Systems/EntityGridSystem.hpp"
 #include "Systems/RenderSystem.hpp"
 
 namespace editor
@@ -29,7 +30,6 @@ LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::A
     m_settingsManager(settingsManager),
     m_luaState(),
     m_guiView(sf::FloatRect(0.f, 0.f, 1024.f, 768.f)),
-    m_levelView(m_guiView),
     m_sfgui(sfgui),
     m_desktop(desktop),
     m_fileToolbar(),
@@ -96,7 +96,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         }
         else if(event.type == sf::Event::MouseMoved)
         {
-            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y), m_levelView);
+            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y), getLevelView());
 
             //When not in insertion process, move the insertion pos according to the mouse
             if(!m_isInserting)
@@ -183,7 +183,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             && event.mouseButton.button == sf::Mouse::Left
             )
         {
-            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), m_levelView);
+            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), getLevelView());
 
             m_selectedEntity = getFirstEntityUnderMouse(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target);
             m_propertiesManager->setCurrentEntity(m_selectedEntity);
@@ -200,7 +200,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         }
         else if(event.type == sf::Event::MouseMoved)
         {
-            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y), m_levelView);
+            sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseMove.x, event.mouseMove.y), getLevelView());
 
             if(isMouseNotOnWidgets(sf::Vector2i(event.mouseMove.x, event.mouseMove.y), target))
             {
@@ -237,7 +237,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         {
             if(isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
             {
-                sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), m_levelView);
+                sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), getLevelView());
                 m_level.setSpawnPosition(mousePosition);
             }
         }
@@ -258,7 +258,9 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         sf::Vector2i mousePos(event.mouseMove.x, event.mouseMove.y);
         if(m_draggingView)
         {
-            m_levelView.move(m_mousePosBeforeDrag.x - mousePos.x, m_mousePosBeforeDrag.y - mousePos.y);
+            sf::View updatedView = m_systemMgr->system<systems::RenderSystem>()->getView();
+            updatedView.move(m_mousePosBeforeDrag.x - mousePos.x, m_mousePosBeforeDrag.y - mousePos.y);
+            m_systemMgr->system<systems::RenderSystem>()->setView(updatedView);
             m_mousePosBeforeDrag = mousePos;
         }
     }
@@ -273,10 +275,10 @@ void LevelEditorState::render(sf::RenderTarget& target)
     target.clear(sf::Color(0, 180, 255));
 
     //Render the level
-    target.setView(m_levelView);
     m_systemMgr->system<systems::RenderSystem>()->render(target);
 
     //Draw the spawn position
+    target.setView(m_systemMgr->system<systems::RenderSystem>()->getView());
     m_spawnSprite.setPosition(m_level.getSpawnPosition());
     target.draw(m_spawnSprite);
 
@@ -352,6 +354,7 @@ void LevelEditorState::doUnpause()
 
 void LevelEditorState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 {
+    m_systemMgr->update<systems::EntityGridSystem>(dt.asSeconds());
     m_systemMgr->update<systems::RenderSystem>(dt.asSeconds());
     m_desktop.Update(dt.asSeconds());
 }
@@ -510,7 +513,11 @@ void LevelEditorState::initSystemManager()
 {
     m_systemMgr.reset(new entityx::SystemManager(m_level.getEntityManager(), m_level.getEventManager()));
 
-    m_systemMgr->add<systems::RenderSystem>(m_resourcesManager.getTextures(), nullptr, true);
+    m_systemMgr->add<systems::EntityGridSystem>();
+
+    auto& grid = m_systemMgr->system<systems::EntityGridSystem>()->getGrid();
+    m_systemMgr->add<systems::RenderSystem>(m_resourcesManager.getTextures(), grid, false);
+    m_systemMgr->system<systems::RenderSystem>()->setView(m_guiView);
 
     m_systemMgr->configure();
 }
@@ -649,7 +656,7 @@ entityx::Entity LevelEditorState::getFirstEntityUnderMouse(sf::Vector2f position
 
 bool LevelEditorState::isEntityUnderMouse(entityx::Entity entity, sf::Vector2i mousePosition, sf::RenderTarget& target) const
 {
-    sf::Vector2f mouseAbsolutePos = target.mapPixelToCoords(mousePosition, m_levelView);
+    sf::Vector2f mouseAbsolutePos = target.mapPixelToCoords(mousePosition, getLevelView());
 
     return isEntityUnderMouse(entity, mouseAbsolutePos);
 }
@@ -714,6 +721,11 @@ sf::Vector2f LevelEditorState::getInsertionPosition(sf::Vector2f position, float
     }
 
     return newPosition;
+}
+
+sf::View LevelEditorState::getLevelView() const
+{
+    return m_systemMgr->system<systems::RenderSystem>()->getView();
 }
 
 }
