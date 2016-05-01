@@ -7,7 +7,7 @@
 
 #include "Components/HitboxComponent.hpp"
 #include "Components/PositionComponent.hpp"
-#include "Tools/InfiniteQuadTreesGrid.hpp"
+#include "Tools/EntitySpatialGrid.hpp"
 
 namespace systems
 {

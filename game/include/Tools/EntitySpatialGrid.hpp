@@ -1,5 +1,5 @@
-#ifndef YAPG_GAME_TOOLS_INFINITEQUADTREESGRID_H
-#define YAPG_GAME_TOOLS_INFINITEQUADTREESGRID_H
+#ifndef YAPG_GAME_TOOLS_ENTITYSPATIALGRID_H
+#define YAPG_GAME_TOOLS_ENTITYSPATIALGRID_H
 
 #include <cmath>
 #include <iostream>
@@ -138,22 +138,6 @@ public:
         }
 
         return objects;
-    }
-
-    void printContent()
-    {
-        std::cout << "Content of the Grid:" << std::endl;
-        std::cout << "====================" << std::endl;
-        for(const auto& gridPair : m_grids)
-        {
-            std::cout << "  (" << getAABBOfGrid(gridPair.first).left << ";" << getAABBOfGrid(gridPair.first).top << ") --> " << "(" << getAABBOfGrid(gridPair.first).left + getAABBOfGrid(gridPair.first).width << ";" << getAABBOfGrid(gridPair.first).top + getAABBOfGrid(gridPair.first).height << ")" << std::endl;
-            std::cout << "   |";
-            for(const entityx::Entity& entity : gridPair.second)
-            {
-                std::cout << entity << ", ";
-            }
-            std::cout << "." << std::endl;
-        }
     }
 
     void debugDraw(sf::RenderTarget& target, sf::Text& textToUse) const

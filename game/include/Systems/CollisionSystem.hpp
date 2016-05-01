@@ -10,13 +10,13 @@
 
 #include "Messaging/Messaging.hpp"
 #include "Systems/HitboxUpdaterSystem.hpp"
-#include "Tools/InfiniteQuadTreesGrid.hpp"
+#include "Tools/EntitySpatialGrid.hpp"
 
 namespace systems
 {
 
 /**
- * Struct used by other systems and classes to send collisions messages to the
+ * Struct used by other systems and classes to send col²lisions messages to the
  * CollisionSystem.
  */
 struct ExtraSystemCollisionMessage
