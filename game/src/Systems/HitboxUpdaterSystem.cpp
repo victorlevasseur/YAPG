@@ -8,7 +8,7 @@ namespace systems
 {
 
 HitboxUpdaterSystem::HitboxUpdaterSystem() :
-    m_grid(500.f, 500.f)
+    m_grid(250.f, 250.f)
 {
 
 }

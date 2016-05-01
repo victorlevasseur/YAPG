@@ -39,7 +39,7 @@ public:
             for(std::ptrdiff_t yIndex = gridIndexes.top; yIndex < gridIndexes.top + gridIndexes.height; ++yIndex)
             {
                 safeAt(xIndex, yIndex).insert(value);
-                m_assignments[value].insert(&safeAt(xIndex, yIndex));
+                m_assignments[value].insert(std::make_pair(xIndex, yIndex));
             }
         }
 
@@ -63,8 +63,11 @@ public:
         //Make a copy. Avoids undefined behavior if the list of assigned quadtress changes during updates
         while(m_assignments[value].size() > 0)
         {
-            (*(m_assignments[value].begin()))->erase(value);
-            m_assignments[value].erase(m_assignments[value].begin());
+            if(!newAABB.intersects(getAABBOfGrid(*(m_assignments[value].begin()))))
+            {
+                m_grids[*(m_assignments[value].begin())].erase(value);
+                m_assignments[value].erase(m_assignments[value].begin());
+            }
         }
 
         //Create the non-existing quadtrees if needed
@@ -74,7 +77,7 @@ public:
             for(std::ptrdiff_t yIndex = gridIndexes.top; yIndex < gridIndexes.top + gridIndexes.height; ++yIndex)
             {
                 safeAt(xIndex, yIndex).insert(value); //This will create the quadtrees if needed.
-                m_assignments[value].insert(&safeAt(xIndex, yIndex));
+                m_assignments[value].insert(std::make_pair(xIndex, yIndex));
             }
         }
     }
@@ -92,7 +95,7 @@ public:
             for(std::ptrdiff_t yIndex = gridIndexes.top; yIndex < gridIndexes.top + gridIndexes.height; ++yIndex)
             {
                 safeAt(xIndex, yIndex).erase(value);
-                m_assignments[value].erase(&safeAt(xIndex, yIndex));
+                m_assignments[value].erase(std::make_pair(xIndex, yIndex));
             }
         }
     }
@@ -153,6 +156,16 @@ private:
         );
     }
 
+    sf::FloatRect getAABBOfGrid(std::pair<std::ptrdiff_t, std::ptrdiff_t> coords)
+    {
+        return sf::FloatRect(
+            static_cast<float>(coords.first) * m_gridWidth,
+            static_cast<float>(coords.second) * m_gridHeight,
+            m_gridWidth,
+            m_gridHeight
+        );
+    }
+
     static sf::FloatRect getAABB(entityx::Entity entity)
     {
         return sf::FloatRect(
@@ -167,7 +180,7 @@ private:
     const float m_gridHeight;
 
     std::map<std::pair<std::ptrdiff_t, std::ptrdiff_t>, std::set<entityx::Entity>> m_grids;
-    std::map<entityx::Entity, std::set<std::set<entityx::Entity>*>> m_assignments;
+    std::map<entityx::Entity, std::set<std::pair<std::ptrdiff_t, std::ptrdiff_t>>> m_assignments;
 };
 
 }
