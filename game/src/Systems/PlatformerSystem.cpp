@@ -57,7 +57,7 @@ std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const HitboxU
     objectBoundingBox.width = cBox->width + 2*maxMoveLength;
     objectBoundingBox.height = cBox->height + 2*maxMoveLength;
 
-    auto collisionCandidates = quadtreesGrid.getObjectsIntersectingAABB(objectBoundingBox);
+    auto collisionCandidates = quadtreesGrid.getEntitiesIntersectingAABB(objectBoundingBox);
     for(e::Entity obstacle : collisionCandidates)
     {
         if(!obstacle)

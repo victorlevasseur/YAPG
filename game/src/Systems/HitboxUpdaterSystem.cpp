@@ -8,7 +8,7 @@ namespace systems
 {
 
 HitboxUpdaterSystem::HitboxUpdaterSystem() :
-    m_quadtreesGrid(500.f, 500.f, 16, 8)
+    m_grid(500.f, 500.f)
 {
 
 }
@@ -47,9 +47,9 @@ void HitboxUpdaterSystem::update(entityx::EntityManager &es, entityx::EventManag
         }
 
         if(hitbox.getHitbox().GetOrigin() != sf::Vector2f(position.x, position.y)
-            || !m_quadtreesGrid.contains(entity))
+            || !m_grid.contains(entity))
         {
-            m_quadtreesGrid.update(entity);
+            m_grid.update(entity);
         }
     });
 }
@@ -73,13 +73,13 @@ void HitboxUpdaterSystem::tryToAddEntityToQuadTree(entityx::Entity entity)
 {
     if(entity.has_component<c::PositionComponent>() && entity.has_component<c::HitboxComponent>())
     {
-        m_quadtreesGrid.insert(entity);
+        m_grid.insert(entity);
     }
 }
 
 void HitboxUpdaterSystem::tryToRemoveEntityFromQuadTree(entityx::Entity entity)
 {
-    m_quadtreesGrid.erase(entity);
+    m_grid.erase(entity);
 }
 
 }

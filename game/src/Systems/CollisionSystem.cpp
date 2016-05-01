@@ -33,7 +33,7 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
     {
         sf::FloatRect boundingBox(position.x, position.y, position.width, position.height);
 
-        auto collisionCandidates = m_quadtreesGrid.getObjectsIntersectingAABB(boundingBox);
+        auto collisionCandidates = m_quadtreesGrid.getEntitiesIntersectingAABB(boundingBox);
         for(entityx::Entity entity2 : collisionCandidates)
         {
             if(!entity || !entity2 || !entity2.has_component<c::CollidableComponent>() || entity == entity2)
