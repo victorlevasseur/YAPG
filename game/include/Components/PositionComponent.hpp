@@ -22,6 +22,11 @@ public:
     float width;
     float height;
 
+    float oldX;
+    float oldY;
+    float oldWidth;
+    float oldHeight;
+
     static void registerComponent(lua::LuaState& state);
 };
 

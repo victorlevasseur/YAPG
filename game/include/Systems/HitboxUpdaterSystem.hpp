@@ -29,7 +29,6 @@ public:
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
     void receive(const entityx::ComponentRemovedEvent<components::PositionComponent>& event);
-    void receive(const entityx::ComponentRemovedEvent<components::HitboxComponent>& event);
     void receive(const entityx::EntityDestroyedEvent& event);
 
     const tools::EntitySpatialGrid& getQuadTrees() const { return m_grid; }

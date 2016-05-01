@@ -62,7 +62,7 @@ std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const HitboxU
     {
         if(!obstacle)
             continue;
-        if(!obstacle.has_component<c::PositionComponent>() || !obstacle.has_component<c::PlatformComponent>())
+        if(!obstacle.has_component<c::PositionComponent>() || !obstacle.has_component<c::HitboxComponent>() || !obstacle.has_component<c::PlatformComponent>())
             continue;
 
         entityx::ComponentHandle<c::PlatformComponent> obstacleCObs = obstacle.component<c::PlatformComponent>();

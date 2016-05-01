@@ -32,9 +32,9 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_desktop(desktop),
     m_font(resourcesManager.getFonts().requestResource("LiberationSans.ttf")),
     m_perfText("update: -.----\nrender: -.----", *m_font, 14),
-    m_gridText("", *m_font, 16),
     m_lastUpdateDuration(),
     m_lastRenderDuration(),
+    m_gridText("", *m_font, 16),
     m_asyncExecutor()
 {
     m_systemMgr.add<systems::HitboxUpdaterSystem>();

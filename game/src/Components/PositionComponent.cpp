@@ -11,7 +11,11 @@ PositionComponent::PositionComponent() :
     y(0.f),
     z(0.f),
     width(0.f),
-    height(0.f)
+    height(0.f),
+    oldX(std::numeric_limits<float>::lowest()),
+    oldY(std::numeric_limits<float>::lowest()),
+    oldWidth(std::numeric_limits<float>::lowest()),
+    oldHeight(std::numeric_limits<float>::lowest())
 {
 
 }
