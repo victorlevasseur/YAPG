@@ -76,10 +76,10 @@ void LevelState::render(sf::RenderTarget& target)
     target.draw(m_perfText);
 
     // DEBUG CODE TO OBSERVE THE GRID INDEXATION
-    sf::View oldView = target.getView();
+    /*sf::View oldView = target.getView();
     target.setView(m_systemMgr.system<systems::RenderSystem>()->getView());
     m_systemMgr.system<systems::EntityGridSystem>()->getGrid().debugDraw(target, m_gridText);
-    target.setView(oldView);
+    target.setView(oldView);*/
     // END OF DEBUG CODE
 
     auto timeAfter = std::chrono::high_resolution_clock::now();
