@@ -61,6 +61,8 @@ private:
     std::chrono::duration<double, std::milli> m_lastUpdateDuration;
     std::chrono::duration<double, std::milli> m_lastRenderDuration;
 
+    sf::Text m_gridText;
+
     async::AsyncExecutor m_asyncExecutor;
 };
 

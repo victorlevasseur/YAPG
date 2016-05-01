@@ -4,8 +4,14 @@
 #include <cmath>
 #include <iostream>
 #include <map>
+#include <sstream>
 
 #include "entityx/entityx.h"
+
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 #include "Components/PositionComponent.hpp"
 
@@ -60,13 +66,16 @@ public:
 
         sf::FloatRect newAABB = getAABB(value);
 
-        //Make a copy. Avoids undefined behavior if the list of assigned quadtress changes during updates
-        while(m_assignments[value].size() > 0)
+        for(auto it = m_assignments[value].begin(); it != m_assignments[value].end();)
         {
-            if(!newAABB.intersects(getAABBOfGrid(*(m_assignments[value].begin()))))
+            if(!newAABB.intersects(getAABBOfGrid(*it)))
             {
-                m_grids[*(m_assignments[value].begin())].erase(value);
-                m_assignments[value].erase(m_assignments[value].begin());
+                m_grids[*it].erase(value);
+                it = m_assignments[value].erase(it);
+            }
+            else
+            {
+                ++it;
             }
         }
 
@@ -98,6 +107,7 @@ public:
                 m_assignments[value].erase(std::make_pair(xIndex, yIndex));
             }
         }
+
     }
 
     bool contains(const entityx::Entity& value)
@@ -118,7 +128,7 @@ public:
                 {
                     for(entityx::Entity object : m_grids.at(std::make_pair(xIndex, yIndex)))
                     {
-                        if(getAABB(object).intersects(AABB))
+                        if(object && getAABB(object).intersects(AABB))
                         {
                             objects.insert(object);
                         }
@@ -134,10 +144,39 @@ public:
     {
         std::cout << "Content of the Grid:" << std::endl;
         std::cout << "====================" << std::endl;
-        /*for(const auto& quadtree : m_grids)
+        for(const auto& gridPair : m_grids)
         {
-            quadtree.second.printContent(2);
-        }*/
+            std::cout << "  (" << getAABBOfGrid(gridPair.first).left << ";" << getAABBOfGrid(gridPair.first).top << ") --> " << "(" << getAABBOfGrid(gridPair.first).left + getAABBOfGrid(gridPair.first).width << ";" << getAABBOfGrid(gridPair.first).top + getAABBOfGrid(gridPair.first).height << ")" << std::endl;
+            std::cout << "   |";
+            for(const entityx::Entity& entity : gridPair.second)
+            {
+                std::cout << entity << ", ";
+            }
+            std::cout << "." << std::endl;
+        }
+    }
+
+    void debugDraw(sf::RenderTarget& target, sf::Text& textToUse) const
+    {
+        for(const auto& grid : m_grids)
+        {
+            sf::RectangleShape outline;
+            outline.setFillColor(sf::Color::Transparent);
+            outline.setOutlineThickness(1.f);
+            outline.setOutlineColor(sf::Color::Black);
+            outline.setSize(sf::Vector2f(m_gridWidth, m_gridHeight));
+            outline.setPosition(sf::Vector2f(grid.first.first * m_gridWidth, grid.first.second * m_gridHeight));
+
+            target.draw(outline);
+
+            std::ostringstream os;
+            os << grid.second.size();
+
+            textToUse.setString(os.str());
+            textToUse.setPosition(sf::Vector2f(grid.first.first * m_gridWidth, grid.first.second * m_gridHeight));
+
+            target.draw(textToUse);
+        }
     }
 
 private:

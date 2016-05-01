@@ -32,6 +32,7 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_desktop(desktop),
     m_font(resourcesManager.getFonts().requestResource("LiberationSans.ttf")),
     m_perfText("update: -.----\nrender: -.----", *m_font, 14),
+    m_gridText("", *m_font, 16),
     m_lastUpdateDuration(),
     m_lastRenderDuration(),
     m_asyncExecutor()
@@ -55,7 +56,6 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
 
     //First update to register the object
     m_systemMgr.update<systems::HitboxUpdaterSystem>(0);
-    m_systemMgr.system<systems::HitboxUpdaterSystem>()->getQuadTrees().printContent();
 }
 
 void LevelState::processEvent(sf::Event event, sf::RenderTarget &target)
@@ -70,6 +70,13 @@ void LevelState::render(sf::RenderTarget& target)
     target.clear(sf::Color(0, 180, 255));
     m_systemMgr.system<systems::RenderSystem>()->render(target);
     target.draw(m_perfText);
+
+    // DEBUG CODE TO OBSERVE THE GRID INDEXATION
+    sf::View oldView = target.getView();
+    target.setView(m_systemMgr.system<systems::RenderSystem>()->getView());
+    m_systemMgr.system<systems::HitboxUpdaterSystem>()->getQuadTrees().debugDraw(target, m_gridText);
+    target.setView(oldView);
+    // END OF DEBUG CODE
 
     auto timeAfter = std::chrono::high_resolution_clock::now();
     m_lastRenderDuration = timeAfter - timeBefore;

@@ -32,6 +32,8 @@ public:
 
     void render(sf::RenderTarget& target);
 
+    sf::View getView() const { return m_renderingView; }
+
 private:
     void addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, sf::RenderStates states, float z);
 

@@ -38,17 +38,17 @@ void HitboxUpdaterSystem::update(entityx::EntityManager &es, entityx::EventManag
         c::PositionComponent& position,
         c::HitboxComponent& hitbox)
     {
+        if(!m_grid.contains(entity))
+        {
+            m_grid.insert(entity);
+        }
+
         if(hitbox.getHitbox().GetOrigin() != sf::Vector2f(position.x, position.y))
         {
             hitbox.getHitbox().SetOrigin(sf::Vector2f(position.x, position.y));
             hitbox.getHitbox().ComputeGlobalVertices();
             hitbox.getHitbox().ComputeGlobalEdges();
             hitbox.getHitbox().ComputeGlobalCenter();
-        }
-
-        if(hitbox.getHitbox().GetOrigin() != sf::Vector2f(position.x, position.y)
-            || !m_grid.contains(entity))
-        {
             m_grid.update(entity);
         }
     });
