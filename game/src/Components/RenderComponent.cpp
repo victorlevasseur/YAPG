@@ -1,6 +1,7 @@
 #include "Components/RenderComponent.hpp"
 
 #include "Lua/EntityHandle.hpp"
+#include "Systems/RenderSystem.hpp"
 
 namespace components
 {
@@ -39,13 +40,18 @@ void RenderComponent::registerComponent(lua::LuaState& state)
 
     state.getState().new_usertype<RenderComponent>("render_component",
         "texture", &RenderComponent::textureName,
-        "current_animation", &RenderComponent::currentAnimation,
+        "current_animation", sol::property(&RenderComponent::getCurrentAnimation, &RenderComponent::setCurrentAnimation),
         "animations", &RenderComponent::animations,
         "flipped", &RenderComponent::flipped,
         "on_animation_changed", &RenderComponent::onAnimationChangedFunc,
         "on_animation_end", &RenderComponent::onAnimationEndFunc
     );
     state.declareComponentGetter<RenderComponent>("render");
+}
+
+void RenderComponent::setCurrentAnimation(const std::string& animationName)
+{
+    emit<systems::ChangeAnimationMessage>(getEntity(), animationName);
 }
 
 std::ostream& operator<<(std::ostream& stream, const RenderComponent& component)

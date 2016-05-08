@@ -8,11 +8,12 @@
 #include "Components/Component.hpp"
 #include "Lua/LuaState.hpp"
 #include "Lua/sol.hpp"
+#include "Messaging/Messaging.hpp"
 
 namespace components
 {
 
-class RenderComponent : public Component
+class RenderComponent : public Component, public messaging::Emitter
 {
 public:
     RenderComponent(entityx::Entity entity);
@@ -23,7 +24,11 @@ public:
     static void registerComponent(lua::LuaState& state);
 
     std::string textureName;
+
     std::string currentAnimation;
+    std::string getCurrentAnimation() const { return currentAnimation; }
+    void setCurrentAnimation(const std::string& animationName);
+
     std::map<std::string, animation::Animation> animations;
     bool flipped;
 

@@ -11,6 +11,7 @@
 #include "entityx/entityx.h"
 
 #include "Animation/AnimatedSprite.hpp"
+#include "Messaging/Messaging.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Systems/HitboxUpdaterSystem.hpp"
 #include "Tools/EntitySpatialGrid.hpp"
@@ -18,7 +19,13 @@
 namespace systems
 {
 
-class RenderSystem : public entityx::System<RenderSystem>
+struct ChangeAnimationMessage
+{
+    entityx::Entity entity;
+    std::string animationName;
+};
+
+class RenderSystem : public entityx::System<RenderSystem>, public messaging::Receiver<ChangeAnimationMessage>
 {
 public:
     struct Renderable
@@ -34,11 +41,15 @@ public:
 
     void render(sf::RenderTarget& target);
 
+    virtual void receive(const ChangeAnimationMessage& msg);
+
     sf::View getView() const { return m_renderingView; }
     void setView(sf::View view) { m_renderingView = view; m_viewInit = true; }
 
 private:
     void addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, sf::RenderStates states, float z);
+
+    std::shared_ptr<animation::AnimatedSprite> getAnimatedSprite(entityx::Entity entity);
 
     bool m_cameraFollowPlayers;
 

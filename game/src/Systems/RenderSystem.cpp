@@ -58,27 +58,8 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
     }
 
     auto drawFunc = [&](entityx::Entity entity, c::PositionComponent& position, c::RenderComponent& render) {
-        if(m_animatedSprites.count(entity) == 0)
-        {
-            //Create the animated sprite if it doesn't exist
-            auto animatedSprite = std::make_shared<animation::AnimatedSprite>(
-                m_texturesManager.requestResource(render.textureName),
-                render.animations
-            );
-            animatedSprite->setCurrentAnimation(render.currentAnimation);
-            m_animatedSprites[entity] = animatedSprite;
-        }
-
         //Update the animated sprite and put it in the render queue
-        auto animatedSprite = m_animatedSprites[entity];
-        if(render.currentAnimation != animatedSprite->getCurrentAnimation())
-        {
-            std::string oldAnimation = animatedSprite->getCurrentAnimation();
-            animatedSprite->setCurrentAnimation(render.currentAnimation);
-
-            if(render.onAnimationChangedFunc.valid())
-                render.onAnimationChangedFunc.call(lua::EntityHandle(entity), oldAnimation, render.currentAnimation);
-        }
+        auto animatedSprite = getAnimatedSprite(entity);
 
         animatedSprite->update(dt);
         animatedSprite->setOrigin(sf::Vector2f(0.5f, 0.5f));
@@ -169,10 +150,44 @@ void RenderSystem::render(sf::RenderTarget& target)
     target.setView(oldView);
 }
 
+void RenderSystem::receive(const ChangeAnimationMessage& msg)
+{
+    auto animatedSprite = getAnimatedSprite(msg.entity);
+    auto render = entityx::Entity(msg.entity).component<c::RenderComponent>();
+    if(msg.animationName != animatedSprite->getCurrentAnimation())
+    {
+        std::string oldAnimation = animatedSprite->getCurrentAnimation();
+        animatedSprite->setCurrentAnimation(msg.animationName);
+
+        if(render->onAnimationChangedFunc.valid())
+            render->onAnimationChangedFunc.call(lua::EntityHandle(msg.entity), oldAnimation, msg.animationName);
+
+        render->currentAnimation = msg.animationName;
+    }
+}
+
 void RenderSystem::addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, sf::RenderStates states, float z)
 {
     auto insertionIt = std::lower_bound(m_renderingQueue.begin(), m_renderingQueue.end(), z, [](Renderable& renderable, float z) { return renderable.z < z; });
     m_renderingQueue.insert(insertionIt, Renderable{drawable, states, z});
+}
+
+std::shared_ptr<animation::AnimatedSprite> RenderSystem::getAnimatedSprite(entityx::Entity entity)
+{
+    auto render = entityx::Entity(entity).component<c::RenderComponent>();
+
+    if(m_animatedSprites.count(entity) == 0)
+    {
+        //Create the animated sprite if it doesn't exist
+        auto animatedSprite = std::make_shared<animation::AnimatedSprite>(
+            m_texturesManager.requestResource(render->textureName),
+            render->animations
+        );
+        animatedSprite->setCurrentAnimation(render->currentAnimation);
+        m_animatedSprites[entity] = animatedSprite;
+    }
+
+    return m_animatedSprites[entity];
 }
 
 }
