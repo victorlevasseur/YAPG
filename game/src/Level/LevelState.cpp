@@ -4,6 +4,10 @@
 
 #include <SFML/System/Time.hpp>
 
+#include "Components/HitboxComponent.hpp"
+#include "Components/PlayerComponent.hpp"
+#include "Components/PositionComponent.hpp"
+
 #include "Level/LevelFailureState.hpp"
 #include "Level/LevelSuccessState.hpp"
 #include "State/MainMenuState.hpp"
@@ -116,10 +120,10 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 
     m_systemMgr.update<systems::PlayerSystem>(dt.asSeconds());
     m_systemMgr.update<systems::EntityGridSystem>(dt.asSeconds());
-    m_systemMgr.update<systems::HitboxUpdaterSystem>(dt.asSeconds());
     m_systemMgr.update<systems::PlatformerSystem>(dt.asSeconds());
-    m_systemMgr.update<systems::CollisionSystem>(dt.asSeconds());
     m_systemMgr.update<systems::CustomBehaviorSystem>(dt.asSeconds());
+    m_systemMgr.update<systems::HitboxUpdaterSystem>(dt.asSeconds());
+    m_systemMgr.update<systems::CollisionSystem>(dt.asSeconds());
     m_systemMgr.update<systems::RenderSystem>(dt.asSeconds());
     m_systemMgr.update<systems::FinishLineSystem>(dt.asSeconds());
     m_systemMgr.update<systems::HealthSystem>(dt.asSeconds());

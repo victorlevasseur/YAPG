@@ -174,6 +174,7 @@ LuaState::LuaState() :
 
     //Load yapg core libraries
     m_luaState.script_file("scripts/core/array_tools.lua");
+    m_luaState.script_file("scripts/game/position_tools.lua");
     std::cout << "[Lua/Note] Scripting tools loaded." << std::endl;
 
     //Load templates

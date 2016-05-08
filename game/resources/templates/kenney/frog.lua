@@ -119,10 +119,8 @@ entity_template = {
             on_collision_begin = function(entity, other)
                 if(player(other) ~= nil and health(other) ~= nil) then
                     --If the slime collided with a player
-                    local player_bottom_hitbox_pos = position(other).y + hitbox(other).polygon:get_local_bounding_box().top + hitbox(other).polygon:get_local_bounding_box().height
-                    local slime_top_hitbox_pos = position(entity).y + hitbox(entity).polygon:get_local_bounding_box().top
-                    if(player_bottom_hitbox_pos - 12 <= slime_top_hitbox_pos) then
-                        --The player hit the slime on the top, kill myself (slime)
+                    if(position_tools.was_over(other, entity)) then
+                        --The player hit the slime on the top, kill myself (frog)
                         health(entity):kill()
                     else
                         -- The slime touched the player on its side or top, kill the player.

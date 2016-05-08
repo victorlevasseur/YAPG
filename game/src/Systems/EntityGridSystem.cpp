@@ -46,12 +46,12 @@ void EntityGridSystem::update(entityx::EntityManager &es, entityx::EventManager 
             || position.height != position.oldHeight)
         {
             m_grid.update(entity);
-
-            position.oldX = position.x;
-            position.oldY = position.y;
-            position.oldWidth = position.width;
-            position.oldHeight = position.height;
         }
+
+        position.oldX = position.x;
+        position.oldY = position.y;
+        position.oldWidth = position.width;
+        position.oldHeight = position.height;
     });
 }
 

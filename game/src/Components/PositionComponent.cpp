@@ -48,7 +48,11 @@ void PositionComponent::registerComponent(lua::LuaState& state)
         "y", &PositionComponent::y,
         "z", &PositionComponent::z,
         "width", &PositionComponent::width,
-        "height", &PositionComponent::height
+        "height", &PositionComponent::height,
+        "old_x", sol::readonly(&PositionComponent::oldX),
+        "old_y", sol::readonly(&PositionComponent::oldY),
+        "old_width", sol::readonly(&PositionComponent::oldWidth),
+        "old_height", sol::readonly(&PositionComponent::oldHeight)
     );
     state.declareComponentGetter<PositionComponent>("position");
 }
