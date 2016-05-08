@@ -5,8 +5,8 @@
 namespace components
 {
 
-ColliderComponent::ColliderComponent() :
-    Component()
+ColliderComponent::ColliderComponent(entityx::Entity entity) :
+    Component(entity)
 {
 
 }

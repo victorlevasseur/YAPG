@@ -5,8 +5,8 @@
 namespace components
 {
 
-CustomDataComponent::CustomDataComponent() :
-    Component(),
+CustomDataComponent::CustomDataComponent(entityx::Entity entity) :
+    Component(entity),
     m_dataTable()
 {
 

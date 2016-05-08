@@ -13,7 +13,7 @@ namespace components
 class {0}Component : public Component
 {{
 public:
-    {0}Component();
+    {0}Component(entityx::Entity entity);
     virtual ~{0}Component();
 
     virtual std::string getName() const;
@@ -35,8 +35,8 @@ srcContent = """#include "Components/{0}Component.hpp"
 namespace components
 {{
 
-{0}Component::{0}Component() :
-    Component()
+{0}Component::{0}Component(entityx::Entity entity) :
+    Component(entity)
 {{
 
 }}

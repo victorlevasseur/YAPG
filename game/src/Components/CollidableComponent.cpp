@@ -5,8 +5,8 @@
 namespace components
 {
 
-CollidableComponent::CollidableComponent() :
-    Component()
+CollidableComponent::CollidableComponent(entityx::Entity entity) :
+    Component(entity)
 {
 
 }

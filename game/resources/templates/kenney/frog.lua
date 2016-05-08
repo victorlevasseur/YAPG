@@ -123,10 +123,10 @@ entity_template = {
                     local slime_top_hitbox_pos = position(entity).y + hitbox(entity).polygon:get_local_bounding_box().top
                     if(player_bottom_hitbox_pos - 12 <= slime_top_hitbox_pos) then
                         --The player hit the slime on the top, kill myself (slime)
-                        health_kill(entity)
+                        health(entity):kill()
                     else
                         -- The slime touched the player on its side or top, kill the player.
-                        health_loose_pv(other, 1)
+                        health(other):loose_pv(1)
                     end
                 end
             end,

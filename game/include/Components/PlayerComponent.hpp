@@ -11,7 +11,7 @@ namespace components
 class PlayerComponent : public Component
 {
 public:
-    PlayerComponent();
+    PlayerComponent(entityx::Entity entity);
     virtual ~PlayerComponent();
 
     virtual std::string getName() const;

@@ -11,7 +11,7 @@ namespace components
 class PositionComponent : public Component
 {
 public:
-    PositionComponent();
+    PositionComponent(entityx::Entity entity);
     virtual ~PositionComponent();
 
     virtual std::string getName() const;

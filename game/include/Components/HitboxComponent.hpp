@@ -12,7 +12,7 @@ namespace components
 class HitboxComponent : public Component
 {
 public:
-    HitboxComponent();
+    HitboxComponent(entityx::Entity entity);
     virtual ~HitboxComponent();
 
     virtual std::string getName() const;

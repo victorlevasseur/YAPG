@@ -17,7 +17,8 @@
 namespace components
 {
 
-Component::Component()
+Component::Component(entityx::Entity entity) :
+    m_entity(entity)
 {
 
 }
@@ -36,31 +37,31 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
 {
     if(component == "position")
     {
-        entity.assign<PositionComponent>().get()->loadFromLua(luaTable, entityGetter);
+        entity.assign<PositionComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "custom_behavior")
     {
-        entity.assign<CustomBehaviorComponent>().get()->loadFromLua(luaTable, entityGetter);
+        entity.assign<CustomBehaviorComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "hitbox")
     {
-        entity.assign<HitboxComponent>().get()->loadFromLua(luaTable, entityGetter);
+        entity.assign<HitboxComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "platform")
     {
-        entity.assign<PlatformComponent>().get()->loadFromLua(luaTable, entityGetter);
+        entity.assign<PlatformComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "platformer")
     {
-        entity.assign<PlatformerComponent>().get()->loadFromLua(luaTable, entityGetter);
+        entity.assign<PlatformerComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "player")
     {
-        entity.assign<PlayerComponent>().get()->loadFromLua(luaTable, entityGetter);
+        entity.assign<PlayerComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "render")
     {
-        entity.assign<RenderComponent>().get()->loadFromLua(luaTable, entityGetter);
+        entity.assign<RenderComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "custom_data")
     {
@@ -68,19 +69,19 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
     }
     else if(component == "collidable")
     {
-        entity.assign<CollidableComponent>().get()->loadFromLua(luaTable, entityGetter);
+        entity.assign<CollidableComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "collider")
     {
-        entity.assign<ColliderComponent>().get()->loadFromLua(luaTable, entityGetter);
+        entity.assign<ColliderComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "finish_line")
     {
-        entity.assign<FinishLineComponent>().get()->loadFromLua(luaTable, entityGetter);
+        entity.assign<FinishLineComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "health")
     {
-        entity.assign<HealthComponent>().get()->loadFromLua(luaTable, entityGetter);
+        entity.assign<HealthComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
     else
     {

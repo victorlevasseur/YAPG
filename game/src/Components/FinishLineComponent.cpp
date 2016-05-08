@@ -5,8 +5,8 @@
 namespace components
 {
 
-FinishLineComponent::FinishLineComponent() :
-    Component()
+FinishLineComponent::FinishLineComponent(entityx::Entity entity) :
+    Component(entity)
 {
 
 }

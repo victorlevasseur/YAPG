@@ -5,8 +5,8 @@
 namespace components
 {
 
-CustomBehaviorComponent::CustomBehaviorComponent() :
-    Component(),
+CustomBehaviorComponent::CustomBehaviorComponent(entityx::Entity entity) :
+    Component(entity),
     updateFunction()
 {
 

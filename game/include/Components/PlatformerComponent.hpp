@@ -27,7 +27,7 @@ public:
         Left
     };
 
-    PlatformerComponent();
+    PlatformerComponent(entityx::Entity entity);
     virtual ~PlatformerComponent();
 
     virtual std::string getName() const;

@@ -17,7 +17,7 @@ public:
         All = Platform|Jumpthru
     };
 
-    PlatformComponent();
+    PlatformComponent(entityx::Entity entity);
     virtual ~PlatformComponent();
 
     virtual std::string getName() const;

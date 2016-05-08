@@ -5,8 +5,8 @@
 namespace components
 {
 
-HitboxComponent::HitboxComponent() :
-    Component()
+HitboxComponent::HitboxComponent(entityx::Entity entity) :
+    Component(entity)
 {
 
 }

@@ -10,7 +10,7 @@ namespace components
 class CustomBehaviorComponent : public Component
 {
 public:
-    CustomBehaviorComponent();
+    CustomBehaviorComponent(entityx::Entity entity);
     virtual ~CustomBehaviorComponent();
 
     virtual std::string getName() const;

@@ -15,7 +15,7 @@ namespace components
 class RenderComponent : public Component
 {
 public:
-    RenderComponent();
+    RenderComponent(entityx::Entity entity);
     virtual ~RenderComponent();
 
     virtual std::string getName() const;

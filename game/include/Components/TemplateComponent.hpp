@@ -12,7 +12,7 @@ namespace components
 class TemplateComponent : public Component
 {
 public:
-    TemplateComponent(int serializedId, const std::string& templateName, const lua::EntityParametersHelper& parametersHelper);
+    TemplateComponent(entityx::Entity entity, int serializedId, const std::string& templateName, const lua::EntityParametersHelper& parametersHelper);
     virtual ~TemplateComponent();
 
     virtual std::string getName() const;

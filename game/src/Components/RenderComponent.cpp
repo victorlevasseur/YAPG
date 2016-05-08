@@ -5,8 +5,8 @@
 namespace components
 {
 
-RenderComponent::RenderComponent() :
-    Component(),
+RenderComponent::RenderComponent(entityx::Entity entity) :
+    Component(entity),
     textureName(),
     currentAnimation(),
     animations(),

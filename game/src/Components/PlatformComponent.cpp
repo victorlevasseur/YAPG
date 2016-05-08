@@ -5,8 +5,8 @@
 namespace components
 {
 
-PlatformComponent::PlatformComponent() :
-    Component(),
+PlatformComponent::PlatformComponent(entityx::Entity entity) :
+    Component(entity),
     activated(true),
     platformType(Platform),
     layer(0)

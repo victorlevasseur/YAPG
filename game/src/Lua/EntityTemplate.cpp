@@ -99,7 +99,7 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
     });
 
     //Add the CustomData component (special case!)
-    entity.assign<components::CustomDataComponent>();
+    entity.assign<components::CustomDataComponent>(entity);
     if(m_componentsTable.get<sol::object>("custom_data").is<sol::table>())
     {
         //If the template has CustomDataComponent defined, it means that he needs to predefine some values
@@ -113,6 +113,7 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
     {
         //Add the template component, containing infos about the template
         entity.assign<components::TemplateComponent>(
+            entity,
             entityGetter.getSerializationIdFromEntity(entity),
             getName(),
             lua::EntityParametersHelper(this, entity)

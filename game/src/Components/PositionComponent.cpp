@@ -5,8 +5,8 @@
 namespace components
 {
 
-PositionComponent::PositionComponent() :
-    Component(),
+PositionComponent::PositionComponent(entityx::Entity entity) :
+    Component(entity),
     x(0.f),
     y(0.f),
     z(0.f),

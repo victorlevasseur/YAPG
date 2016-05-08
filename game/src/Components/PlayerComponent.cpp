@@ -5,8 +5,8 @@
 namespace components
 {
 
-PlayerComponent::PlayerComponent() :
-    Component(),
+PlayerComponent::PlayerComponent(entityx::Entity entity) :
+    Component(entity),
     playerNumber(-1),
     finishedLevel(false)
 {

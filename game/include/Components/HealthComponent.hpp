@@ -13,16 +13,16 @@ namespace components
 class HealthComponent : public Component, public messaging::Emitter
 {
 public:
-    HealthComponent();
+    HealthComponent(entityx::Entity entity);
     virtual ~HealthComponent();
 
     virtual std::string getName() const;
 
     static void registerComponent(lua::LuaState& state);
 
-    static void kill(lua::EntityHandle entity);
-    static void loosePV(lua::EntityHandle entity, float pv);
-    static void gainPV(lua::EntityHandle entity, float pv);
+    void kill();
+    void loosePV(float pv);
+    void gainPV(float pv);
 
     float health;
     float maxHealth;

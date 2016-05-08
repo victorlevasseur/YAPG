@@ -48,7 +48,7 @@ void HealthSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
 
         if(position.y > 200.f + lowestPlatformPos)
         {
-            c::HealthComponent::kill(entity);
+            entity.component<c::HealthComponent>()->kill();;
         }
     });
 }
@@ -79,7 +79,7 @@ void HealthSystem::receive(const HealthLoosePVMessage& msg)
 
     entityx::Entity(msg.entity).component<c::HealthComponent>()->health -= msg.pv;
     if(entityx::Entity(msg.entity).component<c::HealthComponent>()->health <= 0)
-        c::HealthComponent::kill(msg.entity);
+        entityx::Entity(msg.entity).component<c::HealthComponent>()->kill();
 
     //TODO: Call the loose PV callback
 

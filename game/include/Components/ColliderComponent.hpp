@@ -11,7 +11,7 @@ namespace components
 class ColliderComponent : public Component
 {
 public:
-    ColliderComponent();
+    ColliderComponent(entityx::Entity entity);
     virtual ~ColliderComponent();
 
     virtual std::string getName() const;

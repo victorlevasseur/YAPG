@@ -11,7 +11,7 @@ namespace components
 class CollidableComponent : public Component
 {
 public:
-    CollidableComponent();
+    CollidableComponent(entityx::Entity entity);
     virtual ~CollidableComponent();
 
     virtual std::string getName() const;

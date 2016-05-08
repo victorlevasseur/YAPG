@@ -5,8 +5,8 @@
 namespace components
 {
 
-TemplateComponent::TemplateComponent(int serializedId, const std::string& templateName, const lua::EntityParametersHelper& parametersHelper) :
-    Component(),
+TemplateComponent::TemplateComponent(entityx::Entity entity, int serializedId, const std::string& templateName, const lua::EntityParametersHelper& parametersHelper) :
+    Component(entity),
     serializedId(serializedId),
     templateName(templateName),
     parametersHelper(parametersHelper)

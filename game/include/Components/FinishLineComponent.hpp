@@ -11,7 +11,7 @@ namespace components
 class FinishLineComponent : public Component
 {
 public:
-    FinishLineComponent();
+    FinishLineComponent(entityx::Entity entity);
     virtual ~FinishLineComponent();
 
     virtual std::string getName() const;

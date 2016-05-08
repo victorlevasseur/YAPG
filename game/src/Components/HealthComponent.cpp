@@ -5,8 +5,8 @@
 namespace components
 {
 
-HealthComponent::HealthComponent() :
-    Component()
+HealthComponent::HealthComponent(entityx::Entity entity) :
+    Component(entity)
 {
 
 }
@@ -31,27 +31,27 @@ void HealthComponent::registerComponent(lua::LuaState& state)
 
     state.getState().new_usertype<HealthComponent>("health_component",
         "health", sol::readonly(&HealthComponent::health),
-        "max_health", &HealthComponent::maxHealth
+        "max_health", &HealthComponent::maxHealth,
+        "kill", &HealthComponent::kill,
+        "loose_pv", &HealthComponent::loosePV,
+        "gain_pv", &HealthComponent::gainPV
     );
-    state.getState().set_function("health_kill", &HealthComponent::kill);
-    state.getState().set_function("health_loose_pv", &HealthComponent::loosePV);
-    state.getState().set_function("health_gain_pv", &HealthComponent::gainPV);
     state.declareComponentGetter<HealthComponent>("health");
 }
 
-void HealthComponent::kill(lua::EntityHandle entity)
+void HealthComponent::kill()
 {
-    emit<systems::HealthKillMessage>(entity);
+    emit<systems::HealthKillMessage>(getEntity());
 }
 
-void HealthComponent::loosePV(lua::EntityHandle entity, float pv)
+void HealthComponent::loosePV(float pv)
 {
-    emit<systems::HealthLoosePVMessage>(entity, pv);
+    emit<systems::HealthLoosePVMessage>(getEntity(), pv);
 }
 
-void HealthComponent::gainPV(lua::EntityHandle entity, float pv)
+void HealthComponent::gainPV(float pv)
 {
-    emit<systems::HealthGainPVMessage>(entity, pv);
+    emit<systems::HealthGainPVMessage>(getEntity(), pv);
 }
 
 std::ostream& operator<<(std::ostream& stream, const HealthComponent& component)

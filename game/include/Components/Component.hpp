@@ -18,7 +18,7 @@ namespace components
 class Component
 {
 public:
-    Component();
+    Component(entityx::Entity entity);
     virtual ~Component();
 
     /**
@@ -41,8 +41,11 @@ public:
 
     static void registerComponent(lua::LuaState& state);
 
-private:
+protected:
+    entityx::Entity getEntity() const { return m_entity; }
 
+private:
+    entityx::Entity m_entity;
 };
 
 std::ostream& operator<<(std::ostream& stream, const Component& component);

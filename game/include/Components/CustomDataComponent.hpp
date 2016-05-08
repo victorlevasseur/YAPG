@@ -15,7 +15,7 @@ namespace components
 class CustomDataComponent : public Component
 {
 public:
-    CustomDataComponent();
+    CustomDataComponent(entityx::Entity entity);
     virtual ~CustomDataComponent();
 
     virtual std::string getName() const;

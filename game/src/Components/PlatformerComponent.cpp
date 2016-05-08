@@ -5,8 +5,8 @@
 namespace components
 {
 
-PlatformerComponent::PlatformerComponent() :
-    Component(),
+PlatformerComponent::PlatformerComponent(entityx::Entity entity) :
+    Component(entity),
     wantsToJump(false),
     wantsToGoLeft(false),
     wantsToGoRight(false),
