@@ -1,5 +1,7 @@
 #include "Lua/EntityTemplate.hpp"
 
+#include <SFML/Graphics/Texture.hpp>
+
 #include "Components/Component.hpp"
 #include "Components/CustomDataComponent.hpp"
 #include "Components/TemplateComponent.hpp"
@@ -183,6 +185,42 @@ void EntityTemplate::saveEntity(entityx::Entity entity, const level::SerializedE
 bool EntityTemplate::isPlayer() const
 {
     return getComponentsTable().get<sol::object>("player").is<sol::table>();
+}
+
+sf::Image EntityTemplate::getImage() const
+{
+    if(getComponentsTable().get<sol::object>("render").is<sol::table>())
+    {
+        sol::table renderTable = getComponentsTable().get<sol::table>("render");
+
+        std::string texturePath = "assets/" + renderTable.get<std::string>("texture");
+
+        std::string defaultAnimationName = renderTable.get<std::string>("current_animation");
+        sol::table defaultAnimation = renderTable.get<sol::table>("animations").get<sol::table>(defaultAnimationName);
+        sol::table frames = defaultAnimation.get<sol::table>("frames");
+
+        sol::table firstFrame = frames.get<sol::table>(1);
+        sol::table rectTable = firstFrame.get<sol::table>("rect");
+
+        sf::IntRect imageRect(
+            rectTable.get<int>("left"),
+            rectTable.get<int>("top"),
+            rectTable.get<int>("width"),
+            rectTable.get<int>("height")
+        );
+
+        sf::Texture texture;
+        if(!texture.loadFromFile(texturePath, imageRect))
+        {
+            return sf::Image();
+        }
+
+        return texture.copyToImage();
+    }
+    else
+    {
+        return sf::Image();
+    }
 }
 
 }

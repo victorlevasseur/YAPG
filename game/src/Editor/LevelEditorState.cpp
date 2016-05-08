@@ -445,6 +445,7 @@ void LevelEditorState::initGUI()
 
     m_templatesListBox = sfg::ListBox::Create();
     m_templatesListBox->SetItemTextPolicy(sfg::ListBox::ItemTextPolicy::SHRINK);
+    m_templatesListBox->SetImagesSize(sf::Vector2f(32.f, 32.f));
     toolsSettingsBox->PackEnd(m_templatesListBox);
 
     m_propertiesScrolled = sfg::ScrolledWindow::Create();
@@ -613,7 +614,8 @@ void LevelEditorState::updateTemplatesList()
             else //If not, add it to the general template list
             {
                 m_templatesNames.push_back(pair.first);
-                m_templatesListBox->AppendItem(entityTemplate.getFriendlyName());
+
+                m_templatesListBox->AppendItem(entityTemplate.getFriendlyName(), entityTemplate.getImage());
             }
         }
     }

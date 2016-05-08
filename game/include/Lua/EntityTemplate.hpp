@@ -6,6 +6,8 @@
 #include <map>
 #include <string>
 
+#include <SFML/Graphics/Image.hpp>
+
 #include "Level/SerializedEntityGetter.hpp"
 #include "Lua/sol.hpp"
 
@@ -84,6 +86,8 @@ public:
     bool isAbstract() const { return m_abstract; }
 
     bool isPlayer() const;
+
+    sf::Image getImage() const;
 
     const std::map<std::string, Parameter>& getParameters() const { return m_parameters; }
 
