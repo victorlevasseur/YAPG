@@ -1,6 +1,8 @@
 #ifndef YAPG_GAME_ANIMATION_ANIMATION_H
 #define YAPG_GAME_ANIMATION_ANIMATION_H
 
+#include <vector>
+
 #include "Animation/Frame.hpp"
 
 namespace animation

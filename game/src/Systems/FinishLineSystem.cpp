@@ -1,10 +1,10 @@
 #include "Systems/FinishLineSystem.hpp"
 
+#include "Collision/Polygon.hpp"
 #include "Components/FinishLineComponent.hpp"
 #include "Components/HitboxComponent.hpp"
 #include "Components/PlayerComponent.hpp"
 #include "Components/PositionComponent.hpp"
-#include "Tools/Polygon.hpp"
 
 namespace c = components;
 
@@ -33,7 +33,7 @@ void FinishLineSystem::update(entityx::EntityManager &es, entityx::EventManager 
         {
             if(!player.finishedLevel)
             {
-                if(tools::PolygonCollision(hitbox.getHitbox(), finishLineHitbox.getHitbox()))
+                if(collision::PolygonCollision(hitbox.getHitbox(), finishLineHitbox.getHitbox()))
                 {
                     //The player has collided the finish line.
                     player.finishedLevel = true;

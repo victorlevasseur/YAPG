@@ -15,7 +15,7 @@
 
 #include "Components/PositionComponent.hpp"
 
-namespace tools
+namespace collision
 {
 
 class EntitySpatialGrid

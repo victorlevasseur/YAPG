@@ -8,8 +8,8 @@
 
 #include "entityx/entityx.h"
 
+#include "Collision/EntitySpatialGrid.hpp"
 #include "Messaging/Messaging.hpp"
-#include "Tools/EntitySpatialGrid.hpp"
 
 namespace systems
 {
@@ -29,7 +29,7 @@ struct ExtraSystemCollisionMessage
 class CollisionSystem : public entityx::System<CollisionSystem>, public messaging::Receiver<ExtraSystemCollisionMessage>
 {
 public:
-    CollisionSystem(tools::EntitySpatialGrid& quadtreesGrid);
+    CollisionSystem(collision::EntitySpatialGrid& quadtreesGrid);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
@@ -42,7 +42,7 @@ private:
 
     std::vector<std::pair<entityx::Entity, entityx::Entity>> m_declaredCollisions; ///< Stores collision declared using the declareCollision(...) method (the PlatformerSystem use it)
 
-    tools::EntitySpatialGrid& m_quadtreesGrid;
+    collision::EntitySpatialGrid& m_quadtreesGrid;
 };
 
 }

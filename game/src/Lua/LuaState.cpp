@@ -10,6 +10,7 @@
 
 #include "Animation/Animation.hpp"
 #include "Animation/Frame.hpp"
+#include "Collision/Polygon.hpp"
 #include "Components/CollidableComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/CustomBehaviorComponent.hpp"
@@ -25,7 +26,6 @@
 #include "Level/Level.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Meta/Metadata.hpp"
-#include "Tools/Polygon.hpp"
 
 namespace fs = boost::filesystem;
 
@@ -151,7 +151,7 @@ LuaState::LuaState() :
     //Declare class metadatas
     animation::Animation::registerClass();
     animation::Frame::registerClass();
-    tools::Polygon::registerClass(*this);
+    collision::Polygon::registerClass(*this);
     std::cout << "[Lua/Note] Classes registered." << std::endl;
 
     //Declare main C++ classes and declare their metadatas

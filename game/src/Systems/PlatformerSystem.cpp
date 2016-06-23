@@ -6,6 +6,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
+#include "Collision/Polygon.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/HitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
@@ -13,7 +14,6 @@
 #include "Components/PositionComponent.hpp"
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/PlayerSystem.hpp"
-#include "Tools/Polygon.hpp"
 
 namespace c = components;
 namespace e = entityx;
@@ -24,7 +24,7 @@ namespace e = entityx;
 namespace systems
 {
 
-PlatformerSystem::PlatformerSystem(tools::EntitySpatialGrid& quadtreesGrid) :
+PlatformerSystem::PlatformerSystem(collision::EntitySpatialGrid& quadtreesGrid) :
     entityx::System<PlatformerSystem>(),
     m_quadtreesGrid(quadtreesGrid)
 {
@@ -34,14 +34,14 @@ PlatformerSystem::PlatformerSystem(tools::EntitySpatialGrid& quadtreesGrid) :
 namespace
 {
 
-void MovePolygon(tools::Polygon &poly, float dx, float dy)
+void MovePolygon(collision::Polygon &poly, float dx, float dy)
 {
     poly.SetOrigin(poly.GetOrigin() + sf::Vector2f(dx, dy));
     poly.ComputeGlobalVertices();
     poly.ComputeGlobalEdges();
 }
 
-std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const tools::EntitySpatialGrid& quadtreesGrid, entityx::Entity object, float maxMoveLength, int types = c::PlatformComponent::All)
+std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const collision::EntitySpatialGrid& quadtreesGrid, entityx::Entity object, float maxMoveLength, int types = c::PlatformComponent::All)
 {
     std::vector<e::Entity> potentialObstacles;
 
@@ -74,7 +74,7 @@ std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const tools::
     return potentialObstacles;
 }
 
-bool IsCollidingObstacle(tools::Polygon polygon, std::vector<e::Entity> potentialObstacles, std::vector<e::Entity> except, int onlyOfType = c::PlatformComponent::All)
+bool IsCollidingObstacle(collision::Polygon polygon, std::vector<e::Entity> potentialObstacles, std::vector<e::Entity> except, int onlyOfType = c::PlatformComponent::All)
 {
     for(e::Entity& obstacle : potentialObstacles)
     {
@@ -94,7 +94,7 @@ bool IsCollidingObstacle(tools::Polygon polygon, std::vector<e::Entity> potentia
         }
 
         //Test if there is a collision
-        if(tools::PolygonCollision(polygon, obstacleCPolygon->getHitbox()))
+        if(collision::PolygonCollision(polygon, obstacleCPolygon->getHitbox()))
         {
             return true;
         }
@@ -103,7 +103,7 @@ bool IsCollidingObstacle(tools::Polygon polygon, std::vector<e::Entity> potentia
     return false;
 }
 
-bool IsCollidingObstacle(tools::Polygon polygon, e::Entity obstacle)
+bool IsCollidingObstacle(collision::Polygon polygon, e::Entity obstacle)
 {
     //Get the collision polygon
     entityx::ComponentHandle<c::HitboxComponent> obstacleCPolygon = obstacle.component<c::HitboxComponent>();
@@ -115,7 +115,7 @@ bool IsCollidingObstacle(tools::Polygon polygon, e::Entity obstacle)
     }
 
     //Test if there is a collision
-    if(tools::PolygonCollision(polygon, obstacleCPolygon->getHitbox()))
+    if(collision::PolygonCollision(polygon, obstacleCPolygon->getHitbox()))
     {
         return true;
     }
@@ -125,7 +125,7 @@ bool IsCollidingObstacle(tools::Polygon polygon, e::Entity obstacle)
     }
 }
 
-std::vector<e::Entity> GetCollidingObstacles(tools::Polygon polygon, std::vector<e::Entity> potentialObstacles, std::vector<e::Entity> except, int types = c::PlatformComponent::All)
+std::vector<e::Entity> GetCollidingObstacles(collision::Polygon polygon, std::vector<e::Entity> potentialObstacles, std::vector<e::Entity> except, int types = c::PlatformComponent::All)
 {
     std::vector<e::Entity> collidingObstacles;
 
@@ -147,7 +147,7 @@ std::vector<e::Entity> GetCollidingObstacles(tools::Polygon polygon, std::vector
         }
 
         //Test if there is a collision
-        if(tools::PolygonCollision(polygon, obstacleCPolygon->getHitbox()))
+        if(collision::PolygonCollision(polygon, obstacleCPolygon->getHitbox()))
         {
             collidingObstacles.push_back(obstacle);
         }
@@ -156,13 +156,13 @@ std::vector<e::Entity> GetCollidingObstacles(tools::Polygon polygon, std::vector
     return collidingObstacles;
 }
 
-bool IsOnFloor(tools::Polygon polygon, std::vector<e::Entity> potentialFloors, std::vector<e::Entity> except = NO_EXCEPTIONS)
+bool IsOnFloor(collision::Polygon polygon, std::vector<e::Entity> potentialFloors, std::vector<e::Entity> except = NO_EXCEPTIONS)
 {
     MovePolygon(polygon, 0, 5.f);
     return IsCollidingObstacle(polygon, potentialFloors, except);
 }
 
-e::Entity GetFloor(tools::Polygon polygon, std::vector<e::Entity> potentialFloors, std::vector<e::Entity> except = NO_EXCEPTIONS)
+e::Entity GetFloor(collision::Polygon polygon, std::vector<e::Entity> potentialFloors, std::vector<e::Entity> except = NO_EXCEPTIONS)
 {
     MovePolygon(polygon, 0, 5.f);
     std::vector<e::Entity> floors = GetCollidingObstacles(polygon, potentialFloors, except);
@@ -173,7 +173,7 @@ e::Entity GetFloor(tools::Polygon polygon, std::vector<e::Entity> potentialFloor
         return floors[0];
 }
 
-void ResetPolygonPosition(e::Entity entity, tools::Polygon &poly)
+void ResetPolygonPosition(e::Entity entity, collision::Polygon &poly)
 {
     if(!entity.component<c::PositionComponent>())
         return;
@@ -208,7 +208,7 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         //and the future PlayerSystem will set them to true or false depending
         //of the pressed keys (according to the config)
 
-        tools::Polygon polygon = hitbox.getHitbox();
+        collision::Polygon polygon = hitbox.getHitbox();
         polygon.ComputeGlobalVertices();
         polygon.ComputeGlobalEdges();
 

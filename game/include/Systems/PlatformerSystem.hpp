@@ -3,8 +3,8 @@
 
 #include "entityx/entityx.h"
 
+#include "Collision/EntitySpatialGrid.hpp"
 #include "Messaging/Messaging.hpp"
-#include "Tools/EntitySpatialGrid.hpp"
 
 namespace systems
 {
@@ -12,12 +12,12 @@ namespace systems
 class PlatformerSystem : public entityx::System<PlatformerSystem>, public messaging::Emitter
 {
 public:
-    PlatformerSystem(tools::EntitySpatialGrid& quadtreesGrid);
+    PlatformerSystem(collision::EntitySpatialGrid& quadtreesGrid);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
 private:
-    tools::EntitySpatialGrid& m_quadtreesGrid;
+    collision::EntitySpatialGrid& m_quadtreesGrid;
 };
 
 }

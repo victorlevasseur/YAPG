@@ -5,8 +5,8 @@
 
 #include <SFML/Graphics/Rect.hpp>
 
+#include "Collision/EntitySpatialGrid.hpp"
 #include "Components/PositionComponent.hpp"
-#include "Tools/EntitySpatialGrid.hpp"
 
 namespace systems
 {
@@ -28,14 +28,14 @@ public:
     void receive(const entityx::ComponentRemovedEvent<components::PositionComponent>& event);
     void receive(const entityx::EntityDestroyedEvent& event);
 
-    const tools::EntitySpatialGrid& getGrid() const { return m_grid; }
-    tools::EntitySpatialGrid& getGrid() { return m_grid; }
+    const collision::EntitySpatialGrid& getGrid() const { return m_grid; }
+    collision::EntitySpatialGrid& getGrid() { return m_grid; }
 
 private:
     void tryToAddEntityToGrid(entityx::Entity entity);
     void tryToRemoveEntityFromGrid(entityx::Entity entity);
 
-    tools::EntitySpatialGrid m_grid;
+    collision::EntitySpatialGrid m_grid;
 };
 
 }

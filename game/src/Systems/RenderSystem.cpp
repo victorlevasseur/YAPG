@@ -18,7 +18,7 @@ namespace c = components;
 namespace systems
 {
 
-RenderSystem::RenderSystem(resources::TexturesManager& texturesManager, tools::EntitySpatialGrid& grid, bool cameraFollowPlayers, bool debugHitboxDraw) :
+RenderSystem::RenderSystem(resources::TexturesManager& texturesManager, collision::EntitySpatialGrid& grid, bool cameraFollowPlayers, bool debugHitboxDraw) :
     entityx::System<RenderSystem>(),
     m_cameraFollowPlayers(cameraFollowPlayers),
     m_renderingQueue(),

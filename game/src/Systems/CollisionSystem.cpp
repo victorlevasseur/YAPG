@@ -3,19 +3,19 @@
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
 
+#include "Collision/Polygon.hpp"
 #include "Components/CollidableComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/HitboxComponent.hpp"
 #include "Components/PositionComponent.hpp"
 #include "Lua/EntityHandle.hpp"
-#include "Tools/Polygon.hpp"
 
 namespace c = components;
 
 namespace systems
 {
 
-CollisionSystem::CollisionSystem(tools::EntitySpatialGrid& quadtreesGrid) :
+CollisionSystem::CollisionSystem(collision::EntitySpatialGrid& quadtreesGrid) :
     m_entitiesInCollision(),
     m_declaredCollisions(),
     m_quadtreesGrid(quadtreesGrid)

@@ -11,10 +11,10 @@
 #include "entityx/entityx.h"
 
 #include "Animation/AnimatedSprite.hpp"
+#include "Collision/EntitySpatialGrid.hpp"
 #include "Messaging/Messaging.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Systems/HitboxUpdaterSystem.hpp"
-#include "Tools/EntitySpatialGrid.hpp"
 
 namespace systems
 {
@@ -35,7 +35,7 @@ public:
         float z;
     };
 
-    RenderSystem(resources::TexturesManager& texturesManager, tools::EntitySpatialGrid& grid, bool cameraFollowPlayers = true, bool debugHitboxDraw = false);
+    RenderSystem(resources::TexturesManager& texturesManager, collision::EntitySpatialGrid& grid, bool cameraFollowPlayers = true, bool debugHitboxDraw = false);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
@@ -64,7 +64,7 @@ private:
     resources::TexturesManager& m_texturesManager;
     bool m_debugHitboxDraw;
 
-    tools::EntitySpatialGrid& m_grid;
+    collision::EntitySpatialGrid& m_grid;
 };
 
 }

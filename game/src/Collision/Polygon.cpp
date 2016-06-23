@@ -1,4 +1,4 @@
-#include "Tools/Polygon.hpp"
+#include "Collision/Polygon.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -12,7 +12,7 @@
 #define M_PI       3.14159265358979323846
 
 
-namespace tools
+namespace collision
 {
 
 Polygon::Polygon() : m_vertices(), m_origin(), m_angle(0), m_globalVertices(), m_globalEdges(), m_globalCenter()

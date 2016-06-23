@@ -10,7 +10,7 @@
 namespace sf{ class RenderTarget; }
 namespace lua{ class LuaState; }
 
-namespace tools
+namespace collision
 {
 
 class Polygon
