@@ -5,7 +5,7 @@
 #include <SFML/Graphics/ConvexShape.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 
-#include "Components/HitboxComponent.hpp"
+#include "Components/PlatformerHitboxComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PlayerComponent.hpp"
 #include "Components/PositionComponent.hpp"
@@ -40,7 +40,7 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
 
     if(m_debugHitboxDraw)
     {
-        es.each<c::HitboxComponent>([&](entityx::Entity entity, c::HitboxComponent& hitbox) {
+        es.each<c::PlatformerHitboxComponent>([&](entityx::Entity entity, c::PlatformerHitboxComponent& hitbox) {
             auto shape = std::make_shared<sf::ConvexShape>(hitbox.getHitbox().GetGlobalVertices().size());
             shape->setOutlineThickness(1.f);
             shape->setFillColor(sf::Color::Transparent);

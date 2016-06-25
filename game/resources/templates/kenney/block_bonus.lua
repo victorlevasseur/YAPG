@@ -19,10 +19,10 @@ entity_template = {
                 if render(entity).current_animation == "normal" and player(other) ~= nil then
                     -- Get some useful positions (the Y bottom coord of the block and the Y top coord of the player's HITBOX)
                     local block_bottom_pos = position(entity).y + position(entity).height
-                    local player_top_hitbox_pos = position(other).y + hitbox(other).polygon:get_local_bounding_box().top
+                    local player_top_platformer_hitbox_pos = position(other).y + platformer_hitbox(other).polygon:get_local_bounding_box().top
 
                     -- Test if the player hit the block from under
-                    if player_top_hitbox_pos >= block_bottom_pos then
+                    if player_top_platformer_hitbox_pos >= block_bottom_pos then
                         render(entity).current_animation = "hit"
                     end
                 end

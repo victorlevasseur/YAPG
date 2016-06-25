@@ -8,7 +8,7 @@
 
 #include "Collision/Polygon.hpp"
 #include "Components/ColliderComponent.hpp"
-#include "Components/HitboxComponent.hpp"
+#include "Components/PlatformerHitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PositionComponent.hpp"
@@ -48,7 +48,7 @@ std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const collisi
     e::ComponentHandle<c::PositionComponent> cBox = object.component<c::PositionComponent>();
     e::ComponentHandle<c::PlatformerComponent> cPhysic = object.component<c::PlatformerComponent>();
 
-    if(!cBox || !object.component<c::HitboxComponent>())
+    if(!cBox || !object.component<c::PlatformerHitboxComponent>())
         return potentialObstacles;
 
     sf::FloatRect objectBoundingBox;
@@ -62,7 +62,7 @@ std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const collisi
     {
         if(!obstacle)
             continue;
-        if(!obstacle.has_component<c::PositionComponent>() || !obstacle.has_component<c::HitboxComponent>() || !obstacle.has_component<c::PlatformComponent>())
+        if(!obstacle.has_component<c::PositionComponent>() || !obstacle.has_component<c::PlatformerHitboxComponent>() || !obstacle.has_component<c::PlatformComponent>())
             continue;
 
         entityx::ComponentHandle<c::PlatformComponent> obstacleCObs = obstacle.component<c::PlatformComponent>();
@@ -85,7 +85,7 @@ bool IsCollidingObstacle(collision::Polygon polygon, std::vector<e::Entity> pote
         }
 
         //Get the collision polygon
-        entityx::ComponentHandle<c::HitboxComponent> obstacleCPolygon = obstacle.component<c::HitboxComponent>();
+        entityx::ComponentHandle<c::PlatformerHitboxComponent> obstacleCPolygon = obstacle.component<c::PlatformerHitboxComponent>();
         entityx::ComponentHandle<c::PlatformComponent> obstacleCO = obstacle.component<c::PlatformComponent>();
 
         if(!obstacleCPolygon || !obstacleCO || ((onlyOfType & obstacleCO->platformType) == 0) || !obstacleCO->activated)
@@ -106,7 +106,7 @@ bool IsCollidingObstacle(collision::Polygon polygon, std::vector<e::Entity> pote
 bool IsCollidingObstacle(collision::Polygon polygon, e::Entity obstacle)
 {
     //Get the collision polygon
-    entityx::ComponentHandle<c::HitboxComponent> obstacleCPolygon = obstacle.component<c::HitboxComponent>();
+    entityx::ComponentHandle<c::PlatformerHitboxComponent> obstacleCPolygon = obstacle.component<c::PlatformerHitboxComponent>();
     entityx::ComponentHandle<c::PlatformComponent> obstacleCO = obstacle.component<c::PlatformComponent>();
 
     if(!obstacleCPolygon || !obstacleCO || !obstacleCO->activated)
@@ -138,7 +138,7 @@ std::vector<e::Entity> GetCollidingObstacles(collision::Polygon polygon, std::ve
         }
 
         //Get the collision polygon
-        entityx::ComponentHandle<c::HitboxComponent> obstacleCPolygon = obstacle.component<c::HitboxComponent>();
+        entityx::ComponentHandle<c::PlatformerHitboxComponent> obstacleCPolygon = obstacle.component<c::PlatformerHitboxComponent>();
         entityx::ComponentHandle<c::PlatformComponent> obstacleCO = obstacle.component<c::PlatformComponent>();
 
         if(!obstacleCPolygon || !obstacleCO || ((types & obstacleCO->platformType) == 0) || !obstacleCO->activated)
@@ -189,11 +189,11 @@ void ResetPolygonPosition(e::Entity entity, collision::Polygon &poly)
 
 void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
 {
-    es.each<c::PositionComponent, c::PlatformerComponent, c::HitboxComponent>([&](
+    es.each<c::PositionComponent, c::PlatformerComponent, c::PlatformerHitboxComponent>([&](
         entityx::Entity entity,
         c::PositionComponent& position,
         c::PlatformerComponent& platformer,
-        c::HitboxComponent& hitbox)
+        c::PlatformerHitboxComponent& hitbox)
     {
         float oldX = position.x;
         float oldY = position.y;

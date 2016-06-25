@@ -9,11 +9,11 @@
 namespace components
 {
 
-class HitboxComponent : public Component
+class PlatformerHitboxComponent : public Component
 {
 public:
-    HitboxComponent(entityx::Entity entity);
-    virtual ~HitboxComponent();
+    PlatformerHitboxComponent(entityx::Entity entity);
+    virtual ~PlatformerHitboxComponent();
 
     virtual std::string getName() const;
 
@@ -26,7 +26,7 @@ private:
     collision::Polygon m_polygon;
 };
 
-std::ostream& operator<<(std::ostream& stream, const HitboxComponent& component);
+std::ostream& operator<<(std::ostream& stream, const PlatformerHitboxComponent& component);
 
 }
 

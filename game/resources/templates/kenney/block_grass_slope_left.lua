@@ -27,7 +27,7 @@ entity_template = {
         ["platform"] = {
 
         },
-        ["hitbox"] = {
+        ["platformer_hitbox"] = {
             polygon = {
                 points = {
                     {

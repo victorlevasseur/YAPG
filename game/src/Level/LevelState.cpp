@@ -4,7 +4,7 @@
 
 #include <SFML/System/Time.hpp>
 
-#include "Components/HitboxComponent.hpp"
+#include "Components/PlatformerHitboxComponent.hpp"
 #include "Components/PlayerComponent.hpp"
 #include "Components/PositionComponent.hpp"
 

@@ -93,7 +93,7 @@ entity_template = {
             health = 1,
             max_health = 1,
         },
-        ["hitbox"] = {
+        ["platformer_hitbox"] = {
             polygon = {
                 points = {
                     {

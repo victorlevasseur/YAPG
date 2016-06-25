@@ -19,10 +19,10 @@ void HitboxUpdaterSystem::configure(entityx::EventManager &event_manager)
 
 void HitboxUpdaterSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
 {
-    es.each<c::PositionComponent, c::HitboxComponent>([&](
+    es.each<c::PositionComponent, c::PlatformerHitboxComponent>([&](
         entityx::Entity entity,
         c::PositionComponent& position,
-        c::HitboxComponent& hitbox)
+        c::PlatformerHitboxComponent& hitbox)
     {
         if(hitbox.getHitbox().GetOrigin() != sf::Vector2f(position.x, position.y))
         {

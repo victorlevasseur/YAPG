@@ -5,7 +5,7 @@
 
 #include <SFML/Graphics/Rect.hpp>
 
-#include "Components/HitboxComponent.hpp"
+#include "Components/PlatformerHitboxComponent.hpp"
 #include "Components/PositionComponent.hpp"
 
 namespace systems

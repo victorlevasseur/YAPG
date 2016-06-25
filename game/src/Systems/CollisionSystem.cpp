@@ -6,7 +6,7 @@
 #include "Collision/Polygon.hpp"
 #include "Components/CollidableComponent.hpp"
 #include "Components/ColliderComponent.hpp"
-#include "Components/HitboxComponent.hpp"
+#include "Components/PlatformerHitboxComponent.hpp"
 #include "Components/PositionComponent.hpp"
 #include "Lua/EntityHandle.hpp"
 
@@ -25,10 +25,10 @@ CollisionSystem::CollisionSystem(collision::EntitySpatialGrid& quadtreesGrid) :
 
 void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
 {
-    es.each<c::PositionComponent, c::HitboxComponent, c::ColliderComponent>([&](
+    es.each<c::PositionComponent, c::PlatformerHitboxComponent, c::ColliderComponent>([&](
         entityx::Entity entity,
         c::PositionComponent& position,
-        c::HitboxComponent& hitbox,
+        c::PlatformerHitboxComponent& hitbox,
         c::ColliderComponent& collider)
     {
         sf::FloatRect boundingBox(position.x, position.y, position.width, position.height);
@@ -39,7 +39,7 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
             if(!entity || !entity2 || !entity2.has_component<c::CollidableComponent>() || entity == entity2)
                 continue;
 
-            auto hitbox2 = entity2.component<c::HitboxComponent>();
+            auto hitbox2 = entity2.component<c::PlatformerHitboxComponent>();
             auto collidable2 = entity2.component<c::CollidableComponent>();
 
             auto collisionPairIt = std::find(m_entitiesInCollision.begin(), m_entitiesInCollision.end(), std::make_pair(entity, entity2));

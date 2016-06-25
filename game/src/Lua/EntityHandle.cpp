@@ -9,7 +9,7 @@
 #include "Components/CustomDataComponent.hpp"
 #include "Components/FinishLineComponent.hpp"
 #include "Components/HealthComponent.hpp"
-#include "Components/HitboxComponent.hpp"
+#include "Components/PlatformerHitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PlayerComponent.hpp"

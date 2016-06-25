@@ -5,7 +5,7 @@
 #include "Components/CustomBehaviorComponent.hpp"
 #include "Components/FinishLineComponent.hpp"
 #include "Components/HealthComponent.hpp"
-#include "Components/HitboxComponent.hpp"
+#include "Components/PlatformerHitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PlayerComponent.hpp"
@@ -43,9 +43,9 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
     {
         entity.assign<CustomBehaviorComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
-    else if(component == "hitbox")
+    else if(component == "platformer_hitbox")
     {
-        entity.assign<HitboxComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
+        entity.assign<PlatformerHitboxComponent>(entity).get()->loadFromLua(luaTable, entityGetter);
     }
     else if(component == "platform")
     {

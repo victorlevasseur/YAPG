@@ -25,7 +25,7 @@ entity_template = {
         ["platform"] = {
             platform_type = "Jumpthru",
         },
-        ["hitbox"] = {
+        ["platformer_hitbox"] = {
             polygon = {
                 points = {
                     {

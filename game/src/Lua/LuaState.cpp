@@ -17,7 +17,7 @@
 #include "Components/CustomDataComponent.hpp"
 #include "Components/FinishLineComponent.hpp"
 #include "Components/HealthComponent.hpp"
-#include "Components/HitboxComponent.hpp"
+#include "Components/PlatformerHitboxComponent.hpp"
 #include "Components/PlatformComponent.hpp"
 #include "Components/PlatformerComponent.hpp"
 #include "Components/PlayerComponent.hpp"
@@ -164,7 +164,7 @@ LuaState::LuaState() :
     components::CustomDataComponent::registerComponent(*this);
     components::FinishLineComponent::registerComponent(*this);
     components::HealthComponent::registerComponent(*this);
-    components::HitboxComponent::registerComponent(*this);
+    components::PlatformerHitboxComponent::registerComponent(*this);
     components::PlatformComponent::registerComponent(*this);
     components::PlatformerComponent::registerComponent(*this);
     components::PlayerComponent::registerComponent(*this);
