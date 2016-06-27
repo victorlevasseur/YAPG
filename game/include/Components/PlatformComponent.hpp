@@ -30,6 +30,8 @@ public:
     bool activated;
     PlatformType platformType;
     int layer;
+
+    sol::function onHitFunc;
 };
 
 std::ostream& operator<<(std::ostream& stream, const PlatformComponent& component);

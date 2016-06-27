@@ -28,6 +28,7 @@ void PlatformComponent::registerComponent(lua::LuaState& state)
 {
     meta::MetadataStore::registerClass<PlatformComponent>("PlatformComponent")
         .declareAttribute("activated", &PlatformComponent::activated)
+        .declareAttribute("on_hit", &PlatformComponent::onHitFunc)
         .setExtraLoadFunction([](PlatformComponent* platform, const sol::object& luaObject)
         {
             const sol::object& platformTypeLua = luaObject.as<sol::table>().get<sol::object>("platform_type");
@@ -41,7 +42,8 @@ void PlatformComponent::registerComponent(lua::LuaState& state)
 
     state.getState().new_usertype<PlatformComponent>("platform_component",
         "activated", &PlatformComponent::activated,
-        "platform_type", sol::property(&PlatformComponent::getPlatformTypeAsString, &PlatformComponent::setPlatformTypeAsString)
+        "platform_type", sol::property(&PlatformComponent::getPlatformTypeAsString, &PlatformComponent::setPlatformTypeAsString),
+        "on_hit", &PlatformComponent::onHitFunc
     );
     state.declareComponentGetter<PlatformComponent>("platform");
 }

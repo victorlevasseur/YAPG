@@ -15,11 +15,16 @@ entity_template = {
     components = {
         ["collidable"] = {
             on_collision_begin = function(entity, other)
+
+            end,
+        },
+        ["platform"] = {
+            on_hit = function(entity, platformer)
                 -- Test if the block has not been hit and if the collision is made with a player
-                if render(entity).current_animation == "normal" and player(other) ~= nil then
+                if render(entity).current_animation == "normal" and player(platformer) ~= nil then
                     -- Get some useful positions (the Y bottom coord of the block and the Y top coord of the player's HITBOX)
                     local block_bottom_pos = position(entity).y + position(entity).height
-                    local player_top_platformer_hitbox_pos = position(other).y + platformer_hitbox(other).polygon:get_local_bounding_box().top
+                    local player_top_platformer_hitbox_pos = position(platformer).y + platformer_hitbox(platformer).polygon:get_local_bounding_box().top
 
                     -- Test if the player hit the block from under
                     if player_top_platformer_hitbox_pos >= block_bottom_pos then

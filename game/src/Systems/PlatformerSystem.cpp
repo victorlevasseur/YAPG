@@ -204,9 +204,8 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         bool wantsToJump(platformer.wantsToJump);
         bool wantsToGoLeft(platformer.wantsToGoLeft);
         bool wantsToGoRight(platformer.wantsToGoRight);
-        //TODO: Put the previous variables as attributes of PlatformerComponent
-        //and the future PlayerSystem will set them to true or false depending
-        //of the pressed keys (according to the config)
+
+        std::set<entityx::Entity> entitiesHit; //< Store the entities hit by the platformer object
 
         collision::Polygon polygon = hitbox.getHitbox();
         polygon.ComputeGlobalVertices();
@@ -272,16 +271,13 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         //Move the player's hitbox if the floor has moved
         MovePolygon(polygon, requestedXFloorMove, requestedYFloorMove);
 
-        //Get all colliding platforms and give them to CollisionSystem (it will filter those that have a CollidableComponent)
-        //(after the X change)
-        if(entity.has_component<c::ColliderComponent>())
+        //Store the entities collided by the platformer entity
+        std::vector<entityx::Entity> collidedPlatforms = GetCollidingObstacles(polygon, potentialObstacles, NO_EXCEPTIONS);
+        for(entityx::Entity& collidedPlatform : collidedPlatforms)
         {
-            auto collidedPlatforms = GetCollidingObstacles(polygon, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::All);
-            for(auto& platform : collidedPlatforms)
-            {
-                emit<ExtraSystemCollisionMessage>(entity, platform);
-            }
+            entitiesHit.insert(collidedPlatform);
         }
+        //////////////////////////////////////////////////////
 
         //Detect collision on the X-axis
         bool reqXPositive = requestedXMove > 0.f;
@@ -362,16 +358,13 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         bool reqYPositive = requestedFall > 0.f;
         MovePolygon(polygon, 0.f, requestedFall);
 
-        //Get all colliding platforms and give them to CollisionSystem (it will filter those that have a CollidableComponent)
-        //(after the Y change)
-        if(entity.has_component<c::ColliderComponent>())
+        //Store the entities collided by the platformer entity
+        std::vector<entityx::Entity> collidedPlatforms2 = GetCollidingObstacles(polygon, potentialObstacles, NO_EXCEPTIONS);
+        for(entityx::Entity& collidedPlatform : collidedPlatforms2)
         {
-            auto collidedPlatforms = GetCollidingObstacles(polygon, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::All);
-            for(auto& platform : collidedPlatforms)
-            {
-                emit<ExtraSystemCollisionMessage>(entity, platform);
-            }
+            entitiesHit.insert(collidedPlatform);
         }
+        //////////////////////////////////////////////////////
 
         //Delete Jumpthru which are under or overlapping the player
         std::vector<entityx::Entity> allCollidingObstacles = GetCollidingObstacles(polygon, potentialObstacles, overlappingJumpthrus);
@@ -418,9 +411,21 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
             platformer.groundEntity = entityx::Entity();
         }
 
+        //Move the entity
         position.x += requestedXMove;
         position.y += requestedYMove;
+        ResetPolygonPosition(entity, polygon);
 
+        //Call on_hit callback on all platform hit by the platformer
+        for(entityx::Entity collidedPlatform: entitiesHit)
+        {
+            if(collidedPlatform.component<c::PlatformComponent>()->onHitFunc.valid())
+            {
+                collidedPlatform.component<c::PlatformComponent>()->onHitFunc.call(lua::EntityHandle(collidedPlatform), lua::EntityHandle(entity));
+            }
+        }
+
+        //Call the movement callbacks
         if(IsOnFloor(polygon, potentialObstacles, overlappingJumpthrus))
         {
             if(abs(position.x - oldX - requestedXFloorMove) > 0.1f)
