@@ -66,13 +66,11 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
 
                         if(nextFrameCollisions.insert(Collision{entity1, polygon1.first, entity2, polygon2.first}).second) //They were not colliding before !
                         {
-                            std::cout << "Collision begin: " << entity1 << " -> " << polygon1.first << " <=> " << entity2 << " -> " << polygon2.first << std::endl;
                             polygon1.second.callOnCollisionBegin(entity1, entity2);
                             std::cout << "OK !" << std::endl;
                         }
                         else //They were already colliding before
                         {
-                            std::cout << "Collision in progress: " << entity1 << " -> " << polygon1.first << " <=> " << entity2 << " -> " << polygon2.first << std::endl;
                             polygon1.second.callCollides(entity1, entity2);
                         }
                     }
@@ -80,7 +78,6 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
                     {
                         if(nextFrameCollisions.erase(Collision{entity1, polygon1.first, entity2, polygon2.first}) == 1) //The collision has just ended
                         {
-                            std::cout << "Collision ended: " << entity1 << " -> " << polygon1.first << " <=> " << entity2 << " -> " << polygon2.first << std::endl;
                             polygon1.second.callOnCollisionEnd(entity1, entity2);
                         }
                     }
