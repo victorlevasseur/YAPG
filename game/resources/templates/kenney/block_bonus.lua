@@ -13,11 +13,6 @@ entity_template = {
     },
 
     components = {
-        ["collidable"] = {
-            on_collision_begin = function(entity, other)
-
-            end,
-        },
         ["platform"] = {
             on_hit = function(entity, platformer)
                 -- Test if the block has not been hit and if the collision is made with a player

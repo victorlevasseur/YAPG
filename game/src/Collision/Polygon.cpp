@@ -15,18 +15,18 @@
 namespace collision
 {
 
-Polygon::Polygon() : m_vertices(), m_origin(), m_angle(0), m_globalVertices(), m_globalEdges(), m_globalCenter()
+Polygon::Polygon() : m_vertices()
 {
 
 }
 
-Polygon::Polygon(std::initializer_list<sf::Vector2f> vertices) : m_vertices(), m_origin(), m_angle(0), m_globalVertices(), m_globalEdges(), m_globalCenter()
+Polygon::Polygon(std::initializer_list<sf::Vector2f> vertices) : m_vertices()
 {
     m_vertices.resize(vertices.size());
     std::copy(vertices.begin(), vertices.end(), m_vertices.begin());
 }
 
-Polygon::Polygon(std::vector<sf::Vector2f> vertices) : m_vertices(vertices), m_origin(), m_angle(0), m_globalVertices(), m_globalEdges(), m_globalCenter()
+Polygon::Polygon(std::vector<sf::Vector2f> vertices) : m_vertices(vertices)
 {
 
 }
@@ -36,48 +36,178 @@ Polygon::~Polygon()
 
 }
 
-sf::FloatRect Polygon::GetLocalBoundingBox() const
+sf::Vector2f Polygon::getPoint(std::size_t index) const
 {
-    if(m_vertices.size() == 0)
+    return m_vertices[index];
+}
+
+void Polygon::setPoint(std::size_t index, sf::Vector2f position)
+{
+    m_vertices[index] = position;
+}
+
+std::size_t Polygon::getPointsCount() const
+{
+    return m_vertices.size();
+}
+
+sf::Vector2f Polygon::getEdge(std::size_t index) const
+{
+    if(index == getPointsCount() - 1)
+        return getPoint(0) - getPoint(index);
+    else
+        return getPoint(index + 1) - getPoint(index);
+}
+
+sf::Vector2f Polygon::getCenter() const
+{
+    sf::Vector2f sum;
+    for(std::size_t i = 0; i < getPointsCount(); ++i)
+    {
+        sum += getPoint(i);
+    }
+
+    return sum / static_cast<float>(getPointsCount());
+}
+
+sf::FloatRect Polygon::getAABB() const
+{
+    if(getPointsCount() == 0)
         return sf::FloatRect();
 
-    sf::Vector2f topLeftMax = m_vertices[0];
-    sf::Vector2f bottomRightMax = m_vertices[0];
+    sf::Vector2f topLeftMax = getPoint(0);
+    sf::Vector2f bottomRightMax = getPoint(0);
 
-    for(const sf::Vector2f& vertex : m_vertices)
+    for(std::size_t i = 1; i < getPointsCount(); ++i)
     {
-        topLeftMax.x = std::min(vertex.x, topLeftMax.x);
-        topLeftMax.y = std::min(vertex.y, topLeftMax.y);
-        bottomRightMax.x = std::max(vertex.x, bottomRightMax.x);
-        bottomRightMax.y = std::max(vertex.y, bottomRightMax.y);
+        topLeftMax.x = std::min(getPoint(i).x, topLeftMax.x);
+        topLeftMax.y = std::min(getPoint(i).y, topLeftMax.y);
+        bottomRightMax.x = std::max(getPoint(i).x, bottomRightMax.x);
+        bottomRightMax.y = std::max(getPoint(i).y, bottomRightMax.y);
     }
 
     return sf::FloatRect(topLeftMax, bottomRightMax - topLeftMax);
 }
 
-void Polygon::DrawDebugPolygon(sf::RenderTarget &target)
+sf::Vector2f Polygon::getTransformedPoint(std::size_t index, sf::Transform transform) const
+{
+    return transform.transformPoint(getPoint(index));
+}
+
+sf::Vector2f Polygon::getTransformedEdge(std::size_t index, sf::Transform transform) const
+{
+    if(index == getPointsCount() - 1)
+        return transform.transformPoint(getPoint(0)) - transform.transformPoint(getPoint(index));
+    else
+        return transform.transformPoint(getPoint(index + 1)) - transform.transformPoint(getPoint(index));
+}
+
+void Polygon::drawDebugPolygon(sf::RenderTarget &target)
 {
     sf::VertexArray poly(sf::LinesStrip);
 
-    for(unsigned int i = 0; i < m_globalVertices.size(); i++)
+    for(std::size_t i = 0; i < getPointsCount(); ++i)
     {
-        poly.append(sf::Vertex(m_globalVertices[i]));
+        poly.append(sf::Vertex(getPoint(i)));
     }
 
-    poly.append(sf::Vertex(m_globalVertices[0]));
+    poly.append(sf::Vertex(getPoint(0)));
 
     target.draw(poly);
 }
 
-sf::Vector2f Polygon::RotatePoint(sf::Vector2f point, float angle)
+namespace
 {
-    sf::Vector2f futurePoint;
-    float radAngle = angle * M_PI / 180.f;
+    //Utility functions for the collision test
+    float DotProduct(sf::Vector2f vec1, sf::Vector2f vec2)
+    {
+        return vec1.x * vec2.x + vec1.y * vec2.y;
+    }
 
-    futurePoint.x = point.x * cos(radAngle) - point.y * sin(radAngle);
-    futurePoint.y = point.y * cos(radAngle) + point.x * sin(radAngle);
+    sf::Vector2f Normalise(sf::Vector2f vec)
+    {
+        float length = sqrt(vec.x * vec.x + vec.y * vec.y);
 
-    return futurePoint;
+        if(length != 0)
+        {
+            return vec / length;
+        }
+        else
+        {
+            return vec;
+        }
+    }
+
+    sf::Vector2f ProjectPolygon(sf::Vector2f &axis, Polygon &p, sf::Transform transform)
+    {
+        sf::Vector2f minMax;
+        //First value for the min (x) and max (y)
+        minMax.x = minMax.y = DotProduct(axis, p.getTransformedPoint(0, transform));
+
+        for(unsigned int i = 0; i < p.getPointsCount(); i++)
+        {
+            float dotPr = DotProduct(axis, p.getTransformedPoint(i, transform));
+            if(dotPr < minMax.x)
+            {
+                minMax.x = dotPr;
+            }
+            else if(dotPr > minMax.y)
+            {
+                minMax.y = dotPr;
+            }
+        }
+
+        return minMax;
+    }
+
+    float IntervalDistance(sf::Vector2f i1, sf::Vector2f i2)
+    {
+        if(i1.x < i2.x)
+        {
+            return i2.x - i1.y;
+        }
+        else
+        {
+            return i1.x - i2.y;
+        }
+    }
+}
+
+bool Polygon::collides(Polygon &p1, Polygon &p2, sf::Transform p1Transform, sf::Transform p2Transform)
+{
+    bool intersect = true;
+
+    std::size_t p1EdgesCount = p1.getPointsCount();
+    std::size_t p2EdgesCount = p2.getPointsCount();
+    if(p1EdgesCount == 0 || p2EdgesCount == 0)
+        return false;
+
+    for(std::size_t i = 0; i < p1EdgesCount + p2EdgesCount; ++i)
+    {
+        sf::Vector2f edge;
+
+        if(i < p1EdgesCount)
+        {
+            edge = p1.getTransformedEdge(i, p1Transform);
+        }
+        else
+        {
+            edge = p2.getTransformedEdge(i - p1EdgesCount, p2Transform);
+        }
+
+        sf::Vector2f axis(-edge.y, edge.x);
+        axis = Normalise(axis);
+
+        sf::Vector2f p1Project(ProjectPolygon(axis, p1, p1Transform));
+        sf::Vector2f p2Project(ProjectPolygon(axis, p2, p2Transform));
+
+        if(IntervalDistance(p1Project, p2Project) > 0.f)
+        {
+            intersect = false;
+        }
+    }
+
+    return intersect;
 }
 
 Polygon Polygon::Rectangle(float width, float height)
@@ -88,138 +218,13 @@ Polygon Polygon::Rectangle(float width, float height)
 void Polygon::registerClass(lua::LuaState& state)
 {
     meta::MetadataStore::registerClass<Polygon>()
-        .declareAttribute("points", &Polygon::m_vertices)
-        .setExtraLoadFunction([](Polygon* c, const sol::object& luaObject) {
-            c->ComputeGlobalVertices();
-            c->ComputeGlobalEdges();
-            c->ComputeGlobalCenter();
-        });
+        .declareAttribute("points", &Polygon::m_vertices);
 
     state.getState().new_usertype<Polygon>("polygon",
-        "get_local_bounding_box", &Polygon::GetLocalBoundingBox
+        "get_local_bounding_box", &Polygon::getAABB
     );
 
     state.declareAnyConvertibleType<Polygon>("polygon");
-}
-
-void Polygon::ComputeGlobalVertices()
-{
-    m_globalVertices.resize(m_vertices.size());
-
-    for(unsigned int i = 0; i < m_vertices.size(); i++)
-    {
-        m_globalVertices[i] = Polygon::RotatePoint(m_vertices[i], m_angle);
-        m_globalVertices[i] += m_origin;
-    }
-}
-
-void Polygon::ComputeGlobalEdges()
-{
-    m_globalEdges.resize(m_globalVertices.size());
-
-    for(unsigned int i = 0; i < m_globalVertices.size() - 1; i++)
-    {
-        m_globalEdges[i] = m_globalVertices[i+1] - m_globalVertices[i];
-    }
-
-    m_globalEdges[m_globalVertices.size() - 1] = m_globalVertices[0] - m_globalVertices[m_globalVertices.size() - 1];
-}
-
-void Polygon::ComputeGlobalCenter()
-{
-
-}
-
-//Utility functions for the collision test
-float DotProduct(sf::Vector2f vec1, sf::Vector2f vec2)
-{
-    return vec1.x * vec2.x + vec1.y * vec2.y;
-}
-
-sf::Vector2f Normalise(sf::Vector2f vec)
-{
-    float length = sqrt(vec.x * vec.x + vec.y * vec.y);
-
-    if(length != 0)
-    {
-        return vec / length;
-    }
-    else
-    {
-        return vec;
-    }
-}
-
-sf::Vector2f ProjectPolygon(sf::Vector2f &axis, Polygon &p)
-{
-    sf::Vector2f minMax;
-    //First value for the min (x) and max (y)
-    minMax.x = minMax.y = DotProduct(axis, p.GetGlobalVertices()[0]);
-
-    for(unsigned int i = 0; i < p.GetGlobalVertices().size(); i++)
-    {
-        float dotPr = DotProduct(axis, p.GetGlobalVertices()[i]);
-        if(dotPr < minMax.x)
-        {
-            minMax.x = dotPr;
-        }
-        else if(dotPr > minMax.y)
-        {
-            minMax.y = dotPr;
-        }
-    }
-
-    return minMax;
-}
-
-float IntervalDistance(sf::Vector2f i1, sf::Vector2f i2)
-{
-    if(i1.x < i2.x)
-    {
-        return i2.x - i1.y;
-    }
-    else
-    {
-        return i1.x - i2.y;
-    }
-}
-
-//Collision test
-bool PolygonCollision(Polygon &p1, Polygon &p2)
-{
-    bool intersect = true;
-
-    unsigned int p1EdgesCount = p1.GetGlobalEdges().size();
-    unsigned int p2EdgesCount = p2.GetGlobalEdges().size();
-    if(p1EdgesCount == 0 || p2EdgesCount == 0)
-        return false;
-
-    for(unsigned int i = 0; i < p1EdgesCount + p2EdgesCount; i++)
-    {
-        sf::Vector2f edge;
-
-        if(i < p1EdgesCount)
-        {
-            edge = p1.GetGlobalEdges()[i];
-        }
-        else
-        {
-            edge = p2.GetGlobalEdges()[i - p1EdgesCount];
-        }
-
-        sf::Vector2f axis(-edge.y, edge.x);
-        axis = Normalise(axis);
-
-        sf::Vector2f p1Project(ProjectPolygon(axis, p1));
-        sf::Vector2f p2Project(ProjectPolygon(axis, p2));
-
-        if(IntervalDistance(p1Project, p2Project) > 0.f)
-        {
-            intersect = false;
-        }
-    }
-
-    return intersect;
 }
 
 }

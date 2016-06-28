@@ -16,8 +16,7 @@ namespace systems
 {
 
 CollisionSystem::CollisionSystem(collision::EntitySpatialGrid& quadtreesGrid) :
-    m_entitiesInCollision(),
-    m_declaredCollisions(),
+    m_collisions(),
     m_quadtreesGrid(quadtreesGrid)
 {
 
@@ -25,93 +24,52 @@ CollisionSystem::CollisionSystem(collision::EntitySpatialGrid& quadtreesGrid) :
 
 void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
 {
-    es.each<c::PositionComponent, c::PlatformerHitboxComponent, c::ColliderComponent>([&](
-        entityx::Entity entity,
-        c::PositionComponent& position,
-        c::PlatformerHitboxComponent& hitbox,
-        c::ColliderComponent& collider)
+    CollisionUnorderedSet nextFrameCollisions(m_collisions);
+
+    es.each<c::PositionComponent, c::CollidableComponent>([&](
+        entityx::Entity entity1,
+        c::PositionComponent& position1,
+        c::CollidableComponent& collidable1)
     {
-        sf::FloatRect boundingBox(position.x, position.y, position.width, position.height);
+        sf::FloatRect boundingBox(position1.x, position1.y, position1.width, position1.height);
 
         auto collisionCandidates = m_quadtreesGrid.getEntitiesIntersectingAABB(boundingBox);
         for(entityx::Entity entity2 : collisionCandidates)
         {
-            if(!entity || !entity2 || !entity2.has_component<c::CollidableComponent>() || entity == entity2)
+            if(!entity1 || !entity2 || !entity2.has_component<c::CollidableComponent>() || entity1 == entity2)
                 continue;
 
-            auto hitbox2 = entity2.component<c::PlatformerHitboxComponent>();
+            auto position2 = entity2.component<c::PositionComponent>();
             auto collidable2 = entity2.component<c::CollidableComponent>();
 
-            auto collisionPairIt = std::find(m_entitiesInCollision.begin(), m_entitiesInCollision.end(), std::make_pair(entity, entity2));
-            //sf::FloatRect boundingBox2(position2.x, position2.y, position2.width, position2.height);
-
-            if((!PolygonCollision(hitbox.getHitbox(), hitbox2->getHitbox())) &&
-                std::find(m_declaredCollisions.begin(), m_declaredCollisions.end(), std::make_pair(entity, entity2)) == m_declaredCollisions.end())
+            for(auto& polygon1 : collidable1.polygons)
             {
-                //No collision (or no more collision)
-
-                //If the pair (collider, collidable) was colliding before, remove it from the entities colliding and call on_end_collision
-                if(collisionPairIt != m_entitiesInCollision.end())
+                for(auto& polygon2 : collidable2->polygons)
                 {
-                    if(collidable2->onCollisionEnd.valid())
-                        collidable2->onCollisionEnd.call(lua::EntityHandle(entity2), lua::EntityHandle(entity));
-
-                    //If the collider also has a CollidableComponent, call the callback on it too
-                    if(entity.has_component<c::CollidableComponent>())
+                    if(collision::Polygon::collides(polygon1.second.getPolygon(), polygon2.second.getPolygon(), position1.getPositionTransform(), position2->getPositionTransform())) //Collision between the two polygons
                     {
-                        if(entity.component<c::CollidableComponent>()->onCollisionEnd.valid())
-                            entity.component<c::CollidableComponent>()->onCollisionEnd.call(lua::EntityHandle(entity), lua::EntityHandle(entity2));
+                        if(nextFrameCollisions.insert(Collision{entity1, polygon1.first, entity2, polygon2.first}).second) //They were not colliding before !
+                        {
+                            polygon1.second.callOnCollisionBegin(entity1, entity2);
+                        }
+                        else //They were already colliding before
+                        {
+                            polygon1.second.callCollides(entity1, entity2);
+                        }
                     }
-
-                    m_entitiesInCollision.erase(collisionPairIt);
-                }
-            }
-            else
-            {
-                //If the pair (collider, collidable) was not colliding before, add it to the entities colliding and call on_begin_collision
-                if(collisionPairIt == m_entitiesInCollision.end())
-                {
-                    m_entitiesInCollision.push_back(std::make_pair(entity, entity2));
-                    if(collidable2->onCollisionBegin.valid())
-                        collidable2->onCollisionBegin.call(lua::EntityHandle(entity2), lua::EntityHandle(entity));
-
-                    //If the collider also has a CollidableComponent, call the callback on it too
-                    if(entity.has_component<c::CollidableComponent>())
+                    else
                     {
-                        if(entity.component<c::CollidableComponent>()->onCollisionBegin.valid())
-                            entity.component<c::CollidableComponent>()->onCollisionBegin.call(lua::EntityHandle(entity), lua::EntityHandle(entity2));
-                    }
-                }
-                else
-                {
-                    //Collision still happening, call collides callback
-                    if(collidable2->collides.valid())
-                        collidable2->collides.call(lua::EntityHandle(entity2), lua::EntityHandle(entity));
-
-                    //If the collider also has a CollidableComponent, call the callback on it too
-                    if(entity.has_component<c::CollidableComponent>())
-                    {
-                        if(entity.component<c::CollidableComponent>()->collides.valid())
-                            entity.component<c::CollidableComponent>()->collides.call(lua::EntityHandle(entity), lua::EntityHandle(entity2));
+                        if(nextFrameCollisions.erase(Collision{entity1, polygon1.first, entity2, polygon2.first}) == 1) //The collision has just ended
+                        {
+                            polygon1.second.callOnCollisionEnd(entity1, entity2);
+                        }
                     }
                 }
             }
         }
     });
 
-    m_declaredCollisions.clear();
-}
-
-void CollisionSystem::receive(const ExtraSystemCollisionMessage& collisionMessage)
-{
-    //Check if they are respectively the ColliderComponent and the CollidableComponent
-    if(collisionMessage.collider.has_component<c::ColliderComponent>() && collisionMessage.collidable.has_component<c::CollidableComponent>())
-    {
-        if(std::find(m_declaredCollisions.begin(), m_declaredCollisions.end(), std::make_pair(collisionMessage.collider, collisionMessage.collidable)) == m_declaredCollisions.end())
-        {
-            m_declaredCollisions.push_back(std::make_pair(collisionMessage.collider, collisionMessage.collidable));
-        }
-    }
+    m_collisions = nextFrameCollisions;
 }
 
 }

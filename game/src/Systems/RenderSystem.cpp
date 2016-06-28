@@ -40,20 +40,23 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
 
     if(m_debugHitboxDraw)
     {
-        es.each<c::PlatformerHitboxComponent>([&](entityx::Entity entity, c::PlatformerHitboxComponent& hitbox) {
-            auto shape = std::make_shared<sf::ConvexShape>(hitbox.getHitbox().GetGlobalVertices().size());
+        es.each<c::PositionComponent, c::PlatformerHitboxComponent>([&](
+            entityx::Entity entity,
+            c::PositionComponent& position,
+            c::PlatformerHitboxComponent& hitbox) {
+            auto shape = std::make_shared<sf::ConvexShape>(hitbox.getHitbox().getPointsCount());
             shape->setOutlineThickness(1.f);
             shape->setFillColor(sf::Color::Transparent);
             shape->setOutlineColor(sf::Color::Black);
-            for(unsigned int i = 0; i < shape->getPointCount(); i++)
+            for(std::size_t i = 0; i < shape->getPointCount(); ++i)
             {
                 shape->setPoint(i, sf::Vector2f(
-                    hitbox.getHitbox().GetGlobalVertices()[i].x,
-                    hitbox.getHitbox().GetGlobalVertices()[i].y
+                    hitbox.getHitbox().getPoint(i).x,
+                    hitbox.getHitbox().getPoint(i).y
                 ));
             }
 
-            addToRenderingQueue(shape, sf::RenderStates::Default, 100000.f);
+            addToRenderingQueue(shape, sf::RenderStates(position.getPositionTransform()), 100000.f);
         });
     }
 

@@ -30,6 +30,14 @@ std::string PositionComponent::getName() const
     return "Position";
 }
 
+sf::Transform PositionComponent::getPositionTransform() const
+{
+    sf::Transform transform;
+    transform.translate(x, y);
+
+    return transform;
+}
+
 void PositionComponent::registerComponent(lua::LuaState& state)
 {
     //Register loading infos

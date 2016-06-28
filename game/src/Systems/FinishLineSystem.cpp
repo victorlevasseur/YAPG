@@ -27,13 +27,21 @@ void FinishLineSystem::update(entityx::EntityManager &es, entityx::EventManager 
         m_allPlayersFinishedLevel = true; //Be sure to have at least one finish line entity !
     });
 
-    es.each<c::PositionComponent, c::PlatformerHitboxComponent, c::PlayerComponent>([&](entityx::Entity entity, c::PositionComponent& position, c::PlatformerHitboxComponent& hitbox, c::PlayerComponent& player)
+    es.each<c::PositionComponent, c::PlatformerHitboxComponent, c::PlayerComponent>([&](
+        entityx::Entity entity,
+        c::PositionComponent& position,
+        c::PlatformerHitboxComponent& hitbox,
+        c::PlayerComponent& player)
     {
-        es.each<c::PlatformerHitboxComponent, c::FinishLineComponent>([&](entityx::Entity finishLineEntity, c::PlatformerHitboxComponent& finishLineHitbox, c::FinishLineComponent&)
+        es.each<c::PositionComponent, c::PlatformerHitboxComponent, c::FinishLineComponent>([&](
+            entityx::Entity finishLineEntity,
+            c::PositionComponent& finishLinePosition,
+            c::PlatformerHitboxComponent& finishLineHitbox,
+            c::FinishLineComponent&)
         {
             if(!player.finishedLevel)
             {
-                if(collision::PolygonCollision(hitbox.getHitbox(), finishLineHitbox.getHitbox()))
+                if(collision::Polygon::collides(hitbox.getHitbox(), finishLineHitbox.getHitbox(), position.getPositionTransform(), finishLinePosition.getPositionTransform()))
                 {
                     //The player has collided the finish line.
                     player.finishedLevel = true;

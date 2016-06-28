@@ -24,16 +24,11 @@ std::string CollidableComponent::getName() const
 void CollidableComponent::registerComponent(lua::LuaState& state)
 {
     meta::MetadataStore::registerClass<CollidableComponent>()
-        .declareAttribute("on_collision_begin", &CollidableComponent::onCollisionBegin)
-        .declareAttribute("collides", &CollidableComponent::collides)
-        .declareAttribute("on_collision_end", &CollidableComponent::onCollisionEnd);
+        .declareAttribute("polygons", &CollidableComponent::polygons);
 
     lua::EntityHandle::declareComponent<CollidableComponent>("collidable");
 
-    state.getState().new_usertype<CollidableComponent>("collidable_component",
-        "on_collision_begin", &CollidableComponent::onCollisionBegin,
-        "collides", &CollidableComponent::collides,
-        "on_collision_end", &CollidableComponent::onCollisionEnd
+    state.getState().new_usertype<CollidableComponent>("collidable_component"
     );
     state.declareComponentGetter<CollidableComponent>("collidable");
 }

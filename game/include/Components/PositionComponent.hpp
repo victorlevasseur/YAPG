@@ -1,9 +1,10 @@
 #ifndef YAPG_GAME_COMPONENTS_POSITIONCOMPONENT_H
 #define YAPG_GAME_COMPONENTS_POSITIONCOMPONENT_H
 
+#include <SFML/Graphics/Transform.hpp>
+
 #include "Components/Component.hpp"
 #include "Lua/LuaState.hpp"
-
 
 namespace components
 {
@@ -15,6 +16,8 @@ public:
     virtual ~PositionComponent();
 
     virtual std::string getName() const;
+
+    sf::Transform getPositionTransform() const;
 
     float x;
     float y;

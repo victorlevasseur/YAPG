@@ -11,6 +11,7 @@
 #include "Animation/Animation.hpp"
 #include "Animation/Frame.hpp"
 #include "Collision/Polygon.hpp"
+#include "Collision/PolygonCallback.hpp"
 #include "Components/CollidableComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/CustomBehaviorComponent.hpp"
@@ -152,6 +153,7 @@ LuaState::LuaState() :
     animation::Animation::registerClass();
     animation::Frame::registerClass();
     collision::Polygon::registerClass(*this);
+    collision::PolygonCallback::registerClass(*this);
     std::cout << "[Lua/Note] Classes registered." << std::endl;
 
     //Declare main C++ classes and declare their metadatas

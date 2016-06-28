@@ -5,6 +5,7 @@
 #include <initializer_list>
 
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Vector2.hpp>
 
 namespace sf{ class RenderTarget; }
@@ -22,25 +23,22 @@ public:
 
     ~Polygon();
 
-    void SetOrigin(sf::Vector2f origin) {m_origin = origin;};
-    void SetAngle(float angle){m_angle = angle;};
+    sf::Vector2f getPoint(std::size_t index) const;
+    void setPoint(std::size_t index, sf::Vector2f position);
+    std::size_t getPointsCount() const;
 
-    sf::Vector2f GetOrigin() const {return m_origin;};
-    float GetAngle() const {return m_angle;};
+    sf::Vector2f getEdge(std::size_t index) const;
 
-    const std::vector<sf::Vector2f>& GetLocalVertices() const {return m_vertices;};
-    sf::FloatRect GetLocalBoundingBox() const;
+    sf::Vector2f getCenter() const;
 
-    const std::vector<sf::Vector2f>& GetGlobalVertices() const {return m_globalVertices;};
-    const std::vector<sf::Vector2f>& GetGlobalEdges() const {return m_globalEdges;};
+    sf::FloatRect getAABB() const;
 
-    void DrawDebugPolygon(sf::RenderTarget &target);
+    sf::Vector2f getTransformedPoint(std::size_t index, sf::Transform transform) const;
+    sf::Vector2f getTransformedEdge(std::size_t index, sf::Transform transform) const;
 
-    void ComputeGlobalVertices();
-    void ComputeGlobalEdges(); // Compute global vertices before
-    void ComputeGlobalCenter(); // Compute global vertices before
+    void drawDebugPolygon(sf::RenderTarget &target);
 
-    static sf::Vector2f RotatePoint(sf::Vector2f point, float angle);
+    static bool collides(Polygon &p1, Polygon &p2, sf::Transform p1Transform = sf::Transform(), sf::Transform p2Transform = sf::Transform());
 
     static Polygon Rectangle(float width, float height);
 
@@ -49,23 +47,7 @@ public:
 private:
     //Relative vertices positions
     std::vector<sf::Vector2f> m_vertices;
-
-    //Position and angle
-    sf::Vector2f m_origin;
-    float m_angle;
-
-    //Global vertices positions and edges(the origin position and the rotation angle can be set)
-    std::vector<sf::Vector2f> m_globalVertices;
-    std::vector<sf::Vector2f> m_globalEdges;
-    sf::Vector2f m_globalCenter;
 };
-
-float DotProduct(sf::Vector2f vec1, sf::Vector2f vec2);
-sf::Vector2f Normalise(sf::Vector2f vec);
-sf::Vector2f ProjectPolygon(sf::Vector2f &axis, Polygon &p);
-float IntervalDistance(sf::Vector2f i1, sf::Vector2f i2);
-
-bool PolygonCollision(Polygon &p1, Polygon &p2);
 
 }
 

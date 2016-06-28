@@ -1,6 +1,9 @@
 #ifndef YAPG_GAME_COMPONENTS_COLLIDABLECOMPONENT_H
 #define YAPG_GAME_COMPONENTS_COLLIDABLECOMPONENT_H
 
+#include <map>
+
+#include "Collision/PolygonCallback.hpp"
 #include "Components/Component.hpp"
 #include "Lua/LuaState.hpp"
 #include "Meta/Metadata.hpp"
@@ -18,9 +21,7 @@ public:
 
     static void registerComponent(lua::LuaState& state);
 
-    sol::function onCollisionBegin;
-    sol::function collides;
-    sol::function onCollisionEnd;
+    std::map<std::string, collision::PolygonCallback> polygons;
 };
 
 std::ostream& operator<<(std::ostream& stream, const CollidableComponent& component);
