@@ -45,7 +45,7 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
             auto position2 = entity2.component<c::PositionComponent>();
             auto collidable2 = entity2.component<c::CollidableComponent>();
 
-            for(auto& polygon1 : collidable1.polygons)
+            for(auto& polygon1 : collidable1.polygonsByPriority)
             {
                 if(!entity1 || !entity2) //Prevents crashes when an entity is deleted as a result of a callback call.
                     break;
@@ -67,7 +67,6 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
                         if(nextFrameCollisions.insert(Collision{entity1, polygon1.first, entity2, polygon2.first}).second) //They were not colliding before !
                         {
                             polygon1.second.callOnCollisionBegin(entity1, entity2);
-                            std::cout << "OK !" << std::endl;
                         }
                         else //They were already colliding before
                         {
