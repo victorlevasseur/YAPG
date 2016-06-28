@@ -37,27 +37,23 @@ target_include_directories(yapg-game PUBLIC ${ENTITYX_INCLUDE_DIR})
 
 #SFML lib
 find_package(SFML 2.3 REQUIRED system window graphics audio)
-if(SFML_FOUND)
-    target_include_directories(yapg-game PUBLIC ${SFML_INCLUDE_DIR})
-endif()
+target_include_directories(yapg-game PUBLIC ${SFML_INCLUDE_DIR})
+
+#OpenGL
+find_package(OpenGL REQUIRED)
+target_include_directories(yapg-game PUBLIC ${OPENGL_INCLUDE_DIRS})
 
 #SFGUI lib
 find_package(SFGUI 0.3 REQUIRED)
-if(SFGUI_FOUND)
-    target_include_directories(yapg-game PUBLIC ${SFGUI_INCLUDE_DIR})
-endif()
+target_include_directories(yapg-game PUBLIC ${SFGUI_INCLUDE_DIR})
 
 #Lua
 find_package(Lua 5 REQUIRED)
-if(LUA_FOUND)
-    target_include_directories(yapg-game PUBLIC ${LUA_INCLUDE_DIR})
-endif()
+target_include_directories(yapg-game PUBLIC ${LUA_INCLUDE_DIR})
 
 #Boost filesystem
 find_package(Boost COMPONENTS system filesystem REQUIRED)
-if(Boost_FOUND)
-    target_include_directories(yapg-game PUBLIC ${Boost_INCLUDE_DIR})
-endif()
+target_include_directories(yapg-game PUBLIC ${Boost_INCLUDE_DIR})
 
 if(DEFINED OS_LINUX)
     # GTK3 on Linux (for NativeGui classes)
@@ -70,7 +66,7 @@ endif()
 
 #Linking
 target_link_libraries(yapg-game PUBLIC
-    ${ENTITYX_STATIC_LIBRARY} ${SFML_LIBRARIES} ${SFGUI_LIBRARY} ${LUA_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${GTK3_LIBRARIES}
+    ${OPENGL_LIBRARIES} ${ENTITYX_STATIC_LIBRARY} ${SFML_LIBRARIES} ${SFGUI_LIBRARY} ${LUA_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${GTK3_LIBRARIES}
 )
 
 #Install the app

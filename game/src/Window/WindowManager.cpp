@@ -4,6 +4,10 @@
 
 #include <SFML/System/Clock.hpp>
 
+#include "imgui.h"
+#include "imgui_internal.h"
+#include "imgui-SFML.h"
+
 #include "State/State.hpp"
 #include "State/StateEngine.hpp"
 
@@ -17,6 +21,13 @@ WindowManager::WindowManager(state::StateEngine& engine, const sf::String& windo
     m_engine(engine)
 {
     m_engine.addObserver(*this);
+
+    ImGui::SFML::Init(m_window);
+}
+
+WindowManager::~WindowManager()
+{
+    ImGui::SFML::Shutdown();
 }
 
 void WindowManager::run()
@@ -35,6 +46,8 @@ void WindowManager::run()
         sf::Event event;
         while (m_window.pollEvent(event))
         {
+            ImGui::SFML::ProcessEvent(event);
+
             //Let the state process the event
             if(m_engine.getRunningState())
                 m_engine.getRunningState()->processEvent(event, m_window);
@@ -44,13 +57,16 @@ void WindowManager::run()
         }
 
         elapsedTime += dtClock.restart();
+        ImGui::SFML::Update(elapsedTime - elapsedTime % sf::seconds(1.f/60.f)); //Update ImGui
         //Fix the timestep so that the game logic is refreshed every 1/60s (60 fps)
-        while(elapsedTime >= sf::seconds(1/60.f))
+        while(elapsedTime >= sf::seconds(1.f/60.f))
         {
             if(m_engine.getRunningState())
-                m_engine.getRunningState()->update(sf::seconds(1/60.f), m_window);
+            {
+                m_engine.getRunningState()->update(sf::seconds(1.f/60.f), m_window);
+            }
 
-            elapsedTime -= sf::seconds(1/60.f);
+            elapsedTime -= sf::seconds(1.f/60.f);
         }
 
         //Render the state
@@ -58,6 +74,8 @@ void WindowManager::run()
             m_engine.getRunningState()->render(m_window);
         else
             m_window.clear(sf::Color::Black);
+
+        ImGui::Render();
 
         m_window.display();
     }

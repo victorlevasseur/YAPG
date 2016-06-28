@@ -16,6 +16,7 @@ class WindowManager : public tools::Observer
 {
 public:
     WindowManager(state::StateEngine& engine, const sf::String& windowTitle);
+    virtual ~WindowManager();
 
     void run();
 
