@@ -5,7 +5,8 @@
 namespace collision
 {
 
-PolygonCallback::PolygonCallback()
+PolygonCallback::PolygonCallback() :
+    exclusive(false)
 {
 
 }

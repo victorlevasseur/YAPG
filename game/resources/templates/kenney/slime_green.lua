@@ -94,18 +94,62 @@ entity_template = {
             }
         },
         ["collidable"] = {
-            on_collision_begin = function(entity, other)
-                if(player(other) ~= nil and health(other) ~= nil) then
-                    --If the slime collided with a player
-                    if(position_tools.was_over(other, entity)) then
-                        --The player hit the slime on the top, kill myself (slime)
-                        health(entity):kill()
-                    else
-                        -- The slime touched the player on its side or top, kill the player.
-                        health(other):loose_pv(1)
-                    end
-                end
-            end,
+            polygons = {
+                ["body"] = {
+                    polygon = {
+                        points = {
+                            {
+                                x = 0,
+                                y = 38
+                            },
+                            {
+                                x = 64,
+                                y = 38
+                            },
+                            {
+                                x = 64,
+                                y = 64
+                            },
+                            {
+                                x = 0,
+                                y = 64
+                            },
+                        },
+                    },
+                    on_collision_begin = function(entity, other)
+                        if(player(other) ~= nil and health(other) ~= nil) then
+                            health(other):loose_pv(1)
+                        end
+                    end,
+                },
+                ["head"] = {
+                    polygon = {
+                        points = {
+                            {
+                                x = 0,
+                                y = 32
+                            },
+                            {
+                                x = 64,
+                                y = 32
+                            },
+                            {
+                                x = 64,
+                                y = 38
+                            },
+                            {
+                                x = 0,
+                                y = 38
+                            },
+                        },
+                    },
+                    on_collision_begin = function(entity, other)
+                        if(player(other) ~= nil and health(other) ~= nil) then
+                            health(entity):kill()
+                        end
+                    end,
+                }
+            },
         },
         ["render"] = {
             texture = "spritesheet_complete.png",

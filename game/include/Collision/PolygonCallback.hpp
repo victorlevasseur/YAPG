@@ -23,6 +23,8 @@ public:
     void callCollides(entityx::Entity entity1, entityx::Entity entity2);
     void callOnCollisionEnd(entityx::Entity entity1, entityx::Entity entity2);
 
+    bool isExclusive() const { return exclusive; }
+
 private:
     Polygon m_polygon;
 

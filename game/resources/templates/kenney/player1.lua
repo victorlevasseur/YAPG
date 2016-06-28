@@ -50,6 +50,32 @@ entity_template = {
             health = 1,
             max_health = 1
         },
+        ["collidable"] = {
+            polygons = {
+                ["body"] = {
+                    polygon = {
+                        points = {
+                            {
+                                x = 12,
+                                y = 50
+                            },
+                            {
+                                x = 52,
+                                y = 50
+                            },
+                            {
+                                x = 52,
+                                y = 128
+                            },
+                            {
+                                x = 12,
+                                y = 128
+                            },
+                        },
+                    },
+                },
+            },
+        },
         ["platformer_hitbox"] = {
             polygon = {
                 points = {
@@ -71,9 +97,6 @@ entity_template = {
                     },
                 }
             }
-        },
-        ["collider"] = {
-
         },
         ["render"] = {
             texture = "spritesheet_complete.png",
