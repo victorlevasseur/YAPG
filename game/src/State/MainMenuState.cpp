@@ -1,8 +1,11 @@
 #include "State/MainMenuState.hpp"
 
+#include <array>
 #include <cmath>
 
 #include <SFML/Graphics/RenderWindow.hpp>
+
+#include "imgui.h"
 
 #include <SFGUI/Box.hpp>
 #include <SFGUI/Button.hpp>
@@ -28,10 +31,7 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     m_logoSprite(*m_logoTexture),
     m_sfgui(sfgui),
     m_desktop(desktop),
-    m_mainMenuWindow(),
-    m_settingsWindow(),
-    m_playersKeysWidgets(),
-    m_lastSelectedKeyButton(),
+    m_selectedKeyButton(nullptr),
     m_playerAnimations(),
     m_playerSprite(m_resourcesManager.getTextures().requestResource("menu/spritesheet_players.png"), m_playerAnimations),
     m_draggingPlayer(false),
@@ -56,172 +56,6 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     //Logo
     m_logoSprite.setOrigin(m_logoSprite.getLocalBounds().width/2.f, m_logoSprite.getLocalBounds().height/2.f);
     m_logoSprite.setPosition(sf::Vector2f(512.f, 120.f));
-
-    //Main menu Window
-    m_mainMenuWindow = sfg::Window::Create(sfg::Window::BACKGROUND|sfg::Window::SHADOW);
-    auto windowBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.f);
-    auto playBox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 0.f);
-    auto playLevelEntry = sfg::Entry::Create("level.xml");
-
-    playLevelEntry->SetRequisition(sf::Vector2f(200.f, 0.f));
-    playBox->PackEnd(playLevelEntry, true, true);
-
-    auto playLevelButton = sfg::Button::Create("Play it!");
-    playLevelButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind([&](sfg::Entry::PtrConst levelPathEntry)
-    {
-        getStateEngine().pauseAndStartState
-            <level::LevelState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-            levelPathEntry->GetText(), m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
-        );
-    }, playLevelEntry));
-    playBox->PackEnd(playLevelButton, false, true);
-
-    windowBox->PackEnd(playBox);
-
-    auto editorButton = sfg::Button::Create("Level editor...");
-    editorButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
-    {
-        getStateEngine().pauseAndStartState
-            <editor::LevelEditorState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-            m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
-        );
-    });
-    windowBox->PackEnd(editorButton, true, true);
-
-    auto settingsAboutBox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL);
-    settingsAboutBox->SetSpacing(5.f);
-    windowBox->PackEnd(settingsAboutBox, true, true);
-
-    auto settingsButton = sfg::Button::Create("Settings...");
-    settingsButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
-    {
-        m_settingsWindow->Show(true);
-        m_desktop.BringToFront(m_settingsWindow);
-    });
-    settingsAboutBox->PackEnd(settingsButton, true, true);
-
-    auto aboutButton = sfg::Button::Create("About...");
-    aboutButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
-    {
-        m_aboutDialog->Show(true);
-        m_desktop.BringToFront(m_aboutDialog);
-    });
-    settingsAboutBox->PackEnd(aboutButton, true, true);
-
-    auto quitButton = sfg::Button::Create("Exit");
-    quitButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
-    {
-        getStateEngine().stopStateAndUnpause();
-    });
-    windowBox->PackEnd(quitButton);
-
-    m_mainMenuWindow->Add(windowBox);
-
-    m_mainMenuWindow->SetPosition(sf::Vector2f(
-        512.f - m_mainMenuWindow->GetAllocation().width/2.f,
-        300.f - m_mainMenuWindow->GetAllocation().height/2.f
-    ));
-    m_mainMenuWindow->SetTitle("Main menu");
-
-    //Settings window
-    m_settingsWindow = sfg::Window::Create(sfg::Window::TOPLEVEL|sfg::Window::SHADOW);
-    m_settingsWindow->Show(false);
-
-    auto settingsMainBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
-    m_settingsWindow->Add(settingsMainBox);
-
-    auto settingsNotebook = sfg::Notebook::Create();
-    settingsMainBox->PackEnd(settingsNotebook);
-
-    { //Keysettings tab
-        auto keySettingsBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
-        keySettingsBox->PackEnd(sfg::Label::Create("Players keys:"), false, true);
-
-        auto playersNotebook = sfg::Notebook::Create();
-        keySettingsBox->PackEnd(playersNotebook, true, true);
-
-        auto keyButtonClickCallback = [&](sfg::Button::Ptr button)
-        {
-            updateKeysButtonsFromSettings();
-            button->SetLabel("Type to set");
-            m_lastSelectedKeyButton = button;
-        };
-
-        for(int i = 0; i < 4; i++)
-        {
-            auto playerKeysTable = sfg::Table::Create();
-            m_playersKeysWidgets.push_back(PlayerKeysWidgets{
-                sfg::Button::Create("=="),
-                sfg::Button::Create("=="),
-                sfg::Button::Create("=="),
-            });
-
-            //Set callbacks
-            m_playersKeysWidgets.back().leftKeyButton->GetSignal(sfg::Widget::OnLeftClick).Connect(
-                std::bind(keyButtonClickCallback, m_playersKeysWidgets.back().leftKeyButton)
-            );
-            m_playersKeysWidgets.back().rightKeyButton->GetSignal(sfg::Widget::OnLeftClick).Connect(
-                std::bind(keyButtonClickCallback, m_playersKeysWidgets.back().rightKeyButton)
-            );
-            m_playersKeysWidgets.back().jumpKeyButton->GetSignal(sfg::Widget::OnLeftClick).Connect(
-                std::bind(keyButtonClickCallback, m_playersKeysWidgets.back().jumpKeyButton)
-            );
-
-            //Add the buttons
-            playerKeysTable->Attach(sfg::Label::Create("Left: "), sf::Rect<sf::Uint32>(0, 0, 1, 1), sfg::Table::FILL);
-            playerKeysTable->Attach(m_playersKeysWidgets.back().leftKeyButton, sf::Rect<sf::Uint32>(1, 0, 1, 1));
-            playerKeysTable->Attach(sfg::Label::Create("Right: "), sf::Rect<sf::Uint32>(0, 1, 1, 1), sfg::Table::FILL);
-            playerKeysTable->Attach(m_playersKeysWidgets.back().rightKeyButton, sf::Rect<sf::Uint32>(1, 1, 1, 1));
-            playerKeysTable->Attach(sfg::Label::Create("Jump: "), sf::Rect<sf::Uint32>(0, 2, 1, 1), sfg::Table::FILL);
-            playerKeysTable->Attach(m_playersKeysWidgets.back().jumpKeyButton, sf::Rect<sf::Uint32>(1, 2, 1, 1));
-
-            playersNotebook->AppendPage(playerKeysTable, sfg::Label::Create("Player " + std::to_string(i+1)));
-        }
-
-        updateKeysButtonsFromSettings();
-
-        settingsNotebook->AppendPage(keySettingsBox, sfg::Label::Create("Keyboard"));
-    }
-
-    auto backButton = sfg::Button::Create("Back");
-    backButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
-    {
-        m_settingsWindow->Show(false);
-    });
-    settingsMainBox->PackEnd(backButton);
-
-    m_settingsWindow->SetPosition(sf::Vector2f(
-        512.f - m_settingsWindow->GetAllocation().width/2.f,
-        300.f - m_settingsWindow->GetAllocation().height/2.f
-    ));
-    m_settingsWindow->SetTitle("Settings");
-
-    //About dialog
-    //Settings window
-    m_aboutDialog = sfg::Window::Create(sfg::Window::TOPLEVEL|sfg::Window::SHADOW);
-    m_aboutDialog->SetTitle("About YAPG");
-    m_aboutDialog->Show(false);
-
-    {
-        //TODO: Instanciate about dialog's widgets
-        auto aboutBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
-        aboutBox->SetSpacing(5.f);
-        m_aboutDialog->Add(aboutBox);
-
-        aboutBox->PackEnd(sfg::Label::Create("YAPG - Yet Another Platformer Game\n\nDeveloped by Victor Levasseur\n\nLibraries used :\n - Entityx 1.2\n - Lua\n - SFGUI 0.3.0 (modified)\n - SFML\n - Sol 2.5\n - Boost"));
-
-        auto closeButton = sfg::Button::Create("Close");
-        closeButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
-        {
-            m_aboutDialog->Show(false);
-        });
-        aboutBox->PackEnd(closeButton);
-    }
-
-    m_aboutDialog->SetPosition(sf::Vector2f(
-        512.f - m_aboutDialog->GetAllocation().width/2.f,
-        300.f - m_aboutDialog->GetAllocation().height/2.f
-    ));
 
     //Main menu animations
     // - The player
@@ -260,12 +94,12 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     m_sfguiLogo.setPosition(sf::Vector2f(420.f, 650.f));
     m_sfmlLogo.setPosition(sf::Vector2f(590.f, 650.f));
     m_solLogo.setPosition(sf::Vector2f(760.f, 600.f));
+
+    updateKeysButtonsFromSettings();
 }
 
 void MainMenuState::processEvent(sf::Event event, sf::RenderTarget &target)
 {
-    m_desktop.HandleEvent(event);
-
     if(event.type == sf::Event::MouseButtonPressed)
     {
         if(!m_draggingPlayer)
@@ -298,11 +132,14 @@ void MainMenuState::processEvent(sf::Event event, sf::RenderTarget &target)
     }
     else if(event.type == sf::Event::KeyPressed)
     {
-        if(m_lastSelectedKeyButton != nullptr)
+        if(m_selectedKeyButton != nullptr)
         {
             if(event.key.code != sf::Keyboard::Escape)
-                m_lastSelectedKeyButton->SetLabel(tools::keyToString(event.key.code));
-            m_lastSelectedKeyButton = nullptr;
+            {
+                strncpy(m_selectedKeyButton, tools::keyToString(event.key.code).data(), 31);
+                m_selectedKeyButton[31] = '\0';
+            }
+
             updateSettingsFromKeysButtons();
             updateKeysButtonsFromSettings();
         }
@@ -311,6 +148,95 @@ void MainMenuState::processEvent(sf::Event event, sf::RenderTarget &target)
 
 void MainMenuState::render(sf::RenderTarget& target)
 {
+    //ImGui interface
+    ImGui::SetNextWindowPosCenter();
+    ImGui::SetNextWindowSize(ImVec2(350, 200));
+    ImGui::Begin("YAPG - Main menu");
+        //Level selection
+        static char levelName[512] = "level.xml";
+        ImGui::InputText("", levelName, 512);
+        ImGui::SameLine();
+        if(ImGui::Button("Play !"))
+        {
+            getStateEngine().pauseAndStartState
+                <level::LevelState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
+                std::string(levelName), m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+            );
+        }
+
+        //Level editor
+        if(ImGui::Button("Level editor"))
+        {
+            getStateEngine().pauseAndStartState
+                <editor::LevelEditorState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
+                m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+            );
+        }
+
+        //Settings
+        if(ImGui::Button("Settings..."))
+        {
+            ImGui::OpenPopup("Settings");
+        }
+
+        //Settings popup
+        ImGui::SetNextWindowSize(ImVec2(350, 400));
+        if(ImGui::BeginPopupModal("Settings"))
+        {
+            if(ImGui::CollapsingHeader("Keyboard settings"))
+            {
+                ImGui::Indent();
+                for(std::size_t i = 0; i < 4; ++i)
+                {
+                    std::string label = "Player " + std::to_string(i + 1);
+                    if(ImGui::CollapsingHeader(label.data()))
+                    {
+                        ImGui::Text("Left key: ");
+                        ImGui::SameLine();
+                        if(ImGui::Button(m_playersKeys[i][0]))
+                        {
+                            m_selectedKeyButton = m_playersKeys[i][0];
+                        }
+
+                        ImGui::Text("Right key: ");
+                        ImGui::SameLine();
+                        if(ImGui::Button(m_playersKeys[i][1]))
+                        {
+                            m_selectedKeyButton = m_playersKeys[i][1];
+                        }
+
+                        ImGui::Text("Jump key: ");
+                        ImGui::SameLine();
+                        if(ImGui::Button(m_playersKeys[i][2]))
+                        {
+                            m_selectedKeyButton = m_playersKeys[i][2];
+                        }
+                    }
+                }
+                ImGui::Unindent();
+            }
+
+            if(ImGui::Button("Close"))
+            {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        //About
+        if(ImGui::Button("About..."))
+        {
+
+        }
+
+        //Quit button
+        if(ImGui::Button("Exit"))
+        {
+            getStateEngine().stopStateAndUnpause();
+        }
+    ImGui::End();
+
+    //Draw
     target.clear(sf::Color(140, 200, 255));
 
     target.draw(m_logoSprite);
@@ -322,62 +248,32 @@ void MainMenuState::render(sf::RenderTarget& target)
     target.draw(m_sfguiLogo);
     target.draw(m_sfmlLogo);
     target.draw(m_solLogo);
-
-    m_sfgui.Display(dynamic_cast<sf::RenderWindow&>(target));
 }
 
 void MainMenuState::doStart()
 {
     m_backgroundSound.play();
-
-    m_mainMenuWindow->Show(true);
-
-    m_desktop.Add(m_mainMenuWindow);
-    m_desktop.Add(m_settingsWindow);
-    m_desktop.Add(m_aboutDialog);
 }
 
 void MainMenuState::doStop()
 {
     m_backgroundSound.stop();
-
-    m_desktop.Remove(m_mainMenuWindow);
-    m_desktop.Remove(m_settingsWindow);
-    m_desktop.Remove(m_aboutDialog);
 }
 
 void MainMenuState::doPause()
 {
     m_backgroundSound.stop();
-
-    m_mainMenuWindow->Show(false); //Hide them to be able to show them again when unpaused
-    m_settingsWindow->Show(false);
-    m_aboutDialog->Show(false);
-
-    m_desktop.Remove(m_mainMenuWindow);
-    m_desktop.Remove(m_settingsWindow);
-    m_desktop.Remove(m_aboutDialog);
-    m_desktop.Refresh();
 }
 
 void MainMenuState::doUnpause()
 {
     m_backgroundSound.play();
-
-    m_desktop.Add(m_mainMenuWindow);
-    m_desktop.Add(m_settingsWindow);
-    m_desktop.Add(m_aboutDialog);
-    m_desktop.Refresh();
-
-    m_mainMenuWindow->Show(true); //Show again the main menu when unpaused
 }
 
 void MainMenuState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 {
     float scale = 1.f + 0.05f * std::sin(getTimeSinceStart().asSeconds());
     m_logoSprite.setScale(sf::Vector2f(scale, scale));
-
-    m_desktop.Update(dt.asSeconds());
 
     m_playerSprite.update(dt.asSeconds());
 
@@ -438,9 +334,14 @@ void MainMenuState::updateKeysButtonsFromSettings()
     {
         settings::KeySettings::PlayerKeys& playerKeys = m_settingsManager.getKeySettings().getPlayerKeys(i);
 
-        m_playersKeysWidgets[i].leftKeyButton->SetLabel(tools::keyToString(playerKeys.leftKey));
-        m_playersKeysWidgets[i].rightKeyButton->SetLabel(tools::keyToString(playerKeys.rightKey));
-        m_playersKeysWidgets[i].jumpKeyButton->SetLabel(tools::keyToString(playerKeys.jumpKey));
+        strncpy(m_playersKeys[i][0], tools::keyToString(playerKeys.leftKey).data(), 31);
+        m_playersKeys[i][0][31] = '\0';
+
+        strncpy(m_playersKeys[i][1], tools::keyToString(playerKeys.rightKey).data(), 31);
+        m_playersKeys[i][1][31] = '\0';
+
+        strncpy(m_playersKeys[i][2], tools::keyToString(playerKeys.jumpKey).data(), 31);
+        m_playersKeys[i][2][31] = '\0';
     }
 }
 
@@ -450,9 +351,9 @@ void MainMenuState::updateSettingsFromKeysButtons()
     {
         settings::KeySettings::PlayerKeys& playerKeys = m_settingsManager.getKeySettings().getPlayerKeys(i);
 
-        playerKeys.leftKey = tools::stringToKey(m_playersKeysWidgets[i].leftKeyButton->GetLabel());
-        playerKeys.rightKey = tools::stringToKey(m_playersKeysWidgets[i].rightKeyButton->GetLabel());
-        playerKeys.jumpKey = tools::stringToKey(m_playersKeysWidgets[i].jumpKeyButton->GetLabel());
+        playerKeys.leftKey = tools::stringToKey(std::string(m_playersKeys[i][0]));
+        playerKeys.rightKey = tools::stringToKey(std::string(m_playersKeys[i][1]));
+        playerKeys.jumpKey = tools::stringToKey(std::string(m_playersKeys[i][2]));
     }
 }
 

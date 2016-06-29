@@ -65,13 +65,10 @@ private:
     //GUI
     sfg::SFGUI& m_sfgui;
     sfg::Desktop& m_desktop;
-    sfg::Window::Ptr m_mainMenuWindow;
+
     // - Settings window
-    sfg::Window::Ptr m_settingsWindow;
-    std::vector<PlayerKeysWidgets> m_playersKeysWidgets;
-    sfg::Button::Ptr m_lastSelectedKeyButton;
-    // - About dialog
-    sfg::Window::Ptr m_aboutDialog;
+    std::array<std::array<char[32], 3>, 4> m_playersKeys;
+    char* m_selectedKeyButton;
 
     //Menu anim
     // - Player

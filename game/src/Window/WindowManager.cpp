@@ -22,6 +22,8 @@ WindowManager::WindowManager(state::StateEngine& engine, const sf::String& windo
 {
     m_engine.addObserver(*this);
 
+    m_window.setFramerateLimit(60);
+
     ImGui::SFML::Init(m_window);
 }
 
