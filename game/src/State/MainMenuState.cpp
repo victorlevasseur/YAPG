@@ -139,6 +139,7 @@ void MainMenuState::processEvent(sf::Event event, sf::RenderTarget &target)
                 strncpy(m_selectedKeyButton, tools::keyToString(event.key.code).data(), 31);
                 m_selectedKeyButton[31] = '\0';
             }
+            m_selectedKeyButton = nullptr;
 
             updateSettingsFromKeysButtons();
             updateKeysButtonsFromSettings();
@@ -188,30 +189,44 @@ void MainMenuState::render(sf::RenderTarget& target)
                 ImGui::Indent();
                 for(std::size_t i = 0; i < 4; ++i)
                 {
+                    ImGui::PushID(i);
                     std::string label = "Player " + std::to_string(i + 1);
                     if(ImGui::CollapsingHeader(label.data()))
                     {
                         ImGui::Text("Left key: ");
                         ImGui::SameLine();
+                        ImGui::PushID("left_key");
                         if(ImGui::Button(m_playersKeys[i][0]))
                         {
+                            updateKeysButtonsFromSettings();
                             m_selectedKeyButton = m_playersKeys[i][0];
+                            strncpy(m_playersKeys[i][0], "...", 31);
                         }
+                        ImGui::PopID();
 
                         ImGui::Text("Right key: ");
                         ImGui::SameLine();
+                        ImGui::PushID("right_key");
                         if(ImGui::Button(m_playersKeys[i][1]))
                         {
+                            updateKeysButtonsFromSettings();
                             m_selectedKeyButton = m_playersKeys[i][1];
+                            strncpy(m_playersKeys[i][1], "...", 31);
                         }
+                        ImGui::PopID();
 
                         ImGui::Text("Jump key: ");
                         ImGui::SameLine();
+                        ImGui::PushID("jump_key");
                         if(ImGui::Button(m_playersKeys[i][2]))
                         {
+                            updateKeysButtonsFromSettings();
                             m_selectedKeyButton = m_playersKeys[i][2];
+                            strncpy(m_playersKeys[i][2], "...", 31);
                         }
+                        ImGui::PopID();
                     }
+                    ImGui::PopID();
                 }
                 ImGui::Unindent();
             }
