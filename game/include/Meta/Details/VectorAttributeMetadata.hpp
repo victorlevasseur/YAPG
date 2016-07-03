@@ -20,13 +20,16 @@ class AttributeMetadata<C, std::vector<T>> : public AttributeMetadataBase
 public:
     AttributeMetadata(
         std::vector<T> C::*vectorMember,
+        std::vector<T>(C::*getter)() const = nullptr,
+        void(C::*setter)(std::vector<T>) = nullptr,
         bool loadableFromLua = true,
         bool gettableFromLua = true,
         bool settableFromLua = true
         ) :
         AttributeMetadataBase(loadableFromLua, gettableFromLua, settableFromLua),
-        m_vectorMember(vectorMember)
-
+        m_member(vectorMember),
+        m_getter(getter),
+        m_setter(setter)
     {
 
     }
@@ -50,11 +53,11 @@ public:
 
         const sol::table& table = luaObject.as<sol::table>();
 
-        ((*object).*m_vectorMember).clear();
+        ((*object).*m_member).clear();
         table.for_each([&](const sol::object& key, const sol::object& value) {
-            ((*object).*m_vectorMember).emplace_back();
+            ((*object).*m_member).emplace_back();
             MetadataStore::getMetadata<T>().load(
-                &(((*object).*m_vectorMember).back()),
+                &(((*object).*m_member).back()),
                 value
             );
         });
@@ -106,7 +109,7 @@ private:
     typename std::enable_if<std::is_copy_constructible<U>::value, void>::type
     getAsLuaTableImpl(const C* object, sol::table result) const
     {
-        const std::vector<U>& vector = object->*m_vectorMember;
+        const std::vector<U> vector = getMemberValue(object);
         for(unsigned int i = 0; i < vector.size(); i++)
         {
             result.set(static_cast<int>(i+1), U(vector[i]));
@@ -124,8 +127,7 @@ private:
     typename std::enable_if<std::is_copy_assignable<U>::value, void>::type
     setAsLuaTableImpl(C* object, sol::table value) const
     {
-        std::vector<U>& vector = object->*m_vectorMember;
-        vector.clear();
+        std::vector<U> vector;
         value.for_each([&](const sol::object& indexObject, const sol::object& element)
         {
             if(!indexObject.is<int>())
@@ -141,6 +143,8 @@ private:
             //Set the value
             vector[index-1] = element.as<U>();
         });
+
+        setMemberValue(object, vector);
     }
 
     template<typename U = T>
@@ -150,7 +154,25 @@ private:
         std::cout << "Script trying to set a value not convertible from a lua table !" << std::endl;
     }
 
-    std::vector<T> C::*m_vectorMember;
+    std::vector<T> getMemberValue(const C* object) const
+    {
+        if(m_getter != nullptr)
+            return (object->*m_getter)();
+        else
+            return object->*m_member;
+    }
+
+    void setMemberValue(C* object, std::vector<T> value) const
+    {
+        if(m_setter != nullptr)
+            return (object->*m_setter)(value);
+        else
+            object->*m_member = value;
+    }
+
+    std::vector<T> C::*m_member;
+    std::vector<T>(C::*m_getter)() const;
+    void(C::*m_setter)(std::vector<T>);
 };
 
 }

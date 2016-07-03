@@ -16,12 +16,16 @@ class AttributeMetadata : public AttributeMetadataBase
 public:
     AttributeMetadata(
         T C::*member,
+        T(C::*getter)() const = nullptr,
+        void(C::*setter)(T) = nullptr,
         bool loadableFromLua = true,
         bool gettableFromLua = true,
         bool settableFromLua = true
         ) :
         AttributeMetadataBase(loadableFromLua, gettableFromLua, settableFromLua),
-        m_member(member)
+        m_member(member),
+        m_getter(getter),
+        m_setter(setter)
     {
 
     }
@@ -70,7 +74,7 @@ private:
     template<typename U = T>
     typename std::enable_if<std::is_copy_constructible<U>::value && std::is_nothrow_destructible<U>::value, boost::any>::type getAsAnyImpl(const C* object) const
     {
-        return boost::any(object->*m_member);
+        return boost::any(getMemberValue(object));
     }
 
     template<typename U = T>
@@ -85,7 +89,7 @@ private:
     typename std::enable_if<std::is_copy_constructible<U>::value && std::is_nothrow_destructible<U>::value, void>::type setAsAnyImpl(C* object, const boost::any& value) const
     {
         if(value.type() == typeid(U))
-            object->*m_member = boost::any_cast<U>(value);
+            setMemberValue(object, boost::any_cast<U>(value));
         else
             std::cout << "Script trying to set a value as boost::any but with an invalid type !" << std::endl;
     }
@@ -96,10 +100,28 @@ private:
         std::cout << "Script to set a value as boost::any but the value is not supported by boost::any (not copy constructible or not nothrow destructible) !" << std::endl;
     }
 
+    T getMemberValue(const C* object) const
+    {
+        if(m_getter != nullptr)
+            return (object->*m_getter)();
+        else
+            return object->*m_member;
+    }
+
+    void setMemberValue(C* object, T value) const
+    {
+        if(m_setter != nullptr)
+            return (object->*m_setter)(value);
+        else
+            object->*m_member = value;
+    }
+
     /**
      * Pointer to the class attribute
      */
     T C::*m_member;
+    T(C::*m_getter)() const;
+    void(C::*m_setter)(T);
 };
 
 }

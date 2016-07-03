@@ -30,7 +30,7 @@ void RenderComponent::registerComponent(lua::LuaState& state)
 {
     meta::MetadataStore::registerClass<RenderComponent>("RenderComponent")
         .declareAttribute("texture", &RenderComponent::textureName)
-        .declareAttribute("current_animation", &RenderComponent::currentAnimation)
+        .declareAttribute("current_animation", &RenderComponent::currentAnimation, &RenderComponent::getCurrentAnimation, &RenderComponent::setCurrentAnimation)
         .declareAttribute("animations", &RenderComponent::animations)
         .declareAttribute("flipped", &RenderComponent::flipped)
         .declareAttribute("on_animation_changed", &RenderComponent::onAnimationChangedFunc)
@@ -49,7 +49,7 @@ void RenderComponent::registerComponent(lua::LuaState& state)
     state.declareComponentGetter<RenderComponent>("render");
 }
 
-void RenderComponent::setCurrentAnimation(const std::string& animationName)
+void RenderComponent::setCurrentAnimation(std::string animationName)
 {
     currentAnimation = animationName;
     emit<systems::AnimationChangedMessage>(getEntity());

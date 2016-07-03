@@ -20,13 +20,16 @@ class AttributeMetadata<C, std::map<T, U>> : public AttributeMetadataBase
 public:
     AttributeMetadata(
         std::map<T, U> C::*mapMember,
+        std::map<T, U>(C::*getter)() const = nullptr,
+        void(C::*setter)(std::map<T, U>) = nullptr,
         bool loadableFromLua = true,
         bool gettableFromLua = true,
         bool settableFromLua = true
         ) :
         AttributeMetadataBase(loadableFromLua, gettableFromLua, settableFromLua),
-        m_mapMember(mapMember)
-
+        m_member(mapMember),
+        m_getter(getter),
+        m_setter(setter)
     {
 
     }
@@ -50,7 +53,7 @@ public:
 
         const sol::table& table = luaObject.as<sol::table>();
 
-        ((*object).*m_mapMember).clear();
+        ((*object).*m_member).clear();
         table.for_each([&](const sol::object& key, const sol::object& value) {
             T loadedKey;
             U loaderValue;
@@ -58,7 +61,7 @@ public:
             MetadataStore::getMetadata<T>().load(&loadedKey, key);
             MetadataStore::getMetadata<U>().load(&loaderValue, value);
 
-            ((*object).*m_mapMember).emplace(std::make_pair(
+            ((*object).*m_member).emplace(std::make_pair(
                 std::move(loadedKey),
                 std::move(loaderValue)
             ));
@@ -80,7 +83,25 @@ public:
     //TODO: Implement get/setAsLuaTable
 
 private:
-    std::map<T, U> C::*m_mapMember;
+    std::map<T, U> getMemberValue(const C* object) const
+    {
+        if(m_getter != nullptr)
+            return (object->*m_getter)();
+        else
+            return object->*m_member;
+    }
+
+    void setMemberValue(C* object, std::map<T, U> value) const
+    {
+        if(m_setter != nullptr)
+            return (object->*m_setter)(value);
+        else
+            object->*m_member = value;
+    }
+
+    std::map<T, U> C::*m_member;
+    std::map<T, U>(C::*m_getter)() const;
+    void(C::*m_setter)(std::map<T, U>);
 };
 
 }

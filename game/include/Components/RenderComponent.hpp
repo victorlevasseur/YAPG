@@ -27,7 +27,7 @@ public:
 
     std::string currentAnimation;
     std::string getCurrentAnimation() const { return currentAnimation; }
-    void setCurrentAnimation(const std::string& animationName);
+    void setCurrentAnimation(std::string animationName);
 
     std::map<std::string, animation::Animation> animations;
     bool flipped;

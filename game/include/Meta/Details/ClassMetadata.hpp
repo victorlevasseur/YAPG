@@ -57,7 +57,21 @@ public:
     template<typename T>
     ClassMetadata<C>& declareAttribute(const std::string& name, T C::*member, bool loadableFromLua = true, bool gettableFromLua = true, bool settableFromLua = true)
     {
-        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase>(new AttributeMetadata<C, T>(member, loadableFromLua, gettableFromLua, settableFromLua)));
+        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase>(new AttributeMetadata<C, T>(member, nullptr, nullptr, loadableFromLua, gettableFromLua, settableFromLua)));
+        return *this;
+    }
+
+    template<typename T>
+    ClassMetadata<C>& declareAttribute(const std::string& name, T(C::*getter)() const = nullptr, void(C::*setter)(T) = nullptr, bool gettableFromLua = true, bool settableFromLua = true)
+    {
+        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase>(new AttributeMetadata<C, T>(nullptr, getter, setter, false, gettableFromLua, settableFromLua)));
+        return *this;
+    }
+
+    template<typename T>
+    ClassMetadata<C>& declareAttribute(const std::string& name, T C::*member, T(C::*getter)() const, void(C::*setter)(T) = nullptr, bool loadableFromLua = true, bool gettableFromLua = true, bool settableFromLua = true)
+    {
+        m_attributes.emplace(name, std::unique_ptr<AttributeMetadataBase>(new AttributeMetadata<C, T>(member, getter, setter, loadableFromLua, gettableFromLua, settableFromLua)));
         return *this;
     }
 
