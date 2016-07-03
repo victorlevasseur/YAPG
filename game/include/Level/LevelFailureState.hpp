@@ -11,7 +11,6 @@
 
 #include <SFGUI/Desktop.hpp>
 #include <SFGUI/SFGUI.hpp>
-#include <SFGUI/Window.hpp>
 
 #include "Async/AsyncExecutor.hpp"
 #include "Resources/ResourcesManager.hpp"
@@ -53,7 +52,6 @@ private:
 
     sfg::SFGUI& m_sfgui;
     sfg::Desktop& m_desktop;
-    sfg::Window::Ptr m_window;
 };
 
 }
