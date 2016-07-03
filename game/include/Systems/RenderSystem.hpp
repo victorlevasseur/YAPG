@@ -19,13 +19,12 @@
 namespace systems
 {
 
-struct ChangeAnimationMessage
+struct AnimationChangedMessage
 {
     entityx::Entity entity;
-    std::string animationName;
 };
 
-class RenderSystem : public entityx::System<RenderSystem>, public messaging::Receiver<ChangeAnimationMessage>
+class RenderSystem : public entityx::System<RenderSystem>, public messaging::Receiver<AnimationChangedMessage>
 {
 public:
     struct Renderable
@@ -41,7 +40,7 @@ public:
 
     void render(sf::RenderTarget& target);
 
-    virtual void receive(const ChangeAnimationMessage& msg);
+    virtual void receive(const AnimationChangedMessage& msg);
 
     sf::View getView() const { return m_renderingView; }
     void setView(sf::View view) { m_renderingView = view; m_viewInit = true; }

@@ -7,6 +7,7 @@
 #include <string>
 
 #include <SFML/Graphics/Image.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 #include "Level/SerializedEntityGetter.hpp"
 #include "Lua/sol.hpp"
@@ -84,10 +85,10 @@ public:
     std::string getFriendlyName() const { return m_friendlyName; }
 
     bool isAbstract() const { return m_abstract; }
-
     bool isPlayer() const;
 
     sf::Image getImage() const;
+    sf::Texture getTexture() const;
 
     const std::map<std::string, Parameter>& getParameters() const { return m_parameters; }
 

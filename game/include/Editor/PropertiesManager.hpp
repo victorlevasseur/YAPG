@@ -2,6 +2,7 @@
 #define YAPG_GAME_STATE_EDITOR_PROPERTIESMANAGER_H
 
 #include <map>
+#include <memory>
 #include <typeindex>
 #include <vector>
 
@@ -18,21 +19,22 @@ namespace editor
 class PropertiesManager
 {
 public:
-    PropertiesManager(sfg::ScrolledWindow::Ptr propertiesScrolled);
+    PropertiesManager();
 
     void setCurrentEntity(entityx::Entity currentEntity);
+
+    void display();
 
     template<typename T, typename U>
     void registerPropertyWidget();
 
 private:
-    sfg::ScrolledWindow::Ptr m_propertiesScrolled;
-    sfg::Table::Ptr m_propertiesTable;
-    std::vector<std::unique_ptr<PropertyWidget>> m_propertiesWidgets;
+    std::map<std::type_index, std::function<std::unique_ptr<PropertyWidget>(entityx::Entity, const lua::EntityTemplate::Parameter&)>> m_registeredWidgets;
 
     entityx::Entity m_currentEntity;
 
-    std::map<std::type_index, std::function<std::unique_ptr<PropertyWidget>(entityx::Entity, const lua::EntityTemplate::Parameter&)>> m_registeredWidgets;
+    std::vector<std::string> m_propertiesNames;
+    std::vector<std::unique_ptr<PropertyWidget>> m_propertiesWidgets;
 };
 
 }

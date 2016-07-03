@@ -51,7 +51,8 @@ void RenderComponent::registerComponent(lua::LuaState& state)
 
 void RenderComponent::setCurrentAnimation(const std::string& animationName)
 {
-    emit<systems::ChangeAnimationMessage>(getEntity(), animationName);
+    currentAnimation = animationName;
+    emit<systems::AnimationChangedMessage>(getEntity());
 }
 
 std::ostream& operator<<(std::ostream& stream, const RenderComponent& component)

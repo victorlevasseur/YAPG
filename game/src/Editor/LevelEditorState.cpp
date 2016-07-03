@@ -3,6 +3,9 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 
+#include "imgui.h"
+#include "imgui-SFML.h"
+
 #include <SFGUI/Box.hpp>
 #include <SFGUI/Button.hpp>
 #include <SFGUI/RadioButton.hpp>
@@ -32,14 +35,11 @@ LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::A
     m_guiView(sf::FloatRect(0.f, 0.f, 1024.f, 768.f)),
     m_sfgui(sfgui),
     m_desktop(desktop),
-    m_fileToolbar(),
-    m_filepathLabel(),
-    m_toolsToolbar(),
-    m_toolsSettingsToolbar(),
-    m_templatesListBox(),
+    m_editionMode(EditionMode::Insertion),
     m_templatesNames(),
-    m_propertiesScrolled(),
-    m_propertiesManager(nullptr),
+    m_templatesTextures(),
+    m_selectedTemplate(std::string::npos),
+    m_propertiesManager(),
     m_playerTemplatesNames(),
     m_level(m_luaState, level::Level::LevelMode::EditMode),
     m_filepath(),
@@ -54,8 +54,16 @@ LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::A
     m_draggingView(false),
     m_mousePosBeforeDrag(),
     m_spawnSprite(),
-    m_spawnTexture(resourcesManager.getTextures().requestResource("editor/spawn.png"))
+    m_spawnTexture(resourcesManager.getTextures().requestResource("editor/spawn.png")),
+    m_iconRenderTexture()
 {
+    m_iconRenderTexture.create(48, 48);
+
+    m_propertiesManager.registerPropertyWidget<float, editor::EntryPropertyWidget<float>>();
+    m_propertiesManager.registerPropertyWidget<int, editor::EntryPropertyWidget<int>>();
+    m_propertiesManager.registerPropertyWidget<unsigned int, editor::EntryPropertyWidget<unsigned int>>();
+    m_propertiesManager.registerPropertyWidget<std::string, editor::EntryPropertyWidget<std::string, true>>();
+
     initSystemManager();
     initGUI();
     updateTemplatesList();
@@ -77,10 +85,10 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             event.mouseButton.button == sf::Mouse::Left &&
             isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
         {
-            if(m_templatesListBox->GetSelectedItemsCount() > 0)
+            if(m_selectedTemplate != std::string::npos)
             {
                 //Get the template, its width and height (just to check it's available!)
-                const lua::EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
+                const lua::EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_selectedTemplate]);
                 if(selectedTemplate.getComponentsTable().get<sol::object>("position").is<sol::table>())
                 {
                     sol::table positionComponent = selectedTemplate.getComponentsTable().get<sol::object>("position").as<sol::table>();
@@ -101,10 +109,10 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             //When not in insertion process, move the insertion pos according to the mouse
             if(!m_isInserting)
             {
-                if(m_templatesListBox->GetSelectedItemsCount() > 0)
+                if(m_selectedTemplate != std::string::npos)
                 {
                     //Get the template, its width and height
-                    const lua::EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
+                    const lua::EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_selectedTemplate]);
                     if(selectedTemplate.getComponentsTable().get<sol::object>("position").is<sol::table>())
                     {
                         sol::table positionComponent = selectedTemplate.getComponentsTable().get<sol::object>("position").as<sol::table>();
@@ -134,17 +142,17 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             if(m_isInserting)
             {
                 //Insert the new entities when the mouse is released.
-                if(m_templatesListBox->GetSelectedItemsCount() > 0)
+                if(m_selectedTemplate != std::string::npos)
                 {
                     //Get the template of the entities to insert
-                    const lua::EntityTemplate& entityTemplate = m_luaState.getTemplate(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()]);
+                    const lua::EntityTemplate& entityTemplate = m_luaState.getTemplate(m_templatesNames[m_selectedTemplate]);
 
                     //Insert all the new entities
                     for(int i = std::min(0, m_insertionCount.x); i <= std::max(0, m_insertionCount.x); ++i)
                     {
                         for(int j = std::min(0, m_insertionCount.y); j <= std::max(0, m_insertionCount.y); ++j)
                         {
-                            entityx::Entity newEntity = m_level.createNewEntity(m_templatesNames[m_templatesListBox->GetSelectedItemIndex()], true);
+                            entityx::Entity newEntity = m_level.createNewEntity(m_templatesNames[m_selectedTemplate], true);
 
                             try
                             {
@@ -186,7 +194,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), getLevelView());
 
             m_selectedEntity = getFirstEntityUnderMouse(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target);
-            m_propertiesManager->setCurrentEntity(m_selectedEntity);
+            m_propertiesManager.setCurrentEntity(m_selectedEntity);
 
             if(m_selectedEntity)
             {
@@ -215,7 +223,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 
                     m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", std::round(newPosition.x));
                     m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", std::round(newPosition.y));
-                    m_propertiesManager->setCurrentEntity(m_selectedEntity);
+                    m_propertiesManager.setCurrentEntity(m_selectedEntity);
                 }
             }
         }
@@ -272,6 +280,95 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 
 void LevelEditorState::render(sf::RenderTarget& target)
 {
+    if(ImGui::BeginMainMenuBar())
+    {
+        if(ImGui::BeginMenu("File"))
+        {
+            if(ImGui::MenuItem("New level"))
+            {
+                newLevel();
+            }
+
+            if(ImGui::MenuItem("Open..."))
+            {
+                openLevel();
+            }
+
+            if(ImGui::MenuItem("Save"))
+            {
+                saveLevel();
+            }
+
+            if(ImGui::MenuItem("Save as..."))
+            {
+                saveAsLevel();
+            }
+
+            if(ImGui::MenuItem("Exit"))
+            {
+                getStateEngine().stopStateAndUnpause();
+            }
+
+            ImGui::EndMenu();
+        }
+        ImGui::MenuItem(m_filepath == "" ? "(level not saved)" : m_filepath.data(), NULL, false, false);
+
+        ImGui::EndMainMenuBar();
+    }
+
+    ImGui::SetNextWindowPos(ImVec2(0.f, 25.f));
+    ImGui::Begin("Edition mode");
+        ImGui::RadioButton("Insertion mode", reinterpret_cast<int*>(&m_editionMode), EditionMode::Insertion);
+        ImGui::RadioButton("Modify mode", reinterpret_cast<int*>(&m_editionMode), EditionMode::Modify);
+        ImGui::RadioButton("Spawn config.", reinterpret_cast<int*>(&m_editionMode), EditionMode::SpawnConfig);
+    ImGui::End();
+
+    ImGui::SetNextWindowPos(ImVec2(1024.f-320.f, 25.f));
+    ImGui::SetNextWindowSize(ImVec2(320.f, 300.f));
+    ImGui::Begin("Templates");
+        for(std::size_t i = 0; i < m_templatesNames.size(); ++i)
+        {
+            ImGui::PushID(i);
+
+            bool stylePushed = false;
+            if(i == m_selectedTemplate)
+            {
+                stylePushed = true;
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.f));
+            }
+            if(ImGui::ImageButton(m_templatesTextures[i]))
+            {
+                m_selectedTemplate = i;
+            }
+            if(stylePushed)
+                ImGui::PopStyleColor();
+
+            ImGui::SameLine();
+
+            if(i == m_selectedTemplate)
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 1.f, 0.f, 1.f));
+            ImGui::Text(m_templatesNames[i].substr(0, 32).data());
+            if(i == m_selectedTemplate)
+                ImGui::PopStyleColor();
+
+            ImGui::PopID();
+        }
+    ImGui::End();
+
+    ImGui::SetNextWindowPos(ImVec2(1024.f-320.f, 325.f));
+    ImGui::SetNextWindowSize(ImVec2(320.f, 300.f));
+    ImGui::Begin("Properties");
+        if(m_selectedEntity)
+        {
+            ImGui::Text("Entity ID: %d.%d", m_selectedEntity.id().index(), m_selectedEntity.id().version());
+            m_propertiesManager.display();
+        }
+        else
+        {
+            ImGui::TextWrapped("Select an entity to display its properties here.");
+        }
+    ImGui::End();
+
     target.clear(sf::Color(0, 180, 255));
 
     //Render the level
@@ -326,30 +423,22 @@ void LevelEditorState::render(sf::RenderTarget& target)
 
 void LevelEditorState::doStart()
 {
-    m_desktop.Add(m_fileToolbar);
-    m_desktop.Add(m_toolsToolbar);
-    m_desktop.Add(m_toolsSettingsToolbar);
+
 }
 
 void LevelEditorState::doStop()
 {
-    m_desktop.Remove(m_fileToolbar);
-    m_desktop.Remove(m_toolsToolbar);
-    m_desktop.Remove(m_toolsSettingsToolbar);
+
 }
 
 void LevelEditorState::doPause()
 {
-    m_fileToolbar->Show(false);
-    m_toolsToolbar->Show(false);
-    m_toolsSettingsToolbar->Show(false);
+
 }
 
 void LevelEditorState::doUnpause()
 {
-    m_fileToolbar->Show(true);
-    m_toolsToolbar->Show(true);
-    m_toolsSettingsToolbar->Show(true);
+
 }
 
 void LevelEditorState::doUpdate(sf::Time dt, sf::RenderTarget &target)
@@ -361,153 +450,7 @@ void LevelEditorState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 
 void LevelEditorState::initGUI()
 {
-    //FILE TOOLBAR
-    m_fileToolbar = sfg::Window::Create(sfg::Window::BACKGROUND);
-    {
-        auto verticalFileBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
-        verticalFileBox->SetSpacing(5.f);
-        m_fileToolbar->Add(verticalFileBox);
 
-        m_filepathLabel = sfg::Label::Create("(Not saved yet)");
-        verticalFileBox->PackEnd(m_filepathLabel);
-
-        auto fileBox = sfg::Box::Create();
-        fileBox->SetSpacing(5.f);
-        verticalFileBox->PackEnd(fileBox);
-
-        auto newButton = sfg::Button::Create("New level");
-        fileBox->PackEnd(newButton);
-        newButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&LevelEditorState::newLevel, this));
-
-        auto openButton = sfg::Button::Create("Open level...");
-        fileBox->PackEnd(openButton);
-        openButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&LevelEditorState::openLevel, this));
-
-        auto saveButton = sfg::Button::Create("Save");
-        fileBox->PackEnd(saveButton);
-        saveButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&LevelEditorState::saveLevel, this));
-
-        auto saveAsButton = sfg::Button::Create("Save as...");
-        fileBox->PackEnd(saveAsButton);
-        saveAsButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&LevelEditorState::saveAsLevel, this));
-
-        fileBox->PackEnd(sfg::Separator::Create(sfg::Separator::Orientation::VERTICAL));
-
-        auto backButton = sfg::Button::Create("Return to menu");
-        backButton->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
-        {
-            getStateEngine().stopStateAndUnpause();
-        });
-        fileBox->PackEnd(backButton);
-    }
-
-    //TOOLS TOOLBAR
-    m_toolsToolbar = sfg::Window::Create(sfg::Window::BACKGROUND|sfg::Window::TITLEBAR);
-    m_toolsToolbar->SetTitle("Tools");
-    m_toolsToolbar->SetPosition(sf::Vector2f(
-        0.f,
-        m_fileToolbar->GetAllocation().top + m_fileToolbar->GetAllocation().height
-    ));
-    m_toolsToolbar->SetRequisition(sf::Vector2f(
-        300.f,
-        0.f
-    ));
-
-    auto toolsBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
-    m_toolsToolbar->Add(toolsBox);
-    toolsBox->SetSpacing(2.f);
-
-    auto radioGroup = sfg::RadioButtonGroup::Create();
-
-    m_insertionTool = sfg::RadioButton::Create("Insert new entities", radioGroup);
-    m_modifyTool = sfg::RadioButton::Create("Modify placed entities", radioGroup);
-    m_spawnConfigTool = sfg::RadioButton::Create("Set spawn configuration", radioGroup);
-
-    m_insertionTool->SetActive(true);
-    toolsBox->PackEnd(m_insertionTool);
-    toolsBox->PackEnd(m_modifyTool);
-    toolsBox->PackEnd(m_spawnConfigTool);
-
-    //TEMPLATES TOOLBAR
-    m_toolsSettingsToolbar = sfg::Window::Create(sfg::Window::BACKGROUND|sfg::Window::TITLEBAR);
-    m_toolsSettingsToolbar->SetTitle("Templates");
-    m_toolsSettingsToolbar->SetPosition(sf::Vector2f(
-        0.f,
-        m_toolsToolbar->GetAllocation().top + m_toolsToolbar->GetAllocation().height
-    ));
-    m_toolsSettingsToolbar->SetRequisition(sf::Vector2f(
-        300.f,
-        400.f
-    ));
-
-    auto toolsSettingsBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
-    m_toolsSettingsToolbar->Add(toolsSettingsBox);
-
-    m_templatesListBox = sfg::ListBox::Create();
-    m_templatesListBox->SetItemTextPolicy(sfg::ListBox::ItemTextPolicy::SHRINK);
-    m_templatesListBox->SetImagesSize(sf::Vector2f(32.f, 32.f));
-    toolsSettingsBox->PackEnd(m_templatesListBox);
-
-    m_propertiesScrolled = sfg::ScrolledWindow::Create();
-    m_propertiesScrolled->Show(false);
-    toolsSettingsBox->PackEnd(m_propertiesScrolled);
-
-    m_spawnConfigBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
-    m_spawnConfigBox->SetSpacing(5.f);
-    m_spawnConfigBox->Show(false);
-    toolsSettingsBox->PackEnd(m_spawnConfigBox);
-    {
-        m_spawnConfigBox->PackEnd(sfg::Label::Create("Left click on the level to\nset the spawn position."), false, true);
-
-        m_spawnConfigTable = sfg::Table::Create();
-        m_spawnConfigBox->PackEnd(m_spawnConfigTable, false, true);
-
-        m_spawnConfigTable->Attach(sfg::Label::Create("Player template: "), sf::Rect<sf::Uint32>(0u, 0u, 1u, 1u), sfg::Table::FILL, sfg::Table::FILL);
-
-        m_playerTemplateComboBox = sfg::ComboBox::Create();
-        m_playerTemplateComboBox->GetSignal(sfg::ComboBox::OnSelect).Connect([&]()
-        {
-            //Set the player template
-            std::string newPlayerTemplate = m_playerTemplatesNames[m_playerTemplateComboBox->GetSelectedItem()];
-            if(m_level.getPlayersTemplates().size() < 1)
-                m_level.getPlayersTemplates().push_back(newPlayerTemplate);
-            else
-                m_level.getPlayersTemplates()[0] = newPlayerTemplate;
-        });
-        m_spawnConfigTable->Attach(m_playerTemplateComboBox, sf::Rect<sf::Uint32>(1u, 0u, 1u, 1u), sfg::Table::EXPAND|sfg::Table::FILL, sfg::Table::FILL);
-    }
-
-    //END OF TOOLS TOOLBAR
-    auto enableCorrectToolSettings = [&](std::weak_ptr<sfg::Widget> toEnable, sf::String title)
-    {
-        m_templatesListBox->Show(false);
-        m_propertiesScrolled->Show(false);
-        m_spawnConfigBox->Show(false);
-
-        m_toolsSettingsToolbar->SetTitle(title);
-
-        if(toEnable.lock())
-            toEnable.lock()->Show(true);
-    };
-
-    m_insertionTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
-        std::bind(enableCorrectToolSettings, m_templatesListBox, "Templates")
-    );
-
-    m_modifyTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
-        std::bind(enableCorrectToolSettings, m_propertiesScrolled, "Properties")
-    );
-
-    m_spawnConfigTool->GetSignal(sfg::ToggleButton::OnToggle).Connect(
-        std::bind(enableCorrectToolSettings, m_spawnConfigBox, "Spawn configuration")
-    );
-
-    //Init the properties manager
-    m_propertiesManager.reset(new PropertiesManager(m_propertiesScrolled));
-    m_propertiesManager->registerPropertyWidget<float, editor::EntryPropertyWidget<float>>();
-    m_propertiesManager->registerPropertyWidget<int, editor::EntryPropertyWidget<int>>();
-    m_propertiesManager->registerPropertyWidget<unsigned int, editor::EntryPropertyWidget<unsigned int>>();
-    m_propertiesManager->registerPropertyWidget<std::string, editor::EntryPropertyWidget<std::string, true>>();
 }
 
 void LevelEditorState::initSystemManager()
@@ -528,7 +471,6 @@ void LevelEditorState::newLevel()
     m_level.LoadFromFile("newlevel.xml");
     m_filepath = std::string();
 
-    m_filepathLabel->SetText("(not saved yet)");
     updateGuiFromLevel();
 }
 
@@ -539,8 +481,6 @@ void LevelEditorState::openLevel()
     {
         m_level.LoadFromFile(fileDialog.getFilename());
         m_filepath = fileDialog.getFilename();
-
-        m_filepathLabel->SetText(m_filepath);
         updateGuiFromLevel();
     }
 }
@@ -560,42 +500,32 @@ void LevelEditorState::saveAsLevel()
     {
         m_level.SaveToFile(fileDialog.getFilename());
         m_filepath = fileDialog.getFilename();
-
-        m_filepathLabel->SetText(m_filepath);
     }
 }
 
 void LevelEditorState::updateGuiFromLevel()
 {
-    m_playerTemplateComboBox->SelectItem(0);
+    //TODO:m_playerTemplateComboBox->SelectItem(0);
     if(m_level.getPlayersTemplates().size() > 0)
     {
         auto it = std::find(m_playerTemplatesNames.cbegin(), m_playerTemplatesNames.cend(), m_level.getPlayersTemplates()[0]);
         if(it != m_playerTemplatesNames.cend())
         {
-            m_playerTemplateComboBox->SelectItem(std::distance(m_playerTemplatesNames.cbegin(), it));
+            //TODO:m_playerTemplateComboBox->SelectItem(std::distance(m_playerTemplatesNames.cbegin(), it));
         }
     }
 }
 
 LevelEditorState::EditionMode LevelEditorState::getEditionMode() const
 {
-    if(m_insertionTool->IsActive())
-        return EditionMode::Insertion;
-    else if(m_modifyTool->IsActive())
-        return EditionMode::Modify;
-    else if(m_spawnConfigTool->IsActive())
-        return EditionMode::SpawnConfig;
-    return EditionMode::Unknown;
+    return m_editionMode;
 }
 
 void LevelEditorState::updateTemplatesList()
 {
     //Clear all buttons
-    m_templatesListBox->Clear();
-    m_playerTemplateComboBox->Clear();
-    m_playerTemplateComboBox->AppendItem("No player!");
     m_templatesNames.clear();
+    m_templatesTextures.clear();
     m_playerTemplatesNames.clear();
     m_playerTemplatesNames.push_back("");
 
@@ -609,13 +539,13 @@ void LevelEditorState::updateTemplatesList()
             if(entityTemplate.isPlayer())
             {
                 m_playerTemplatesNames.push_back(pair.first);
-                m_playerTemplateComboBox->AppendItem(entityTemplate.getFriendlyName());
+                //m_playerTemplateComboBox->AppendItem(entityTemplate.getFriendlyName());
             }
             else //If not, add it to the general template list
             {
                 m_templatesNames.push_back(pair.first);
-
-                m_templatesListBox->AppendItem(entityTemplate.getFriendlyName(), entityTemplate.getImage());
+                sf::Texture entityTexture = entityTemplate.getTexture();
+                m_templatesTextures.push_back(getIconFromTexture(entityTemplate.getTexture()));
             }
         }
     }
@@ -623,13 +553,7 @@ void LevelEditorState::updateTemplatesList()
 
 bool LevelEditorState::isMouseNotOnWidgets(sf::Vector2i mousePosition, sf::RenderTarget& target) const
 {
-    sf::Vector2f mouseCoords = target.mapPixelToCoords(mousePosition, m_guiView);
-
-    return (
-        !m_fileToolbar->GetAllocation().contains(mouseCoords) &&
-        !m_toolsToolbar->GetAllocation().contains(mouseCoords) &&
-        !m_toolsSettingsToolbar->GetAllocation().contains(mouseCoords)
-    );
+    return (!ImGui::IsMouseHoveringAnyWindow());
 }
 
 entityx::Entity LevelEditorState::getFirstEntityUnderMouse(sf::Vector2i mousePosition, sf::RenderTarget& target)
@@ -728,6 +652,23 @@ sf::Vector2f LevelEditorState::getInsertionPosition(sf::Vector2f position, float
 sf::View LevelEditorState::getLevelView() const
 {
     return m_systemMgr->system<systems::RenderSystem>()->getView();
+}
+
+sf::Texture LevelEditorState::getIconFromTexture(sf::Texture texture) const
+{
+    m_iconRenderTexture.clear(sf::Color::Transparent);
+
+    sf::Sprite icon(texture);
+    icon.setScale(
+        48.f / static_cast<float>(texture.getSize().x),
+        48.f / static_cast<float>(texture.getSize().y)
+    );
+
+    m_iconRenderTexture.draw(icon);
+
+    m_iconRenderTexture.display();
+
+    return m_iconRenderTexture.getTexture();
 }
 
 }

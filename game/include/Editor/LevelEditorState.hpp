@@ -7,7 +7,9 @@
 
 #include "entityx/entityx.h"
 
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 #include <SFGUI/Box.hpp>
 #include <SFGUI/ComboBox.hpp>
@@ -54,7 +56,7 @@ protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);
 
 private:
-    enum class EditionMode
+    enum EditionMode
     {
         Insertion,
         Modify,
@@ -96,21 +98,16 @@ private:
 
     sfg::SFGUI& m_sfgui;
     sfg::Desktop& m_desktop;
-    sfg::Window::Ptr m_fileToolbar;
-        sfg::Label::Ptr m_filepathLabel;
-    sfg::Window::Ptr m_toolsToolbar;
-        sfg::RadioButton::Ptr m_insertionTool;
-        sfg::RadioButton::Ptr m_modifyTool;
-        sfg::RadioButton::Ptr m_spawnConfigTool;
-    sfg::Window::Ptr m_toolsSettingsToolbar;
-        sfg::ListBox::Ptr m_templatesListBox;
-        std::vector<std::string> m_templatesNames;
-        sfg::ScrolledWindow::Ptr m_propertiesScrolled;
-        std::unique_ptr<PropertiesManager> m_propertiesManager;
-        sfg::Box::Ptr m_spawnConfigBox;
-            sfg::Table::Ptr m_spawnConfigTable;
-            sfg::ComboBox::Ptr m_playerTemplateComboBox;
-            std::vector<std::string> m_playerTemplatesNames;
+
+    EditionMode m_editionMode;
+
+    std::vector<std::string> m_templatesNames;
+    std::vector<sf::Texture> m_templatesTextures;
+    std::size_t m_selectedTemplate;
+
+    PropertiesManager m_propertiesManager;
+
+    std::vector<std::string> m_playerTemplatesNames;
 
     level::Level m_level;
     std::string m_filepath;
@@ -135,6 +132,9 @@ private:
     //Spawn position
     sf::Sprite m_spawnSprite;
     std::shared_ptr<sf::Texture> m_spawnTexture;
+
+    sf::Texture getIconFromTexture(sf::Texture texture) const;
+    mutable sf::RenderTexture m_iconRenderTexture;
 };
 
 }

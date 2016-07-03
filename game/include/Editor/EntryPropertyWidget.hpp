@@ -3,9 +3,7 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include <SFGUI/Box.hpp>
-#include <SFGUI/Button.hpp>
-#include <SFGUI/Entry.hpp>
+#include "imgui.h"
 
 #include "Components/TemplateComponent.hpp"
 #include "Editor/PropertyWidget.hpp"
@@ -20,64 +18,66 @@ class EntryPropertyWidget : public PropertyWidget
 public:
     EntryPropertyWidget(entityx::Entity entity, const lua::EntityTemplate::Parameter& parameter) :
         PropertyWidget(entity, parameter),
-        m_box(sfg::Box::Create()),
-        m_entry(sfg::Entry::Create()),
-        m_moreButton(sfg::Button::Create("..."))
+        m_wasActiveBefore(false)
     {
-        m_box->PackEnd(m_entry, true, true);
-        if(MULTILINETEXT)
-        {
-            m_moreButton->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&EntryPropertyWidget<T, MULTILINETEXT>::openMultilineTextWindow, this));
-            m_box->PackEnd(m_moreButton, true, false);
-        }
-
-        m_entry->GetSignal(sfg::Widget::OnLostFocus).Connect(std::bind(&EntryPropertyWidget<T, MULTILINETEXT>::setParameterFromEntry, this));
-        m_entry->SetRequisition(sf::Vector2f(130.f, 0.f));
-
         updateEntryFromParameter();
     }
 
-    virtual ~EntryPropertyWidget() {}
+    virtual ~EntryPropertyWidget()
+    {
 
-    virtual sfg::Widget::Ptr getWidget() { return m_box; }
+    }
+
+    virtual void display()
+    {
+        ImGui::InputText("", m_propertyContent, 1024);
+        if(ImGui::IsItemActive())
+        {
+            m_wasActiveBefore = true;
+        }
+        else
+        {
+            if(m_wasActiveBefore)
+            {
+                setParameterFromEntry();
+            }
+            else
+            {
+                updateEntryFromParameter();
+            }
+            m_wasActiveBefore = false;
+        }
+    }
 
 private:
     void updateEntryFromParameter()
     {
         auto templateComponent = m_entity.component<components::TemplateComponent>();
-        m_entry->SetText(
+        std::string propertyAsString =
             boost::lexical_cast<std::string>(
                 boost::any_cast<T>(
                     templateComponent->parametersHelper.getParameter(m_parameter.name)
                 )
-            )
-        );
+            );
+
+        strncpy(m_propertyContent, propertyAsString.data(), 1023);
+        m_propertyContent[1023] = '\0';
     }
 
     void setParameterFromEntry()
     {
         auto templateComponent = m_entity.component<components::TemplateComponent>();
-        std::string entryText = m_entry->GetText();
 
         templateComponent->parametersHelper.setParameter(
             m_parameter.name,
             boost::any(
-                boost::lexical_cast<T>(entryText)
+                boost::lexical_cast<T>(std::string(m_propertyContent))
             )
         );
     }
 
-    void openMultilineTextWindow()
-    {
-        nativegui::TextBoxWindow textBoxWindow(m_entry->GetText(), "Enter text here...");
-        textBoxWindow.run();
-
-        m_entry->SetText(textBoxWindow.getText());
-    }
-
-    sfg::Box::Ptr m_box;
-    sfg::Entry::Ptr m_entry;
-    sfg::Button::Ptr m_moreButton;
+    char m_propertyContent[1024];
+    bool m_wasActiveBefore;
 };
 
 }

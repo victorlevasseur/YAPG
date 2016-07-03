@@ -153,19 +153,17 @@ void RenderSystem::render(sf::RenderTarget& target)
     target.setView(oldView);
 }
 
-void RenderSystem::receive(const ChangeAnimationMessage& msg)
+void RenderSystem::receive(const AnimationChangedMessage& msg)
 {
     auto animatedSprite = getAnimatedSprite(msg.entity);
     auto render = entityx::Entity(msg.entity).component<c::RenderComponent>();
-    if(msg.animationName != animatedSprite->getCurrentAnimation())
+    if(render->currentAnimation != animatedSprite->getCurrentAnimation())
     {
         std::string oldAnimation = animatedSprite->getCurrentAnimation();
-        animatedSprite->setCurrentAnimation(msg.animationName);
+        animatedSprite->setCurrentAnimation(render->currentAnimation);
 
         if(render->onAnimationChangedFunc.valid())
-            render->onAnimationChangedFunc.call(lua::EntityHandle(msg.entity), oldAnimation, msg.animationName);
-
-        render->currentAnimation = msg.animationName;
+            render->onAnimationChangedFunc.call(lua::EntityHandle(msg.entity), oldAnimation, render->currentAnimation);
     }
 }
 

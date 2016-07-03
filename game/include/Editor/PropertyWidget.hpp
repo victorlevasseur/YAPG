@@ -16,7 +16,7 @@ public:
     PropertyWidget(entityx::Entity entity, const lua::EntityTemplate::Parameter& parameter);
     virtual ~PropertyWidget();
 
-    virtual sfg::Widget::Ptr getWidget() = 0;
+    virtual void display() = 0;
 
 protected:
     entityx::Entity m_entity;
