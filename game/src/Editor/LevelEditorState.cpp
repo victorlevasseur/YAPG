@@ -39,8 +39,9 @@ LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::A
     m_templatesNames(),
     m_templatesTextures(),
     m_selectedTemplate(std::string::npos),
-    m_propertiesManager(),
     m_playerTemplatesNames(),
+    m_selectedPlayerTemplate(),
+    m_propertiesManager(),
     m_level(m_luaState, level::Level::LevelMode::EditMode),
     m_filepath(),
     m_systemMgr(nullptr),
@@ -369,6 +370,23 @@ void LevelEditorState::render(sf::RenderTarget& target)
         }
     ImGui::End();
 
+    ImGui::SetNextWindowPos(ImVec2(1024.f-320.f, 625.f));
+    ImGui::SetNextWindowSize(ImVec2(320.f, 100.f));
+    ImGui::Begin("Spawn config.");
+        ImGui::Text("P1 template :");
+        ImGui::SameLine();
+        if(ImGui::Combo("",
+            reinterpret_cast<int*>(&m_selectedPlayerTemplate),
+            m_playerTemplatesNamesList.data(),
+            m_playerTemplatesNames.size()
+        ))
+        {
+            m_level.getPlayersTemplates()[0] = (m_selectedPlayerTemplate != 0 ? m_playerTemplatesNames[m_selectedPlayerTemplate] : "");
+        }
+
+        ImGui::TextWrapped("To move the spawn, select \"Spawn config.\" in the \"Edition Mode\" window and click on the level.");
+    ImGui::End();
+
     target.clear(sf::Color(0, 180, 255));
 
     //Render the level
@@ -505,13 +523,13 @@ void LevelEditorState::saveAsLevel()
 
 void LevelEditorState::updateGuiFromLevel()
 {
-    //TODO:m_playerTemplateComboBox->SelectItem(0);
+    m_selectedPlayerTemplate = 0;
     if(m_level.getPlayersTemplates().size() > 0)
     {
         auto it = std::find(m_playerTemplatesNames.cbegin(), m_playerTemplatesNames.cend(), m_level.getPlayersTemplates()[0]);
         if(it != m_playerTemplatesNames.cend())
         {
-            //TODO:m_playerTemplateComboBox->SelectItem(std::distance(m_playerTemplatesNames.cbegin(), it));
+            m_selectedPlayerTemplate = std::distance(m_playerTemplatesNames.cbegin(), it);
         }
     }
 }
@@ -528,6 +546,7 @@ void LevelEditorState::updateTemplatesList()
     m_templatesTextures.clear();
     m_playerTemplatesNames.clear();
     m_playerTemplatesNames.push_back("");
+    m_playerTemplatesNamesList += std::string("Pas de joueur\0", 14);
 
     auto& templatesList = m_luaState.getTemplates();
     for(auto& pair : templatesList)
@@ -539,7 +558,7 @@ void LevelEditorState::updateTemplatesList()
             if(entityTemplate.isPlayer())
             {
                 m_playerTemplatesNames.push_back(pair.first);
-                //m_playerTemplateComboBox->AppendItem(entityTemplate.getFriendlyName());
+                m_playerTemplatesNamesList += pair.first + '\0';
             }
             else //If not, add it to the general template list
             {
@@ -549,6 +568,8 @@ void LevelEditorState::updateTemplatesList()
             }
         }
     }
+
+    m_playerTemplatesNamesList += '\0';
 }
 
 bool LevelEditorState::isMouseNotOnWidgets(sf::Vector2i mousePosition, sf::RenderTarget& target) const

@@ -105,9 +105,11 @@ private:
     std::vector<sf::Texture> m_templatesTextures;
     std::size_t m_selectedTemplate;
 
-    PropertiesManager m_propertiesManager;
-
     std::vector<std::string> m_playerTemplatesNames;
+    std::string m_playerTemplatesNamesList;
+    std::size_t m_selectedPlayerTemplate;
+
+    PropertiesManager m_propertiesManager;
 
     level::Level m_level;
     std::string m_filepath;
