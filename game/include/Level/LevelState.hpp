@@ -9,9 +9,6 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 
-#include <SFGUI/Desktop.hpp>
-#include <SFGUI/SFGUI.hpp>
-
 #include "Async/AsyncExecutor.hpp"
 #include "Async/PunctualTask.hpp"
 #include "Level/Level.hpp"
@@ -30,7 +27,7 @@ namespace level
 class LevelState : public state::State, public messaging::Receiver<messaging::AllPlayersFinishedMessage, messaging::AllPlayersLostMessage>
 {
 public:
-    LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
+    LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
@@ -51,8 +48,6 @@ private:
 
     resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;
-    sfg::SFGUI& m_sfgui;
-    sfg::Desktop& m_desktop;
 
     void updatePerfText();
 

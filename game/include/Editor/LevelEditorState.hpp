@@ -11,17 +11,6 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
-#include <SFGUI/Box.hpp>
-#include <SFGUI/ComboBox.hpp>
-#include <SFGUI/Desktop.hpp>
-#include <SFGUI/Label.hpp>
-#include <SFGUI/ListBox.hpp>
-#include <SFGUI/RadioButton.hpp>
-#include <SFGUI/SFGUI.hpp>
-#include <SFGUI/ScrolledWindow.hpp>
-#include <SFGUI/ToggleButton.hpp>
-#include <SFGUI/Window.hpp>
-
 #include "Level/Level.hpp"
 #include "Lua/EntityTemplate.hpp"
 #include "Lua/LuaState.hpp"
@@ -38,7 +27,7 @@ namespace editor
 class LevelEditorState : public state::State
 {
 public:
-    LevelEditorState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
+    LevelEditorState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
@@ -95,9 +84,6 @@ private:
     lua::LuaState m_luaState;
 
     sf::View m_guiView;
-
-    sfg::SFGUI& m_sfgui;
-    sfg::Desktop& m_desktop;
 
     EditionMode m_editionMode;
 

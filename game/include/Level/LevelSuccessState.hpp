@@ -7,9 +7,6 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Text.hpp>
 
-#include <SFGUI/Desktop.hpp>
-#include <SFGUI/SFGUI.hpp>
-
 #include "Async/AsyncExecutor.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
@@ -23,7 +20,7 @@ namespace level
 class LevelSuccessState : public state::State
 {
 public:
-    LevelSuccessState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
+    LevelSuccessState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
@@ -44,9 +41,6 @@ private:
 
     std::shared_ptr<sf::Font> m_font;
     sf::Text m_winText;
-
-    sfg::SFGUI& m_sfgui;
-    sfg::Desktop& m_desktop;
 };
 
 }

@@ -2,9 +2,6 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include <SFGUI/Entry.hpp>
-#include <SFGUI/Label.hpp>
-
 #include "Components/TemplateComponent.hpp"
 #include "Editor/EntryPropertyWidget.hpp"
 

@@ -3,8 +3,6 @@
 
 #include "entityx/entityx.h"
 
-#include <SFGUI/Widget.hpp>
-
 #include "Lua/EntityTemplate.hpp"
 
 namespace editor

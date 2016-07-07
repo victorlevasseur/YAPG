@@ -8,11 +8,6 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
-#include <SFGUI/Button.hpp>
-#include <SFGUI/Desktop.hpp>
-#include <SFGUI/SFGUI.hpp>
-#include <SFGUI/Window.hpp>
-
 #include "Animation/AnimatedSprite.hpp"
 #include "Animation/Animation.hpp"
 #include "Resources/ResourcesManager.hpp"
@@ -27,7 +22,7 @@ namespace state
 class MainMenuState : public State
 {
 public:
-    MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop);
+    MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
@@ -45,13 +40,6 @@ protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);
 
 private:
-    struct PlayerKeysWidgets
-    {
-        sfg::Button::Ptr leftKeyButton;
-        sfg::Button::Ptr rightKeyButton;
-        sfg::Button::Ptr jumpKeyButton;
-    };
-
     void updateKeysButtonsFromSettings();
     void updateSettingsFromKeysButtons();
 
@@ -61,10 +49,6 @@ private:
     //Menu elements
     std::shared_ptr<sf::Texture> m_logoTexture;
     sf::Sprite m_logoSprite;
-
-    //GUI
-    sfg::SFGUI& m_sfgui;
-    sfg::Desktop& m_desktop;
 
     // - Settings window
     std::array<std::array<char[32], 3>, 4> m_playersKeys;
@@ -89,7 +73,6 @@ private:
     std::vector<std::shared_ptr<sf::Texture>> m_logosTextures;
     sf::Sprite m_boostLogo;
     sf::Sprite m_entityxLogo;
-    sf::Sprite m_sfguiLogo;
     sf::Sprite m_sfmlLogo;
     sf::Sprite m_solLogo;
 };

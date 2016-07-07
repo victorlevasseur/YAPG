@@ -43,10 +43,6 @@ target_include_directories(yapg-game PUBLIC ${SFML_INCLUDE_DIR})
 find_package(OpenGL REQUIRED)
 target_include_directories(yapg-game PUBLIC ${OPENGL_INCLUDE_DIRS})
 
-#SFGUI lib
-find_package(SFGUI 0.3 REQUIRED)
-target_include_directories(yapg-game PUBLIC ${SFGUI_INCLUDE_DIR})
-
 #Lua
 find_package(Lua 5 REQUIRED)
 target_include_directories(yapg-game PUBLIC ${LUA_INCLUDE_DIR})
@@ -66,7 +62,7 @@ endif()
 
 #Linking
 target_link_libraries(yapg-game PUBLIC
-    ${OPENGL_LIBRARIES} ${ENTITYX_STATIC_LIBRARY} ${SFML_LIBRARIES} ${SFGUI_LIBRARY} ${LUA_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${GTK3_LIBRARIES}
+    ${OPENGL_LIBRARIES} ${ENTITYX_STATIC_LIBRARY} ${SFML_LIBRARIES} ${LUA_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${GTK3_LIBRARIES}
 )
 
 #Install the app

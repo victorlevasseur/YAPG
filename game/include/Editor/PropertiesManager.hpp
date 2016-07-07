@@ -6,9 +6,6 @@
 #include <typeindex>
 #include <vector>
 
-#include <SFGUI/ScrolledWindow.hpp>
-#include <SFGUI/Table.hpp>
-
 #include "entityx/entityx.h"
 
 #include "Editor/PropertyWidget.hpp"

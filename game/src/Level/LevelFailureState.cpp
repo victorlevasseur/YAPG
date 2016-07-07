@@ -10,7 +10,7 @@
 namespace level
 {
 
-LevelFailureState::LevelFailureState(state::StateEngine& stateEngine, const std::string& levelPath, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop) :
+LevelFailureState::LevelFailureState(state::StateEngine& stateEngine, const std::string& levelPath, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
     state::State(stateEngine),
     m_levelPath(levelPath),
     m_resourcesManager(resourcesManager),
@@ -18,9 +18,7 @@ LevelFailureState::LevelFailureState(state::StateEngine& stateEngine, const std:
     m_looseMusic(m_resourcesManager.getSounds().requestResource("menu/bensound-sadday.ogg")),
     m_looseSound(*m_looseMusic),
     m_font(m_resourcesManager.getFonts().requestResource("LiberationSans.ttf")),
-    m_looseText("You failed !", *m_font, 70u),
-    m_sfgui(sfgui),
-    m_desktop(desktop)
+    m_looseText("You failed !", *m_font, 70u)
 {
     //Sound init
     m_looseSound.setLoop(true);
@@ -44,8 +42,8 @@ void LevelFailureState::render(sf::RenderTarget& target)
         if(ImGui::Button("Try again"))
         {
             getStateEngine().stopAndStartState
-            <level::LevelState, const std::string&, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-                m_levelPath, m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+            <level::LevelState, const std::string&, resources::AllResourcesManagers&, settings::SettingsManager&>(
+                m_levelPath, m_resourcesManager, m_settingsManager
             );
         }
         if(ImGui::Button("Return to main menu"))
@@ -71,7 +69,7 @@ void LevelFailureState::doStop()
 
 void LevelFailureState::doUpdate(sf::Time dt, sf::RenderTarget& target)
 {
-    m_desktop.Update(dt.asSeconds());
+
 }
 
 }

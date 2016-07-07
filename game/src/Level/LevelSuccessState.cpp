@@ -9,15 +9,13 @@
 namespace level
 {
 
-LevelSuccessState::LevelSuccessState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop) :
+LevelSuccessState::LevelSuccessState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
     state::State(stateEngine),
     m_resourcesManager(resourcesManager),
     m_winMusic(m_resourcesManager.getSounds().requestResource("menu/bensound-happiness.ogg")),
     m_winSound(*m_winMusic),
     m_font(m_resourcesManager.getFonts().requestResource("LiberationSans.ttf")),
-    m_winText("Level clear !", *m_font, 70u),
-    m_sfgui(sfgui),
-    m_desktop(desktop)
+    m_winText("Level clear !", *m_font, 70u)
 {
     //Sound init
     m_winSound.setLoop(true);
@@ -29,7 +27,7 @@ LevelSuccessState::LevelSuccessState(state::StateEngine& stateEngine, resources:
 
 void LevelSuccessState::processEvent(sf::Event event, sf::RenderTarget &target)
 {
-    
+
 }
 
 void LevelSuccessState::render(sf::RenderTarget& target)

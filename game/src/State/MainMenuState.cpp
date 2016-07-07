@@ -7,13 +7,6 @@
 
 #include "imgui.h"
 
-#include <SFGUI/Box.hpp>
-#include <SFGUI/Button.hpp>
-#include <SFGUI/Entry.hpp>
-#include <SFGUI/Label.hpp>
-#include <SFGUI/Notebook.hpp>
-#include <SFGUI/Table.hpp>
-
 #include "Editor/LevelEditorState.hpp"
 #include "Level/LevelState.hpp"
 #include "Settings/KeySettings.hpp"
@@ -23,14 +16,12 @@
 namespace state
 {
 
-MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop) :
+MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
     State(stateEngine),
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
     m_logoTexture(m_resourcesManager.getTextures().requestResource("menu/YAPGLogo.png")),
     m_logoSprite(*m_logoTexture),
-    m_sfgui(sfgui),
-    m_desktop(desktop),
     m_selectedKeyButton(nullptr),
     m_playerAnimations(),
     m_playerSprite(m_resourcesManager.getTextures().requestResource("menu/spritesheet_players.png"), m_playerAnimations),
@@ -43,15 +34,13 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     m_logosTextures{
         m_resourcesManager.getTextures().requestResource("credits/boost.png"),
         m_resourcesManager.getTextures().requestResource("credits/entityx.png"),
-        m_resourcesManager.getTextures().requestResource("credits/sfgui.png"),
         m_resourcesManager.getTextures().requestResource("credits/sfml.png"),
         m_resourcesManager.getTextures().requestResource("credits/sol.png")
     },
     m_boostLogo(*m_logosTextures[0]),
     m_entityxLogo(*m_logosTextures[1]),
-    m_sfguiLogo(*m_logosTextures[2]),
-    m_sfmlLogo(*m_logosTextures[3]),
-    m_solLogo(*m_logosTextures[4])
+    m_sfmlLogo(*m_logosTextures[2]),
+    m_solLogo(*m_logosTextures[3])
 {
     //Logo
     m_logoSprite.setOrigin(m_logoSprite.getLocalBounds().width/2.f, m_logoSprite.getLocalBounds().height/2.f);
@@ -91,9 +80,8 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
     //Libs logos
     m_boostLogo.setPosition(sf::Vector2f(90.f, 650.f));
     m_entityxLogo.setPosition(sf::Vector2f(260.f, 650.f));
-    m_sfguiLogo.setPosition(sf::Vector2f(420.f, 650.f));
-    m_sfmlLogo.setPosition(sf::Vector2f(590.f, 650.f));
-    m_solLogo.setPosition(sf::Vector2f(760.f, 600.f));
+    m_sfmlLogo.setPosition(sf::Vector2f(420.f, 650.f));
+    m_solLogo.setPosition(sf::Vector2f(590.f, 600.f));
 
     updateKeysButtonsFromSettings();
 }
@@ -160,8 +148,8 @@ void MainMenuState::render(sf::RenderTarget& target)
         if(ImGui::Button("Play !"))
         {
             getStateEngine().pauseAndStartState
-                <level::LevelState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-                std::string(levelName), m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+                <level::LevelState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&>(
+                std::string(levelName), m_resourcesManager, m_settingsManager
             );
         }
 
@@ -169,8 +157,8 @@ void MainMenuState::render(sf::RenderTarget& target)
         if(ImGui::Button("Level editor"))
         {
             getStateEngine().pauseAndStartState
-                <editor::LevelEditorState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-                m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+                <editor::LevelEditorState, resources::AllResourcesManagers&, settings::SettingsManager&>(
+                m_resourcesManager, m_settingsManager
             );
         }
 
@@ -260,7 +248,6 @@ void MainMenuState::render(sf::RenderTarget& target)
 
     target.draw(m_boostLogo);
     target.draw(m_entityxLogo);
-    target.draw(m_sfguiLogo);
     target.draw(m_sfmlLogo);
     target.draw(m_solLogo);
 }

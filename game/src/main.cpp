@@ -2,8 +2,6 @@
 
 #include <boost/filesystem.hpp>
 
-#include <SFGUI/SFGUI.hpp>
-
 #ifdef OS_LINUX
 #include <gtk/gtk.h>
 #endif
@@ -48,14 +46,9 @@ int main(int argc, char** argv)
     //Window manager
     window::WindowManager windowManager(stateEngine, "Yet Another Platformer Game");
 
-    //SFGUI
-    sfg::SFGUI sfgui;
-    sfg::Desktop desktop;
-    desktop.LoadThemeFromFile("assets/menu/widgets.theme");
-
     stateEngine.stopAndStartState
-    <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-        resManager, settingsManager, sfgui, desktop
+    <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&>(
+        resManager, settingsManager
     );
 
     windowManager.run();

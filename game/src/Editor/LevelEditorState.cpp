@@ -6,12 +6,6 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 
-#include <SFGUI/Box.hpp>
-#include <SFGUI/Button.hpp>
-#include <SFGUI/RadioButton.hpp>
-#include <SFGUI/RadioButtonGroup.hpp>
-#include <SFGUI/Separator.hpp>
-
 #include "Components/PositionComponent.hpp"
 #include "Components/TemplateComponent.hpp"
 #include "Editor/EntryPropertyWidget.hpp"
@@ -27,14 +21,12 @@
 namespace editor
 {
 
-LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop) :
+LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
     state::State(stateEngine),
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
     m_luaState(),
     m_guiView(sf::FloatRect(0.f, 0.f, 1024.f, 768.f)),
-    m_sfgui(sfgui),
-    m_desktop(desktop),
     m_editionMode(EditionMode::Insertion),
     m_templatesNames(),
     m_templatesTextures(),
@@ -76,8 +68,6 @@ LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::A
 
 void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 {
-    m_desktop.HandleEvent(event);
-
     if(getEditionMode() == EditionMode::Insertion)
     {
         m_selectedEntity = entityx::Entity();
@@ -436,7 +426,6 @@ void LevelEditorState::render(sf::RenderTarget& target)
 
     //Render the gui
     target.setView(m_guiView);
-    m_sfgui.Display(dynamic_cast<sf::RenderWindow&>(target));
 }
 
 void LevelEditorState::doStart()
@@ -463,7 +452,6 @@ void LevelEditorState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 {
     m_systemMgr->update<systems::EntityGridSystem>(dt.asSeconds());
     m_systemMgr->update<systems::RenderSystem>(dt.asSeconds());
-    m_desktop.Update(dt.asSeconds());
 }
 
 void LevelEditorState::initGUI()

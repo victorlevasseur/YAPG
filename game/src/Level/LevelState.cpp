@@ -25,7 +25,7 @@
 namespace level
 {
 
-LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager, sfg::SFGUI& sfgui, sfg::Desktop& desktop) :
+LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
     state::State(stateEngine),
     m_luaState(),
     m_path(path),
@@ -33,8 +33,6 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_systemMgr(m_level.getEntityManager(), m_level.getEventManager()),
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
-    m_sfgui(sfgui),
-    m_desktop(desktop),
     m_font(resourcesManager.getFonts().requestResource("LiberationSans.ttf")),
     m_perfText("update: -.----\nrender: -.----", *m_font, 14),
     m_lastUpdateDuration(),
@@ -98,8 +96,8 @@ void LevelState::receive(const messaging::AllPlayersFinishedMessage& message)
         [&]()
         {
             getStateEngine().stopAndStartState
-            <level::LevelSuccessState, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-                m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+            <level::LevelSuccessState, resources::AllResourcesManagers&, settings::SettingsManager&>(
+                m_resourcesManager, m_settingsManager
             );
         },
         sf::seconds(2.f)
@@ -109,8 +107,8 @@ void LevelState::receive(const messaging::AllPlayersFinishedMessage& message)
 void LevelState::receive(const messaging::AllPlayersLostMessage& message)
 {
     getStateEngine().stopAndStartState
-    <level::LevelFailureState, const std::string&, resources::AllResourcesManagers&, settings::SettingsManager&, sfg::SFGUI&, sfg::Desktop&>(
-        m_path, m_resourcesManager, m_settingsManager, m_sfgui, m_desktop
+    <level::LevelFailureState, const std::string&, resources::AllResourcesManagers&, settings::SettingsManager&>(
+        m_path, m_resourcesManager, m_settingsManager
     );
 }
 
