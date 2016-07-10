@@ -5,6 +5,10 @@
 #include <boost/any.hpp>
 #include <boost/filesystem.hpp>
 
+#include "Box2D/Collision/Shapes/b2PolygonShape.h"
+#include "Box2D/Dynamics/b2Fixture.h"
+#include "Box2D/Dynamics/b2Body.h"
+
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
 
@@ -155,6 +159,37 @@ LuaState::LuaState() :
     collision::Polygon::registerClass(*this);
     collision::PolygonCallback::registerClass(*this);
     std::cout << "[Lua/Note] Classes registered." << std::endl;
+
+    //Declare Box2D classes
+    meta::MetadataStore::registerClass<b2Vec2>()
+        .declareAttribute("x", &b2Vec2::x)
+        .declareAttribute("y", &b2Vec2::y);
+
+    meta::MetadataStore::registerClass<b2PolygonShape>()
+        .setExtraLoadFunction([](b2PolygonShape* c, const sol::object& luaObject)
+        {
+            std::vector<b2Vec2> points;
+            sol::table luaPoints = luaObject.as<sol::table>().get<sol::table>("points");
+            luaPoints.for_each([&](sol::object& keyObject, sol::object& value)
+            {
+                unsigned int key = keyObject.as<unsigned int>();
+                sol::table point = value.as<sol::table>();
+
+                if(key >= points.size())
+                {
+                    points.resize(key + 1);
+                }
+
+                points[key] = b2Vec2(point.get<float>("x"), point.get<float>("y"));
+            });
+
+            c->Set(points.data(), points.size());
+        });
+
+    meta::MetadataStore::registerClass<b2FixtureDef>()
+        .declareAttribute("density", &b2FixtureDef::density)
+        .declareAttribute("friction", &b2FixtureDef::friction)
+        .declareAttribute("restitution", &b2FixtureDef::restitution);
 
     //Declare main C++ classes and declare their metadatas
     EntityHandle::registerClass(*this);

@@ -26,7 +26,8 @@ namespace systems
 
 PlatformerSystem::PlatformerSystem(collision::EntitySpatialGrid& quadtreesGrid) :
     entityx::System<PlatformerSystem>(),
-    m_quadtreesGrid(quadtreesGrid)
+    m_quadtreesGrid(quadtreesGrid),
+    m_world(std::make_unique<b2World>(b2Vec2(0.f, -9.f)))
 {
 
 }
@@ -436,6 +437,9 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         }
         platformer.directionStateCallbacks.callIfNeeded(lua::EntityHandle(entity));
     });
+
+    m_world->Step(dt, 10, 8);
+    m_world->ClearForces();
 }
 
 }
