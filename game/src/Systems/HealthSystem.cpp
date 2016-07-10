@@ -61,6 +61,8 @@ void HealthSystem::receive(const HealthKillMessage& msg)
     entityx::Entity(msg.entityToKill).component<c::HealthComponent>()->health = 0;
     m_alreadyDeadEntities.push_back(entityx::Entity(msg.entityToKill));
 
+    emit<HealthKilledMessage>(msg.entityToKill);
+
     //TODO: Call the death callback or destroy the entity if no callback.
     if(false)
     {

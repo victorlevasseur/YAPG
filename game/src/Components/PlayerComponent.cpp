@@ -1,6 +1,7 @@
 #include "Components/PlayerComponent.hpp"
 
 #include "Lua/EntityHandle.hpp"
+#include "Systems/PlayerSystem.hpp"
 
 namespace components
 {
@@ -8,7 +9,7 @@ namespace components
 PlayerComponent::PlayerComponent(entityx::Entity entity) :
     Component(entity),
     playerNumber(-1),
-    finishedLevel(false)
+    m_finishedLevel(false)
 {
 
 }
@@ -32,9 +33,16 @@ void PlayerComponent::registerComponent(lua::LuaState& state)
 
     state.getState().new_usertype<PlayerComponent>("player_component",
         "player_number", sol::readonly(&PlayerComponent::playerNumber),
-        "finished_level", sol::readonly(&PlayerComponent::finishedLevel)
+        "has_finished_level", &PlayerComponent::hasFinishedLevel,
+        "set_finished_level", &PlayerComponent::setFinishedLevel
     );
     state.declareComponentGetter<PlayerComponent>("player");
+}
+
+void PlayerComponent::setFinishedLevel()
+{
+    m_finishedLevel = true;
+    emit<systems::PlayerFinishedMessage>(getEntity());
 }
 
 std::ostream& operator<<(std::ostream& stream, const PlayerComponent& component)

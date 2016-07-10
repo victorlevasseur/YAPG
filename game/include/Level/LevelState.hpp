@@ -43,16 +43,12 @@ protected:
 
 private:
     lua::EntityHandle lua_createNewEntity(const std::string& templateName);
-    void lua_setPlayerFinished(lua::EntityHandle playerEntity);
 
     lua::LuaState m_luaState;
 
     std::string m_path;
     level::Level m_level;
     entityx::SystemManager m_systemMgr;
-
-    std::size_t m_playersCount;
-    std::size_t m_stillPlayingCount;
 
     resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;

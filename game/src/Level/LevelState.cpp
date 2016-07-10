@@ -15,7 +15,6 @@
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/CustomBehaviorSystem.hpp"
 #include "Systems/EntityGridSystem.hpp"
-#include "Systems/FinishLineSystem.hpp"
 #include "Systems/HealthSystem.hpp"
 #include "Systems/PlatformerSystem.hpp"
 #include "Systems/PlayerSystem.hpp"
@@ -46,7 +45,7 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_systemMgr.add<systems::CustomBehaviorSystem>();
     m_systemMgr.add<systems::CollisionSystem>(grid);
     m_systemMgr.add<systems::PlatformerSystem>(grid);
-    m_systemMgr.add<systems::PlayerSystem>(settingsManager);
+    m_systemMgr.add<systems::PlayerSystem>(1, settingsManager);
     m_systemMgr.add<systems::HealthSystem>(settingsManager);
 
     m_systemMgr.configure();
@@ -55,7 +54,6 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
 
     //Load the players
     //TODO: Support multiple players creation
-    m_stillPlayingCount = m_playersCount = 1;
     std::cout << "Creating players..." << std::endl;
 
     const lua::EntityTemplate& playerTemplate = m_luaState.getTemplate(m_level.getPlayersTemplates()[0]);
@@ -133,9 +131,16 @@ void LevelState::receive(const messaging::AllPlayersFinishedMessage& message)
 
 void LevelState::receive(const messaging::AllPlayersLostMessage& message)
 {
-    getStateEngine().stopAndStartState
-    <level::LevelFailureState, const std::string&, resources::AllResourcesManagers&, settings::SettingsManager&>(
-        m_path, m_resourcesManager, m_settingsManager
+    m_asyncExecutor.addNewTask<async::PunctualTask, std::function<void()>>
+    (
+        [&]()
+        {
+            getStateEngine().stopAndStartState
+            <level::LevelFailureState, const std::string&, resources::AllResourcesManagers&, settings::SettingsManager&>(
+                m_path, m_resourcesManager, m_settingsManager
+            );
+        },
+        sf::seconds(1.f)
     );
 }
 
@@ -143,8 +148,7 @@ void LevelState::registerClass(lua::LuaState& luaState)
 {
     sol::constructors<> ctor;
     sol::usertype<LevelState> levelLuaClass(ctor,
-        "create_new_entity", &LevelState::lua_createNewEntity,
-        "set_player_finished", &LevelState::lua_setPlayerFinished
+        "create_new_entity", &LevelState::lua_createNewEntity
     );
     luaState.getState().set_usertype("level_state", levelLuaClass);
 }
@@ -172,30 +176,6 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 lua::EntityHandle LevelState::lua_createNewEntity(const std::string& templateName)
 {
     return lua::EntityHandle(m_level.createNewEntity(templateName));
-}
-
-void LevelState::lua_setPlayerFinished(lua::EntityHandle playerEntity_)
-{
-    entityx::Entity playerEntity = static_cast<entityx::Entity>(playerEntity_);
-    if(!playerEntity.has_component<components::PlayerComponent>())
-    {
-        std::cout << "[Lua/Warning] The entity given to set_player_finished is not a player !" << std::endl;
-        return;
-    }
-
-    auto playerComponent = playerEntity.component<components::PlayerComponent>();
-
-    if(!playerComponent->finishedLevel)
-    {
-        playerComponent->finishedLevel = true;
-        --m_stillPlayingCount;
-        emit<messaging::PlayerFinishedMessage>(playerComponent->playerNumber);
-
-        if(m_stillPlayingCount == 0)
-        {
-            emit<messaging::AllPlayersFinishedMessage>();
-        }
-    }
 }
 
 void LevelState::updatePerfText()

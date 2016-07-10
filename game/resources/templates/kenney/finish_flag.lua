@@ -50,7 +50,7 @@ entity_template = {
                     },
                     on_collision_begin = function(entity, other)
                         if(player(other) ~= nil) then
-                            current_level:set_player_finished(other)
+                            player(other):set_finished_level()
                         end
                     end,
                 },

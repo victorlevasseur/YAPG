@@ -10,24 +10,41 @@ namespace settings{ class SettingsManager; }
 namespace systems
 {
 
+/**
+ * Message to send to ask the HealthSystem to try to kill an entity.
+ */
 struct HealthKillMessage
 {
     entityx::Entity entityToKill;
 };
 
+/**
+ * Message to send to ask the HealthSystem to try to remove PV of an entity.
+ */
 struct HealthLoosePVMessage
 {
     entityx::Entity entity;
     float pv;
 };
 
+/**
+ * Message to send to ask the HealthSystem to try to add PV to an entity.
+ */
 struct HealthGainPVMessage
 {
     entityx::Entity entity;
     float pv;
 };
 
-class HealthSystem : public entityx::System<HealthSystem>, public messaging::Receiver<HealthKillMessage, HealthLoosePVMessage, HealthGainPVMessage>
+/**
+ * Message sent by the HealthSystem to inform that an entity is about to be killed (and will be for sure).
+ */
+struct HealthKilledMessage
+{
+    entityx::Entity entity;
+};
+
+class HealthSystem : public entityx::System<HealthSystem>, public messaging::Emitter, public messaging::Receiver<HealthKillMessage, HealthLoosePVMessage, HealthGainPVMessage>
 {
 public:
 
