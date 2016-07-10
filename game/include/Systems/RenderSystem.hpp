@@ -14,7 +14,6 @@
 #include "Collision/EntitySpatialGrid.hpp"
 #include "Messaging/Messaging.hpp"
 #include "Resources/ResourcesManager.hpp"
-#include "Systems/HitboxUpdaterSystem.hpp"
 
 namespace systems
 {
