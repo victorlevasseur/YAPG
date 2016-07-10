@@ -25,6 +25,7 @@
 #include "Components/PositionComponent.hpp"
 #include "Components/RenderComponent.hpp"
 #include "Level/Level.hpp"
+#include "Level/LevelState.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Meta/Metadata.hpp"
 
@@ -159,6 +160,8 @@ LuaState::LuaState() :
     //Declare main C++ classes and declare their metadatas
     EntityHandle::registerClass(*this);
     level::Level::registerClass(*this);
+    level::LevelState::registerClass(*this);
+
     components::Component::registerComponent(*this);
     components::CollidableComponent::registerComponent(*this);
     components::ColliderComponent::registerComponent(*this);

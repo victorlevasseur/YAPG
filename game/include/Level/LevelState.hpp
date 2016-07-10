@@ -24,7 +24,7 @@ namespace state{ class StateEngine; }
 namespace level
 {
 
-class LevelState : public state::State, public messaging::Receiver<messaging::AllPlayersFinishedMessage, messaging::AllPlayersLostMessage>
+class LevelState : public state::State, public messaging::Emitter, public messaging::Receiver<messaging::AllPlayersFinishedMessage, messaging::AllPlayersLostMessage>
 {
 public:
     LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
@@ -36,15 +36,23 @@ public:
     virtual void receive(const messaging::AllPlayersFinishedMessage& message) override;
     virtual void receive(const messaging::AllPlayersLostMessage& message) override;
 
+    static void registerClass(lua::LuaState& luaState);
+
 protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);
 
 private:
+    lua::EntityHandle lua_createNewEntity(const std::string& templateName);
+    void lua_setPlayerFinished(lua::EntityHandle playerEntity);
+
     lua::LuaState m_luaState;
 
     std::string m_path;
     level::Level m_level;
     entityx::SystemManager m_systemMgr;
+
+    std::size_t m_playersCount;
+    std::size_t m_stillPlayingCount;
 
     resources::AllResourcesManagers& m_resourcesManager;
     settings::SettingsManager& m_settingsManager;

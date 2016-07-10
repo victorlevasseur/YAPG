@@ -131,37 +131,9 @@ void Level::LoadFromFile(const std::string& path)
         ++i;
     }
 
-    //Put the current level instance into "current_level" lua global variable
-    m_luaState.getState().set("current_level", this);
-
     std::cout << "Level successfully loaded (" << createdEntities.size() << " entities)." << std::endl;
 
-    //TODO: Support multiple players creation
-    if(m_levelMode == LevelMode::PlayMode)
-    {
-        std::cout << "Creating players..." << std::endl;
-
-        const lua::EntityTemplate& playerTemplate = m_luaState.getTemplate(m_playersTemplates[0]);
-
-        entityx::Entity playerEntity = m_entityMgr.create();
-        playerTemplate.initializeEntity(playerEntity, entityGetter);
-
-        //Set x and y parameters according to spawn_position
-        auto& parameters = playerTemplate.getParameters();
-
-        const lua::EntityTemplate::Parameter& xParameter = parameters.at("x");
-        const lua::EntityTemplate::Parameter& yParameter = parameters.at("y");
-
-        lua::EntityHandle(playerEntity).setAttributeAsAny(xParameter.component, xParameter.attribute, m_spawnPosition.x);
-        lua::EntityHandle(playerEntity).setAttributeAsAny(yParameter.component, yParameter.attribute, m_spawnPosition.y);
-
-        if(!playerEntity.has_component<components::PlayerComponent>())
-            throw std::runtime_error(std::string("[Level/Error] Player entities must have the \"Player\" component declared in their template ! Not the case with \"") + m_playersTemplates[0] + std::string("\""));
-        playerEntity.component<components::PlayerComponent>()->playerNumber = 0;
-
-        std::cout << "Players created." << std::endl;
-    }
-    /////////////////////////////////////////
+    //Note: the player's creation is done in LevelState.
 }
 
 void Level::SaveToFile(const std::string& path)
@@ -257,18 +229,9 @@ entityx::Entity Level::createNewEntity(const std::string& templateName, bool tem
     return newEntity;
 }
 
-lua::EntityHandle Level::createNewEntityLua(const std::string& templateName)
-{
-    return lua::EntityHandle(createNewEntity(templateName));
-}
-
 void Level::registerClass(lua::LuaState& luaState)
 {
-    sol::constructors<> ctor;
-    sol::usertype<Level> levelLuaClass(ctor,
-        "create_new_entity", &Level::createNewEntityLua
-    );
-    luaState.getState().set_usertype("level", levelLuaClass);
+
 }
 
 }

@@ -48,7 +48,7 @@ void HealthSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
 
         if(position.y > 200.f + lowestPlatformPos)
         {
-            entity.component<c::HealthComponent>()->kill();;
+            entity.component<c::HealthComponent>()->kill();
         }
     });
 }

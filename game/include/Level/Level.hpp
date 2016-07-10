@@ -42,8 +42,6 @@ public:
 
     entityx::Entity createNewEntity(const std::string& templateName, bool templateComponent = false);
 
-    lua::EntityHandle createNewEntityLua(const std::string& templateName);
-
     static void registerClass(lua::LuaState& luaState);
 
 private:

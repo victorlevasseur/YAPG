@@ -32,7 +32,7 @@ void PlayerComponent::registerComponent(lua::LuaState& state)
 
     state.getState().new_usertype<PlayerComponent>("player_component",
         "player_number", sol::readonly(&PlayerComponent::playerNumber),
-        "finished_level", &PlayerComponent::finishedLevel
+        "finished_level", sol::readonly(&PlayerComponent::finishedLevel)
     );
     state.declareComponentGetter<PlayerComponent>("player");
 }

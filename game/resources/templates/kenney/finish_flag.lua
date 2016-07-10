@@ -25,27 +25,36 @@ entity_template = {
         ["finish_line"] = {
 
         },
-        ["platformer_hitbox"] = {
-            polygon = {
-                points = {
-                    {
-                        x = 0,
-                        y = 0
+        ["collidable"] = {
+            polygons = {
+                ["all"] = {
+                    polygon = {
+                        points = {
+                            {
+                                x = 0,
+                                y = 0
+                            },
+                            {
+                                x = 24,
+                                y = 0
+                            },
+                            {
+                                x = 24,
+                                y = 64
+                            },
+                            {
+                                x = 0,
+                                y = 64
+                            },
+                        },
                     },
-                    {
-                        x = 24,
-                        y = 0
-                    },
-                    {
-                        x = 24,
-                        y = 64
-                    },
-                    {
-                        x = 0,
-                        y = 64
-                    },
-                }
-            }
+                    on_collision_begin = function(entity, other)
+                        if(player(other) ~= nil) then
+                            current_level:set_player_finished(other)
+                        end
+                    end,
+                },
+            },
         },
         ["render"] = {
             texture = "spritesheet_complete.png",
