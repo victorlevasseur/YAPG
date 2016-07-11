@@ -7,7 +7,7 @@
 #include "NativeGui/Win32/FileDialogImpl.hpp"
 #endif
 
-namespace nativegui
+namespace yapg
 {
 
 FileDialog::FileDialog(

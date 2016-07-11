@@ -10,12 +10,12 @@
 #include "Platformer/PlatformerHitboxComponent.hpp"
 #include "Lua/EntityHandle.hpp"
 
-namespace c = components;
 
-namespace systems
+
+namespace yapg
 {
 
-CollisionSystem::CollisionSystem(collision::EntitySpatialGrid& quadtreesGrid) :
+CollisionSystem::CollisionSystem(EntitySpatialGrid& quadtreesGrid) :
     m_collisions(),
     m_quadtreesGrid(quadtreesGrid)
 {
@@ -26,10 +26,10 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
 {
     CollisionUnorderedSet nextFrameCollisions(m_collisions);
 
-    es.each<c::PositionComponent, c::CollidableComponent>([&](
+    es.each<PositionComponent, CollidableComponent>([&](
         entityx::Entity entity1,
-        c::PositionComponent& position1,
-        c::CollidableComponent& collidable1)
+        PositionComponent& position1,
+        CollidableComponent& collidable1)
     {
         sf::FloatRect boundingBox(position1.x, position1.y, position1.width, position1.height);
 
@@ -39,11 +39,11 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
             if(!entity1 || !entity2) //Prevents crashes when an entity is deleted as a result of a callback call.
                 break;
 
-            if(!entity2.has_component<c::CollidableComponent>() || entity1 == entity2)
+            if(!entity2.has_component<CollidableComponent>() || entity1 == entity2)
                 continue;
 
-            auto position2 = entity2.component<c::PositionComponent>();
-            auto collidable2 = entity2.component<c::CollidableComponent>();
+            auto position2 = entity2.component<PositionComponent>();
+            auto collidable2 = entity2.component<CollidableComponent>();
 
             for(auto& polygon1 : collidable1.polygonsByPriority)
             {
@@ -58,7 +58,7 @@ void CollisionSystem::update(entityx::EntityManager &es, entityx::EventManager &
                     if(!entity1 || !entity2) //Prevents crashes when an entity is deleted as a result of a callback call.
                         break;
 
-                    if(collision::Polygon::collides(polygon1.second.getPolygon(), polygon2.second.getPolygon(), position1.getPositionTransform(), position2->getPositionTransform())) //Collision between the two polygons
+                    if(Polygon::collides(polygon1.second.getPolygon(), polygon2.second.getPolygon(), position1.getPositionTransform(), position2->getPositionTransform())) //Collision between the two polygons
                     {
                         //If it's an polygon1 is exclusive, do not iterate the others
                         if(polygon1.second.isExclusive())

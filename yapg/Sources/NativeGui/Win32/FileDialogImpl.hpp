@@ -7,7 +7,7 @@
 
 #include "NativeGui/FileDialog.hpp"
 
-namespace nativegui
+namespace yapg
 {
 namespace impl
 {

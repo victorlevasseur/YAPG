@@ -12,12 +12,12 @@
 #include "Lua/sol.hpp"
 #include "Meta/Metadata.hpp"
 
-namespace components{ class Component; }
-namespace components{ class CustomDataComponent; }
-namespace lua{ class LuaState; }
+namespace yapg{ class Component; }
+namespace yapg{ class CustomDataComponent; }
+namespace yapg{ class LuaState; }
 
 
-namespace lua
+namespace yapg
 {
 
 class EntityHandle
@@ -33,7 +33,7 @@ public:
      */
     struct ComponentAttributesCallbacks
     {
-        void (EntityHandle::*loadFromXmlCallback)(const std::string&, const tinyxml2::XMLElement*, const level::SerializedEntityGetter&);
+        void (EntityHandle::*loadFromXmlCallback)(const std::string&, const tinyxml2::XMLElement*, const SerializedEntityGetter&);
 
         boost::any (EntityHandle::*getAnyCallback)(const std::string&) const;
         void (EntityHandle::*setAnyCallback)(const std::string&, const boost::any&);
@@ -45,12 +45,12 @@ public:
     EntityHandle();
     EntityHandle(entityx::Entity entity);
 
-    void loadAttributeFromXml(const std::string& componentName, const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter);
-    void saveAttributeToXml(const std::string& componentName, const std::string& attributeName, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const;
+    void loadAttributeFromXml(const std::string& componentName, const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter);
+    void saveAttributeToXml(const std::string& componentName, const std::string& attributeName, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const;
 
     bool hasComponent(const std::string& componentName) const;
-    components::Component* getComponentPtr(const std::string& componentName);
-    const components::Component* getComponentPtr(const std::string& componentName) const;
+    Component* getComponentPtr(const std::string& componentName);
+    const Component* getComponentPtr(const std::string& componentName) const;
 
     boost::any getAttributeAsAny(const std::string& componentName, const std::string& attributeName) const;
     void setAttributeAsAny(const std::string& componentName, const std::string& attributeName, const boost::any& value);
@@ -59,7 +59,7 @@ public:
     void getAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table result) const;
     void setAttributeAsLuaTable(const std::string& componentName, const std::string& attributeName, sol::table value);
 
-    components::CustomDataComponent* getCustomData();
+    CustomDataComponent* getCustomData();
 
     void writeToConsole(const std::string& str);
 
@@ -78,10 +78,10 @@ public:
 private:
 
     template<class C>
-    components::Component* doGetComponentPtr();
+    Component* doGetComponentPtr();
 
     template<class C>
-    const components::Component* doGetComponentPtrConst() const;
+    const Component* doGetComponentPtrConst() const;
 
     template<class C>
     bool doHasComponent() const;
@@ -89,8 +89,8 @@ private:
     entityx::Entity m_entity;
 
     static std::map<std::string, std::type_index> componentsTypeIndex;
-    static std::map<std::string, std::function<components::Component*(EntityHandle*)>> componentsGetters;
-    static std::map<std::string, std::function<const components::Component*(const EntityHandle*)>> componentsGettersConst;
+    static std::map<std::string, std::function<Component*(EntityHandle*)>> componentsGetters;
+    static std::map<std::string, std::function<const Component*(const EntityHandle*)>> componentsGettersConst;
     static std::map<std::string, std::function<bool(const EntityHandle*)>> componentsCheckers;
 };
 

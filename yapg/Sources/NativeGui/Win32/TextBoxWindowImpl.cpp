@@ -10,7 +10,7 @@
 
 #define ID_EDITCHILD 100
 
-namespace nativegui
+namespace yapg
 {
 namespace impl
 {

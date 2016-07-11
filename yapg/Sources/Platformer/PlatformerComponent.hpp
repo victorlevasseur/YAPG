@@ -6,7 +6,7 @@
 #include "Lua/LuaState.hpp"
 #include "Lua/EnumStateCallbacks.hpp"
 
-namespace components
+namespace yapg
 {
 
 class PlatformerComponent : public Component
@@ -31,7 +31,7 @@ public:
 
     virtual std::string getName() const;
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 
     bool wantsToJump;
     bool wantsToGoLeft;
@@ -57,13 +57,13 @@ public:
     float oldFloorPosX;
     float oldFloorPosY;
 
-    lua::EnumStateCallbacks<4, State, lua::EntityHandle> movementStateCallbacks;
+    EnumStateCallbacks<4, State, EntityHandle> movementStateCallbacks;
     sol::function onIdleFunc;
     sol::function onWalkingFunc;
     sol::function onJumpingFunc;
     sol::function onFallingFunc;
 
-    lua::EnumStateCallbacks<2, Direction, lua::EntityHandle> directionStateCallbacks;
+    EnumStateCallbacks<2, Direction, EntityHandle> directionStateCallbacks;
     sol::function onTurnRightFunc;
     sol::function onTurnLeftFunc;
 };

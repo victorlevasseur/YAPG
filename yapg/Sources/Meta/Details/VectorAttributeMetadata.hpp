@@ -7,6 +7,9 @@
 #include "Meta/Details/AttributeMetadataBase.hpp"
 #include "Meta/Details/MetadataStore.hpp"
 
+namespace yapg
+{
+
 namespace meta
 {
 
@@ -63,13 +66,13 @@ public:
         });
     }
 
-    virtual void loadFromXml(void* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
+    virtual void loadFromXml(void* object, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const override
     {
         //TODO: Support it !
         std::cout << "[Meta/Warning] Loading std::vector attributes from XML is not supported yet !" << std::endl;
     }
 
-    virtual void saveToXml(const void* object, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
+    virtual void saveToXml(const void* object, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const override
     {
         //TODO: Support it !
         std::cout << "[Meta/Warning] Saving std::vector attributes to XML is not supported yet !" << std::endl;
@@ -174,6 +177,8 @@ private:
     std::vector<T>(C::*m_getter)() const;
     void(C::*m_setter)(std::vector<T>);
 };
+
+}
 
 }
 

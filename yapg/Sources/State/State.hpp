@@ -7,9 +7,9 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
 
-namespace state{ class StateEngine; }
+namespace yapg{ class StateEngine; }
 
-namespace state
+namespace yapg
 {
 
 /**

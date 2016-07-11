@@ -7,7 +7,7 @@ headerContent = """#ifndef YAPG_GAME_COMPONENTS_{1}COMPONENT_H
 #include "Lua/LuaState.hpp"
 #include "Meta/Metadata.hpp"
 
-namespace components
+namespace yapg
 {{
 
 class {0}Component : public Component
@@ -18,7 +18,7 @@ public:
 
     virtual std::string getName() const;
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 }};
 
 std::ostream& operator<<(std::ostream& stream, const {0}Component& component);
@@ -32,7 +32,7 @@ srcContent = """#include "Components/{0}Component.hpp"
 
 #include "Lua/EntityHandle.hpp"
 
-namespace components
+namespace yapg
 {{
 
 {0}Component::{0}Component(entityx::Entity entity) :
@@ -51,11 +51,11 @@ std::string {0}Component::getName() const
     return "{0}";
 }}
 
-void {0}Component::registerComponent(lua::LuaState& state)
+void {0}Component::registerComponent(LuaState& state)
 {{
     meta::MetadataStore::registerClass<{0}Component>();
 
-    lua::EntityHandle::declareComponent<{0}Component>("{1}");
+    EntityHandle::declareComponent<{0}Component>("{1}");
 
     state.getState().new_usertype<{0}Component>("{1}_component"
         //TODO: Register the properties here

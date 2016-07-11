@@ -15,16 +15,16 @@
 #include "Platformer/PlatformerComponent.hpp"
 #include "Player/PlayerSystem.hpp"
 
-namespace c = components;
+
 namespace e = entityx;
 
 #define NO_EXCEPTIONS std::vector<entityx::Entity>()
 
 
-namespace systems
+namespace yapg
 {
 
-PlatformerSystem::PlatformerSystem(collision::EntitySpatialGrid& quadtreesGrid) :
+PlatformerSystem::PlatformerSystem(EntitySpatialGrid& quadtreesGrid) :
     entityx::System<PlatformerSystem>(),
     m_quadtreesGrid(quadtreesGrid)
 {
@@ -34,14 +34,14 @@ PlatformerSystem::PlatformerSystem(collision::EntitySpatialGrid& quadtreesGrid) 
 namespace
 {
 
-std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const collision::EntitySpatialGrid& quadtreesGrid, entityx::Entity object, float maxMoveLength, int types = c::PlatformComponent::All)
+std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const EntitySpatialGrid& quadtreesGrid, entityx::Entity object, float maxMoveLength, int types = PlatformComponent::All)
 {
     std::vector<e::Entity> potentialObstacles;
 
-    e::ComponentHandle<c::PositionComponent> cBox = object.component<c::PositionComponent>();
-    e::ComponentHandle<c::PlatformerComponent> cPhysic = object.component<c::PlatformerComponent>();
+    e::ComponentHandle<PositionComponent> cBox = object.component<PositionComponent>();
+    e::ComponentHandle<PlatformerComponent> cPhysic = object.component<PlatformerComponent>();
 
-    if(!cBox || !object.component<c::PlatformerHitboxComponent>())
+    if(!cBox || !object.component<PlatformerHitboxComponent>())
         return potentialObstacles;
 
     sf::FloatRect objectBoundingBox;
@@ -55,10 +55,10 @@ std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const collisi
     {
         if(!obstacle)
             continue;
-        if(!obstacle.has_component<c::PositionComponent>() || !obstacle.has_component<c::PlatformerHitboxComponent>() || !obstacle.has_component<c::PlatformComponent>())
+        if(!obstacle.has_component<PositionComponent>() || !obstacle.has_component<PlatformerHitboxComponent>() || !obstacle.has_component<PlatformComponent>())
             continue;
 
-        entityx::ComponentHandle<c::PlatformComponent> obstacleCObs = obstacle.component<c::PlatformComponent>();
+        entityx::ComponentHandle<PlatformComponent> obstacleCObs = obstacle.component<PlatformComponent>();
 
         if((obstacle.id() != object.id()) && (cPhysic->layer == obstacleCObs->layer) && ((types & obstacleCObs->platformType) != 0))
             potentialObstacles.push_back(obstacle);
@@ -67,7 +67,7 @@ std::vector<e::Entity> GetPotentialObstacles(e::EntityManager& es, const collisi
     return potentialObstacles;
 }
 
-bool IsCollidingObstacle(collision::Polygon polygon, sf::Transform transform, std::vector<e::Entity> potentialObstacles, std::vector<e::Entity> except, int onlyOfType = c::PlatformComponent::All)
+bool IsCollidingObstacle(Polygon polygon, sf::Transform transform, std::vector<e::Entity> potentialObstacles, std::vector<e::Entity> except, int onlyOfType = PlatformComponent::All)
 {
     for(e::Entity& obstacle : potentialObstacles)
     {
@@ -78,9 +78,9 @@ bool IsCollidingObstacle(collision::Polygon polygon, sf::Transform transform, st
         }
 
         //Get the collision polygon
-        entityx::ComponentHandle<c::PositionComponent> obstacleCPosition = obstacle.component<c::PositionComponent>();
-        entityx::ComponentHandle<c::PlatformerHitboxComponent> obstacleCPolygon = obstacle.component<c::PlatformerHitboxComponent>();
-        entityx::ComponentHandle<c::PlatformComponent> obstacleCO = obstacle.component<c::PlatformComponent>();
+        entityx::ComponentHandle<PositionComponent> obstacleCPosition = obstacle.component<PositionComponent>();
+        entityx::ComponentHandle<PlatformerHitboxComponent> obstacleCPolygon = obstacle.component<PlatformerHitboxComponent>();
+        entityx::ComponentHandle<PlatformComponent> obstacleCO = obstacle.component<PlatformComponent>();
 
         if(!obstacleCPosition || !obstacleCPolygon || !obstacleCO || ((onlyOfType & obstacleCO->platformType) == 0) || !obstacleCO->activated)
         {
@@ -90,7 +90,7 @@ bool IsCollidingObstacle(collision::Polygon polygon, sf::Transform transform, st
         //Test if there is a collision
         sf::Transform obstacleTransform;
         obstacleTransform.translate(obstacleCPosition->x, obstacleCPosition->y);
-        if(collision::Polygon::collides(polygon, obstacleCPolygon->getHitbox(), transform, obstacleTransform))
+        if(Polygon::collides(polygon, obstacleCPolygon->getHitbox(), transform, obstacleTransform))
         {
             return true;
         }
@@ -99,12 +99,12 @@ bool IsCollidingObstacle(collision::Polygon polygon, sf::Transform transform, st
     return false;
 }
 
-bool IsCollidingObstacle(collision::Polygon polygon, sf::Transform transform, e::Entity obstacle)
+bool IsCollidingObstacle(Polygon polygon, sf::Transform transform, e::Entity obstacle)
 {
     //Get the collision polygon
-    entityx::ComponentHandle<c::PositionComponent> obstacleCPosition = obstacle.component<c::PositionComponent>();
-    entityx::ComponentHandle<c::PlatformerHitboxComponent> obstacleCPolygon = obstacle.component<c::PlatformerHitboxComponent>();
-    entityx::ComponentHandle<c::PlatformComponent> obstacleCO = obstacle.component<c::PlatformComponent>();
+    entityx::ComponentHandle<PositionComponent> obstacleCPosition = obstacle.component<PositionComponent>();
+    entityx::ComponentHandle<PlatformerHitboxComponent> obstacleCPolygon = obstacle.component<PlatformerHitboxComponent>();
+    entityx::ComponentHandle<PlatformComponent> obstacleCO = obstacle.component<PlatformComponent>();
 
     if(!obstacleCPosition || !obstacleCPolygon || !obstacleCO || !obstacleCO->activated)
     {
@@ -114,10 +114,10 @@ bool IsCollidingObstacle(collision::Polygon polygon, sf::Transform transform, e:
     //Test if there is a collision
     sf::Transform obstacleTransform;
     obstacleTransform.translate(obstacleCPosition->x, obstacleCPosition->y);
-    return collision::Polygon::collides(polygon, obstacleCPolygon->getHitbox(), transform, obstacleTransform);
+    return Polygon::collides(polygon, obstacleCPolygon->getHitbox(), transform, obstacleTransform);
 }
 
-std::vector<e::Entity> GetCollidingObstacles(collision::Polygon polygon, sf::Transform transform, std::vector<e::Entity> potentialObstacles, std::vector<e::Entity> except, int types = c::PlatformComponent::All)
+std::vector<e::Entity> GetCollidingObstacles(Polygon polygon, sf::Transform transform, std::vector<e::Entity> potentialObstacles, std::vector<e::Entity> except, int types = PlatformComponent::All)
 {
     std::vector<e::Entity> collidingObstacles;
 
@@ -130,9 +130,9 @@ std::vector<e::Entity> GetCollidingObstacles(collision::Polygon polygon, sf::Tra
         }
 
         //Get the collision polygon
-        entityx::ComponentHandle<c::PositionComponent> obstacleCPosition = obstacle.component<c::PositionComponent>();
-        entityx::ComponentHandle<c::PlatformerHitboxComponent> obstacleCPolygon = obstacle.component<c::PlatformerHitboxComponent>();
-        entityx::ComponentHandle<c::PlatformComponent> obstacleCO = obstacle.component<c::PlatformComponent>();
+        entityx::ComponentHandle<PositionComponent> obstacleCPosition = obstacle.component<PositionComponent>();
+        entityx::ComponentHandle<PlatformerHitboxComponent> obstacleCPolygon = obstacle.component<PlatformerHitboxComponent>();
+        entityx::ComponentHandle<PlatformComponent> obstacleCO = obstacle.component<PlatformComponent>();
 
         if(!obstacleCPosition || !obstacleCPolygon || !obstacleCO || ((types & obstacleCO->platformType) == 0) || !obstacleCO->activated)
         {
@@ -142,7 +142,7 @@ std::vector<e::Entity> GetCollidingObstacles(collision::Polygon polygon, sf::Tra
         //Test if there is a collision
         sf::Transform obstacleTransform;
         obstacleTransform.translate(obstacleCPosition->x, obstacleCPosition->y);
-        if(collision::Polygon::collides(polygon, obstacleCPolygon->getHitbox(), transform, obstacleTransform))
+        if(Polygon::collides(polygon, obstacleCPolygon->getHitbox(), transform, obstacleTransform))
         {
             collidingObstacles.push_back(obstacle);
         }
@@ -151,13 +151,13 @@ std::vector<e::Entity> GetCollidingObstacles(collision::Polygon polygon, sf::Tra
     return collidingObstacles;
 }
 
-bool IsOnFloor(collision::Polygon polygon, sf::Transform transform, std::vector<e::Entity> potentialFloors, std::vector<e::Entity> except = NO_EXCEPTIONS)
+bool IsOnFloor(Polygon polygon, sf::Transform transform, std::vector<e::Entity> potentialFloors, std::vector<e::Entity> except = NO_EXCEPTIONS)
 {
     transform.translate(0.f, 5.f);
     return IsCollidingObstacle(polygon, transform, potentialFloors, except);
 }
 
-e::Entity GetFloor(collision::Polygon polygon, sf::Transform transform, std::vector<e::Entity> potentialFloors, std::vector<e::Entity> except = NO_EXCEPTIONS)
+e::Entity GetFloor(Polygon polygon, sf::Transform transform, std::vector<e::Entity> potentialFloors, std::vector<e::Entity> except = NO_EXCEPTIONS)
 {
     transform.translate(0.f, 5.f);
     std::vector<e::Entity> floors = GetCollidingObstacles(polygon, transform, potentialFloors, except);
@@ -172,11 +172,11 @@ e::Entity GetFloor(collision::Polygon polygon, sf::Transform transform, std::vec
 
 void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
 {
-    es.each<c::PositionComponent, c::PlatformerComponent, c::PlatformerHitboxComponent>([&](
+    es.each<PositionComponent, PlatformerComponent, PlatformerHitboxComponent>([&](
         entityx::Entity entity,
-        c::PositionComponent& position,
-        c::PlatformerComponent& platformer,
-        c::PlatformerHitboxComponent& hitbox)
+        PositionComponent& position,
+        PlatformerComponent& platformer,
+        PlatformerHitboxComponent& hitbox)
     {
         float oldX = position.x;
         float oldY = position.y;
@@ -190,7 +190,7 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
 
         std::set<entityx::Entity> entitiesHit; //< Store the entities hit by the platformer object
 
-        collision::Polygon polygon = hitbox.getHitbox();
+        Polygon polygon = hitbox.getHitbox();
         sf::Transform polygonTransform = position.getPositionTransform();
 
         //Update moving speed according to inputs
@@ -234,7 +234,7 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         std::vector<entityx::Entity> potentialObstacles = GetPotentialObstacles(es, m_quadtreesGrid, entity, std::max(platformer.currentSpeed * dt, platformer.maxFallingSpeed * dt));
 
         //Update position according to the floor movements
-        std::vector<entityx::Entity> overlappingJumpthrus = GetCollidingObstacles(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::Jumpthru);
+        std::vector<entityx::Entity> overlappingJumpthrus = GetCollidingObstacles(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, PlatformComponent::Jumpthru);
         std::vector<entityx::Entity>::iterator ground = std::find(overlappingJumpthrus.begin(), overlappingJumpthrus.end(), platformer.groundEntity); //Test the current ground (even if it's a jumpthru)
         if(ground != overlappingJumpthrus.end())
             overlappingJumpthrus.erase(ground);
@@ -244,7 +244,7 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
             platformer.groundEntity &&
             platformer.groundEntity == GetFloor(polygon, polygonTransform, potentialObstacles, overlappingJumpthrus))
         {
-            e::ComponentHandle<c::PositionComponent> floorCPos = platformer.groundEntity.component<c::PositionComponent>();
+            e::ComponentHandle<PositionComponent> floorCPos = platformer.groundEntity.component<PositionComponent>();
 
             requestedXMove += floorCPos->x - platformer.oldFloorPosX;
             requestedYMove += floorCPos->y - platformer.oldFloorPosY;
@@ -265,16 +265,16 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
 
         //Detect collision on the X-axis
         bool reqXPositive = requestedXMove > 0.f;
-        while(IsCollidingObstacle(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::Platform))
+        while(IsCollidingObstacle(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, PlatformComponent::Platform))
         {
             //Try to move the object on Y-axis to support slopes
             polygonTransform.translate(0.f, -1-ceil(abs(requestedXMove)));
-            if(!IsCollidingObstacle(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::Platform))
+            if(!IsCollidingObstacle(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, PlatformComponent::Platform))
             {
                 requestedYMove += -1-ceil(abs(requestedXMove));
 
                 //Drop the object onto the obstacle
-                while(!IsCollidingObstacle(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::Platform))
+                while(!IsCollidingObstacle(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, PlatformComponent::Platform))
                 {
                     requestedYMove++;
                     polygonTransform.translate(0.f, 1.f);
@@ -298,7 +298,7 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
             polygonTransform.translate(requestedXMove, 0.f);
         }
 
-        overlappingJumpthrus = GetCollidingObstacles(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, c::PlatformComponent::Jumpthru); //Test the current ground (even if it's a jumpthru)
+        overlappingJumpthrus = GetCollidingObstacles(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, PlatformComponent::Jumpthru); //Test the current ground (even if it's a jumpthru)
         ground = std::find(overlappingJumpthrus.begin(), overlappingJumpthrus.end(), platformer.groundEntity);
         if(ground != overlappingJumpthrus.end())
             overlappingJumpthrus.erase(ground);
@@ -354,7 +354,7 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         std::vector<entityx::Entity> allCollidingObstacles = GetCollidingObstacles(polygon, polygonTransform, potentialObstacles, overlappingJumpthrus);
 
         while((IsCollidingObstacle(polygon, polygonTransform, allCollidingObstacles, NO_EXCEPTIONS) && requestedYMove >= requestedYFloorMove) ||
-              (IsCollidingObstacle(polygon, polygonTransform, allCollidingObstacles, NO_EXCEPTIONS, c::PlatformComponent::Platform) && requestedYMove < requestedYFloorMove))
+              (IsCollidingObstacle(polygon, polygonTransform, allCollidingObstacles, NO_EXCEPTIONS, PlatformComponent::Platform) && requestedYMove < requestedYFloorMove))
         {
             platformer.fallingSpeed = 0.f;
             platformer.jumpingSpeed = 0.f;
@@ -386,7 +386,7 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         {
             platformer.groundEntity = GetFloor(polygon, polygonTransform, potentialObstacles, overlappingJumpthrus);
 
-            e::ComponentHandle<c::PositionComponent> floorCPos = platformer.groundEntity.component<c::PositionComponent>();
+            e::ComponentHandle<PositionComponent> floorCPos = platformer.groundEntity.component<PositionComponent>();
             platformer.oldFloorPosX = floorCPos->x;
             platformer.oldFloorPosY = floorCPos->y;
         }
@@ -403,9 +403,9 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         //Call on_hit callback on all platform hit by the platformer
         for(entityx::Entity collidedPlatform: entitiesHit)
         {
-            if(collidedPlatform.component<c::PlatformComponent>()->onHitFunc.valid())
+            if(collidedPlatform.component<PlatformComponent>()->onHitFunc.valid())
             {
-                collidedPlatform.component<c::PlatformComponent>()->onHitFunc.call(lua::EntityHandle(collidedPlatform), lua::EntityHandle(entity));
+                collidedPlatform.component<PlatformComponent>()->onHitFunc.call(EntityHandle(collidedPlatform), EntityHandle(entity));
             }
         }
 
@@ -413,28 +413,28 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         if(IsOnFloor(polygon, polygonTransform, potentialObstacles, overlappingJumpthrus))
         {
             if(abs(position.x - oldX - requestedXFloorMove) > 0.1f)
-                platformer.movementStateCallbacks.setState(c::PlatformerComponent::Walking);
+                platformer.movementStateCallbacks.setState(PlatformerComponent::Walking);
             else
-                platformer.movementStateCallbacks.setState(c::PlatformerComponent::Idle);
+                platformer.movementStateCallbacks.setState(PlatformerComponent::Idle);
         }
         else
         {
             if(position.y - oldY < 0)
-                platformer.movementStateCallbacks.setState(c::PlatformerComponent::Jumping);
+                platformer.movementStateCallbacks.setState(PlatformerComponent::Jumping);
             else
-                platformer.movementStateCallbacks.setState(c::PlatformerComponent::Falling);
+                platformer.movementStateCallbacks.setState(PlatformerComponent::Falling);
         }
-        platformer.movementStateCallbacks.callIfNeeded(lua::EntityHandle(entity));
+        platformer.movementStateCallbacks.callIfNeeded(EntityHandle(entity));
 
         if(position.x - oldX > requestedXFloorMove + 0.01f)
         {
-            platformer.directionStateCallbacks.setState(c::PlatformerComponent::Right);
+            platformer.directionStateCallbacks.setState(PlatformerComponent::Right);
         }
         else if(position.x - oldX < requestedXFloorMove - 0.01f)
         {
-            platformer.directionStateCallbacks.setState(c::PlatformerComponent::Left);
+            platformer.directionStateCallbacks.setState(PlatformerComponent::Left);
         }
-        platformer.directionStateCallbacks.callIfNeeded(lua::EntityHandle(entity));
+        platformer.directionStateCallbacks.callIfNeeded(EntityHandle(entity));
     });
 }
 

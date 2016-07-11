@@ -9,12 +9,12 @@
 
 #include <SFML/Window/Keyboard.hpp>
 
-namespace c = components;
 
-namespace systems
+
+namespace yapg
 {
 
-HealthSystem::HealthSystem(const settings::SettingsManager& settingsManager) :
+HealthSystem::HealthSystem(const SettingsManager& settingsManager) :
     m_settingsManager(settingsManager),
     m_alreadyDeadEntities()
 {
@@ -26,7 +26,7 @@ namespace
     float getLowestPlatformY(entityx::EntityManager &es)
     {
         float maxYPos = std::numeric_limits<float>::lowest();
-        es.each<c::PositionComponent, c::PlatformComponent>([&](entityx::Entity, c::PositionComponent& position, c::PlatformComponent&)
+        es.each<PositionComponent, PlatformComponent>([&](entityx::Entity, PositionComponent& position, PlatformComponent&)
         {
             if(position.y + position.height > maxYPos)
                 maxYPos = position.y + position.height;
@@ -41,24 +41,24 @@ void HealthSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
     float lowestPlatformPos = getLowestPlatformY(es);
 
     //Test for entities beyond level's limits
-    es.each<c::PositionComponent, c::HealthComponent>([&](entityx::Entity entity, c::PositionComponent& position, c::HealthComponent& health)
+    es.each<PositionComponent, HealthComponent>([&](entityx::Entity entity, PositionComponent& position, HealthComponent& health)
     {
         if(health.health <= 0)
             return;
 
         if(position.y > 200.f + lowestPlatformPos)
         {
-            entity.component<c::HealthComponent>()->kill();
+            entity.component<HealthComponent>()->kill();
         }
     });
 }
 
 void HealthSystem::receive(const HealthKillMessage& msg)
 {
-    if(!entityx::Entity(msg.entityToKill).has_component<c::HealthComponent>())
+    if(!entityx::Entity(msg.entityToKill).has_component<HealthComponent>())
         return;
 
-    entityx::Entity(msg.entityToKill).component<c::HealthComponent>()->health = 0;
+    entityx::Entity(msg.entityToKill).component<HealthComponent>()->health = 0;
     m_alreadyDeadEntities.push_back(entityx::Entity(msg.entityToKill));
 
     emit<HealthKilledMessage>(msg.entityToKill);
@@ -76,12 +76,12 @@ void HealthSystem::receive(const HealthKillMessage& msg)
 
 void HealthSystem::receive(const HealthLoosePVMessage& msg)
 {
-    if(!entityx::Entity(msg.entity).has_component<c::HealthComponent>())
+    if(!entityx::Entity(msg.entity).has_component<HealthComponent>())
         return;
 
-    entityx::Entity(msg.entity).component<c::HealthComponent>()->health -= msg.pv;
-    if(entityx::Entity(msg.entity).component<c::HealthComponent>()->health <= 0)
-        entityx::Entity(msg.entity).component<c::HealthComponent>()->kill();
+    entityx::Entity(msg.entity).component<HealthComponent>()->health -= msg.pv;
+    if(entityx::Entity(msg.entity).component<HealthComponent>()->health <= 0)
+        entityx::Entity(msg.entity).component<HealthComponent>()->kill();
 
     //TODO: Call the loose PV callback
 
@@ -90,10 +90,10 @@ void HealthSystem::receive(const HealthLoosePVMessage& msg)
 
 void HealthSystem::receive(const HealthGainPVMessage& msg)
 {
-    if(!entityx::Entity(msg.entity).has_component<c::HealthComponent>())
+    if(!entityx::Entity(msg.entity).has_component<HealthComponent>())
         return;
 
-    auto healthComp = entityx::Entity(msg.entity).component<c::HealthComponent>();
+    auto healthComp = entityx::Entity(msg.entity).component<HealthComponent>();
     healthComp->health += msg.pv;
     healthComp->health = std::min(healthComp->health, healthComp->maxHealth);
 

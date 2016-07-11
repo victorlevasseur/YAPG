@@ -6,7 +6,7 @@
 #include "entityx/entityx.h"
 
 
-namespace level
+namespace yapg
 {
 
 /**

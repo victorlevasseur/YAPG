@@ -3,7 +3,7 @@
 #include "Tools/Observer.hpp"
 
 
-namespace tools
+namespace yapg
 {
 
 Observable::Observable() :

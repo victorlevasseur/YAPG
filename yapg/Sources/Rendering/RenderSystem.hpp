@@ -15,7 +15,7 @@
 #include "Messaging/Messaging.hpp"
 #include "Resources/ResourcesManager.hpp"
 
-namespace systems
+namespace yapg
 {
 
 struct AnimationChangedMessage
@@ -33,7 +33,7 @@ public:
         float z;
     };
 
-    RenderSystem(resources::TexturesManager& texturesManager, collision::EntitySpatialGrid& grid, bool cameraFollowPlayers = true, bool debugHitboxDraw = false);
+    RenderSystem(TexturesManager& texturesManager, EntitySpatialGrid& grid, bool cameraFollowPlayers = true, bool debugHitboxDraw = false);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
@@ -47,7 +47,7 @@ public:
 private:
     void addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, sf::RenderStates states, float z);
 
-    std::shared_ptr<animation::AnimatedSprite> getAnimatedSprite(entityx::Entity entity);
+    std::shared_ptr<AnimatedSprite> getAnimatedSprite(entityx::Entity entity);
 
     bool m_cameraFollowPlayers;
 
@@ -57,12 +57,12 @@ private:
     int m_centerOnPlayer;
     entityx::Entity m_lastGroundEntity;
 
-    std::map<entityx::Entity, std::shared_ptr<animation::AnimatedSprite>> m_animatedSprites;
+    std::map<entityx::Entity, std::shared_ptr<AnimatedSprite>> m_animatedSprites;
 
-    resources::TexturesManager& m_texturesManager;
+    TexturesManager& m_texturesManager;
     bool m_debugHitboxDraw;
 
-    collision::EntitySpatialGrid& m_grid;
+    EntitySpatialGrid& m_grid;
 };
 
 }

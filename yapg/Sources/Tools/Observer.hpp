@@ -1,10 +1,10 @@
 #ifndef YAPG_GAME_TOOLS_OBSERVER_H
 #define YAPG_GAME_TOOLS_OBSERVER_H
 
-namespace tools{ class Observable; }
+namespace yapg{ class Observable; }
 
 
-namespace tools
+namespace yapg
 {
 
 class Observer

@@ -5,7 +5,7 @@
 
 #include <SFML/System/String.hpp>
 
-namespace tools
+namespace yapg
 {
 
 std::u32string getUTF32String(const std::string& str)

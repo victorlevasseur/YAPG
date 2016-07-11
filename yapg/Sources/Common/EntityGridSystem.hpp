@@ -8,7 +8,7 @@
 #include "Common/EntitySpatialGrid.hpp"
 #include "Common/PositionComponent.hpp"
 
-namespace systems
+namespace yapg
 {
 
 class EntityGridSystem : public entityx::System<EntityGridSystem>, public entityx::Receiver<EntityGridSystem>
@@ -25,17 +25,17 @@ public:
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
-    void receive(const entityx::ComponentRemovedEvent<components::PositionComponent>& event);
+    void receive(const entityx::ComponentRemovedEvent<PositionComponent>& event);
     void receive(const entityx::EntityDestroyedEvent& event);
 
-    const collision::EntitySpatialGrid& getGrid() const { return m_grid; }
-    collision::EntitySpatialGrid& getGrid() { return m_grid; }
+    const EntitySpatialGrid& getGrid() const { return m_grid; }
+    EntitySpatialGrid& getGrid() { return m_grid; }
 
 private:
     void tryToAddEntityToGrid(entityx::Entity entity);
     void tryToRemoveEntityFromGrid(entityx::Entity entity);
 
-    collision::EntitySpatialGrid m_grid;
+    EntitySpatialGrid m_grid;
 };
 
 }

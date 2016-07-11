@@ -5,9 +5,9 @@
 
 #include "Messaging/Messaging.hpp"
 
-namespace settings{ class SettingsManager; }
+namespace yapg{ class SettingsManager; }
 
-namespace systems
+namespace yapg
 {
 
 /**
@@ -48,7 +48,7 @@ class HealthSystem : public entityx::System<HealthSystem>, public messaging::Emi
 {
 public:
 
-    HealthSystem(const settings::SettingsManager& settingsManager);
+    HealthSystem(const SettingsManager& settingsManager);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
@@ -57,7 +57,7 @@ public:
     virtual void receive(const HealthGainPVMessage& msg);
 
 private:
-    const settings::SettingsManager& m_settingsManager;
+    const SettingsManager& m_settingsManager;
 
     std::vector<entityx::Entity> m_alreadyDeadEntities;
 };

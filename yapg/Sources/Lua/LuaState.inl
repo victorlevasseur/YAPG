@@ -1,7 +1,7 @@
 #include "Lua/EntityHandle.hpp"
 #include "Lua/LuaAnyConversions.hpp"
 
-namespace lua
+namespace yapg
 {
 
 template<class T>

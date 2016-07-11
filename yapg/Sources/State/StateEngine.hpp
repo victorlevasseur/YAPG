@@ -7,10 +7,10 @@
 #include "Tools/Observable.hpp"
 
 
-namespace state
+namespace yapg
 {
 
-class StateEngine : public tools::Observable
+class StateEngine : public Observable
 {
 public:
     StateEngine();

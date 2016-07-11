@@ -1,5 +1,5 @@
 
-namespace state
+namespace yapg
 {
 
 template<class T, typename... Args>

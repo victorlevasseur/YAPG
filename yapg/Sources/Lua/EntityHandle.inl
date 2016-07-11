@@ -1,4 +1,4 @@
-namespace lua
+namespace yapg
 {
 
 template<class C>
@@ -12,7 +12,7 @@ C* EntityHandle::doGetComponentPtrForLua(EntityHandle entity)
 }
 
 template<class C>
-components::Component* EntityHandle::doGetComponentPtr()
+Component* EntityHandle::doGetComponentPtr()
 {
     if(m_entity.has_component<C>())
     {
@@ -23,7 +23,7 @@ components::Component* EntityHandle::doGetComponentPtr()
 }
 
 template<class C>
-const components::Component* EntityHandle::doGetComponentPtrConst() const
+const Component* EntityHandle::doGetComponentPtrConst() const
 {
     if(m_entity.has_component<C>())
     {

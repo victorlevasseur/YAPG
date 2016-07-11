@@ -6,23 +6,23 @@
 #include "Lua/Template/EntityParametersHelper.hpp"
 #include "Meta/Metadata.hpp"
 
-namespace components
+namespace yapg
 {
 
 class TemplateComponent : public Component
 {
 public:
-    TemplateComponent(entityx::Entity entity, int serializedId, const std::string& templateName, const lua::EntityParametersHelper& parametersHelper);
+    TemplateComponent(entityx::Entity entity, int serializedId, const std::string& templateName, const EntityParametersHelper& parametersHelper);
     virtual ~TemplateComponent();
 
     virtual std::string getName() const;
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 
     int serializedId;
     const std::string templateName;
 
-    const lua::EntityParametersHelper parametersHelper;
+    const EntityParametersHelper parametersHelper;
 };
 
 std::ostream& operator<<(std::ostream& stream, const TemplateComponent& component);

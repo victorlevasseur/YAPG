@@ -7,24 +7,24 @@
 #include "Tools/Observable.hpp"
 #include "Tools/Observer.hpp"
 
-namespace state { class StateEngine; }
+namespace yapg { class StateEngine; }
 
-namespace window
+namespace yapg
 {
 
-class WindowManager : public tools::Observer
+class WindowManager : public Observer
 {
 public:
-    WindowManager(state::StateEngine& engine, const sf::String& windowTitle);
+    WindowManager(StateEngine& engine, const sf::String& windowTitle);
     virtual ~WindowManager();
 
     void run();
 
-    virtual void update(tools::Observable& observable, void* value = nullptr);
+    virtual void update(Observable& observable, void* value = nullptr);
 
 private:
     sf::RenderWindow m_window;
-    state::StateEngine& m_engine;
+    StateEngine& m_engine;
 };
 
 }

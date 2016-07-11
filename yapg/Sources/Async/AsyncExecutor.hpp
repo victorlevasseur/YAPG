@@ -8,7 +8,7 @@
 
 #include "Async/Task.hpp"
 
-namespace async
+namespace yapg
 {
 
 class AsyncExecutor

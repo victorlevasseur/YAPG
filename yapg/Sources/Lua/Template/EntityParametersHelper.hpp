@@ -11,9 +11,9 @@
 
 #include "Lua/Template/EntityTemplate.hpp"
 
-namespace lua{ class EntityHandle; }
+namespace yapg{ class EntityHandle; }
 
-namespace lua
+namespace yapg
 {
 
 /**

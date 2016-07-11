@@ -6,6 +6,9 @@
 #include "Meta/Details/Metadata.hpp"
 #include "Settings/tinyxml2.h"
 
+namespace yapg
+{
+
 namespace meta
 {
 
@@ -41,7 +44,7 @@ public:
         return *this;
     }
 
-    virtual void loadFromXml(void* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
+    virtual void loadFromXml(void* value, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const override
     {
         if(m_loadXmlFunction)
             m_loadXmlFunction(reinterpret_cast<T*>(value), xmlElement, entityGetter);
@@ -49,13 +52,13 @@ public:
             std::cout << "[Meta/Warning] " << typeid(T).name() << " type does not support being loaded from XML !" << std::endl;
     }
 
-    TypeMetadata<T>& setXmlLoadFunction(std::function<void(T*, const tinyxml2::XMLElement*, const level::SerializedEntityGetter&)> loadXmlFunction)
+    TypeMetadata<T>& setXmlLoadFunction(std::function<void(T*, const tinyxml2::XMLElement*, const SerializedEntityGetter&)> loadXmlFunction)
     {
         m_loadXmlFunction = loadXmlFunction;
         return *this;
     }
 
-    virtual void saveToXml(const void* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
+    virtual void saveToXml(const void* value, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const override
     {
         if(m_saveXmlFunction)
             m_saveXmlFunction(reinterpret_cast<const T*>(value), xmlElement, entityGetter);
@@ -63,7 +66,7 @@ public:
             std::cout << "[Meta/Warning] " << typeid(T).name() << " type does not support being saved to XML !" << std::endl;
     }
 
-    TypeMetadata<T>& setXmlSaveFunction(std::function<void(const T*, tinyxml2::XMLElement*, const level::SerializedEntityGetter&)> saveXmlFunction)
+    TypeMetadata<T>& setXmlSaveFunction(std::function<void(const T*, tinyxml2::XMLElement*, const SerializedEntityGetter&)> saveXmlFunction)
     {
         m_saveXmlFunction = saveXmlFunction;
         return *this;
@@ -71,9 +74,11 @@ public:
 
 private:
     std::function<void(T*, const sol::object&)> m_loadFunction;
-    std::function<void(T*, const tinyxml2::XMLElement*, const level::SerializedEntityGetter&)> m_loadXmlFunction;
-    std::function<void(const T*, tinyxml2::XMLElement*, const level::SerializedEntityGetter&)> m_saveXmlFunction;
+    std::function<void(T*, const tinyxml2::XMLElement*, const SerializedEntityGetter&)> m_loadXmlFunction;
+    std::function<void(const T*, tinyxml2::XMLElement*, const SerializedEntityGetter&)> m_saveXmlFunction;
 };
+
+}
 
 }
 

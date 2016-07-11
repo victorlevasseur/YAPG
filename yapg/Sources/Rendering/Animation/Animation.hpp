@@ -5,7 +5,7 @@
 
 #include "Rendering/Animation/Frame.hpp"
 
-namespace animation
+namespace yapg
 {
 
 class Animation

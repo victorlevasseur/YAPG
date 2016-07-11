@@ -10,6 +10,9 @@
 #include "Meta/Details/Metadata.hpp"
 #include "Meta/Details/TypeMetadata.hpp"
 
+namespace yapg
+{
+
 namespace meta
 {
 
@@ -78,6 +81,8 @@ private:
     static std::map<std::type_index, std::unique_ptr<Metadata>> metadatas;
     static std::map<std::string, Metadata*> metadatasByNames; //< Stores not owning pointers to metadata to be able to get a metadata according to its class/type name
 };
+
+}
 
 }
 

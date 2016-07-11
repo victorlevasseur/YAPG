@@ -3,10 +3,10 @@
 
 #include <set>
 
-namespace tools{ class Observer; }
+namespace yapg{ class Observer; }
 
 
-namespace tools
+namespace yapg
 {
 
 class Observable

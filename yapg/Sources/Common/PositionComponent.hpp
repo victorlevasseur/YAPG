@@ -6,7 +6,7 @@
 #include "Common/Component.hpp"
 #include "Lua/LuaState.hpp"
 
-namespace components
+namespace yapg
 {
 
 class PositionComponent : public Component
@@ -30,7 +30,7 @@ public:
     float oldWidth;
     float oldHeight;
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 };
 
 std::ostream& operator<<(std::ostream& stream, const PositionComponent& component);

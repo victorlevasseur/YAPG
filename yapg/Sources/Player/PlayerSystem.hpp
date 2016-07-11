@@ -7,9 +7,9 @@
 #include "Messaging/LevelMessages.hpp"
 #include "Messaging/Messaging.hpp"
 
-namespace settings{ class SettingsManager; }
+namespace yapg{ class SettingsManager; }
 
-namespace systems
+namespace yapg
 {
 
 struct PlayerFinishedMessage
@@ -20,7 +20,7 @@ struct PlayerFinishedMessage
 class PlayerSystem : public entityx::System<PlayerSystem>, public messaging::Receiver<PlayerFinishedMessage, HealthKilledMessage>, public messaging::Emitter
 {
 public:
-    PlayerSystem(std::size_t playersCount, const settings::SettingsManager& settingsManager);
+    PlayerSystem(std::size_t playersCount, const SettingsManager& settingsManager);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
@@ -34,7 +34,7 @@ private:
 
     void sendLevelMessages();
 
-    const settings::SettingsManager& m_settingsManager;
+    const SettingsManager& m_settingsManager;
 };
 
 }

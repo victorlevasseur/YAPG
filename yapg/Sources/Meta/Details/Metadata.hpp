@@ -5,8 +5,11 @@
 
 #include "Lua/sol.hpp"
 
-namespace level{ class SerializedEntityGetter; }
+namespace yapg{ class SerializedEntityGetter; }
 namespace tinyxml2{ class XMLElement; }
+
+namespace yapg
+{
 
 namespace meta
 {
@@ -25,9 +28,9 @@ public:
 
     virtual void load(void* object, const sol::object& luaObject) const = 0;
 
-    virtual void loadFromXml(void* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const = 0;
+    virtual void loadFromXml(void* object, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const = 0;
 
-    virtual void saveToXml(const void* object, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const = 0;
+    virtual void saveToXml(const void* object, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const = 0;
 
     /**
      * \return whether the type/class described by this metadata has attributes or not.
@@ -48,6 +51,8 @@ public:
 
 private:
 };
+
+}
 
 }
 

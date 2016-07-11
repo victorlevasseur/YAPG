@@ -7,10 +7,10 @@
 #include "Player/PlayerComponent.hpp"
 #include "Settings/tinyxml2.h"
 
-namespace level
+namespace yapg
 {
 
-Level::Level(lua::LuaState& luaState, LevelMode levelMode) :
+Level::Level(LuaState& luaState, LevelMode levelMode) :
     m_luaState(luaState),
     m_eventMgr(),
     m_entityMgr(m_eventMgr),
@@ -183,7 +183,7 @@ void Level::SaveToFile(const std::string& path)
 
         SerializedEntityGetter entityGetter;
         unsigned int nextId = 1;
-        m_entityMgr.each<components::TemplateComponent>([&entityGetter, &nextId, &entityElements, &objectsElement, &levelDocument](entityx::Entity entity, components::TemplateComponent& templateComponent)
+        m_entityMgr.each<TemplateComponent>([&entityGetter, &nextId, &entityElements, &objectsElement, &levelDocument](entityx::Entity entity, TemplateComponent& templateComponent)
         {
             entityGetter.registerEntity(entity, nextId);
 
@@ -199,9 +199,9 @@ void Level::SaveToFile(const std::string& path)
 
         //Go through all entities again to save their parameters and entity template name
         //This allows all entities to be able to get the other's ID while saving their parameters
-        m_entityMgr.each<components::TemplateComponent>([&](entityx::Entity entity, components::TemplateComponent& templateComponent)
+        m_entityMgr.each<TemplateComponent>([&](entityx::Entity entity, TemplateComponent& templateComponent)
         {
-            const lua::EntityTemplate& entityTemplate = m_luaState.getTemplate(templateComponent.templateName);
+            const EntityTemplate& entityTemplate = m_luaState.getTemplate(templateComponent.templateName);
 
             tinyxml2::XMLElement* parametersElement = levelDocument.NewElement("parameters");
             entityElements.at(entity)->LinkEndChild(parametersElement);
@@ -222,14 +222,14 @@ entityx::Entity Level::createNewEntity(const std::string& templateName, bool tem
 
     if(templateComponent)
     {
-        newEntity.component<components::TemplateComponent>()->serializedId = m_nextId;
+        newEntity.component<TemplateComponent>()->serializedId = m_nextId;
         ++m_nextId;
     }
 
     return newEntity;
 }
 
-void Level::registerClass(lua::LuaState& luaState)
+void Level::registerClass(LuaState& luaState)
 {
 
 }

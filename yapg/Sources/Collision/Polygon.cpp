@@ -12,7 +12,7 @@
 #define M_PI       3.14159265358979323846
 
 
-namespace collision
+namespace yapg
 {
 
 Polygon::Polygon() : m_vertices()
@@ -215,7 +215,7 @@ Polygon Polygon::Rectangle(float width, float height)
     return Polygon({sf::Vector2f(-width/2, -height/2), sf::Vector2f(+width/2, -height/2), sf::Vector2f(+width/2, +height/2), sf::Vector2f(-width/2, +height/2)});
 }
 
-void Polygon::registerClass(lua::LuaState& state)
+void Polygon::registerClass(LuaState& state)
 {
     meta::MetadataStore::registerClass<Polygon>()
         .declareAttribute("points", &Polygon::m_vertices);

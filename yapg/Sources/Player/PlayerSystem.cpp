@@ -8,12 +8,12 @@
 
 #include <SFML/Window/Keyboard.hpp>
 
-namespace c = components;
 
-namespace systems
+
+namespace yapg
 {
 
-PlayerSystem::PlayerSystem(std::size_t playersCount, const settings::SettingsManager& settingsManager) :
+PlayerSystem::PlayerSystem(std::size_t playersCount, const SettingsManager& settingsManager) :
     m_playersCount(playersCount),
     m_stillAliveCount(playersCount),
     m_finishedCount(0),
@@ -24,10 +24,10 @@ PlayerSystem::PlayerSystem(std::size_t playersCount, const settings::SettingsMan
 
 void PlayerSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
 {
-    es.each<c::PlayerComponent, c::PlatformerComponent>([&](entityx::Entity entity, c::PlayerComponent& player, c::PlatformerComponent& platformer)
+    es.each<PlayerComponent, PlatformerComponent>([&](entityx::Entity entity, PlayerComponent& player, PlatformerComponent& platformer)
     {
         //Get the keys associated to the player
-        const settings::KeySettings::PlayerKeys& playerKeys =
+        const KeySettings::PlayerKeys& playerKeys =
             m_settingsManager.getKeySettings().getPlayerKeys(player.playerNumber);
 
         if(!player.hasFinishedLevel())
@@ -49,7 +49,7 @@ void PlayerSystem::receive(const PlayerFinishedMessage& msg)
 {
     auto entity = entityx::Entity(msg.player);
 
-    if(entity.has_component<c::PlayerComponent>())
+    if(entity.has_component<PlayerComponent>())
     {
         ++m_finishedCount;
         sendLevelMessages();
@@ -60,7 +60,7 @@ void PlayerSystem::receive(const HealthKilledMessage& msg)
 {
     auto entity = entityx::Entity(msg.entity);
 
-    if(entity.has_component<c::PlayerComponent>())
+    if(entity.has_component<PlayerComponent>())
     {
         --m_stillAliveCount;
         sendLevelMessages();

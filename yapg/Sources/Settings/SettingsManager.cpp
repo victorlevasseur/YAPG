@@ -9,7 +9,7 @@
 
 namespace tx2 = tinyxml2;
 
-namespace settings
+namespace yapg
 {
 
 SettingsManager::SettingsManager(const std::string& configFileName) :

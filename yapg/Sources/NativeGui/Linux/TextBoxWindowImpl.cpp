@@ -2,7 +2,7 @@
 
 #ifdef OS_LINUX
 
-namespace nativegui
+namespace yapg
 {
 namespace impl
 {

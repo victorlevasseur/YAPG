@@ -31,7 +31,7 @@
 namespace fs = boost::filesystem;
 
 
-namespace lua
+namespace yapg
 {
 
 LuaState::LuaState() :
@@ -56,72 +56,72 @@ LuaState::LuaState() :
 
     //Declare the metadatas of some basic types
     meta::MetadataStore::registerType<int>()
-        .setXmlLoadFunction([](int* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        .setXmlLoadFunction([](int* value, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
             xmlElement->QueryIntText(value);
         })
-        .setXmlSaveFunction([](const int* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        .setXmlSaveFunction([](const int* value, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
             xmlElement->SetText(*value);
         });
     declareAnyConvertibleType<int>("int");
 
     meta::MetadataStore::registerType<unsigned int>()
-        .setXmlLoadFunction([](unsigned int* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        .setXmlLoadFunction([](unsigned int* value, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
             int intValue = static_cast<int>(*value);
             xmlElement->QueryIntText(&intValue);
             *value = static_cast<unsigned int>(intValue);
         })
-        .setXmlSaveFunction([](const unsigned int* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        .setXmlSaveFunction([](const unsigned int* value, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
             xmlElement->SetText(static_cast<int>(*value));
         });
     declareAnyConvertibleType<unsigned int>("unsigned_int");
 
     meta::MetadataStore::registerType<bool>()
-        .setXmlLoadFunction([](bool* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        .setXmlLoadFunction([](bool* value, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
             const char* stringValue = xmlElement->GetText();
             if(stringValue)
                 *value = strcmp(stringValue, "true");
         })
-        .setXmlSaveFunction([](const bool* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        .setXmlSaveFunction([](const bool* value, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
             xmlElement->SetText(*value);
         });
     declareAnyConvertibleType<bool>("bool");
 
     meta::MetadataStore::registerType<float>()
-        .setXmlLoadFunction([](float* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        .setXmlLoadFunction([](float* value, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
             xmlElement->QueryFloatText(value);
         })
-        .setXmlSaveFunction([](const float* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        .setXmlSaveFunction([](const float* value, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
             xmlElement->SetText(*value);
         });
     declareAnyConvertibleType<float>("float");
 
     meta::MetadataStore::registerType<double>()
-        .setXmlLoadFunction([](double* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        .setXmlLoadFunction([](double* value, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
             xmlElement->QueryDoubleText(value);
         })
-        .setXmlSaveFunction([](const double* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        .setXmlSaveFunction([](const double* value, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
             xmlElement->SetText(*value);
         });
     declareAnyConvertibleType<double>("double");
 
     meta::MetadataStore::registerType<std::string>()
-        .setXmlLoadFunction([](std::string* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        .setXmlLoadFunction([](std::string* value, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
             const char* stringValue = xmlElement->GetText();
             if(stringValue)
                 *value = std::string(stringValue);
         })
-        .setXmlSaveFunction([](const std::string* value, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+        .setXmlSaveFunction([](const std::string* value, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
             xmlElement->SetText(value->c_str());
         });
@@ -150,29 +150,29 @@ LuaState::LuaState() :
     std::cout << "[Lua/Note] Primitive types registered." << std::endl;
 
     //Declare class metadatas
-    animation::Animation::registerClass();
-    animation::Frame::registerClass();
-    collision::Polygon::registerClass(*this);
-    collision::PolygonCallback::registerClass(*this);
+    Animation::registerClass();
+    Frame::registerClass();
+    Polygon::registerClass(*this);
+    PolygonCallback::registerClass(*this);
     std::cout << "[Lua/Note] Classes registered." << std::endl;
 
     //Declare main C++ classes and declare their metadatas
     EntityHandle::registerClass(*this);
-    level::Level::registerClass(*this);
-    level::LevelState::registerClass(*this);
+    Level::registerClass(*this);
+    LevelState::registerClass(*this);
 
-    components::Component::registerComponent(*this);
-    components::CollidableComponent::registerComponent(*this);
-    components::ColliderComponent::registerComponent(*this);
-    components::CustomBehaviorComponent::registerComponent(*this);
-    components::CustomDataComponent::registerComponent(*this);
-    components::HealthComponent::registerComponent(*this);
-    components::PlatformerHitboxComponent::registerComponent(*this);
-    components::PlatformComponent::registerComponent(*this);
-    components::PlatformerComponent::registerComponent(*this);
-    components::PlayerComponent::registerComponent(*this);
-    components::PositionComponent::registerComponent(*this);
-    components::RenderComponent::registerComponent(*this);
+    Component::registerComponent(*this);
+    CollidableComponent::registerComponent(*this);
+    ColliderComponent::registerComponent(*this);
+    CustomBehaviorComponent::registerComponent(*this);
+    CustomDataComponent::registerComponent(*this);
+    HealthComponent::registerComponent(*this);
+    PlatformerHitboxComponent::registerComponent(*this);
+    PlatformComponent::registerComponent(*this);
+    PlatformerComponent::registerComponent(*this);
+    PlayerComponent::registerComponent(*this);
+    PositionComponent::registerComponent(*this);
+    RenderComponent::registerComponent(*this);
     std::cout << "[Lua/Note] All components registered." << std::endl;
 
     //Load yapg core libraries

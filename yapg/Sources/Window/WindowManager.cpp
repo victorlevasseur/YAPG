@@ -12,11 +12,11 @@
 #include "State/StateEngine.hpp"
 
 
-namespace window
+namespace yapg
 {
 
-WindowManager::WindowManager(state::StateEngine& engine, const sf::String& windowTitle) :
-    tools::Observer(),
+WindowManager::WindowManager(StateEngine& engine, const sf::String& windowTitle) :
+    Observer(),
     m_window(sf::VideoMode(1024, 768), windowTitle),
     m_engine(engine)
 {
@@ -83,7 +83,7 @@ void WindowManager::run()
     }
 }
 
-void WindowManager::update(tools::Observable& observable, void* value)
+void WindowManager::update(Observable& observable, void* value)
 {
 
 }

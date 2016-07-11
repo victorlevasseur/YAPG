@@ -14,15 +14,15 @@
 #include "Settings/SettingsManager.hpp"
 #include "State/State.hpp"
 
-namespace state{ class StateEngine; }
+namespace yapg{ class StateEngine; }
 
-namespace state
+namespace yapg
 {
 
 class MainMenuState : public State
 {
 public:
-    MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
+    MainMenuState(StateEngine& stateEngine, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager);
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
@@ -43,8 +43,8 @@ private:
     void updateKeysButtonsFromSettings();
     void updateSettingsFromKeysButtons();
 
-    resources::AllResourcesManagers& m_resourcesManager;
-    settings::SettingsManager& m_settingsManager;
+    AllResourcesManagers& m_resourcesManager;
+    SettingsManager& m_settingsManager;
 
     //Menu elements
     std::shared_ptr<sf::Texture> m_logoTexture;
@@ -56,8 +56,8 @@ private:
 
     //Menu anim
     // - Player
-    std::map<std::string, animation::Animation> m_playerAnimations;
-    animation::AnimatedSprite m_playerSprite;
+    std::map<std::string, Animation> m_playerAnimations;
+    AnimatedSprite m_playerSprite;
     bool m_draggingPlayer;
     sf::Vector2f m_offsetToPlayer;
 

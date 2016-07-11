@@ -1,11 +1,11 @@
 #include "State/StateEngine.hpp"
 
 
-namespace state
+namespace yapg
 {
 
 StateEngine::StateEngine() :
-    tools::Observable(),
+    Observable(),
     m_states(),
     m_todoNextFrame(),
     m_todoNextFrameState(nullptr)

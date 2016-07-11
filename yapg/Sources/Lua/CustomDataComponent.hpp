@@ -9,7 +9,7 @@
 #include "Lua/LuaState.hpp"
 #include "Meta/Metadata.hpp"
 
-namespace components
+namespace yapg
 {
 
 class CustomDataComponent : public Component
@@ -20,7 +20,7 @@ public:
 
     virtual std::string getName() const;
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 
     bool hasValue(const std::string& key) const;
     boost::any getValue(const std::string& key) const;

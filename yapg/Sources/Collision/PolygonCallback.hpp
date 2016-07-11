@@ -6,7 +6,7 @@
 #include "Lua/LuaState.hpp"
 #include "Lua/sol.hpp"
 
-namespace collision
+namespace yapg
 {
 
 class PolygonCallback
@@ -14,7 +14,7 @@ class PolygonCallback
 public:
     PolygonCallback();
 
-    static void registerClass(lua::LuaState& state);
+    static void registerClass(LuaState& state);
 
     const Polygon& getPolygon() const { return m_polygon; }
     Polygon& getPolygon() { return m_polygon; }

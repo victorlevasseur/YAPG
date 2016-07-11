@@ -12,13 +12,13 @@
 #include "Player/PlayerComponent.hpp"
 #include "Rendering/RenderComponent.hpp"
 
-namespace c = components;
 
 
-namespace systems
+
+namespace yapg
 {
 
-RenderSystem::RenderSystem(resources::TexturesManager& texturesManager, collision::EntitySpatialGrid& grid, bool cameraFollowPlayers, bool debugHitboxDraw) :
+RenderSystem::RenderSystem(TexturesManager& texturesManager, EntitySpatialGrid& grid, bool cameraFollowPlayers, bool debugHitboxDraw) :
     entityx::System<RenderSystem>(),
     m_cameraFollowPlayers(cameraFollowPlayers),
     m_renderingQueue(),
@@ -40,10 +40,10 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
 
     if(m_debugHitboxDraw)
     {
-        es.each<c::PositionComponent, c::PlatformerHitboxComponent>([&](
+        es.each<PositionComponent, PlatformerHitboxComponent>([&](
             entityx::Entity entity,
-            c::PositionComponent& position,
-            c::PlatformerHitboxComponent& hitbox) {
+            PositionComponent& position,
+            PlatformerHitboxComponent& hitbox) {
             auto shape = std::make_shared<sf::ConvexShape>(hitbox.getHitbox().getPointsCount());
             shape->setOutlineThickness(1.f);
             shape->setFillColor(sf::Color::Transparent);
@@ -60,7 +60,7 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
         });
     }
 
-    auto drawFunc = [&](entityx::Entity entity, c::PositionComponent& position, c::RenderComponent& render) {
+    auto drawFunc = [&](entityx::Entity entity, PositionComponent& position, RenderComponent& render) {
         //Update the animated sprite and put it in the render queue
         auto animatedSprite = getAnimatedSprite(entity);
 
@@ -71,7 +71,7 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
 
         //Call the lua callback if the animation has just been restarted
         if(animatedSprite->hadRestartedAnimation() && render.onAnimationEndFunc.valid())
-            render.onAnimationEndFunc.call(lua::EntityHandle(entity), render.currentAnimation);
+            render.onAnimationEndFunc.call(EntityHandle(entity), render.currentAnimation);
 
         addToRenderingQueue(animatedSprite, sf::RenderStates::Default, position.z); //TODO: Get z position from RenderComponent
     };
@@ -86,30 +86,30 @@ void RenderSystem::update(entityx::EntityManager &es, entityx::EventManager &eve
     std::set<entityx::Entity> entitiesToDraw = m_grid.getEntitiesIntersectingAABB(viewAABB);
     for(entityx::Entity entity : entitiesToDraw)
     {
-        if(entity.has_component<c::PositionComponent>() && entity.has_component<c::RenderComponent>())
+        if(entity.has_component<PositionComponent>() && entity.has_component<RenderComponent>())
         {
-            drawFunc(entity, *(entity.component<c::PositionComponent>().get()), *(entity.component<c::RenderComponent>().get()));
+            drawFunc(entity, *(entity.component<PositionComponent>().get()), *(entity.component<RenderComponent>().get()));
         }
     }
 
     if(m_cameraFollowPlayers)
     {
         //Update the camera
-        es.each<c::PlayerComponent, c::PlatformerComponent, c::PositionComponent>([&](entityx::Entity entity, c::PlayerComponent& player, c::PlatformerComponent& platformer, c::PositionComponent& position) {
+        es.each<PlayerComponent, PlatformerComponent, PositionComponent>([&](entityx::Entity entity, PlayerComponent& player, PlatformerComponent& platformer, PositionComponent& position) {
             if(player.playerNumber != m_centerOnPlayer)
                 return; //Only center on the selected player
 
             float newX = position.x + position.width / 2.f;
             float newY = m_renderingView.getCenter().y;
 
-            if(platformer.groundEntity && platformer.groundEntity.has_component<c::PositionComponent>())
+            if(platformer.groundEntity && platformer.groundEntity.has_component<PositionComponent>())
             {
                 m_lastGroundEntity = platformer.groundEntity;
             }
 
             if(m_lastGroundEntity)
             {
-                auto groundPosition = m_lastGroundEntity.component<c::PositionComponent>();
+                auto groundPosition = m_lastGroundEntity.component<PositionComponent>();
 
                 //If the player is on the ground, update to Y position.
                 if(std::abs(newY - groundPosition->y) > 10.f)
@@ -156,14 +156,14 @@ void RenderSystem::render(sf::RenderTarget& target)
 void RenderSystem::receive(const AnimationChangedMessage& msg)
 {
     auto animatedSprite = getAnimatedSprite(msg.entity);
-    auto render = entityx::Entity(msg.entity).component<c::RenderComponent>();
+    auto render = entityx::Entity(msg.entity).component<RenderComponent>();
     if(render->currentAnimation != animatedSprite->getCurrentAnimation())
     {
         std::string oldAnimation = animatedSprite->getCurrentAnimation();
         animatedSprite->setCurrentAnimation(render->currentAnimation);
 
         if(render->onAnimationChangedFunc.valid())
-            render->onAnimationChangedFunc.call(lua::EntityHandle(msg.entity), oldAnimation, render->currentAnimation);
+            render->onAnimationChangedFunc.call(EntityHandle(msg.entity), oldAnimation, render->currentAnimation);
     }
 }
 
@@ -173,14 +173,14 @@ void RenderSystem::addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, s
     m_renderingQueue.insert(insertionIt, Renderable{drawable, states, z});
 }
 
-std::shared_ptr<animation::AnimatedSprite> RenderSystem::getAnimatedSprite(entityx::Entity entity)
+std::shared_ptr<AnimatedSprite> RenderSystem::getAnimatedSprite(entityx::Entity entity)
 {
-    auto render = entityx::Entity(entity).component<c::RenderComponent>();
+    auto render = entityx::Entity(entity).component<RenderComponent>();
 
     if(m_animatedSprites.count(entity) == 0)
     {
         //Create the animated sprite if it doesn't exist
-        auto animatedSprite = std::make_shared<animation::AnimatedSprite>(
+        auto animatedSprite = std::make_shared<AnimatedSprite>(
             m_texturesManager.requestResource(render->textureName),
             render->animations
         );

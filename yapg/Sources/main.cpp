@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 #endif
 
     //State manager
-    state::StateEngine stateEngine;
+    yapg::StateEngine stateEngine;
 
     //Settings manager
     //If the settings file doesn't exists, use the default_config.xml file to
@@ -38,16 +38,16 @@ int main(int argc, char** argv)
     }
 
     //Load the settings
-    settings::SettingsManager settingsManager("config.xml");
+    yapg::SettingsManager settingsManager("config.xml");
 
     //Texture manager and font manager
-    resources::AllResourcesManagers resManager("assets");
+    yapg::AllResourcesManagers resManager("assets");
 
     //Window manager
-    window::WindowManager windowManager(stateEngine, "Yet Another Platformer Game");
+    yapg::WindowManager windowManager(stateEngine, "Yet Another Platformer Game");
 
     stateEngine.stopAndStartState
-    <state::MainMenuState, resources::AllResourcesManagers&, settings::SettingsManager&>(
+    <yapg::MainMenuState, yapg::AllResourcesManagers&, yapg::SettingsManager&>(
         resManager, settingsManager
     );
 

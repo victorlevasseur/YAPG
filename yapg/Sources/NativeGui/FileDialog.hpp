@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
-namespace nativegui{ namespace impl { class FileDialogImpl; } }
+namespace yapg{ namespace impl { class FileDialogImpl; } }
 
-namespace nativegui
+namespace yapg
 {
 
 class FileDialog

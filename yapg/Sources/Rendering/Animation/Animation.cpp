@@ -2,7 +2,7 @@
 
 #include "Meta/Metadata.hpp"
 
-namespace animation
+namespace yapg
 {
 
 Animation::Animation() :

@@ -5,7 +5,7 @@
 #include "Editor/EntryPropertyWidget.hpp"
 #include "Lua/Template/TemplateComponent.hpp"
 
-namespace editor
+namespace yapg
 {
 
 PropertiesManager::PropertiesManager() :
@@ -27,7 +27,7 @@ void PropertiesManager::setCurrentEntity(entityx::Entity currentEntity)
 
     if(m_currentEntity)
     {
-        auto templateComponent = m_currentEntity.component<components::TemplateComponent>();
+        auto templateComponent = m_currentEntity.component<TemplateComponent>();
 
         //Add the new properties widgets
         for(auto it = templateComponent->parametersHelper.parametersBegin();

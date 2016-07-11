@@ -2,7 +2,7 @@
 
 #include "State/StateEngine.hpp"
 
-namespace state
+namespace yapg
 {
 
 State::State(StateEngine& stateEngine) :

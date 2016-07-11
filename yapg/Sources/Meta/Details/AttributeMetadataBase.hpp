@@ -9,6 +9,9 @@
 #include "Lua/sol.hpp"
 #include "Settings/tinyxml2.h"
 
+namespace yapg
+{
+
 namespace meta
 {
 
@@ -33,9 +36,9 @@ public:
 
     virtual void load(void* object, const sol::object& luaObject) const = 0;
 
-    virtual void loadFromXml(void* object, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const = 0;
+    virtual void loadFromXml(void* object, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const = 0;
 
-    virtual void saveToXml(const void* object, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const = 0;
+    virtual void saveToXml(const void* object, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const = 0;
 
     virtual boost::any getAsAny(const void* object) const
     {
@@ -70,6 +73,8 @@ protected:
     bool m_gettableFromLua;
     bool m_settableFromLua;
 };
+
+}
 
 }
 

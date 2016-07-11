@@ -6,6 +6,10 @@
 #include <typeindex>
 
 #include "Tools/Singleton.hpp"
+
+namespace yapg
+{
+
 namespace messaging
 {
 
@@ -59,9 +63,9 @@ public:
     static void emit(Args... args);
 };
 
-class MessagingManager : public tools::Singleton<MessagingManager>
+class MessagingManager : public Singleton<MessagingManager>
 {
-    friend class tools::Singleton<MessagingManager>;
+    friend class Singleton<MessagingManager>;
 
     template<typename MessageType>
     friend class SingleReceiver;
@@ -98,6 +102,8 @@ private:
 
     std::map<std::type_index, std::set<BaseReceiver*>> m_receivers;
 };
+
+}
 
 }
 

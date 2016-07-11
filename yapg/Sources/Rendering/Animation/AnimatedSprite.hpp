@@ -11,7 +11,7 @@
 
 #include "Rendering/Animation/Animation.hpp"
 
-namespace animation
+namespace yapg
 {
 
 class AnimatedSprite : public sf::Drawable, public sf::Transformable

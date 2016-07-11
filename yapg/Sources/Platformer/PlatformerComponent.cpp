@@ -2,7 +2,7 @@
 
 #include "Lua/EntityHandle.hpp"
 
-namespace components
+namespace yapg
 {
 
 PlatformerComponent::PlatformerComponent(entityx::Entity entity) :
@@ -40,7 +40,7 @@ std::string PlatformerComponent::getName() const
     return "Platformer";
 }
 
-void PlatformerComponent::registerComponent(lua::LuaState& state)
+void PlatformerComponent::registerComponent(LuaState& state)
 {
     meta::MetadataStore::registerClass<PlatformerComponent>("PlatformerComponent")
         .declareAttribute("max_walking_speed", &PlatformerComponent::maxSpeed)
@@ -68,7 +68,7 @@ void PlatformerComponent::registerComponent(lua::LuaState& state)
             c->directionStateCallbacks.registerCallback(Direction::Left, c->onTurnLeftFunc);
         });
 
-    lua::EntityHandle::declareComponent<PlatformerComponent>("platformer");
+    EntityHandle::declareComponent<PlatformerComponent>("platformer");
 
     state.getState().new_usertype<PlatformerComponent>("platformer_component",
         "max_walking_speed", &PlatformerComponent::maxSpeed,

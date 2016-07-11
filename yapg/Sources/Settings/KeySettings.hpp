@@ -8,7 +8,7 @@
 namespace tinyxml2{ class XMLDocument; }
 namespace tinyxml2{ class XMLElement; }
 
-namespace settings
+namespace yapg
 {
 
 class KeySettings

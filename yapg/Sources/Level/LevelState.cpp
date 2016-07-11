@@ -19,11 +19,11 @@
 #include "Rendering/RenderSystem.hpp"
 #include "State/StateEngine.hpp"
 
-namespace level
+namespace yapg
 {
 
-LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
-    state::State(stateEngine),
+LevelState::LevelState(StateEngine& stateEngine, std::string path, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager) :
+    State(stateEngine),
     m_luaState(),
     m_path(path),
     m_level(m_luaState),
@@ -37,15 +37,15 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_gridText("", *m_font, 16),
     m_asyncExecutor()
 {
-    m_systemMgr.add<systems::EntityGridSystem>();
-    auto& grid = m_systemMgr.system<systems::EntityGridSystem>()->getGrid();
+    m_systemMgr.add<EntityGridSystem>();
+    auto& grid = m_systemMgr.system<EntityGridSystem>()->getGrid();
 
-    m_systemMgr.add<systems::RenderSystem>(resourcesManager.getTextures(), grid);
-    m_systemMgr.add<systems::CustomBehaviorSystem>();
-    m_systemMgr.add<systems::CollisionSystem>(grid);
-    m_systemMgr.add<systems::PlatformerSystem>(grid);
-    m_systemMgr.add<systems::PlayerSystem>(1, settingsManager);
-    m_systemMgr.add<systems::HealthSystem>(settingsManager);
+    m_systemMgr.add<RenderSystem>(resourcesManager.getTextures(), grid);
+    m_systemMgr.add<CustomBehaviorSystem>();
+    m_systemMgr.add<CollisionSystem>(grid);
+    m_systemMgr.add<PlatformerSystem>(grid);
+    m_systemMgr.add<PlayerSystem>(1, settingsManager);
+    m_systemMgr.add<HealthSystem>(settingsManager);
 
     m_systemMgr.configure();
 
@@ -55,7 +55,7 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     //TODO: Support multiple players creation
     std::cout << "Creating players..." << std::endl;
 
-    const lua::EntityTemplate& playerTemplate = m_luaState.getTemplate(m_level.getPlayersTemplates()[0]);
+    const EntityTemplate& playerTemplate = m_luaState.getTemplate(m_level.getPlayersTemplates()[0]);
 
     entityx::Entity playerEntity = m_level.getEntityManager().create();
     playerTemplate.initializeEntity(playerEntity, SerializedEntityGetter());
@@ -63,15 +63,15 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     //Set x and y parameters according to spawn_position
     auto& parameters = playerTemplate.getParameters();
 
-    const lua::EntityTemplate::Parameter& xParameter = parameters.at("x");
-    const lua::EntityTemplate::Parameter& yParameter = parameters.at("y");
+    const EntityTemplate::Parameter& xParameter = parameters.at("x");
+    const EntityTemplate::Parameter& yParameter = parameters.at("y");
 
-    lua::EntityHandle(playerEntity).setAttributeAsAny(xParameter.component, xParameter.attribute, m_level.getSpawnPosition().x);
-    lua::EntityHandle(playerEntity).setAttributeAsAny(yParameter.component, yParameter.attribute, m_level.getSpawnPosition().y);
+    EntityHandle(playerEntity).setAttributeAsAny(xParameter.component, xParameter.attribute, m_level.getSpawnPosition().x);
+    EntityHandle(playerEntity).setAttributeAsAny(yParameter.component, yParameter.attribute, m_level.getSpawnPosition().y);
 
-    if(!playerEntity.has_component<components::PlayerComponent>())
+    if(!playerEntity.has_component<PlayerComponent>())
         throw std::runtime_error(std::string("[Level/Error] Player entities must have the \"Player\" component declared in their template ! Not the case with \"") + m_level.getPlayersTemplates()[0] + std::string("\""));
-    playerEntity.component<components::PlayerComponent>()->playerNumber = 0;
+    playerEntity.component<PlayerComponent>()->playerNumber = 0;
 
     std::cout << "Players created." << std::endl;
     /////////////////////////////////////////
@@ -82,7 +82,7 @@ LevelState::LevelState(state::StateEngine& stateEngine, std::string path, resour
     m_gridText.setColor(sf::Color::Black);
 
     //First update to register the object
-    m_systemMgr.update<systems::EntityGridSystem>(0);
+    m_systemMgr.update<EntityGridSystem>(0);
 
     //Put the current level instance into "current_level" lua global variable
     m_luaState.getState().set("current_level", this);
@@ -98,13 +98,13 @@ void LevelState::render(sf::RenderTarget& target)
     auto timeBefore = std::chrono::high_resolution_clock::now();
 
     target.clear(sf::Color(0, 180, 255));
-    m_systemMgr.system<systems::RenderSystem>()->render(target);
+    m_systemMgr.system<RenderSystem>()->render(target);
     target.draw(m_perfText);
 
     // DEBUG CODE TO OBSERVE THE GRID INDEXATION
     /*sf::View oldView = target.getView();
-    target.setView(m_systemMgr.system<systems::RenderSystem>()->getView());
-    m_systemMgr.system<systems::EntityGridSystem>()->getGrid().debugDraw(target, m_gridText);
+    target.setView(m_systemMgr.system<RenderSystem>()->getView());
+    m_systemMgr.system<EntityGridSystem>()->getGrid().debugDraw(target, m_gridText);
     target.setView(oldView);*/
     // END OF DEBUG CODE
 
@@ -115,12 +115,12 @@ void LevelState::render(sf::RenderTarget& target)
 
 void LevelState::receive(const messaging::AllPlayersFinishedMessage& message)
 {
-    m_asyncExecutor.addNewTask<async::PunctualTask, std::function<void()>>
+    m_asyncExecutor.addNewTask<PunctualTask, std::function<void()>>
     (
         [&]()
         {
             getStateEngine().stopAndStartState
-            <level::LevelSuccessState, resources::AllResourcesManagers&, settings::SettingsManager&>(
+            <LevelSuccessState, AllResourcesManagers&, SettingsManager&>(
                 m_resourcesManager, m_settingsManager
             );
         },
@@ -130,12 +130,12 @@ void LevelState::receive(const messaging::AllPlayersFinishedMessage& message)
 
 void LevelState::receive(const messaging::AllPlayersLostMessage& message)
 {
-    m_asyncExecutor.addNewTask<async::PunctualTask, std::function<void()>>
+    m_asyncExecutor.addNewTask<PunctualTask, std::function<void()>>
     (
         [&]()
         {
             getStateEngine().stopAndStartState
-            <level::LevelFailureState, const std::string&, resources::AllResourcesManagers&, settings::SettingsManager&>(
+            <LevelFailureState, const std::string&, AllResourcesManagers&, SettingsManager&>(
                 m_path, m_resourcesManager, m_settingsManager
             );
         },
@@ -143,7 +143,7 @@ void LevelState::receive(const messaging::AllPlayersLostMessage& message)
     );
 }
 
-void LevelState::registerClass(lua::LuaState& luaState)
+void LevelState::registerClass(LuaState& luaState)
 {
     sol::constructors<> ctor;
     sol::usertype<LevelState> levelLuaClass(ctor,
@@ -156,13 +156,13 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 {
     auto timeBefore = std::chrono::high_resolution_clock::now();
 
-    m_systemMgr.update<systems::PlayerSystem>(dt.asSeconds());
-    m_systemMgr.update<systems::EntityGridSystem>(dt.asSeconds());
-    m_systemMgr.update<systems::PlatformerSystem>(dt.asSeconds());
-    m_systemMgr.update<systems::CustomBehaviorSystem>(dt.asSeconds());
-    m_systemMgr.update<systems::CollisionSystem>(dt.asSeconds());
-    m_systemMgr.update<systems::RenderSystem>(dt.asSeconds());
-    m_systemMgr.update<systems::HealthSystem>(dt.asSeconds());
+    m_systemMgr.update<PlayerSystem>(dt.asSeconds());
+    m_systemMgr.update<EntityGridSystem>(dt.asSeconds());
+    m_systemMgr.update<PlatformerSystem>(dt.asSeconds());
+    m_systemMgr.update<CustomBehaviorSystem>(dt.asSeconds());
+    m_systemMgr.update<CollisionSystem>(dt.asSeconds());
+    m_systemMgr.update<RenderSystem>(dt.asSeconds());
+    m_systemMgr.update<HealthSystem>(dt.asSeconds());
 
     m_asyncExecutor.update(dt);
 
@@ -172,9 +172,9 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 
 }
 
-lua::EntityHandle LevelState::lua_createNewEntity(const std::string& templateName)
+EntityHandle LevelState::lua_createNewEntity(const std::string& templateName)
 {
-    return lua::EntityHandle(m_level.createNewEntity(templateName));
+    return EntityHandle(m_level.createNewEntity(templateName));
 }
 
 void LevelState::updatePerfText()

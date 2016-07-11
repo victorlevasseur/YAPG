@@ -19,15 +19,15 @@
 #include "Editor/PropertiesManager.hpp"
 #include "State/State.hpp"
 
-namespace state{ class StateEngine; }
+namespace yapg{ class StateEngine; }
 
-namespace editor
+namespace yapg
 {
 
-class LevelEditorState : public state::State
+class LevelEditorState : public State
 {
 public:
-    LevelEditorState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
+    LevelEditorState(StateEngine& stateEngine, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager);
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
@@ -78,10 +78,10 @@ private:
 
     sf::View getLevelView() const;
 
-    resources::AllResourcesManagers& m_resourcesManager;
-    settings::SettingsManager& m_settingsManager;
+    AllResourcesManagers& m_resourcesManager;
+    SettingsManager& m_settingsManager;
 
-    lua::LuaState m_luaState;
+    LuaState m_luaState;
 
     sf::View m_guiView;
 
@@ -97,7 +97,7 @@ private:
 
     PropertiesManager m_propertiesManager;
 
-    level::Level m_level;
+    Level m_level;
     std::string m_filepath;
 
     std::unique_ptr<entityx::SystemManager> m_systemMgr;

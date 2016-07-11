@@ -9,9 +9,9 @@
 #include <SFML/System/Vector2.hpp>
 
 namespace sf{ class RenderTarget; }
-namespace lua{ class LuaState; }
+namespace yapg{ class LuaState; }
 
-namespace collision
+namespace yapg
 {
 
 class Polygon
@@ -42,7 +42,7 @@ public:
 
     static Polygon Rectangle(float width, float height);
 
-    static void registerClass(lua::LuaState& state);
+    static void registerClass(LuaState& state);
 
 private:
     //Relative vertices positions

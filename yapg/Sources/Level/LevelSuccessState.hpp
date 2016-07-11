@@ -12,15 +12,15 @@
 #include "Settings/SettingsManager.hpp"
 #include "State/State.hpp"
 
-namespace state{ class StateEngine; }
+namespace yapg{ class StateEngine; }
 
-namespace level
+namespace yapg
 {
 
-class LevelSuccessState : public state::State
+class LevelSuccessState : public State
 {
 public:
-    LevelSuccessState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
+    LevelSuccessState(StateEngine& stateEngine, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager);
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
@@ -34,7 +34,7 @@ protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget& target);
 
 private:
-    resources::AllResourcesManagers& m_resourcesManager;
+    AllResourcesManagers& m_resourcesManager;
 
     std::shared_ptr<sf::SoundBuffer> m_winMusic;
     sf::Sound m_winSound;

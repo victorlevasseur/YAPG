@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
-namespace animation
+namespace yapg
 {
 
 AnimatedSprite::AnimatedSprite(std::shared_ptr<sf::Texture> texture, const std::map<std::string, Animation>& animations) :

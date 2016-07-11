@@ -15,7 +15,7 @@
 
 #include "Common/PositionComponent.hpp"
 
-namespace collision
+namespace yapg
 {
 
 class EntitySpatialGrid
@@ -192,10 +192,10 @@ private:
     static sf::FloatRect getAABB(entityx::Entity entity)
     {
         return sf::FloatRect(
-            entity.component<const components::PositionComponent>()->x,
-            entity.component<const components::PositionComponent>()->y,
-            entity.component<const components::PositionComponent>()->width,
-            entity.component<const components::PositionComponent>()->height
+            entity.component<const PositionComponent>()->x,
+            entity.component<const PositionComponent>()->y,
+            entity.component<const PositionComponent>()->width,
+            entity.component<const PositionComponent>()->height
         );
     }
 

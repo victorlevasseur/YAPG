@@ -5,7 +5,7 @@
 
 #include <SFML/Window/Keyboard.hpp>
 
-namespace tools
+namespace yapg
 {
 
 std::string keyToString(sf::Keyboard::Key key);

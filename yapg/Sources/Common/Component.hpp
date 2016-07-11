@@ -10,9 +10,9 @@
 #include "Lua/sol.hpp"
 #include "Meta/Metadata.hpp"
 
-namespace lua{ class LuaState; }
+namespace yapg{ class LuaState; }
 
-namespace components
+namespace yapg
 {
 
 class Component
@@ -29,7 +29,7 @@ public:
     /**
      * Load the component from its lua table.
      */
-    void loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter);
+    void loadFromLua(const sol::object& luaTable, const SerializedEntityGetter& entityGetter);
 
     /**
      * Assign a component of type "component" loaded with "luaSelector" to "entity".
@@ -37,9 +37,9 @@ public:
      * \param component the name of the component to add
      * \param luaSelector the lua table to load the component properties from
      */
-    static void assignComponent(entityx::Entity entity, const std::string &component, const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter);
+    static void assignComponent(entityx::Entity entity, const std::string &component, const sol::object& luaTable, const SerializedEntityGetter& entityGetter);
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 
 protected:
     entityx::Entity getEntity() const { return m_entity; }

@@ -11,7 +11,7 @@
 #include "Lua/EntityHandle.hpp"
 #include "Lua/LuaState.hpp"
 
-namespace level
+namespace yapg
 {
 
 class Level
@@ -23,7 +23,7 @@ public:
         EditMode
     };
 
-    Level(lua::LuaState& luaState, LevelMode levelMode = LevelMode::PlayMode);
+    Level(LuaState& luaState, LevelMode levelMode = LevelMode::PlayMode);
 
     void LoadFromFile(const std::string& path);
     void SaveToFile(const std::string& path);
@@ -42,10 +42,10 @@ public:
 
     entityx::Entity createNewEntity(const std::string& templateName, bool templateComponent = false);
 
-    static void registerClass(lua::LuaState& luaState);
+    static void registerClass(LuaState& luaState);
 
 private:
-    lua::LuaState& m_luaState;
+    LuaState& m_luaState;
 
     entityx::EventManager m_eventMgr;
     entityx::EntityManager m_entityMgr;

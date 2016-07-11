@@ -12,7 +12,7 @@
 #include "Common/EntitySpatialGrid.hpp"
 #include "Messaging/Messaging.hpp"
 
-namespace systems
+namespace yapg
 {
 
 class CollisionSystem : public entityx::System<CollisionSystem>
@@ -47,7 +47,7 @@ class CollisionSystem : public entityx::System<CollisionSystem>
     using CollisionUnorderedSet = std::unordered_set<Collision, Collision::Hash>;
 
 public:
-    CollisionSystem(collision::EntitySpatialGrid& quadtreesGrid);
+    CollisionSystem(EntitySpatialGrid& quadtreesGrid);
 
     virtual void update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt);
 
@@ -56,7 +56,7 @@ public:
 private:
     CollisionUnorderedSet m_collisions; ///< The collisions that are currently happenning.
 
-    collision::EntitySpatialGrid& m_quadtreesGrid;
+    EntitySpatialGrid& m_quadtreesGrid;
 };
 
 }

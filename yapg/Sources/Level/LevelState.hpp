@@ -19,15 +19,15 @@
 #include "Settings/SettingsManager.hpp"
 #include "State/State.hpp"
 
-namespace state{ class StateEngine; }
+namespace yapg{ class StateEngine; }
 
-namespace level
+namespace yapg
 {
 
-class LevelState : public state::State, public messaging::Emitter, public messaging::Receiver<messaging::AllPlayersFinishedMessage, messaging::AllPlayersLostMessage>
+class LevelState : public State, public messaging::Emitter, public messaging::Receiver<messaging::AllPlayersFinishedMessage, messaging::AllPlayersLostMessage>
 {
 public:
-    LevelState(state::StateEngine& stateEngine, std::string path, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
+    LevelState(StateEngine& stateEngine, std::string path, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager);
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
@@ -36,22 +36,22 @@ public:
     virtual void receive(const messaging::AllPlayersFinishedMessage& message) override;
     virtual void receive(const messaging::AllPlayersLostMessage& message) override;
 
-    static void registerClass(lua::LuaState& luaState);
+    static void registerClass(LuaState& luaState);
 
 protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);
 
 private:
-    lua::EntityHandle lua_createNewEntity(const std::string& templateName);
+    EntityHandle lua_createNewEntity(const std::string& templateName);
 
-    lua::LuaState m_luaState;
+    LuaState m_luaState;
 
     std::string m_path;
-    level::Level m_level;
+    Level m_level;
     entityx::SystemManager m_systemMgr;
 
-    resources::AllResourcesManagers& m_resourcesManager;
-    settings::SettingsManager& m_settingsManager;
+    AllResourcesManagers& m_resourcesManager;
+    SettingsManager& m_settingsManager;
 
     void updatePerfText();
 
@@ -62,7 +62,7 @@ private:
 
     sf::Text m_gridText;
 
-    async::AsyncExecutor m_asyncExecutor;
+    AsyncExecutor m_asyncExecutor;
 };
 
 }

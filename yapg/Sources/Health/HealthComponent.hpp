@@ -7,7 +7,7 @@
 #include "Messaging/Messaging.hpp"
 #include "Meta/Metadata.hpp"
 
-namespace components
+namespace yapg
 {
 
 class HealthComponent : public Component, public messaging::Emitter
@@ -18,7 +18,7 @@ public:
 
     virtual std::string getName() const;
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 
     void kill();
     void loosePV(float pv);

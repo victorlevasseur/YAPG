@@ -16,17 +16,17 @@
 #include "Player/PlayerComponent.hpp"
 #include "Rendering/RenderComponent.hpp"
 
-namespace lua
+namespace yapg
 {
 
 std::map<std::string, std::type_index> EntityHandle::componentsTypeIndex =
         std::map<std::string, std::type_index>();
 
-std::map<std::string, std::function<components::Component*(EntityHandle*)>> EntityHandle::componentsGetters =
-        std::map<std::string, std::function<components::Component*(EntityHandle*)>>();
+std::map<std::string, std::function<Component*(EntityHandle*)>> EntityHandle::componentsGetters =
+        std::map<std::string, std::function<Component*(EntityHandle*)>>();
 
-std::map<std::string, std::function<const components::Component*(const EntityHandle*)>> EntityHandle::componentsGettersConst =
-        std::map<std::string, std::function<const components::Component*(const EntityHandle*)>>();
+std::map<std::string, std::function<const Component*(const EntityHandle*)>> EntityHandle::componentsGettersConst =
+        std::map<std::string, std::function<const Component*(const EntityHandle*)>>();
 
 std::map<std::string, std::function<bool(const EntityHandle*)>> EntityHandle::componentsCheckers =
         std::map<std::string, std::function<bool(const EntityHandle*)>>();
@@ -43,7 +43,7 @@ EntityHandle::EntityHandle(entityx::Entity entity) :
 
 }
 
-void EntityHandle::loadAttributeFromXml(const std::string& componentName, const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter)
+void EntityHandle::loadAttributeFromXml(const std::string& componentName, const std::string& attributeName, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
 {
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
@@ -57,7 +57,7 @@ void EntityHandle::loadAttributeFromXml(const std::string& componentName, const 
     }
 }
 
-void EntityHandle::saveAttributeToXml(const std::string& componentName, const std::string& attributeName, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const
+void EntityHandle::saveAttributeToXml(const std::string& componentName, const std::string& attributeName, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const
 {
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))
     {
@@ -76,12 +76,12 @@ bool EntityHandle::hasComponent(const std::string& componentName) const
     return componentsCheckers.at(componentName)(this);
 }
 
-components::Component* EntityHandle::getComponentPtr(const std::string& componentName)
+Component* EntityHandle::getComponentPtr(const std::string& componentName)
 {
     return componentsGetters.at(componentName)(this);
 }
 
-const components::Component* EntityHandle::getComponentPtr(const std::string& componentName) const
+const Component* EntityHandle::getComponentPtr(const std::string& componentName) const
 {
     return componentsGettersConst.at(componentName)(this);
 }
@@ -158,9 +158,9 @@ void EntityHandle::setAttributeAsLuaTable(const std::string& componentName, cons
     }
 }
 
-components::CustomDataComponent* EntityHandle::getCustomData()
+CustomDataComponent* EntityHandle::getCustomData()
 {
-    return m_entity.component<components::CustomDataComponent>().get();
+    return m_entity.component<CustomDataComponent>().get();
 }
 
 void EntityHandle::writeToConsole(const std::string& str)

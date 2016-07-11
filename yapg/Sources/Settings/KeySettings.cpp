@@ -5,7 +5,7 @@
 
 namespace tx2 = tinyxml2;
 
-namespace settings
+namespace yapg
 {
 
 KeySettings::KeySettings() :
@@ -27,7 +27,7 @@ namespace
         if(element->Attribute(attribute))
         {
             std::string keyName(element->Attribute(attribute));
-            *key = tools::stringToKey(keyName);
+            *key = stringToKey(keyName);
         }
     }
 }
@@ -58,9 +58,9 @@ void KeySettings::saveToXml(tx2::XMLDocument* doc, tx2::XMLElement* elem) const
     {
         tx2::XMLElement* playerElem = doc->NewElement("player");
         playerElem->SetAttribute("id", it->first);
-        playerElem->SetAttribute("left_key", tools::keyToString(it->second.leftKey).data());
-        playerElem->SetAttribute("right_key", tools::keyToString(it->second.rightKey).data());
-        playerElem->SetAttribute("jump_key", tools::keyToString(it->second.jumpKey).data());
+        playerElem->SetAttribute("left_key", keyToString(it->second.leftKey).data());
+        playerElem->SetAttribute("right_key", keyToString(it->second.rightKey).data());
+        playerElem->SetAttribute("jump_key", keyToString(it->second.jumpKey).data());
 
         elem->InsertEndChild(playerElem);
     }

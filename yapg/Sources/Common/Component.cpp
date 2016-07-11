@@ -13,7 +13,7 @@
 #include "Player/PlayerComponent.hpp"
 #include "Rendering/RenderComponent.hpp"
 
-namespace components
+namespace yapg
 {
 
 Component::Component(entityx::Entity entity) :
@@ -27,12 +27,12 @@ Component::~Component()
 
 }
 
-void Component::loadFromLua(const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)
+void Component::loadFromLua(const sol::object& luaTable, const SerializedEntityGetter& entityGetter)
 {
     meta::MetadataStore::getMetadata(std::type_index(typeid(*this))).load(this, luaTable);
 }
 
-void Component::assignComponent(entityx::Entity entity, const std::string &component, const sol::object& luaTable, const level::SerializedEntityGetter& entityGetter)
+void Component::assignComponent(entityx::Entity entity, const std::string &component, const sol::object& luaTable, const SerializedEntityGetter& entityGetter)
 {
     if(component == "position")
     {
@@ -84,7 +84,7 @@ void Component::assignComponent(entityx::Entity entity, const std::string &compo
     }
 }
 
-void Component::registerComponent(lua::LuaState& state)
+void Component::registerComponent(LuaState& state)
 {
     state.getState().new_usertype<Component>("component"
     );

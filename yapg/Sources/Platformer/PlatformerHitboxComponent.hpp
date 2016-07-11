@@ -6,7 +6,7 @@
 #include "Lua/LuaState.hpp"
 #include "Meta/Metadata.hpp"
 
-namespace components
+namespace yapg
 {
 
 class PlatformerHitboxComponent : public Component
@@ -17,13 +17,13 @@ public:
 
     virtual std::string getName() const;
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 
-    collision::Polygon& getHitbox() { return m_polygon; }
-    const collision::Polygon& getHitbox() const { return m_polygon; }
+    Polygon& getHitbox() { return m_polygon; }
+    const Polygon& getHitbox() const { return m_polygon; }
 
 private:
-    collision::Polygon m_polygon;
+    Polygon m_polygon;
 };
 
 std::ostream& operator<<(std::ostream& stream, const PlatformerHitboxComponent& component);

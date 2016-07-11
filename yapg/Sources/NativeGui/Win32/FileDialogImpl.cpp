@@ -7,7 +7,7 @@
 #include <codecvt>
 #include <locale>
 
-namespace nativegui
+namespace yapg
 {
 namespace impl
 {

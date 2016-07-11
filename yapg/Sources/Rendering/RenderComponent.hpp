@@ -10,7 +10,7 @@
 #include "Lua/sol.hpp"
 #include "Messaging/Messaging.hpp"
 
-namespace components
+namespace yapg
 {
 
 class RenderComponent : public Component, public messaging::Emitter
@@ -21,7 +21,7 @@ public:
 
     virtual std::string getName() const;
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 
     std::string textureName;
 
@@ -29,7 +29,7 @@ public:
     std::string getCurrentAnimation() const { return currentAnimation; }
     void setCurrentAnimation(std::string animationName);
 
-    std::map<std::string, animation::Animation> animations;
+    std::map<std::string, Animation> animations;
     bool flipped;
 
     sol::function onAnimationChangedFunc;

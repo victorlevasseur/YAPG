@@ -9,7 +9,7 @@
 #include <string.h>
 #include <tchar.h>
 
-namespace nativegui
+namespace yapg
 {
 namespace impl
 {

@@ -12,10 +12,10 @@
 #include "Level/SerializedEntityGetter.hpp"
 #include "Lua/sol.hpp"
 
-namespace lua{ class LuaState; }
+namespace yapg{ class LuaState; }
 namespace tinyxml2{ class XMLElement; }
 
-namespace lua
+namespace yapg
 {
 
 class EntityTemplate
@@ -64,7 +64,7 @@ public:
      * \param entityGetter the entity getter where all entities id are linked to their Entity instance
      * \param templateComponent create or not the TemplateComponent containing infos about which template initialized this entity
      */
-    void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, bool templateComponent = false) const;
+    void initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, bool templateComponent = false) const;
 
     /**
      * Initializes an entity with this template and fulfills its parameters with the parameters in parametersElement XML element.
@@ -73,12 +73,12 @@ public:
      * \param parametersElement the XML Element containing the values of all the parameters needed by this template
      * \param templateComponent create or not the TemplateComponent containing infos about which template initialized this entity
      */
-    void initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement, bool templateComponent = false) const;
+    void initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement, bool templateComponent = false) const;
 
     /**
      * Save the entity parameters in the given parametersElement.
      */
-    void saveEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, tinyxml2::XMLElement* parametersElement) const;
+    void saveEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, tinyxml2::XMLElement* parametersElement) const;
 
     std::string getName() const { return m_name; }
 

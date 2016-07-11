@@ -18,11 +18,11 @@
 #include "Rendering/RenderSystem.hpp"
 #include "State/StateEngine.hpp"
 
-namespace editor
+namespace yapg
 {
 
-LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
-    state::State(stateEngine),
+LevelEditorState::LevelEditorState(StateEngine& stateEngine, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager) :
+    State(stateEngine),
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
     m_luaState(),
@@ -34,7 +34,7 @@ LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::A
     m_playerTemplatesNames(),
     m_selectedPlayerTemplate(),
     m_propertiesManager(),
-    m_level(m_luaState, level::Level::LevelMode::EditMode),
+    m_level(m_luaState, Level::LevelMode::EditMode),
     m_filepath(),
     m_systemMgr(nullptr),
     m_isInserting(false),
@@ -52,10 +52,10 @@ LevelEditorState::LevelEditorState(state::StateEngine& stateEngine, resources::A
 {
     m_iconRenderTexture.create(48, 48);
 
-    m_propertiesManager.registerPropertyWidget<float, editor::EntryPropertyWidget<float>>();
-    m_propertiesManager.registerPropertyWidget<int, editor::EntryPropertyWidget<int>>();
-    m_propertiesManager.registerPropertyWidget<unsigned int, editor::EntryPropertyWidget<unsigned int>>();
-    m_propertiesManager.registerPropertyWidget<std::string, editor::EntryPropertyWidget<std::string, true>>();
+    m_propertiesManager.registerPropertyWidget<float, EntryPropertyWidget<float>>();
+    m_propertiesManager.registerPropertyWidget<int, EntryPropertyWidget<int>>();
+    m_propertiesManager.registerPropertyWidget<unsigned int, EntryPropertyWidget<unsigned int>>();
+    m_propertiesManager.registerPropertyWidget<std::string, EntryPropertyWidget<std::string, true>>();
 
     initSystemManager();
     initGUI();
@@ -79,7 +79,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             if(m_selectedTemplate != std::string::npos)
             {
                 //Get the template, its width and height (just to check it's available!)
-                const lua::EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_selectedTemplate]);
+                const EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_selectedTemplate]);
                 if(selectedTemplate.getComponentsTable().get<sol::object>("position").is<sol::table>())
                 {
                     sol::table positionComponent = selectedTemplate.getComponentsTable().get<sol::object>("position").as<sol::table>();
@@ -103,7 +103,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
                 if(m_selectedTemplate != std::string::npos)
                 {
                     //Get the template, its width and height
-                    const lua::EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_selectedTemplate]);
+                    const EntityTemplate& selectedTemplate = m_luaState.getTemplate(m_templatesNames[m_selectedTemplate]);
                     if(selectedTemplate.getComponentsTable().get<sol::object>("position").is<sol::table>())
                     {
                         sol::table positionComponent = selectedTemplate.getComponentsTable().get<sol::object>("position").as<sol::table>();
@@ -136,7 +136,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
                 if(m_selectedTemplate != std::string::npos)
                 {
                     //Get the template of the entities to insert
-                    const lua::EntityTemplate& entityTemplate = m_luaState.getTemplate(m_templatesNames[m_selectedTemplate]);
+                    const EntityTemplate& entityTemplate = m_luaState.getTemplate(m_templatesNames[m_selectedTemplate]);
 
                     //Insert all the new entities
                     for(int i = std::min(0, m_insertionCount.x); i <= std::max(0, m_insertionCount.x); ++i)
@@ -147,8 +147,8 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
 
                             try
                             {
-                                newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", m_insertionPos.x + i * m_templateSize.x);
-                                newEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", m_insertionPos.y + j * m_templateSize.y);
+                                newEntity.component<TemplateComponent>()->parametersHelper.setParameter("x", m_insertionPos.x + i * m_templateSize.x);
+                                newEntity.component<TemplateComponent>()->parametersHelper.setParameter("y", m_insertionPos.y + j * m_templateSize.y);
                             }
                             catch(std::exception& e)
                             {
@@ -190,8 +190,8 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             if(m_selectedEntity)
             {
                 sf::Vector2f entityPos;
-                entityPos.x = boost::any_cast<float>(m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.getParameter("x"));
-                entityPos.y = boost::any_cast<float>(m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.getParameter("y"));
+                entityPos.x = boost::any_cast<float>(m_selectedEntity.component<TemplateComponent>()->parametersHelper.getParameter("x"));
+                entityPos.y = boost::any_cast<float>(m_selectedEntity.component<TemplateComponent>()->parametersHelper.getParameter("y"));
 
                 m_mouseOffsetToSelected = mousePosition - entityPos;
                 m_dragging = true;
@@ -206,14 +206,14 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
                 if(m_selectedEntity && m_dragging)
                 {
                     sf::Vector2f newPosition = mousePosition - m_mouseOffsetToSelected;
-                    if(m_selectedEntity.has_component<components::PositionComponent>())
+                    if(m_selectedEntity.has_component<PositionComponent>())
                     {
-                        auto posComponent = m_selectedEntity.component<components::PositionComponent>();
+                        auto posComponent = m_selectedEntity.component<PositionComponent>();
                         newPosition = getInsertionPosition(newPosition, posComponent->width, posComponent->height, m_selectedEntity);
                     }
 
-                    m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("x", std::round(newPosition.x));
-                    m_selectedEntity.component<components::TemplateComponent>()->parametersHelper.setParameter("y", std::round(newPosition.y));
+                    m_selectedEntity.component<TemplateComponent>()->parametersHelper.setParameter("x", std::round(newPosition.x));
+                    m_selectedEntity.component<TemplateComponent>()->parametersHelper.setParameter("y", std::round(newPosition.y));
                     m_propertiesManager.setCurrentEntity(m_selectedEntity);
                 }
             }
@@ -257,9 +257,9 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
         sf::Vector2i mousePos(event.mouseMove.x, event.mouseMove.y);
         if(m_draggingView)
         {
-            sf::View updatedView = m_systemMgr->system<systems::RenderSystem>()->getView();
+            sf::View updatedView = m_systemMgr->system<RenderSystem>()->getView();
             updatedView.move(m_mousePosBeforeDrag.x - mousePos.x, m_mousePosBeforeDrag.y - mousePos.y);
-            m_systemMgr->system<systems::RenderSystem>()->setView(updatedView);
+            m_systemMgr->system<RenderSystem>()->setView(updatedView);
             m_mousePosBeforeDrag = mousePos;
         }
     }
@@ -380,10 +380,10 @@ void LevelEditorState::render(sf::RenderTarget& target)
     target.clear(sf::Color(0, 180, 255));
 
     //Render the level
-    m_systemMgr->system<systems::RenderSystem>()->render(target);
+    m_systemMgr->system<RenderSystem>()->render(target);
 
     //Draw the spawn position
-    target.setView(m_systemMgr->system<systems::RenderSystem>()->getView());
+    target.setView(m_systemMgr->system<RenderSystem>()->getView());
     m_spawnSprite.setPosition(m_level.getSpawnPosition());
     target.draw(m_spawnSprite);
 
@@ -412,7 +412,7 @@ void LevelEditorState::render(sf::RenderTarget& target)
         //Draw the selection box
         if(m_selectedEntity)
         {
-            auto position = m_selectedEntity.component<components::PositionComponent>();
+            auto position = m_selectedEntity.component<PositionComponent>();
             sf::RectangleShape selectionRect(sf::Vector2f(position->width, position->height));
             selectionRect.setPosition(
                 sf::Vector2f(position->x, position->y)
@@ -450,8 +450,8 @@ void LevelEditorState::doUnpause()
 
 void LevelEditorState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 {
-    m_systemMgr->update<systems::EntityGridSystem>(dt.asSeconds());
-    m_systemMgr->update<systems::RenderSystem>(dt.asSeconds());
+    m_systemMgr->update<EntityGridSystem>(dt.asSeconds());
+    m_systemMgr->update<RenderSystem>(dt.asSeconds());
 }
 
 void LevelEditorState::initGUI()
@@ -463,11 +463,11 @@ void LevelEditorState::initSystemManager()
 {
     m_systemMgr.reset(new entityx::SystemManager(m_level.getEntityManager(), m_level.getEventManager()));
 
-    m_systemMgr->add<systems::EntityGridSystem>();
+    m_systemMgr->add<EntityGridSystem>();
 
-    auto& grid = m_systemMgr->system<systems::EntityGridSystem>()->getGrid();
-    m_systemMgr->add<systems::RenderSystem>(m_resourcesManager.getTextures(), grid, false);
-    m_systemMgr->system<systems::RenderSystem>()->setView(m_guiView);
+    auto& grid = m_systemMgr->system<EntityGridSystem>()->getGrid();
+    m_systemMgr->add<RenderSystem>(m_resourcesManager.getTextures(), grid, false);
+    m_systemMgr->system<RenderSystem>()->setView(m_guiView);
 
     m_systemMgr->configure();
 }
@@ -482,7 +482,7 @@ void LevelEditorState::newLevel()
 
 void LevelEditorState::openLevel()
 {
-    nativegui::FileDialog fileDialog("Select a level to open...", nativegui::FileDialog::Open, { { "XML levels", {"*.xml"} } });
+    FileDialog fileDialog("Select a level to open...", FileDialog::Open, { { "XML levels", {"*.xml"} } });
     if(fileDialog.run())
     {
         m_level.LoadFromFile(fileDialog.getFilename());
@@ -501,7 +501,7 @@ void LevelEditorState::saveLevel()
 
 void LevelEditorState::saveAsLevel()
 {
-    nativegui::FileDialog fileDialog("Select where to save the level...", nativegui::FileDialog::Save, { { "XML levels", {"*.xml"} } });
+    FileDialog fileDialog("Select where to save the level...", FileDialog::Save, { { "XML levels", {"*.xml"} } });
     if(fileDialog.run())
     {
         m_level.SaveToFile(fileDialog.getFilename());
@@ -567,7 +567,7 @@ bool LevelEditorState::isMouseNotOnWidgets(sf::Vector2i mousePosition, sf::Rende
 
 entityx::Entity LevelEditorState::getFirstEntityUnderMouse(sf::Vector2i mousePosition, sf::RenderTarget& target)
 {
-    entityx::ComponentHandle<components::PositionComponent> position;
+    entityx::ComponentHandle<PositionComponent> position;
     for(entityx::Entity entity : m_level.getEntityManager().entities_with_components(position))
     {
         if(isEntityUnderMouse(entity, mousePosition, target))
@@ -579,7 +579,7 @@ entityx::Entity LevelEditorState::getFirstEntityUnderMouse(sf::Vector2i mousePos
 
 entityx::Entity LevelEditorState::getFirstEntityUnderMouse(sf::Vector2f position)
 {
-    entityx::ComponentHandle<components::PositionComponent> positionComponent;
+    entityx::ComponentHandle<PositionComponent> positionComponent;
     for(entityx::Entity entity : m_level.getEntityManager().entities_with_components(positionComponent))
     {
         if(isEntityUnderMouse(entity, position))
@@ -598,7 +598,7 @@ bool LevelEditorState::isEntityUnderMouse(entityx::Entity entity, sf::Vector2i m
 
 bool LevelEditorState::isEntityUnderMouse(entityx::Entity entity, sf::Vector2f position) const
 {
-    auto positionComponent = entity.component<components::PositionComponent>();
+    auto positionComponent = entity.component<PositionComponent>();
     if(!positionComponent)
         return false;
 
@@ -622,7 +622,7 @@ sf::Vector2f LevelEditorState::getInsertionPosition(sf::Vector2f position, float
 
     sf::Vector2f newPosition = position;
 
-    entityx::ComponentHandle<components::PositionComponent> positionComponent;
+    entityx::ComponentHandle<PositionComponent> positionComponent;
     for(entityx::Entity entity : m_level.getEntityManager().entities_with_components(positionComponent))
     {
         if(ignore == entity)
@@ -660,7 +660,7 @@ sf::Vector2f LevelEditorState::getInsertionPosition(sf::Vector2f position, float
 
 sf::View LevelEditorState::getLevelView() const
 {
-    return m_systemMgr->system<systems::RenderSystem>()->getView();
+    return m_systemMgr->system<RenderSystem>()->getView();
 }
 
 sf::Texture LevelEditorState::getIconFromTexture(sf::Texture texture) const

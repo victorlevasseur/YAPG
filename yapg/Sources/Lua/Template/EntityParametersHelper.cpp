@@ -4,7 +4,7 @@
 #include "Lua/EntityHandle.hpp"
 #include "Lua/Template/EntityTemplate.hpp"
 
-namespace lua
+namespace yapg
 {
 
 EntityParametersHelper::EntityParametersHelper(const EntityTemplate* entityTemplate, entityx::Entity entity) :
@@ -18,15 +18,15 @@ boost::any EntityParametersHelper::getParameter(const std::string& name) const
 {
     auto& parameters = m_entityTemplate->getParameters();
 
-    const lua::EntityTemplate::Parameter& parameter = parameters.at(name);
-    if(parameter.parameterType == lua::EntityTemplate::Parameter::ComponentAttributeParameter)
+    const EntityTemplate::Parameter& parameter = parameters.at(name);
+    if(parameter.parameterType == EntityTemplate::Parameter::ComponentAttributeParameter)
     {
-        return lua::EntityHandle(m_entity).getAttributeAsAny(parameter.component, parameter.attribute);
+        return EntityHandle(m_entity).getAttributeAsAny(parameter.component, parameter.attribute);
     }
     else
     {
-        if(lua::EntityHandle(m_entity).getCustomData()->hasValue(parameter.field))
-            return lua::EntityHandle(m_entity).getCustomData()->getValue(parameter.field);
+        if(EntityHandle(m_entity).getCustomData()->hasValue(parameter.field))
+            return EntityHandle(m_entity).getCustomData()->getValue(parameter.field);
         else
             return boost::any();
     }
@@ -36,15 +36,15 @@ void EntityParametersHelper::setParameter(const std::string& name, const boost::
 {
     auto& parameters = m_entityTemplate->getParameters();
 
-    const lua::EntityTemplate::Parameter& parameter = parameters.at(name);
-    if(parameter.parameterType == lua::EntityTemplate::Parameter::ComponentAttributeParameter)
+    const EntityTemplate::Parameter& parameter = parameters.at(name);
+    if(parameter.parameterType == EntityTemplate::Parameter::ComponentAttributeParameter)
     {
-        lua::EntityHandle(m_entity).setAttributeAsAny(parameter.component, parameter.attribute, value);
+        EntityHandle(m_entity).setAttributeAsAny(parameter.component, parameter.attribute, value);
     }
     else
     {
-        if(lua::EntityHandle(m_entity).getCustomData()->hasValue(parameter.field))
-            lua::EntityHandle(m_entity).getCustomData()->setValue(parameter.field, value);
+        if(EntityHandle(m_entity).getCustomData()->hasValue(parameter.field))
+            EntityHandle(m_entity).getCustomData()->setValue(parameter.field, value);
     }
 }
 
@@ -52,15 +52,15 @@ std::type_index EntityParametersHelper::getParameterType(const std::string& name
 {
     auto& parameters = m_entityTemplate->getParameters();
 
-    const lua::EntityTemplate::Parameter& parameter = parameters.at(name);
-    if(parameter.parameterType == lua::EntityTemplate::Parameter::ComponentAttributeParameter)
+    const EntityTemplate::Parameter& parameter = parameters.at(name);
+    if(parameter.parameterType == EntityTemplate::Parameter::ComponentAttributeParameter)
     {
-        return lua::EntityHandle(m_entity).getAttributeType(parameter.component, parameter.attribute);
+        return EntityHandle(m_entity).getAttributeType(parameter.component, parameter.attribute);
     }
     else
     {
-        if(lua::EntityHandle(m_entity).getCustomData()->hasValue(parameter.field))
-            return lua::EntityHandle(m_entity).getCustomData()->getValue(parameter.field).type();
+        if(EntityHandle(m_entity).getCustomData()->hasValue(parameter.field))
+            return EntityHandle(m_entity).getCustomData()->getValue(parameter.field).type();
         else
             return typeid(void);
     }

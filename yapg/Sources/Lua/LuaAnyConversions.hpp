@@ -3,7 +3,7 @@
 
 #include <boost/any.hpp>
 
-namespace lua
+namespace yapg
 {
 
 namespace anyconv

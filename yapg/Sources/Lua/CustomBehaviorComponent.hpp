@@ -4,7 +4,7 @@
 #include "Common/Component.hpp"
 #include "Lua/LuaState.hpp"
 
-namespace components
+namespace yapg
 {
 
 class CustomBehaviorComponent : public Component
@@ -17,7 +17,7 @@ public:
 
     sol::function updateFunction;
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 };
 
 std::ostream& operator<<(std::ostream& stream, const CustomBehaviorComponent& component);

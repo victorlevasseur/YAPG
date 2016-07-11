@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics/Rect.hpp>
 
-namespace animation
+namespace yapg
 {
 
 struct Frame

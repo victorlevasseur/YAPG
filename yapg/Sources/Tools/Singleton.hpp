@@ -1,7 +1,7 @@
 #ifndef YAPG_GAME_TOOLS_SINGLETON_H
 #define YAPG_GAME_TOOLS_SINGLETON_H
 
-namespace tools
+namespace yapg
 {
 
 template<class Derived>

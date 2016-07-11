@@ -5,7 +5,7 @@
 
 #include "Async/Task.hpp"
 
-namespace async
+namespace yapg
 {
 
 class PunctualTask : public Task

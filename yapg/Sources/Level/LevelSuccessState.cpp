@@ -6,11 +6,11 @@
 
 #include "State/StateEngine.hpp"
 
-namespace level
+namespace yapg
 {
 
-LevelSuccessState::LevelSuccessState(state::StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
-    state::State(stateEngine),
+LevelSuccessState::LevelSuccessState(StateEngine& stateEngine, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager) :
+    State(stateEngine),
     m_resourcesManager(resourcesManager),
     m_winMusic(m_resourcesManager.getSounds().requestResource("menu/bensound-happiness.ogg")),
     m_winSound(*m_winMusic),

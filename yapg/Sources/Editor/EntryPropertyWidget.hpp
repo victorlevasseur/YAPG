@@ -9,14 +9,14 @@
 #include "Lua/Template/TemplateComponent.hpp"
 #include "NativeGui/TextBoxWindow.hpp"
 
-namespace editor
+namespace yapg
 {
 
 template<typename T, bool MULTILINETEXT = false>
 class EntryPropertyWidget : public PropertyWidget
 {
 public:
-    EntryPropertyWidget(entityx::Entity entity, const lua::EntityTemplate::Parameter& parameter) :
+    EntryPropertyWidget(entityx::Entity entity, const EntityTemplate::Parameter& parameter) :
         PropertyWidget(entity, parameter),
         m_wasActiveBefore(false)
     {
@@ -52,7 +52,7 @@ public:
 private:
     void updateEntryFromParameter()
     {
-        auto templateComponent = m_entity.component<components::TemplateComponent>();
+        auto templateComponent = m_entity.component<TemplateComponent>();
         std::string propertyAsString =
             boost::lexical_cast<std::string>(
                 boost::any_cast<T>(
@@ -66,7 +66,7 @@ private:
 
     void setParameterFromEntry()
     {
-        auto templateComponent = m_entity.component<components::TemplateComponent>();
+        auto templateComponent = m_entity.component<TemplateComponent>();
 
         templateComponent->parametersHelper.setParameter(
             m_parameter.name,

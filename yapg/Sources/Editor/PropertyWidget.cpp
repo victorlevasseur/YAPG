@@ -1,9 +1,9 @@
 #include "Editor/PropertyWidget.hpp"
 
-namespace editor
+namespace yapg
 {
 
-PropertyWidget::PropertyWidget(entityx::Entity entity, const lua::EntityTemplate::Parameter& parameter) :
+PropertyWidget::PropertyWidget(entityx::Entity entity, const EntityTemplate::Parameter& parameter) :
     m_entity(entity),
     m_parameter(parameter)
 {

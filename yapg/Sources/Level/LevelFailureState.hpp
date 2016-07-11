@@ -14,15 +14,15 @@
 #include "Settings/SettingsManager.hpp"
 #include "State/State.hpp"
 
-namespace state{ class StateEngine; }
+namespace yapg{ class StateEngine; }
 
-namespace level
+namespace yapg
 {
 
-class LevelFailureState : public state::State
+class LevelFailureState : public State
 {
 public:
-    LevelFailureState(state::StateEngine& stateEngine, const std::string& levelPath, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager);
+    LevelFailureState(StateEngine& stateEngine, const std::string& levelPath, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager);
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
@@ -38,8 +38,8 @@ protected:
 private:
     std::string m_levelPath;
 
-    resources::AllResourcesManagers& m_resourcesManager;
-    settings::SettingsManager& m_settingsManager;
+    AllResourcesManagers& m_resourcesManager;
+    SettingsManager& m_settingsManager;
 
     std::shared_ptr<sf::SoundBuffer> m_looseMusic;
     sf::Sound m_looseSound;

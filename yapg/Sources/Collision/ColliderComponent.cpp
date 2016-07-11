@@ -2,7 +2,7 @@
 
 #include "Lua/EntityHandle.hpp"
 
-namespace components
+namespace yapg
 {
 
 ColliderComponent::ColliderComponent(entityx::Entity entity) :
@@ -21,11 +21,11 @@ std::string ColliderComponent::getName() const
     return "Collider";
 }
 
-void ColliderComponent::registerComponent(lua::LuaState& state)
+void ColliderComponent::registerComponent(LuaState& state)
 {
     meta::MetadataStore::registerClass<ColliderComponent>();
 
-    lua::EntityHandle::declareComponent<ColliderComponent>("collider");
+    EntityHandle::declareComponent<ColliderComponent>("collider");
 
     state.getState().new_usertype<ColliderComponent>("collider_component" //TODO: Replace the name here
         //TODO: Register the properties here

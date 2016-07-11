@@ -9,7 +9,7 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
-namespace resources
+namespace yapg
 {
 
 /**

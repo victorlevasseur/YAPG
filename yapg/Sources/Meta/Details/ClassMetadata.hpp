@@ -8,6 +8,9 @@
 #include "Meta/Details/Metadata.hpp"
 #include "Meta/Details/MetadataStore.hpp"
 
+namespace yapg
+{
+
 namespace meta
 {
 
@@ -42,13 +45,13 @@ public:
         loadImpl(reinterpret_cast<C*>(object), luaObject);
     }
 
-    virtual void loadFromXml(void* value, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const
+    virtual void loadFromXml(void* value, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const
     {
         //TODO: Support this for classes
         std::cout << "Compound classes do not support being loaded from XML yet ! (TODO!)" << std::endl;
     }
 
-    virtual void saveToXml(const void* object, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const
+    virtual void saveToXml(const void* object, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const
     {
         //TODO: Support for this feature for classes
         std::cout << "Compound classes do not support being saved to XML yet ! (TODO!)" << std::endl;
@@ -114,6 +117,8 @@ private:
     std::map<std::string, std::unique_ptr<AttributeMetadataBase>> m_attributes;
     std::function<void(C*, const sol::object&)> m_extraFunction;
 };
+
+}
 
 }
 

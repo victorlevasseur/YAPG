@@ -8,7 +8,7 @@
 #include "Lua/LuaState.hpp"
 #include "Meta/Metadata.hpp"
 
-namespace components
+namespace yapg
 {
 
 class CollidableComponent : public Component
@@ -19,10 +19,10 @@ public:
 
     virtual std::string getName() const;
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 
-    std::map<std::string, collision::PolygonCallback> polygons;
-    std::vector<std::pair<std::string, collision::PolygonCallback>> polygonsByPriority; ///< Store pointers to the polygons ordered by priority (currently, exclusive polygons are first)
+    std::map<std::string, PolygonCallback> polygons;
+    std::vector<std::pair<std::string, PolygonCallback>> polygonsByPriority; ///< Store pointers to the polygons ordered by priority (currently, exclusive polygons are first)
 };
 
 std::ostream& operator<<(std::ostream& stream, const CollidableComponent& component);

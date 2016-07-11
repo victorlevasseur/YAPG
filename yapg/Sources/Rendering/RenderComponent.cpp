@@ -3,7 +3,7 @@
 #include "Lua/EntityHandle.hpp"
 #include "Rendering/RenderSystem.hpp"
 
-namespace components
+namespace yapg
 {
 
 RenderComponent::RenderComponent(entityx::Entity entity) :
@@ -26,7 +26,7 @@ std::string RenderComponent::getName() const
     return "Render";
 }
 
-void RenderComponent::registerComponent(lua::LuaState& state)
+void RenderComponent::registerComponent(LuaState& state)
 {
     meta::MetadataStore::registerClass<RenderComponent>("RenderComponent")
         .declareAttribute("texture", &RenderComponent::textureName)
@@ -36,7 +36,7 @@ void RenderComponent::registerComponent(lua::LuaState& state)
         .declareAttribute("on_animation_changed", &RenderComponent::onAnimationChangedFunc)
         .declareAttribute("on_animation_end", &RenderComponent::onAnimationEndFunc);
 
-    lua::EntityHandle::declareComponent<RenderComponent>("render");
+    EntityHandle::declareComponent<RenderComponent>("render");
 
     state.getState().new_usertype<RenderComponent>("render_component",
         "texture", &RenderComponent::textureName,
@@ -52,7 +52,7 @@ void RenderComponent::registerComponent(lua::LuaState& state)
 void RenderComponent::setCurrentAnimation(std::string animationName)
 {
     currentAnimation = animationName;
-    emit<systems::AnimationChangedMessage>(getEntity());
+    emit<AnimationChangedMessage>(getEntity());
 }
 
 std::ostream& operator<<(std::ostream& stream, const RenderComponent& component)

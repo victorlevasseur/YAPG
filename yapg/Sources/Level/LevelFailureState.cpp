@@ -7,11 +7,11 @@
 #include "Level/LevelState.hpp"
 #include "State/StateEngine.hpp"
 
-namespace level
+namespace yapg
 {
 
-LevelFailureState::LevelFailureState(state::StateEngine& stateEngine, const std::string& levelPath, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
-    state::State(stateEngine),
+LevelFailureState::LevelFailureState(StateEngine& stateEngine, const std::string& levelPath, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager) :
+    State(stateEngine),
     m_levelPath(levelPath),
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
@@ -42,7 +42,7 @@ void LevelFailureState::render(sf::RenderTarget& target)
         if(ImGui::Button("Try again"))
         {
             getStateEngine().stopAndStartState
-            <level::LevelState, const std::string&, resources::AllResourcesManagers&, settings::SettingsManager&>(
+            <LevelState, const std::string&, AllResourcesManagers&, SettingsManager&>(
                 m_levelPath, m_resourcesManager, m_settingsManager
             );
         }

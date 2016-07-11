@@ -10,7 +10,7 @@
 #include "Lua/Template/TemplateComponent.hpp"
 #include "Settings/tinyxml2.h"
 
-namespace lua
+namespace yapg
 {
 
 EntityTemplate::EntityTemplate(const sol::table& templateTable) :
@@ -88,7 +88,7 @@ void EntityTemplate::applyInheritance(LuaState& luaState)
     }
 }
 
-void EntityTemplate::initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, bool templateComponent) const
+void EntityTemplate::initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, bool templateComponent) const
 {
     if(isAbstract())
         throw std::runtime_error("[Template/Error] Trying to instanciate \"" + getName() + "\", which is an abstract template!");
@@ -97,15 +97,15 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
     m_componentsTable.for_each([&](const sol::object& key, const sol::object& value) {
         std::string componentType = key.as<std::string>();
 
-        components::Component::assignComponent(entity, componentType, value, entityGetter);
+        Component::assignComponent(entity, componentType, value, entityGetter);
     });
 
     //Add the CustomData component (special case!)
-    entity.assign<components::CustomDataComponent>(entity);
+    entity.assign<CustomDataComponent>(entity);
     if(m_componentsTable.get<sol::object>("custom_data").is<sol::table>())
     {
         //If the template has CustomDataComponent defined, it means that he needs to predefine some values
-        entity.component<components::CustomDataComponent>()->loadFromLua(
+        entity.component<CustomDataComponent>()->loadFromLua(
             m_componentsTable.get<sol::object>("custom_data"),
             entityGetter
         );
@@ -114,16 +114,16 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
     if(templateComponent)
     {
         //Add the template component, containing infos about the template
-        entity.assign<components::TemplateComponent>(
+        entity.assign<TemplateComponent>(
             entity,
             entityGetter.getSerializationIdFromEntity(entity),
             getName(),
-            lua::EntityParametersHelper(this, entity)
+            EntityParametersHelper(this, entity)
         );
     }
 }
 
-void EntityTemplate::initializeEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement, bool templateComponent) const
+void EntityTemplate::initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement, bool templateComponent) const
 {
     initializeEntity(entity, entityGetter, templateComponent);
     for(auto it = m_parameters.cbegin(); it != m_parameters.cend(); ++it)
@@ -158,7 +158,7 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const level::Seria
     }
 }
 
-void EntityTemplate::saveEntity(entityx::Entity entity, const level::SerializedEntityGetter& entityGetter, tinyxml2::XMLElement* parametersElement) const
+void EntityTemplate::saveEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, tinyxml2::XMLElement* parametersElement) const
 {
     tinyxml2::XMLDocument* doc = parametersElement->GetDocument();
 

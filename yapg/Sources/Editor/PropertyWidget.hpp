@@ -5,20 +5,20 @@
 
 #include "Lua/Template/EntityTemplate.hpp"
 
-namespace editor
+namespace yapg
 {
 
 class PropertyWidget
 {
 public:
-    PropertyWidget(entityx::Entity entity, const lua::EntityTemplate::Parameter& parameter);
+    PropertyWidget(entityx::Entity entity, const EntityTemplate::Parameter& parameter);
     virtual ~PropertyWidget();
 
     virtual void display() = 0;
 
 protected:
     entityx::Entity m_entity;
-    const lua::EntityTemplate::Parameter& m_parameter;
+    const EntityTemplate::Parameter& m_parameter;
 };
 
 }

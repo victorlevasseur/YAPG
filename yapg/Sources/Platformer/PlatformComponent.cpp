@@ -2,7 +2,7 @@
 
 #include "Lua/EntityHandle.hpp"
 
-namespace components
+namespace yapg
 {
 
 PlatformComponent::PlatformComponent(entityx::Entity entity) :
@@ -24,7 +24,7 @@ std::string PlatformComponent::getName() const
     return "Platform";
 }
 
-void PlatformComponent::registerComponent(lua::LuaState& state)
+void PlatformComponent::registerComponent(LuaState& state)
 {
     meta::MetadataStore::registerClass<PlatformComponent>("PlatformComponent")
         .declareAttribute("activated", &PlatformComponent::activated)
@@ -38,7 +38,7 @@ void PlatformComponent::registerComponent(lua::LuaState& state)
             }
         });
 
-    lua::EntityHandle::declareComponent<PlatformComponent>("platform");
+    EntityHandle::declareComponent<PlatformComponent>("platform");
 
     state.getState().new_usertype<PlatformComponent>("platform_component",
         "activated", &PlatformComponent::activated,

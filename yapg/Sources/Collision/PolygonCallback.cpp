@@ -2,7 +2,7 @@
 
 #include "Lua/EntityHandle.hpp"
 
-namespace collision
+namespace yapg
 {
 
 PolygonCallback::PolygonCallback() :
@@ -11,7 +11,7 @@ PolygonCallback::PolygonCallback() :
 
 }
 
-void PolygonCallback::registerClass(lua::LuaState& state)
+void PolygonCallback::registerClass(LuaState& state)
 {
     meta::MetadataStore::registerClass<PolygonCallback>()
         .declareAttribute("polygon", &PolygonCallback::m_polygon)
@@ -30,19 +30,19 @@ void PolygonCallback::registerClass(lua::LuaState& state)
 void PolygonCallback::callOnCollisionBegin(entityx::Entity entity1, entityx::Entity entity2)
 {
     if(onCollisionBeginFunc.valid())
-        onCollisionBeginFunc.call(lua::EntityHandle(entity1), lua::EntityHandle(entity2));
+        onCollisionBeginFunc.call(EntityHandle(entity1), EntityHandle(entity2));
 }
 
 void PolygonCallback::callCollides(entityx::Entity entity1, entityx::Entity entity2)
 {
     if(collidesFunc.valid())
-        collidesFunc.call(lua::EntityHandle(entity1), lua::EntityHandle(entity2));
+        collidesFunc.call(EntityHandle(entity1), EntityHandle(entity2));
 }
 
 void PolygonCallback::callOnCollisionEnd(entityx::Entity entity1, entityx::Entity entity2)
 {
     if(onCollisionEndFunc.valid())
-        onCollisionEndFunc.call(lua::EntityHandle(entity1), lua::EntityHandle(entity2));
+        onCollisionEndFunc.call(EntityHandle(entity1), EntityHandle(entity2));
 }
 
 }

@@ -1,7 +1,7 @@
 #include "Level/SerializedEntityGetter.hpp"
 
 
-namespace level
+namespace yapg
 {
 
 SerializedEntityGetter::SerializedEntityGetter() :

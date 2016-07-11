@@ -4,9 +4,9 @@
 #include <memory>
 #include <string>
 
-namespace nativegui{ namespace impl{ class TextBoxWindowImpl; } }
+namespace yapg{ namespace impl{ class TextBoxWindowImpl; } }
 
-namespace nativegui
+namespace yapg
 {
 
 class TextBoxWindow

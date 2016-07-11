@@ -2,7 +2,7 @@
 
 #include "Lua/EntityHandle.hpp"
 
-namespace components
+namespace yapg
 {
 
 PositionComponent::PositionComponent(entityx::Entity entity) :
@@ -38,7 +38,7 @@ sf::Transform PositionComponent::getPositionTransform() const
     return transform;
 }
 
-void PositionComponent::registerComponent(lua::LuaState& state)
+void PositionComponent::registerComponent(LuaState& state)
 {
     //Register loading infos
     meta::MetadataStore::registerClass<PositionComponent>("PositionComponent")
@@ -48,7 +48,7 @@ void PositionComponent::registerComponent(lua::LuaState& state)
         .declareAttribute<float>("width", &PositionComponent::width)
         .declareAttribute<float>("height", &PositionComponent::height);
 
-    lua::EntityHandle::declareComponent<PositionComponent>("position");
+    EntityHandle::declareComponent<PositionComponent>("position");
 
     //Register to lua
     state.getState().new_usertype<PositionComponent>("position_component",

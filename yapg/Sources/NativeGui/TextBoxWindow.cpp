@@ -7,7 +7,7 @@
 #include "NativeGui/Win32/TextBoxWindowImpl.hpp"
 #endif
 
-namespace nativegui
+namespace yapg
 {
 
 TextBoxWindow::TextBoxWindow(const std::string& initialText, const std::string& title) :

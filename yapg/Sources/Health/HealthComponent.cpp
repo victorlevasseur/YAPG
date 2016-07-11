@@ -2,7 +2,7 @@
 
 #include "Health/HealthSystem.hpp"
 
-namespace components
+namespace yapg
 {
 
 HealthComponent::HealthComponent(entityx::Entity entity) :
@@ -21,13 +21,13 @@ std::string HealthComponent::getName() const
     return "Health";
 }
 
-void HealthComponent::registerComponent(lua::LuaState& state)
+void HealthComponent::registerComponent(LuaState& state)
 {
     meta::MetadataStore::registerClass<HealthComponent>()
         .declareAttribute("health", &HealthComponent::health)
         .declareAttribute("max_health", &HealthComponent::maxHealth);
 
-    lua::EntityHandle::declareComponent<HealthComponent>("health");
+    EntityHandle::declareComponent<HealthComponent>("health");
 
     state.getState().new_usertype<HealthComponent>("health_component",
         "health", sol::readonly(&HealthComponent::health),
@@ -41,17 +41,17 @@ void HealthComponent::registerComponent(lua::LuaState& state)
 
 void HealthComponent::kill()
 {
-    emit<systems::HealthKillMessage>(getEntity());
+    emit<HealthKillMessage>(getEntity());
 }
 
 void HealthComponent::loosePV(float pv)
 {
-    emit<systems::HealthLoosePVMessage>(getEntity(), pv);
+    emit<HealthLoosePVMessage>(getEntity(), pv);
 }
 
 void HealthComponent::gainPV(float pv)
 {
-    emit<systems::HealthGainPVMessage>(getEntity(), pv);
+    emit<HealthGainPVMessage>(getEntity(), pv);
 }
 
 std::ostream& operator<<(std::ostream& stream, const HealthComponent& component)

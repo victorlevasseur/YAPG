@@ -13,10 +13,10 @@
 #include "State/StateEngine.hpp"
 #include "Tools/KeyStrings.hpp"
 
-namespace state
+namespace yapg
 {
 
-MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesManagers& resourcesManager, settings::SettingsManager& settingsManager) :
+MainMenuState::MainMenuState(StateEngine& stateEngine, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager) :
     State(stateEngine),
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
@@ -48,18 +48,18 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, resources::AllResourcesMa
 
     //Main menu animations
     // - The player
-    m_playerAnimations.emplace("default", animation::Animation(
-        std::vector<animation::Frame>
+    m_playerAnimations.emplace("default", Animation(
+        std::vector<Frame>
         {
-            animation::Frame{sf::IntRect(512, 582, 128, 186), 1.f},
-            animation::Frame{sf::IntRect(512, 326, 128, 186), 1.f}
+            Frame{sf::IntRect(512, 582, 128, 186), 1.f},
+            Frame{sf::IntRect(512, 326, 128, 186), 1.f}
         }
     ));
     m_playerAnimations["default"].setDuration(0.2f);
-    m_playerAnimations.emplace("jump", animation::Animation(
-        std::vector<animation::Frame>
+    m_playerAnimations.emplace("jump", Animation(
+        std::vector<Frame>
         {
-            animation::Frame{sf::IntRect(512, 1606, 128, 186), 1.f},
+            Frame{sf::IntRect(512, 1606, 128, 186), 1.f},
         }
     ));
     m_playerAnimations["jump"].setDuration(1.f);
@@ -124,7 +124,7 @@ void MainMenuState::processEvent(sf::Event event, sf::RenderTarget &target)
         {
             if(event.key.code != sf::Keyboard::Escape)
             {
-                strncpy(m_selectedKeyButton, tools::keyToString(event.key.code).data(), 31);
+                strncpy(m_selectedKeyButton, keyToString(event.key.code).data(), 31);
                 m_selectedKeyButton[31] = '\0';
             }
             m_selectedKeyButton = nullptr;
@@ -148,7 +148,7 @@ void MainMenuState::render(sf::RenderTarget& target)
         if(ImGui::Button("Play !"))
         {
             getStateEngine().pauseAndStartState
-                <level::LevelState, std::string, resources::AllResourcesManagers&, settings::SettingsManager&>(
+                <LevelState, std::string, AllResourcesManagers&, SettingsManager&>(
                 std::string(levelName), m_resourcesManager, m_settingsManager
             );
         }
@@ -157,7 +157,7 @@ void MainMenuState::render(sf::RenderTarget& target)
         if(ImGui::Button("Level editor"))
         {
             getStateEngine().pauseAndStartState
-                <editor::LevelEditorState, resources::AllResourcesManagers&, settings::SettingsManager&>(
+                <LevelEditorState, AllResourcesManagers&, SettingsManager&>(
                 m_resourcesManager, m_settingsManager
             );
         }
@@ -334,15 +334,15 @@ void MainMenuState::updateKeysButtonsFromSettings()
 {
     for(int i = 0; i < 4; i++)
     {
-        settings::KeySettings::PlayerKeys& playerKeys = m_settingsManager.getKeySettings().getPlayerKeys(i);
+        KeySettings::PlayerKeys& playerKeys = m_settingsManager.getKeySettings().getPlayerKeys(i);
 
-        strncpy(m_playersKeys[i][0], tools::keyToString(playerKeys.leftKey).data(), 31);
+        strncpy(m_playersKeys[i][0], keyToString(playerKeys.leftKey).data(), 31);
         m_playersKeys[i][0][31] = '\0';
 
-        strncpy(m_playersKeys[i][1], tools::keyToString(playerKeys.rightKey).data(), 31);
+        strncpy(m_playersKeys[i][1], keyToString(playerKeys.rightKey).data(), 31);
         m_playersKeys[i][1][31] = '\0';
 
-        strncpy(m_playersKeys[i][2], tools::keyToString(playerKeys.jumpKey).data(), 31);
+        strncpy(m_playersKeys[i][2], keyToString(playerKeys.jumpKey).data(), 31);
         m_playersKeys[i][2][31] = '\0';
     }
 }
@@ -351,11 +351,11 @@ void MainMenuState::updateSettingsFromKeysButtons()
 {
     for(int i = 0; i < 4; i++)
     {
-        settings::KeySettings::PlayerKeys& playerKeys = m_settingsManager.getKeySettings().getPlayerKeys(i);
+        KeySettings::PlayerKeys& playerKeys = m_settingsManager.getKeySettings().getPlayerKeys(i);
 
-        playerKeys.leftKey = tools::stringToKey(std::string(m_playersKeys[i][0]));
-        playerKeys.rightKey = tools::stringToKey(std::string(m_playersKeys[i][1]));
-        playerKeys.jumpKey = tools::stringToKey(std::string(m_playersKeys[i][2]));
+        playerKeys.leftKey = stringToKey(std::string(m_playersKeys[i][0]));
+        playerKeys.rightKey = stringToKey(std::string(m_playersKeys[i][1]));
+        playerKeys.jumpKey = stringToKey(std::string(m_playersKeys[i][2]));
     }
 }
 

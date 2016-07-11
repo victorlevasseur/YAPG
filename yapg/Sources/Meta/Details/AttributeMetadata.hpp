@@ -7,6 +7,9 @@
 #include "Meta/Details/AttributeMetadataBase.hpp"
 #include "Meta/Details/MetadataStore.hpp"
 
+namespace yapg
+{
+
 namespace meta
 {
 
@@ -45,14 +48,14 @@ public:
         MetadataStore::getMetadata<T>().load(&(object->*m_member), luaObject);
     }
 
-    virtual void loadFromXml(void* object_, const tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
+    virtual void loadFromXml(void* object_, const tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const override
     {
         C* object = reinterpret_cast<C*>(object_);
         //Get the metadata of the class/type to be able to load the attribute from XML according to its meta definition
         MetadataStore::getMetadata<T>().loadFromXml(&(object->*m_member), xmlElement, entityGetter);
     }
 
-    virtual void saveToXml(const void* object_, tinyxml2::XMLElement* xmlElement, const level::SerializedEntityGetter& entityGetter) const override
+    virtual void saveToXml(const void* object_, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter) const override
     {
         const C* object = reinterpret_cast<const C*>(object_);
         //Get the metadata of the class/type to be able to save the attribute to XML according to its meta definition
@@ -123,6 +126,8 @@ private:
     T(C::*m_getter)() const;
     void(C::*m_setter)(T);
 };
+
+}
 
 }
 

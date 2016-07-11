@@ -2,9 +2,9 @@
 
 #include <SFML/System/Vector2.hpp>
 
-namespace c = components;
 
-namespace systems
+
+namespace yapg
 {
 
 EntityGridSystem::EntityGridSystem() :
@@ -15,9 +15,9 @@ EntityGridSystem::EntityGridSystem() :
 
 void EntityGridSystem::initWithExistingEntities(entityx::EntityManager &es)
 {
-    es.each<c::PositionComponent>([&](
+    es.each<PositionComponent>([&](
         entityx::Entity entity,
-        c::PositionComponent& position)
+        PositionComponent& position)
     {
         tryToAddEntityToGrid(entity);
     });
@@ -25,15 +25,15 @@ void EntityGridSystem::initWithExistingEntities(entityx::EntityManager &es)
 
 void EntityGridSystem::configure(entityx::EventManager &event_manager)
 {
-    event_manager.subscribe<entityx::ComponentRemovedEvent<c::PositionComponent>>(*this);
+    event_manager.subscribe<entityx::ComponentRemovedEvent<PositionComponent>>(*this);
     event_manager.subscribe<entityx::EntityDestroyedEvent>(*this);
 }
 
 void EntityGridSystem::update(entityx::EntityManager &es, entityx::EventManager &events, entityx::TimeDelta dt)
 {
-    es.each<c::PositionComponent>([&](
+    es.each<PositionComponent>([&](
         entityx::Entity entity,
-        c::PositionComponent& position)
+        PositionComponent& position)
     {
         if(!m_grid.contains(entity))
         {
@@ -55,7 +55,7 @@ void EntityGridSystem::update(entityx::EntityManager &es, entityx::EventManager 
     });
 }
 
-void EntityGridSystem::receive(const entityx::ComponentRemovedEvent<components::PositionComponent>& event)
+void EntityGridSystem::receive(const entityx::ComponentRemovedEvent<PositionComponent>& event)
 {
     tryToRemoveEntityFromGrid(event.entity);
 }
@@ -67,7 +67,7 @@ void EntityGridSystem::receive(const entityx::EntityDestroyedEvent& event)
 
 void EntityGridSystem::tryToAddEntityToGrid(entityx::Entity entity)
 {
-    if(entity.has_component<c::PositionComponent>())
+    if(entity.has_component<PositionComponent>())
     {
         m_grid.insert(entity);
     }

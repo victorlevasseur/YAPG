@@ -4,7 +4,7 @@
 #include "Common/Component.hpp"
 #include "Lua/LuaState.hpp"
 
-namespace components
+namespace yapg
 {
 
 class PlatformComponent : public Component
@@ -22,7 +22,7 @@ public:
 
     virtual std::string getName() const;
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 
     std::string getPlatformTypeAsString() const;
     void setPlatformTypeAsString(const std::string str);

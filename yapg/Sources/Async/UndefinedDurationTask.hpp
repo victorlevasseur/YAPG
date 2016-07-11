@@ -6,7 +6,7 @@
 #include "Async/Task.hpp"
 #include "Lua/sol.hpp"
 
-namespace async
+namespace yapg
 {
 
 template<typename StartFunctionType, typename EndFunctionType, typename UpdateFunctionType>
@@ -54,7 +54,7 @@ private:
 };
 
 using FunctionUndefinedDurationTask = UndefinedDurationTask<std::function<void()>, std::function<void()>, std::function<void(sf::Time, bool&)>>;
-using LuaUndefinedDurationTask = async::UndefinedDurationTask<sol::function, sol::function, sol::function>;
+using LuaUndefinedDurationTask = UndefinedDurationTask<sol::function, sol::function, sol::function>;
 
 }
 

@@ -3,7 +3,7 @@
 
 #include "entityx/entityx.h"
 
-namespace systems
+namespace yapg
 {
 
 class CustomBehaviorSystem : public entityx::System<CustomBehaviorSystem>

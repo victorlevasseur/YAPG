@@ -1,6 +1,6 @@
 #include "Async/PunctualTask.hpp"
 
-namespace async
+namespace yapg
 {
 
 PunctualTask::PunctualTask(const std::function<void()>& function) :

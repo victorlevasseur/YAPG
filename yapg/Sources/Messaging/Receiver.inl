@@ -1,3 +1,6 @@
+namespace yapg
+{
+
 namespace messaging
 {
 
@@ -11,6 +14,8 @@ template<class MessageType>
 SingleReceiver<MessageType>::~SingleReceiver()
 {
     MessagingManager::getInstance().unsubscribe<MessageType>(*this);
+}
+
 }
 
 }

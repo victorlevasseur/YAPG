@@ -6,9 +6,9 @@
 #include <string>
 
 namespace tinyxml2{ class XMLDocument; }
-namespace settings{ class KeySettings; }
+namespace yapg{ class KeySettings; }
 
-namespace settings
+namespace yapg
 {
 
 class SettingsManager

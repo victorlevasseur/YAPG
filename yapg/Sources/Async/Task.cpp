@@ -1,6 +1,6 @@
 #include "Async/Task.hpp"
 
-namespace async
+namespace yapg
 {
 
 Task::Task()

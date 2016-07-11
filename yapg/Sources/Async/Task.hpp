@@ -5,7 +5,7 @@
 
 #include <SFML/System/Time.hpp>
 
-namespace async
+namespace yapg
 {
 
 class Task

@@ -4,7 +4,7 @@
 
 #include "Lua/EntityHandle.hpp"
 
-namespace components
+namespace yapg
 {
 
 CollidableComponent::CollidableComponent(entityx::Entity entity) :
@@ -23,7 +23,7 @@ std::string CollidableComponent::getName() const
     return "Collidable";
 }
 
-void CollidableComponent::registerComponent(lua::LuaState& state)
+void CollidableComponent::registerComponent(LuaState& state)
 {
     meta::MetadataStore::registerClass<CollidableComponent>()
         .declareAttribute("polygons", &CollidableComponent::polygons)
@@ -38,14 +38,14 @@ void CollidableComponent::registerComponent(lua::LuaState& state)
             std::sort(
                 collidable->polygonsByPriority.begin(),
                 collidable->polygonsByPriority.end(),
-                [](const std::pair<std::string, collision::PolygonCallback>& p1, const std::pair<std::string, collision::PolygonCallback>& p2)
+                [](const std::pair<std::string, PolygonCallback>& p1, const std::pair<std::string, PolygonCallback>& p2)
                 {
                     return p1.second.isExclusive() && p2.second.isExclusive();
                 }
             );
         });
 
-    lua::EntityHandle::declareComponent<CollidableComponent>("collidable");
+    EntityHandle::declareComponent<CollidableComponent>("collidable");
 
     state.getState().new_usertype<CollidableComponent>("collidable_component"
     );

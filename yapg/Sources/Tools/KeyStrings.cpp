@@ -1,6 +1,6 @@
 #include "Tools/KeyStrings.hpp"
 
-namespace tools
+namespace yapg
 {
 
 std::string keyToString(sf::Keyboard::Key key)

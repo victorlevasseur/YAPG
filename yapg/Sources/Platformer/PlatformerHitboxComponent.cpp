@@ -2,7 +2,7 @@
 
 #include "Lua/EntityHandle.hpp"
 
-namespace components
+namespace yapg
 {
 
 PlatformerHitboxComponent::PlatformerHitboxComponent(entityx::Entity entity) :
@@ -21,12 +21,12 @@ std::string PlatformerHitboxComponent::getName() const
     return "PlatformerHitbox";
 }
 
-void PlatformerHitboxComponent::registerComponent(lua::LuaState& state)
+void PlatformerHitboxComponent::registerComponent(LuaState& state)
 {
     meta::MetadataStore::registerClass<PlatformerHitboxComponent>("PlatformerHitboxComponent")
         .declareAttribute("polygon", &PlatformerHitboxComponent::m_polygon);
 
-    lua::EntityHandle::declareComponent<PlatformerHitboxComponent>("platformer_hitbox");
+    EntityHandle::declareComponent<PlatformerHitboxComponent>("platformer_hitbox");
 
     state.getState().new_usertype<PlatformerHitboxComponent>("platformer_hitbox_component",
         "polygon", &PlatformerHitboxComponent::m_polygon

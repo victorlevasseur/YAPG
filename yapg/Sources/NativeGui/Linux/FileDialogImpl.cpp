@@ -5,7 +5,7 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 
-namespace nativegui
+namespace yapg
 {
 namespace impl
 {

@@ -7,7 +7,7 @@
 
 #include <gtk/gtk.h>
 
-namespace nativegui
+namespace yapg
 {
 namespace impl
 {

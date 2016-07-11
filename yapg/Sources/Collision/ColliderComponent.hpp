@@ -5,7 +5,7 @@
 #include "Lua/LuaState.hpp"
 #include "Meta/Metadata.hpp"
 
-namespace components
+namespace yapg
 {
 
 class ColliderComponent : public Component
@@ -16,7 +16,7 @@ public:
 
     virtual std::string getName() const;
 
-    static void registerComponent(lua::LuaState& state);
+    static void registerComponent(LuaState& state);
 };
 
 std::ostream& operator<<(std::ostream& stream, const ColliderComponent& component);

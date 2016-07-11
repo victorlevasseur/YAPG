@@ -3,7 +3,7 @@
 #include "Lua/EntityHandle.hpp"
 #include "Player/PlayerSystem.hpp"
 
-namespace components
+namespace yapg
 {
 
 PlayerComponent::PlayerComponent(entityx::Entity entity) :
@@ -24,12 +24,12 @@ std::string PlayerComponent::getName() const
     return "Player";
 }
 
-void PlayerComponent::registerComponent(lua::LuaState& state)
+void PlayerComponent::registerComponent(LuaState& state)
 {
     meta::MetadataStore::registerClass<PlayerComponent>("PlayerComponent")
         .declareAttribute("player_number", &PlayerComponent::playerNumber, false, true, false);
 
-    lua::EntityHandle::declareComponent<PlayerComponent>("player");
+    EntityHandle::declareComponent<PlayerComponent>("player");
 
     state.getState().new_usertype<PlayerComponent>("player_component",
         "player_number", sol::readonly(&PlayerComponent::playerNumber),
@@ -42,7 +42,7 @@ void PlayerComponent::registerComponent(lua::LuaState& state)
 void PlayerComponent::setFinishedLevel()
 {
     m_finishedLevel = true;
-    emit<systems::PlayerFinishedMessage>(getEntity());
+    emit<PlayerFinishedMessage>(getEntity());
 }
 
 std::ostream& operator<<(std::ostream& stream, const PlayerComponent& component)

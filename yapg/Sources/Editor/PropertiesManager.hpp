@@ -10,7 +10,7 @@
 
 #include "Editor/PropertyWidget.hpp"
 
-namespace editor
+namespace yapg
 {
 
 class PropertiesManager
@@ -26,7 +26,7 @@ public:
     void registerPropertyWidget();
 
 private:
-    std::map<std::type_index, std::function<std::unique_ptr<PropertyWidget>(entityx::Entity, const lua::EntityTemplate::Parameter&)>> m_registeredWidgets;
+    std::map<std::type_index, std::function<std::unique_ptr<PropertyWidget>(entityx::Entity, const EntityTemplate::Parameter&)>> m_registeredWidgets;
 
     entityx::Entity m_currentEntity;
 

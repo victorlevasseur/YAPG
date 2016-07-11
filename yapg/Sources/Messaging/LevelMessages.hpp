@@ -3,6 +3,9 @@
 
 #include "entityx/entityx.h"
 
+namespace yapg
+{
+
 namespace messaging
 {
 
@@ -15,6 +18,8 @@ struct AllPlayersLostMessage
 {
 
 };
+
+}
 
 }
 

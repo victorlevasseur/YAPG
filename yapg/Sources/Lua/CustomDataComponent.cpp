@@ -2,7 +2,7 @@
 
 #include "Lua/EntityHandle.hpp"
 
-namespace components
+namespace yapg
 {
 
 CustomDataComponent::CustomDataComponent(entityx::Entity entity) :
@@ -22,7 +22,7 @@ std::string CustomDataComponent::getName() const
     return "CustomData";
 }
 
-void CustomDataComponent::registerComponent(lua::LuaState& state)
+void CustomDataComponent::registerComponent(LuaState& state)
 {
     meta::MetadataStore::registerClass<CustomDataComponent>()
         .setExtraLoadFunction([](CustomDataComponent* CustomData, const sol::object& luaObject)
@@ -52,7 +52,7 @@ void CustomDataComponent::registerComponent(lua::LuaState& state)
             }
         });
 
-    lua::EntityHandle::declareComponent<CustomDataComponent>("custom_data");
+    EntityHandle::declareComponent<CustomDataComponent>("custom_data");
 
     state.getState().new_usertype<CustomDataComponent>("data_component",
         "has_value", &CustomDataComponent::hasValue,

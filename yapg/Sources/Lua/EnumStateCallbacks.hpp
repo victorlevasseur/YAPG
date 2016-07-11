@@ -5,7 +5,7 @@
 #include "Lua/sol.hpp"
 
 
-namespace lua
+namespace yapg
 {
 
 /**
