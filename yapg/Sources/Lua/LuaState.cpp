@@ -204,12 +204,30 @@ const EntityTemplate& LuaState::getTemplate(const std::string& name) const
     return m_templates.at(name);
 }
 
+bool LuaState::hasTemplate(const std::string& name) const
+{
+    return m_templates.count(name) != 0;
+}
+
 void LuaState::loadAllTemplates()
 {
     loadTemplates(std::string("templates"));
     std::cout << "[Lua/Note] Applying block inheritance..." << std::endl;
-    for(auto& pair : m_templates)
-        pair.second.applyInheritance(*this);
+    for(auto it = m_templates.begin(); it != m_templates.end(); )
+    {
+        auto currentIt = it++;
+
+        try
+        {
+            currentIt->second.applyInheritance(*this);
+        }
+        catch(const std::out_of_range& e)
+        {
+            //The template didn't find its base template, remove it from the templates
+            std::cout << "[Lua/Warning] Can't find the base template of \"" << currentIt->second.getName() << "\", the template will be ignored !" << std::endl;
+            m_templates.erase(currentIt);
+        }
+    }
     std::cout << "[Lua/Note] Entities templates loaded." << std::endl;
 }
 

@@ -21,6 +21,7 @@ public:
     const sol::state& getState() const;
 
     const EntityTemplate& getTemplate(const std::string& name) const;
+    bool hasTemplate(const std::string& name) const;
 
     void loadAllTemplates();
     void unloadAllTemplates();
