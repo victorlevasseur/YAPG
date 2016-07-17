@@ -45,7 +45,20 @@ protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget &target);
 
 private:
-    void openTemplate(const std::string& path);
+    struct ErrorMessage
+    {
+        enum ErrorType
+        {
+            NOTE,
+            WARNING,
+            ERROR
+        };
+
+        ErrorType errorType;
+        std::string errorMsg;
+    };
+
+    void openTemplate(const std::string& filepath);
 
     void initGUI();
     void initSystemManager();
@@ -70,10 +83,9 @@ private:
 
     entityx::Entity m_block;
 
-    std::string m_blockName;
+    std::string m_filepath;
 
-    //POPUP
-    char m_blockToOpen[128];
+    std::vector<ErrorMessage> m_errorMessages;
 };
 
 }

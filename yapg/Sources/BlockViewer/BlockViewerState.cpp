@@ -36,8 +36,7 @@ BlockViewerState::BlockViewerState(StateEngine& stateEngine, AllResourcesManager
     m_eventMgr(),
     m_entityMgr(m_eventMgr),
     m_block(),
-    m_blockName(),
-    m_blockToOpen{'\0'}
+    m_filepath()
 {
     initSystemManager();
     initGUI();
@@ -77,38 +76,52 @@ void BlockViewerState::render(sf::RenderTarget& target)
     ImGui::SetNextWindowSize(ImVec2(200.f, 150.f));
     ImGui::SetNextWindowPos(ImVec2(1024.f - 200.f, 0.f));
     ImGui::Begin("Files");
-        ImGui::Text(m_blockName == "" ? "(no block loaded)" : m_blockName.data());
+        ImGui::Text(m_filepath == "" ? "(no block loaded)" : m_filepath.data());
         if(ImGui::Button("Open...."))
         {
-            ImGui::OpenPopup("Open");
+            FileDialog fileDialog("Select a template to open...", FileDialog::Open, { { "Lua template", {"*.lua"} } });
+            if(fileDialog.run())
+            {
+                openTemplate(fileDialog.getFilename());
+            }
         }
         if(ImGui::Button("Refresh"))
         {
-            openTemplate(m_blockName);
+            if(!m_filepath.empty())
+                openTemplate(m_filepath);
         }
         if(ImGui::Button("Exit"))
         {
             getStateEngine().stopStateAndUnpause();
         }
+    ImGui::End();
 
-        //Open a template POPUP
-        if(ImGui::BeginPopupModal("Open"))
+    ImGui::SetNextWindowSize(ImVec2(1024.f, 150.f));
+    ImGui::SetNextWindowPos(ImVec2(0.f, 768.f - 150.f));
+    ImGui::Begin("Error messages");
+        for(const auto& error : m_errorMessages)
         {
-            ImGui::Text("Template's name");
-
-            ImGui::InputText("", m_blockToOpen, 127);
-
-            if(ImGui::Button("Open"))
+            if(error.errorType == ErrorMessage::NOTE)
             {
-                openTemplate(std::string(m_blockToOpen));
-                ImGui::CloseCurrentPopup();
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 1.f, 1.f));
+                ImGui::Text("Note: ");
+                ImGui::PopStyleColor();
             }
-            if(ImGui::Button("Cancel"))
+            else if(error.errorType == ErrorMessage::WARNING)
             {
-                ImGui::CloseCurrentPopup();
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 0.f, 1.f));
+                ImGui::Text("Warning: ");
+                ImGui::PopStyleColor();
+            }
+            else if(error.errorType == ErrorMessage::ERROR)
+            {
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 0.f, 0.f, 1.f));
+                ImGui::Text("Error: ");
+                ImGui::PopStyleColor();
             }
 
-            ImGui::EndPopup();
+            ImGui::SameLine();
+            ImGui::TextWrapped(error.errorMsg.c_str());
         }
     ImGui::End();
 
@@ -147,30 +160,57 @@ void BlockViewerState::doUpdate(sf::Time dt, sf::RenderTarget &target)
     m_systemMgr->update<RenderSystem>(dt.asSeconds());
 }
 
-void BlockViewerState::openTemplate(const std::string& name)
+void BlockViewerState::openTemplate(const std::string& filepath)
 {
+    m_errorMessages.clear();
     m_luaState.unloadAllTemplates();
     if(m_block)
         m_block.destroy();
-    m_blockName = "";
+    m_filepath = "";
 
     m_luaState.loadAllTemplates();
 
     try
     {
-        const auto& blockTemplate = m_luaState.getTemplate(name);
-        m_block = m_entityMgr.create();
-
-        blockTemplate.initializeEntity(m_block, SerializedEntityGetter(), true);
-
-        m_blockName = name;
+        //Try to load the template at filepath and get its name
+        m_luaState.getState().script_file(filepath);
     }
-    catch(const std::out_of_range& e)
+    catch(const sol::error& e)
     {
-        if(m_block)
-            m_block.destroy();
-
+        //An error in the loaded template
+        m_errorMessages.push_back({ErrorMessage::ERROR, e.what()});
+        return;
     }
+
+    sol::table templateTable;
+    try
+    {
+        templateTable = m_luaState.getState().get<sol::table>("entity_template");
+    }
+    catch(const sol::error& e)
+    {
+        //Can't find the entity_template variable (or it's not a table)
+        m_errorMessages.push_back({ErrorMessage::ERROR, "Can't find the \"entity_template\" variable in the lua template file !"});
+        return;
+    }
+
+    EntityTemplate blockTemplate(templateTable);
+
+    if(!blockTemplate.getBaseTemplate().empty() && !m_luaState.hasTemplate(blockTemplate.getBaseTemplate()))
+    {
+        //The inherited template doesn't exist !
+        m_errorMessages.push_back({ErrorMessage::ERROR, "The template \"" + blockTemplate.getBaseTemplate() + "\" (base template of the loaded block) doesn't exists (or is errored) !"});
+        return;
+    }
+    blockTemplate.applyInheritance(m_luaState);
+
+    m_block = m_entityMgr.create();
+
+    blockTemplate.initializeEntity(m_block, SerializedEntityGetter(), true);
+
+    m_filepath = filepath;
+
+    m_errorMessages.push_back({ErrorMessage::NOTE, "Block successfully loaded."});
 }
 
 void BlockViewerState::initGUI()
