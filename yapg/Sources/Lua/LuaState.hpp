@@ -15,12 +15,15 @@ namespace yapg
 class LuaState
 {
 public:
-    LuaState();
+    LuaState(bool loadAllTemplates = true);
 
     sol::state& getState();
     const sol::state& getState() const;
 
     const EntityTemplate& getTemplate(const std::string& name) const;
+
+    void loadAllTemplates();
+    void unloadAllTemplates();
 
     const std::map<std::string, EntityTemplate>& getTemplates() const { return m_templates; }
     std::map<std::string, EntityTemplate>& getTemplates() { return m_templates; }
@@ -39,7 +42,6 @@ public:
 
 private:
     void loadTemplates(const std::string& path);
-
     void loadTemplates(const boost::filesystem::path& path);
 
     sol::state m_luaState;

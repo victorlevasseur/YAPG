@@ -58,6 +58,8 @@ public:
      */
     void applyInheritance(LuaState& luaState);
 
+    std::string getBaseTemplate() const { return m_inheritedTemplate; }
+
     /**
      * Initializes an entity with this template.
      * \param entity the entity to initialize (must be an already created entity)

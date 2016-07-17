@@ -34,7 +34,7 @@ namespace fs = boost::filesystem;
 namespace yapg
 {
 
-LuaState::LuaState() :
+LuaState::LuaState(bool loadAllTemplates) :
     m_luaState(),
     m_templates()
 {
@@ -181,11 +181,10 @@ LuaState::LuaState() :
     std::cout << "[Lua/Note] Scripting tools loaded." << std::endl;
 
     //Load templates
-    loadTemplates(std::string("templates"));
-    std::cout << "[Lua/Note] Applying block inheritance..." << std::endl;
-    for(auto& pair : m_templates)
-        pair.second.applyInheritance(*this);
-    std::cout << "[Lua/Note] Entities templates loaded." << std::endl;
+    if(loadAllTemplates)
+    {
+        LuaState::loadAllTemplates();
+    }
 
     std::cout << "[Lua/Note] --> Lua state initialization completed." << std::endl;
 }
@@ -203,6 +202,20 @@ const sol::state& LuaState::getState() const
 const EntityTemplate& LuaState::getTemplate(const std::string& name) const
 {
     return m_templates.at(name);
+}
+
+void LuaState::loadAllTemplates()
+{
+    loadTemplates(std::string("templates"));
+    std::cout << "[Lua/Note] Applying block inheritance..." << std::endl;
+    for(auto& pair : m_templates)
+        pair.second.applyInheritance(*this);
+    std::cout << "[Lua/Note] Entities templates loaded." << std::endl;
+}
+
+void LuaState::unloadAllTemplates()
+{
+    m_templates.clear();
 }
 
 sol::table LuaState::mergeTables(sol::table first, sol::table second)
@@ -237,13 +250,21 @@ void LuaState::loadTemplates(const fs::path& path)
                 else if(fs::is_regular_file(e.path()))
                 {
                     std::string filePath = fs::canonical(e.path()).string();
-                    m_luaState.script_file(filePath);
+                    try
+                    {
+                        m_luaState.script_file(filePath);
 
-                    m_templates.emplace(
-                        m_luaState.get<sol::table>("entity_template").get<std::string>("name"),
-                        EntityTemplate(m_luaState.get<sol::table>("entity_template"))
-                    );
-                    std::cout << "[Lua/Note] Loaded template from " << e.path() << "." << std::endl;
+                        m_templates.emplace(
+                            m_luaState.get<sol::table>("entity_template").get<std::string>("name"),
+                            EntityTemplate(m_luaState.get<sol::table>("entity_template"))
+                        );
+                        std::cout << "[Lua/Note] Loaded template from " << e.path() << "." << std::endl;
+                    }
+                    catch(const sol::error& e)
+                    {
+                        std::cout << "[Lua/Warning] Can't load \"" << filePath << "\" because it contains an error :" << std::endl;
+                        std::cout << e.what() << std::endl;
+                    }
                 }
             }
         }

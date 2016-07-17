@@ -7,6 +7,7 @@
 
 #include "Gui/imgui.h"
 
+#include "BlockViewer/BlockViewerState.hpp"
 #include "Editor/LevelEditorState.hpp"
 #include "Level/LevelState.hpp"
 #include "Settings/KeySettings.hpp"
@@ -158,6 +159,15 @@ void MainMenuState::render(sf::RenderTarget& target)
         {
             getStateEngine().pauseAndStartState
                 <LevelEditorState, AllResourcesManagers&, SettingsManager&>(
+                m_resourcesManager, m_settingsManager
+            );
+        }
+
+        //Block viewer
+        if(ImGui::Button("Block viewer"))
+        {
+            getStateEngine().pauseAndStartState
+                <BlockViewerState, AllResourcesManagers&, SettingsManager&>(
                 m_resourcesManager, m_settingsManager
             );
         }
