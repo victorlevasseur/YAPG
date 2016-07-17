@@ -119,6 +119,8 @@ FileDialogImpl::FileDialogImpl(
 
     m_fileDialogStruct->Flags =
         m_action == FileDialog::Open ? OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST : 0;
+
+    m_fileDialogStruct->Flags |= OFN_NOCHANGEDIR;
 }
 
 FileDialogImpl::~FileDialogImpl()
