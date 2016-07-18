@@ -1,0 +1,3 @@
+[submodule "yapg/Resources"]
+	path = yapg/Resources
+	url = https://github.com/victorlevasseur/YAPG-Resources.git
