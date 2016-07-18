@@ -75,3 +75,4 @@ install(TARGETS yapg-game DESTINATION "${CMAKE_SOURCE_DIR}/release")
 
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/yapg/LuaSources/" DESTINATION "${CMAKE_SOURCE_DIR}/release/scripts/" PATTERN "*.lua")
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/yapg/Resources/" DESTINATION "${CMAKE_SOURCE_DIR}/release/")
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/yapg/Files/" DESTINATION "${CMAKE_SOURCE_DIR}/release/")
