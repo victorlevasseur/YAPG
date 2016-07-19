@@ -41,7 +41,7 @@ int main(int argc, char** argv)
     yapg::SettingsManager settingsManager("config.xml");
 
     //Texture manager and font manager
-    yapg::AllResourcesManagers resManager("assets");
+    yapg::AllResourcesManagers resManager("");
 
     //Window manager
     yapg::WindowManager windowManager(stateEngine, "Yet Another Platformer Game");

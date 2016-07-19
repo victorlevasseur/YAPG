@@ -13,13 +13,14 @@
 namespace yapg
 {
 
-EntityTemplate::EntityTemplate(const sol::table& templateTable) :
+EntityTemplate::EntityTemplate(const sol::table& templateTable, const std::string& packageName) :
     m_name(),
     m_friendlyName(),
     m_inheritedTemplate(),
     m_abstract(false),
     m_parameters(),
-    m_componentsTable()
+    m_componentsTable(),
+    m_packageName(packageName)
 {
     m_name = templateTable.get<std::string>("name");
     m_friendlyName = templateTable.get<std::string>("friendlyname");
@@ -79,16 +80,16 @@ void EntityTemplate::applyInheritance(LuaState& luaState)
     {
         //Merge the parameters
         m_parameters.insert(
-            luaState.getTemplate(m_inheritedTemplate).m_parameters.begin(),
-            luaState.getTemplate(m_inheritedTemplate).m_parameters.end()
+            luaState.getTemplate(m_packageName + "." + m_inheritedTemplate).m_parameters.begin(),
+            luaState.getTemplate(m_packageName + "." + m_inheritedTemplate).m_parameters.end()
         );
 
         //Merge the component lua table
-        m_componentsTable = luaState.mergeTables(luaState.getTemplate(m_inheritedTemplate).m_componentsTable, m_componentsTable);
+        m_componentsTable = luaState.mergeTables(luaState.getTemplate(m_packageName + "." + m_inheritedTemplate).m_componentsTable, m_componentsTable);
     }
 }
 
-void EntityTemplate::initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, bool templateComponent) const
+void EntityTemplate::initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter) const
 {
     if(isAbstract())
         throw std::runtime_error("[Template/Error] Trying to instanciate \"" + getName() + "\", which is an abstract template!");
@@ -111,21 +112,19 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const SerializedEn
         );
     }
 
-    if(templateComponent)
-    {
-        //Add the template component, containing infos about the template
-        entity.assign<TemplateComponent>(
-            entity,
-            entityGetter.getSerializationIdFromEntity(entity),
-            getName(),
-            EntityParametersHelper(this, entity)
-        );
-    }
+    //Add the template component, containing infos about the template
+    entity.assign<TemplateComponent>(
+        entity,
+        entityGetter.getSerializationIdFromEntity(entity),
+        getName(),
+        m_packageName,
+        EntityParametersHelper(this, entity)
+    );
 }
 
-void EntityTemplate::initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement, bool templateComponent) const
+void EntityTemplate::initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement) const
 {
-    initializeEntity(entity, entityGetter, templateComponent);
+    initializeEntity(entity, entityGetter);
     for(auto it = m_parameters.cbegin(); it != m_parameters.cend(); ++it)
     {
         try
@@ -193,7 +192,7 @@ sf::Image EntityTemplate::getImage() const
     {
         sol::table renderTable = getComponentsTable().get<sol::table>("render");
 
-        std::string texturePath = "assets/" + renderTable.get<std::string>("texture");
+        std::string texturePath = "packages/" + m_packageName + "/assets/" + renderTable.get<std::string>("texture");
 
         std::string defaultAnimationName = renderTable.get<std::string>("current_animation");
         sol::table defaultAnimation = renderTable.get<sol::table>("animations").get<sol::table>(defaultAnimationName);
@@ -229,7 +228,7 @@ sf::Texture EntityTemplate::getTexture() const
     {
         sol::table renderTable = getComponentsTable().get<sol::table>("render");
 
-        std::string texturePath = "assets/" + renderTable.get<std::string>("texture");
+        std::string texturePath = "packages/" + m_packageName + "/assets/" + renderTable.get<std::string>("texture");
 
         std::string defaultAnimationName = renderTable.get<std::string>("current_animation");
         sol::table defaultAnimation = renderTable.get<sol::table>("animations").get<sol::table>(defaultAnimationName);

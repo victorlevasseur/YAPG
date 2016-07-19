@@ -7,13 +7,11 @@
 
 #include "Common/PositionComponent.hpp"
 #include "Lua/EntityHandle.hpp"
+#include "Lua/Template/TemplateComponent.hpp"
 #include "Platformer/PlatformerHitboxComponent.hpp"
 #include "Platformer/PlatformerComponent.hpp"
 #include "Player/PlayerComponent.hpp"
 #include "Rendering/RenderComponent.hpp"
-
-
-
 
 namespace yapg
 {
@@ -176,12 +174,13 @@ void RenderSystem::addToRenderingQueue(std::shared_ptr<sf::Drawable> drawable, s
 std::shared_ptr<AnimatedSprite> RenderSystem::getAnimatedSprite(entityx::Entity entity)
 {
     auto render = entityx::Entity(entity).component<RenderComponent>();
+    auto templateComp = entityx::Entity(entity).component<TemplateComponent>();
 
     if(m_animatedSprites.count(entity) == 0)
     {
         //Create the animated sprite if it doesn't exist
         auto animatedSprite = std::make_shared<AnimatedSprite>(
-            m_texturesManager.requestResource(render->textureName),
+            m_texturesManager.requestResource("packages/" + templateComp->packageName + "/assets/" + render->textureName),
             render->animations
         );
         animatedSprite->setCurrentAnimation(render->currentAnimation);

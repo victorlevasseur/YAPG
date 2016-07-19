@@ -5,10 +5,11 @@
 namespace yapg
 {
 
-TemplateComponent::TemplateComponent(entityx::Entity entity, int serializedId, const std::string& templateName, const EntityParametersHelper& parametersHelper) :
+TemplateComponent::TemplateComponent(entityx::Entity entity, int serializedId, const std::string& templateName, const std::string& packageName, const EntityParametersHelper& parametersHelper) :
     Component(entity),
     serializedId(serializedId),
     templateName(templateName),
+    packageName(packageName),
     parametersHelper(parametersHelper)
 {
 

@@ -30,7 +30,7 @@ LevelState::LevelState(StateEngine& stateEngine, std::string path, AllResourcesM
     m_systemMgr(m_level.getEntityManager(), m_level.getEventManager()),
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
-    m_font(resourcesManager.getFonts().requestResource("LiberationSans.ttf")),
+    m_font(resourcesManager.getFonts().requestResource("assets/LiberationSans.ttf")),
     m_perfText("update: -.----\nrender: -.----", *m_font, 14),
     m_lastUpdateDuration(),
     m_lastRenderDuration(),

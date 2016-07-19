@@ -40,7 +40,7 @@ public:
     const entityx::EntityManager& getEntityManager() const { return m_entityMgr; }
     entityx::EntityManager& getEntityManager() { return m_entityMgr; }
 
-    entityx::Entity createNewEntity(const std::string& templateName, bool templateComponent = false);
+    entityx::Entity createNewEntity(const std::string& templateName);
 
     static void registerClass(LuaState& luaState);
 

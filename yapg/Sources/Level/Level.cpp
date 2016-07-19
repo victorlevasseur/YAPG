@@ -126,7 +126,7 @@ void Level::LoadFromFile(const std::string& path)
             continue;
         }
 
-        m_luaState.getTemplate(entityTemplateName).initializeEntity(createdEntities[i], entityGetter, entityParameters, /*templateComponent*/ m_levelMode == LevelMode::EditMode);
+        m_luaState.getTemplate(entityTemplateName).initializeEntity(createdEntities[i], entityGetter, entityParameters);
 
         ++i;
     }
@@ -189,7 +189,9 @@ void Level::SaveToFile(const std::string& path)
 
             tinyxml2::XMLElement* entityElement = levelDocument.NewElement("object");
             entityElement->SetAttribute("id", static_cast<int>(nextId));
-            entityElement->SetAttribute("template", templateComponent.templateName.c_str());
+
+            std::string fullName = templateComponent.templateName;
+            entityElement->SetAttribute("template", fullName.c_str());
 
             entityElements[entity] = entityElement;
             objectsElement->LinkEndChild(entityElement);
@@ -215,16 +217,13 @@ void Level::SaveToFile(const std::string& path)
     levelDocument.SaveFile(path.c_str());
 }
 
-entityx::Entity Level::createNewEntity(const std::string& templateName, bool templateComponent)
+entityx::Entity Level::createNewEntity(const std::string& templateName)
 {
     entityx::Entity newEntity = m_entityMgr.create();
-    m_luaState.getTemplate(templateName).initializeEntity(newEntity, SerializedEntityGetter(), templateComponent);
+    m_luaState.getTemplate(templateName).initializeEntity(newEntity, SerializedEntityGetter());
 
-    if(templateComponent)
-    {
-        newEntity.component<TemplateComponent>()->serializedId = m_nextId;
-        ++m_nextId;
-    }
+    newEntity.component<TemplateComponent>()->serializedId = m_nextId;
+    ++m_nextId;
 
     return newEntity;
 }

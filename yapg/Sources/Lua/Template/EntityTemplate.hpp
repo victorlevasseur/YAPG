@@ -43,7 +43,7 @@ public:
         std::string field;
     };
 
-    EntityTemplate(const sol::table& templateTable);
+    EntityTemplate(const sol::table& templateTable, const std::string& packageName);
     ~EntityTemplate() = default;
 
     EntityTemplate(const EntityTemplate&) = delete;
@@ -66,7 +66,7 @@ public:
      * \param entityGetter the entity getter where all entities id are linked to their Entity instance
      * \param templateComponent create or not the TemplateComponent containing infos about which template initialized this entity
      */
-    void initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, bool templateComponent = false) const;
+    void initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter) const;
 
     /**
      * Initializes an entity with this template and fulfills its parameters with the parameters in parametersElement XML element.
@@ -75,14 +75,14 @@ public:
      * \param parametersElement the XML Element containing the values of all the parameters needed by this template
      * \param templateComponent create or not the TemplateComponent containing infos about which template initialized this entity
      */
-    void initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement, bool templateComponent = false) const;
+    void initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement) const;
 
     /**
      * Save the entity parameters in the given parametersElement.
      */
     void saveEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, tinyxml2::XMLElement* parametersElement) const;
 
-    std::string getName() const { return m_name; }
+    std::string getName() const { return m_packageName + "." + m_name; }
 
     std::string getFriendlyName() const { return m_friendlyName; }
 
@@ -107,6 +107,8 @@ private:
     std::map<std::string, Parameter> m_parameters; ///< The parameters of the template
 
     sol::table m_componentsTable; ///< The "components" table
+
+    const std::string m_packageName;
 };
 
 }

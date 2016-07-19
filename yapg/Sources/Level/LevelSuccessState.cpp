@@ -12,9 +12,9 @@ namespace yapg
 LevelSuccessState::LevelSuccessState(StateEngine& stateEngine, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager) :
     State(stateEngine),
     m_resourcesManager(resourcesManager),
-    m_winMusic(m_resourcesManager.getSounds().requestResource("menu/bensound-happiness.ogg")),
+    m_winMusic(m_resourcesManager.getSounds().requestResource("assets/menu/bensound-happiness.ogg")),
     m_winSound(*m_winMusic),
-    m_font(m_resourcesManager.getFonts().requestResource("LiberationSans.ttf")),
+    m_font(m_resourcesManager.getFonts().requestResource("assets/LiberationSans.ttf")),
     m_winText("Level clear !", *m_font, 70u)
 {
     //Sound init

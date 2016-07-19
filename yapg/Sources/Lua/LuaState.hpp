@@ -12,6 +12,13 @@ namespace boost{ namespace filesystem{ class path; } }
 namespace yapg
 {
 
+struct TemplatesPackage
+{
+    std::string packageName;
+    std::string packageFriendlyName;
+    std::map<std::string, EntityTemplate> templates;
+};
+
 class LuaState
 {
 public:
@@ -26,8 +33,8 @@ public:
     void loadAllTemplates();
     void unloadAllTemplates();
 
-    const std::map<std::string, EntityTemplate>& getTemplates() const { return m_templates; }
-    std::map<std::string, EntityTemplate>& getTemplates() { return m_templates; }
+    const std::map<std::string, TemplatesPackage>& getPackages() const { return m_templatesPackages; }
+    std::map<std::string, TemplatesPackage>& getPackages() { return m_templatesPackages; }
 
     template<class T>
     void declareAnyConvertibleType(const std::string& typeName);
@@ -42,11 +49,11 @@ public:
     sol::table mergeTables(sol::table first, sol::table second);
 
 private:
-    void loadTemplates(const std::string& path);
-    void loadTemplates(const boost::filesystem::path& path);
+    void loadPackages(const std::string& path);
+    void loadPackages(const boost::filesystem::path& path);
 
     sol::state m_luaState;
-    std::map<std::string, EntityTemplate> m_templates;
+    std::map<std::string, TemplatesPackage> m_templatesPackages;
 };
 
 }

@@ -27,16 +27,17 @@
 #include "Rendering/Animation/Animation.hpp"
 #include "Rendering/Animation/Frame.hpp"
 #include "Rendering/RenderComponent.hpp"
+#include "Settings/tinyxml2.h"
 
 namespace fs = boost::filesystem;
-
+namespace tx2 = tinyxml2;
 
 namespace yapg
 {
 
 LuaState::LuaState(bool loadAllTemplates) :
     m_luaState(),
-    m_templates()
+    m_templatesPackages()
 {
     std::cout << "[Lua/Note] Starting lua state initialization process..." << std::endl;
     //Loading lua libraries
@@ -199,33 +200,52 @@ const sol::state& LuaState::getState() const
     return m_luaState;
 }
 
+namespace
+{
+    std::pair<std::string, std::string> decomposeTemplateName(const std::string& fullname)
+    {
+        std::size_t lastPointPosition = fullname.rfind('.');
+        if(lastPointPosition == std::string::npos || lastPointPosition == 0 || lastPointPosition == fullname.size() - 1)
+            throw std::runtime_error("[Template/Error] Invalid template name requested: \"" + fullname + "\" !");
+
+        std::string packageName = fullname.substr(0, lastPointPosition);
+        std::string templateName = fullname.substr(lastPointPosition + 1, std::string::npos);
+
+        return std::make_pair(packageName, templateName);
+    }
+}
+
 const EntityTemplate& LuaState::getTemplate(const std::string& name) const
 {
-    return m_templates.at(name);
+    return m_templatesPackages.at(decomposeTemplateName(name).first).templates.at(decomposeTemplateName(name).second);
 }
 
 bool LuaState::hasTemplate(const std::string& name) const
 {
-    return m_templates.count(name) != 0;
+    return m_templatesPackages.count(decomposeTemplateName(name).first) != 0
+        && m_templatesPackages.at(decomposeTemplateName(name).first).templates.count(decomposeTemplateName(name).second) != 0;
 }
 
 void LuaState::loadAllTemplates()
 {
-    loadTemplates(std::string("templates"));
+    loadPackages(std::string("packages"));
     std::cout << "[Lua/Note] Applying block inheritance..." << std::endl;
-    for(auto it = m_templates.begin(); it != m_templates.end(); )
+    for(auto packageIt = m_templatesPackages.begin(); packageIt != m_templatesPackages.end(); ++packageIt)
     {
-        auto currentIt = it++;
+        for(auto it = packageIt->second.templates.begin(); it != packageIt->second.templates.end(); )
+        {
+            auto currentIt = it++;
 
-        try
-        {
-            currentIt->second.applyInheritance(*this);
-        }
-        catch(const std::out_of_range& e)
-        {
-            //The template didn't find its base template, remove it from the templates
-            std::cout << "[Lua/Warning] Can't find the base template of \"" << currentIt->second.getName() << "\", the template will be ignored !" << std::endl;
-            m_templates.erase(currentIt);
+            try
+            {
+                currentIt->second.applyInheritance(*this);
+            }
+            catch(const std::out_of_range& e)
+            {
+                //The template didn't find its base template, remove it from the templates
+                std::cout << "[Lua/Warning] Can't find the base template of \"" << currentIt->second.getName() << "\", the template will be ignored !" << std::endl;
+                packageIt->second.templates.erase(currentIt);
+            }
         }
     }
     std::cout << "[Lua/Note] Entities templates loaded." << std::endl;
@@ -233,7 +253,7 @@ void LuaState::loadAllTemplates()
 
 void LuaState::unloadAllTemplates()
 {
-    m_templates.clear();
+    m_templatesPackages.clear();
 }
 
 sol::table LuaState::mergeTables(sol::table first, sol::table second)
@@ -247,48 +267,79 @@ sol::table LuaState::mergeTables(sol::table first, sol::table second)
     return result;
 }
 
-void LuaState::loadTemplates(const std::string& path)
+void LuaState::loadPackages(const std::string& path)
 {
-    loadTemplates(fs::path(path));
+    loadPackages(fs::path(path));
 }
 
-void LuaState::loadTemplates(const fs::path& path)
+void LuaState::loadPackages(const fs::path& path)
 {
     try
     {
         if(fs::exists(path) && fs::is_directory(path))
         {
+            //Iterate over each packages
             for(fs::directory_entry& e : fs::directory_iterator(path))
             {
                 if(fs::is_directory(e.path()))
                 {
-                    //Do a recursive search
-                    loadTemplates(e.path());
-                }
-                else if(fs::is_regular_file(e.path()))
-                {
-                    std::string filePath = fs::canonical(e.path()).string();
-                    try
-                    {
-                        m_luaState.script_file(filePath);
+                    std::string packagePath = e.path().string();
 
-                        m_templates.emplace(
-                            m_luaState.get<sol::table>("entity_template").get<std::string>("name"),
-                            EntityTemplate(m_luaState.get<sol::table>("entity_template"))
-                        );
-                        std::cout << "[Lua/Note] Loaded template from " << e.path() << "." << std::endl;
-                    }
-                    catch(const sol::error& e)
+                    //Test if it's a package folder
+                    tx2::XMLDocument packageMetadata;
+                    std::string packageInfoFilePath = packagePath + "/PackageInfo.xml";
+                    if(packageMetadata.LoadFile(packageInfoFilePath.data()) != tx2::XML_NO_ERROR)
                     {
-                        std::cout << "[Lua/Warning] Can't load \"" << filePath << "\" because it contains an error :" << std::endl;
-                        std::cout << e.what() << std::endl;
+                        continue;
                     }
+
+                    tx2::XMLElement* rootElem = packageMetadata.RootElement();
+                    if(strcmp(rootElem->Name(), "yapg_package") != 0)
+                    {
+                        continue;
+                    }
+
+                    tx2::XMLElement* packageFriendlyElem = rootElem->FirstChildElement("friendly_name");
+                    if(packageFriendlyElem->GetText() == nullptr)
+                    {
+                        continue;
+                    }
+
+                    TemplatesPackage newPackage;
+                    newPackage.packageName = fs::relative(e.path(), path).string();
+                    newPackage.packageFriendlyName = std::string(packageFriendlyElem->GetText());
+
+                    //Load the templates of the packages
+                    for(fs::directory_entry& e2 : fs::directory_iterator(fs::canonical(e.path())))
+                    {
+                        if(fs::is_regular_file(e2.path()) && e2.path().extension().string() == ".lua")
+                        {
+                            std::string filePath = fs::canonical(e2.path()).string();
+                            try
+                            {
+                                m_luaState.script_file(filePath);
+
+                                newPackage.templates.emplace(
+                                    m_luaState.get<sol::table>("entity_template").get<std::string>("name"),
+                                    EntityTemplate(m_luaState.get<sol::table>("entity_template"), newPackage.packageName)
+                                );
+                                std::cout << "[Lua/Note] Loaded template from " << e2.path() << "." << std::endl;
+                            }
+                            catch(const sol::error& e)
+                            {
+                                std::cout << "[Lua/Warning] Can't load \"" << filePath << "\" because it contains an error :" << std::endl;
+                                std::cout << e.what() << std::endl;
+                            }
+                        }
+                    }
+
+                    m_templatesPackages[newPackage.packageName] = std::move(newPackage);
                 }
             }
         }
         else
         {
-            std::cout << "[Lua/Warning] Can't find templates in " << path << " ! (not exists or not a directory)" << std::endl;
+            std::cout << "[Lua/Warning] The package folder doesn't exist !" << std::endl;
         }
     }
     catch(const fs::filesystem_error &exc)

@@ -194,7 +194,7 @@ void BlockViewerState::openTemplate(const std::string& filepath)
         return;
     }
 
-    EntityTemplate blockTemplate(templateTable);
+    EntityTemplate blockTemplate(templateTable, "");
 
     if(!blockTemplate.getBaseTemplate().empty() && !m_luaState.hasTemplate(blockTemplate.getBaseTemplate()))
     {
@@ -206,7 +206,7 @@ void BlockViewerState::openTemplate(const std::string& filepath)
 
     m_block = m_entityMgr.create();
 
-    blockTemplate.initializeEntity(m_block, SerializedEntityGetter(), true);
+    blockTemplate.initializeEntity(m_block, SerializedEntityGetter());
 
     m_filepath = filepath;
 

@@ -37,7 +37,7 @@ public:
         if(m_resources[path].expired())
         {
             auto resource = std::make_shared<T>();
-            resource->loadFromFile(m_resourcesPath + "/" + path);
+            resource->loadFromFile(m_resourcesPath + path);
             m_resources[path] = resource;
             return resource;
         }

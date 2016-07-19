@@ -88,6 +88,7 @@ private:
     EditionMode m_editionMode;
 
     std::vector<std::string> m_templatesNames;
+    std::vector<std::string> m_templatesFriendlyNames;
     std::vector<sf::Texture> m_templatesTextures;
     std::size_t m_selectedTemplate;
 

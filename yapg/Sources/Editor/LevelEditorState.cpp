@@ -29,6 +29,7 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, AllResourcesManager
     m_guiView(sf::FloatRect(0.f, 0.f, 1024.f, 768.f)),
     m_editionMode(EditionMode::Insertion),
     m_templatesNames(),
+    m_templatesFriendlyNames(),
     m_templatesTextures(),
     m_selectedTemplate(std::string::npos),
     m_playerTemplatesNames(),
@@ -47,7 +48,7 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, AllResourcesManager
     m_draggingView(false),
     m_mousePosBeforeDrag(),
     m_spawnSprite(),
-    m_spawnTexture(resourcesManager.getTextures().requestResource("editor/spawn.png")),
+    m_spawnTexture(resourcesManager.getTextures().requestResource("assets/editor/spawn.png")),
     m_iconRenderTexture()
 {
     m_iconRenderTexture.create(48, 48);
@@ -143,7 +144,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
                     {
                         for(int j = std::min(0, m_insertionCount.y); j <= std::max(0, m_insertionCount.y); ++j)
                         {
-                            entityx::Entity newEntity = m_level.createNewEntity(m_templatesNames[m_selectedTemplate], true);
+                            entityx::Entity newEntity = m_level.createNewEntity(m_templatesNames[m_selectedTemplate]);
 
                             try
                             {
@@ -338,7 +339,7 @@ void LevelEditorState::render(sf::RenderTarget& target)
 
             if(i == m_selectedTemplate)
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 1.f, 0.f, 1.f));
-            ImGui::Text(m_templatesNames[i].substr(0, 32).data());
+            ImGui::Text(m_templatesFriendlyNames[i].substr(0, 32).data());
             if(i == m_selectedTemplate)
                 ImGui::PopStyleColor();
 
@@ -531,28 +532,33 @@ void LevelEditorState::updateTemplatesList()
 {
     //Clear all buttons
     m_templatesNames.clear();
+    m_templatesFriendlyNames.clear();
     m_templatesTextures.clear();
     m_playerTemplatesNames.clear();
     m_playerTemplatesNames.push_back("");
     m_playerTemplatesNamesList += std::string("Pas de joueur\0", 14);
 
-    auto& templatesList = m_luaState.getTemplates();
-    for(auto& pair : templatesList)
+    auto& packagesList = m_luaState.getPackages();
+    for(auto& packagePair : packagesList)
     {
-        const auto& entityTemplate = pair.second;
-        if(!entityTemplate.isAbstract())
+        for(auto& templatePair : packagePair.second.templates)
         {
-            //If it's a player, add it to the player templates list
-            if(entityTemplate.isPlayer())
+            const auto& entityTemplate = templatePair.second;
+            if(!entityTemplate.isAbstract())
             {
-                m_playerTemplatesNames.push_back(pair.first);
-                m_playerTemplatesNamesList += pair.first + '\0';
-            }
-            else //If not, add it to the general template list
-            {
-                m_templatesNames.push_back(pair.first);
-                sf::Texture entityTexture = entityTemplate.getTexture();
-                m_templatesTextures.push_back(getIconFromTexture(entityTemplate.getTexture()));
+                //If it's a player, add it to the player templates list
+                if(entityTemplate.isPlayer())
+                {
+                    m_playerTemplatesNames.push_back(entityTemplate.getName());
+                    m_playerTemplatesNamesList += entityTemplate.getName() + '\0';
+                }
+                else //If not, add it to the general template list
+                {
+                    m_templatesNames.push_back(entityTemplate.getName());
+                    m_templatesFriendlyNames.push_back(entityTemplate.getFriendlyName());
+                    sf::Texture entityTexture = entityTemplate.getTexture();
+                    m_templatesTextures.push_back(getIconFromTexture(entityTemplate.getTexture()));
+                }
             }
         }
     }

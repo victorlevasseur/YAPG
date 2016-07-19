@@ -15,9 +15,9 @@ LevelFailureState::LevelFailureState(StateEngine& stateEngine, const std::string
     m_levelPath(levelPath),
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
-    m_looseMusic(m_resourcesManager.getSounds().requestResource("menu/bensound-sadday.ogg")),
+    m_looseMusic(m_resourcesManager.getSounds().requestResource("assets/menu/bensound-sadday.ogg")),
     m_looseSound(*m_looseMusic),
-    m_font(m_resourcesManager.getFonts().requestResource("LiberationSans.ttf")),
+    m_font(m_resourcesManager.getFonts().requestResource("assets/LiberationSans.ttf")),
     m_looseText("You failed !", *m_font, 70u)
 {
     //Sound init
