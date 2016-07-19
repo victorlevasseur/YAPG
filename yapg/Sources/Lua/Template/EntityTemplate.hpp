@@ -82,7 +82,10 @@ public:
      */
     void saveEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, tinyxml2::XMLElement* parametersElement) const;
 
+    std::string getShortName() const { return m_name; }
+    std::string getPackageName() const { return m_packageName; }
     std::string getName() const { return m_packageName + "." + m_name; }
+
 
     std::string getFriendlyName() const { return m_friendlyName; }
 
