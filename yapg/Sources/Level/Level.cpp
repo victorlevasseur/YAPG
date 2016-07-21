@@ -3,7 +3,7 @@
 #include <exception>
 
 #include "Common/Component.hpp"
-#include "Lua/Template/TemplateComponent.hpp"
+#include "Template/TemplateComponent.hpp"
 #include "Player/PlayerComponent.hpp"
 #include "Settings/tinyxml2.h"
 

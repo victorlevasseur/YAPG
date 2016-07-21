@@ -13,7 +13,7 @@
 
 #include "Level/Level.hpp"
 #include "Lua/LuaState.hpp"
-#include "Lua/Template/EntityTemplate.hpp"
+#include "Template/EntityTemplate.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
 #include "Editor/PropertiesManager.hpp"

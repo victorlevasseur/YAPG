@@ -1,8 +1,8 @@
-#include "Lua/Template/EntityParametersHelper.hpp"
+#include "Template/EntityParametersHelper.hpp"
 
 #include "Lua/CustomDataComponent.hpp"
 #include "Lua/EntityHandle.hpp"
-#include "Lua/Template/EntityTemplate.hpp"
+#include "Template/EntityTemplate.hpp"
 
 namespace yapg
 {

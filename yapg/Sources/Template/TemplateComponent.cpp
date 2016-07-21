@@ -1,4 +1,4 @@
-#include "Lua/Template/TemplateComponent.hpp"
+#include "Template/TemplateComponent.hpp"
 
 #include "Lua/EntityHandle.hpp"
 

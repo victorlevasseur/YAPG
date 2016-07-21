@@ -7,7 +7,7 @@
 
 #include "Common/PositionComponent.hpp"
 #include "Lua/EntityHandle.hpp"
-#include "Lua/Template/TemplateComponent.hpp"
+#include "Template/TemplateComponent.hpp"
 #include "Platformer/PlatformerHitboxComponent.hpp"
 #include "Platformer/PlatformerComponent.hpp"
 #include "Player/PlayerComponent.hpp"

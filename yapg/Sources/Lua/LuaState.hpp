@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-#include "Lua/Template/EntityTemplate.hpp"
+#include "Template/EntityTemplate.hpp"
 #include "Lua/sol.hpp"
 
 namespace boost{ namespace filesystem{ class path; } }

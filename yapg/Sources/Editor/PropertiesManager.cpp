@@ -3,7 +3,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "Editor/EntryPropertyWidget.hpp"
-#include "Lua/Template/TemplateComponent.hpp"
+#include "Template/TemplateComponent.hpp"
 
 namespace yapg
 {

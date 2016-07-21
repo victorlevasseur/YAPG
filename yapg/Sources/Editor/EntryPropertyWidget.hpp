@@ -6,7 +6,7 @@
 #include "Gui/imgui.h"
 
 #include "Editor/PropertyWidget.hpp"
-#include "Lua/Template/TemplateComponent.hpp"
+#include "Template/TemplateComponent.hpp"
 #include "NativeGui/TextBoxWindow.hpp"
 
 namespace yapg

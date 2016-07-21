@@ -3,7 +3,7 @@
 
 #include "entityx/entityx.h"
 
-#include "Lua/Template/EntityTemplate.hpp"
+#include "Template/EntityTemplate.hpp"
 
 namespace yapg
 {

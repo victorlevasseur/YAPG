@@ -1,4 +1,4 @@
-#include "Lua/Template/EntityTemplate.hpp"
+#include "Template/EntityTemplate.hpp"
 
 #include <SFML/Graphics/Texture.hpp>
 
@@ -6,9 +6,9 @@
 #include "Lua/CustomDataComponent.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Lua/LuaState.hpp"
-#include "Lua/Template/EntityParametersHelper.hpp"
-#include "Lua/Template/TemplateComponent.hpp"
 #include "Settings/tinyxml2.h"
+#include "Template/EntityParametersHelper.hpp"
+#include "Template/TemplateComponent.hpp"
 
 namespace yapg
 {

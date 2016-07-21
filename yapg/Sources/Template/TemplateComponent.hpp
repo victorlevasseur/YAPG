@@ -3,8 +3,8 @@
 
 #include "Common/Component.hpp"
 #include "Lua/LuaState.hpp"
-#include "Lua/Template/EntityParametersHelper.hpp"
 #include "Meta/Metadata.hpp"
+#include "Template/EntityParametersHelper.hpp"
 
 namespace yapg
 {
