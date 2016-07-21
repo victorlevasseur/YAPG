@@ -90,7 +90,7 @@ void Package::loadTemplatesIntoLua(LuaState& luaState) const
                     )
                 );
 
-                std::cout << "[Lua/Note] Loaded template from " << templateFilePath << "." << std::endl;
+                std::cout << "[Lua/Note] " << loadedTemplates.back().get().getName() << " loaded." << std::endl;
             }
             catch(const sol::error& e)
             {
@@ -101,24 +101,18 @@ void Package::loadTemplatesIntoLua(LuaState& luaState) const
     }
 
     //Apply inheritance to all of them
-    iterate_tools::safeForEach(
-        loadedTemplates,
-        [&luaState](EntityTemplate& entityTemplate) -> bool
+    for(auto& entityTemplate : loadedTemplates)
+    {
+        try
         {
-            try
-            {
-                entityTemplate.applyInheritance(luaState);
-            }
-            catch(const std::out_of_range& e)
-            {
-                //The template didn't find its base template, remove it from the templates
-                std::cout << "[Lua/Warning] Can't find the base template of \"" << entityTemplate.getName() << "\", the template inheritance will be ignored !" << std::endl;
-                return false;
-            }
-
-            return true;
+            entityTemplate.get().applyInheritance(luaState);
         }
-    );
+        catch(const std::out_of_range& e)
+        {
+            //The template didn't find its base template, remove it from the templates
+            std::cout << "[Lua/Warning] Can't find the base template of \"" << entityTemplate.get().getName() << "\", the template inheritance will be ignored !" << std::endl;
+        }
+    }
 }
 
 }
