@@ -180,7 +180,7 @@ std::shared_ptr<AnimatedSprite> RenderSystem::getAnimatedSprite(entityx::Entity 
     {
         //Create the animated sprite if it doesn't exist
         auto animatedSprite = std::make_shared<AnimatedSprite>(
-            m_texturesManager.requestResource("packages/" + templateComp->packageName + "/assets/" + render->textureName),
+            m_texturesManager.requestResource(templateComp->assetsPath + "/" + render->textureName),
             render->animations
         );
         animatedSprite->setCurrentAnimation(render->currentAnimation);

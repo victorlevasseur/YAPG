@@ -32,9 +32,11 @@ public:
 
     void loadAllTemplates();
     void unloadAllTemplates();
+    
+    EntityTemplate& declareTemplate(EntityTemplate&& entityTemplate);
 
-    const std::map<std::string, TemplatesPackage>& getPackages() const { return m_templatesPackages; }
-    std::map<std::string, TemplatesPackage>& getPackages() { return m_templatesPackages; }
+    const std::map<std::string, EntityTemplate>& getTemplates() const { return m_templates; }
+    std::map<std::string, EntityTemplate>& getTemplates() { return m_templates; }
 
     template<class T>
     void declareAnyConvertibleType(const std::string& typeName);
@@ -49,11 +51,9 @@ public:
     sol::table mergeTables(sol::table first, sol::table second);
 
 private:
-    void loadPackages(const std::string& path);
-    void loadPackages(const boost::filesystem::path& path);
 
     sol::state m_luaState;
-    std::map<std::string, TemplatesPackage> m_templatesPackages;
+    std::map<std::string, EntityTemplate> m_templates;
 };
 
 }

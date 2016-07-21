@@ -12,7 +12,7 @@ namespace yapg
 class TemplateComponent : public Component
 {
 public:
-    TemplateComponent(entityx::Entity entity, int serializedId, const std::string& templateName, const std::string& packageName, const EntityParametersHelper& parametersHelper);
+    TemplateComponent(entityx::Entity entity, int serializedId, const std::string& templateName, const std::string& packageName, const std::string& assetsPath, const EntityParametersHelper& parametersHelper);
     virtual ~TemplateComponent();
 
     virtual std::string getName() const;
@@ -21,8 +21,9 @@ public:
 
     int serializedId;
     const std::string templateName;
-
     const std::string packageName;
+
+    const std::string assetsPath;
 
     const EntityParametersHelper parametersHelper;
 };

@@ -194,7 +194,7 @@ void BlockViewerState::openTemplate(const std::string& filepath)
         return;
     }
 
-    EntityTemplate blockTemplate(templateTable, "");
+    EntityTemplate blockTemplate(templateTable, "", "");
 
     if(!blockTemplate.getBaseTemplate().empty() && !m_luaState.hasTemplate(blockTemplate.getBaseTemplate()))
     {

@@ -538,27 +538,24 @@ void LevelEditorState::updateTemplatesList()
     m_playerTemplatesNames.push_back("");
     m_playerTemplatesNamesList += std::string("Pas de joueur\0", 14);
 
-    auto& packagesList = m_luaState.getPackages();
-    for(auto& packagePair : packagesList)
+    auto& templatesList = m_luaState.getTemplates();
+    for(auto& templatePair : templatesList)
     {
-        for(auto& templatePair : packagePair.second.templates)
+        const auto& entityTemplate = templatePair.second;
+        if(!entityTemplate.isAbstract())
         {
-            const auto& entityTemplate = templatePair.second;
-            if(!entityTemplate.isAbstract())
+            //If it's a player, add it to the player templates list
+            if(entityTemplate.isPlayer())
             {
-                //If it's a player, add it to the player templates list
-                if(entityTemplate.isPlayer())
-                {
-                    m_playerTemplatesNames.push_back(entityTemplate.getName());
-                    m_playerTemplatesNamesList += entityTemplate.getName() + '\0';
-                }
-                else //If not, add it to the general template list
-                {
-                    m_templatesNames.push_back(entityTemplate.getName());
-                    m_templatesFriendlyNames.push_back(entityTemplate.getFriendlyName());
-                    sf::Texture entityTexture = entityTemplate.getTexture();
-                    m_templatesTextures.push_back(getIconFromTexture(entityTemplate.getTexture()));
-                }
+                m_playerTemplatesNames.push_back(entityTemplate.getName());
+                m_playerTemplatesNamesList += entityTemplate.getName() + '\0';
+            }
+            else //If not, add it to the general template list
+            {
+                m_templatesNames.push_back(entityTemplate.getName());
+                m_templatesFriendlyNames.push_back(entityTemplate.getFriendlyName());
+                sf::Texture entityTexture = entityTemplate.getTexture();
+                m_templatesTextures.push_back(getIconFromTexture(entityTemplate.getTexture()));
             }
         }
     }

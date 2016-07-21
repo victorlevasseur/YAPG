@@ -13,14 +13,15 @@
 namespace yapg
 {
 
-EntityTemplate::EntityTemplate(const sol::table& templateTable, const std::string& packageName) :
+EntityTemplate::EntityTemplate(const sol::table& templateTable, const std::string& packageName, const std::string& assetsPath) :
     m_name(),
     m_friendlyName(),
     m_inheritedTemplate(),
     m_abstract(false),
     m_parameters(),
     m_componentsTable(),
-    m_packageName(packageName)
+    m_packageName(packageName),
+    m_assetsPath(assetsPath)
 {
     m_name = templateTable.get<std::string>("name");
     m_friendlyName = templateTable.get<std::string>("friendlyname");
@@ -118,6 +119,7 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const SerializedEn
         entityGetter.getSerializationIdFromEntity(entity),
         getName(),
         m_packageName,
+        m_assetsPath,
         EntityParametersHelper(this, entity)
     );
 }

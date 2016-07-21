@@ -43,7 +43,7 @@ public:
         std::string field;
     };
 
-    EntityTemplate(const sol::table& templateTable, const std::string& packageName);
+    EntityTemplate(const sol::table& templateTable, const std::string& packageName, const std::string& assetsPath);
     ~EntityTemplate() = default;
 
     EntityTemplate(const EntityTemplate&) = delete;
@@ -54,7 +54,7 @@ public:
 
     /**
      * Apply the inheritance to the template (if it has a base template).
-     * **Must be called after all template are loaded**.
+     * **Must be called after all the templates of the same package have been loaded**.
      */
     void applyInheritance(LuaState& luaState);
 
@@ -86,7 +86,6 @@ public:
     std::string getPackageName() const { return m_packageName; }
     std::string getName() const { return m_packageName + "." + m_name; }
 
-
     std::string getFriendlyName() const { return m_friendlyName; }
 
     bool isAbstract() const { return m_abstract; }
@@ -111,7 +110,9 @@ private:
 
     sol::table m_componentsTable; ///< The "components" table
 
-    const std::string m_packageName;
+    std::string m_packageName;
+
+    std::string m_assetsPath;
 };
 
 }
