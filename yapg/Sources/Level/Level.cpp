@@ -3,6 +3,7 @@
 #include <exception>
 
 #include "Common/Component.hpp"
+#include "Level/Serialization/LevelLoader.hpp"
 #include "Template/TemplateComponent.hpp"
 #include "Player/PlayerComponent.hpp"
 #include "Settings/tinyxml2.h"
@@ -31,103 +32,33 @@ void Level::LoadFromFile(const std::string& path)
 
     std::cout << "Loading level \"" << path << "\"..." << std::endl;
 
-    tinyxml2::XMLDocument levelDocument;
-    if(levelDocument.LoadFile(path.c_str()) != tinyxml2::XML_NO_ERROR)
-    {
-        throw std::runtime_error("[Level/Error] Can't load the level \"" + path + "\" ! Not found or parsing error !");
-    }
-
-    tinyxml2::XMLElement* levelElement = levelDocument.RootElement();
-    if(!levelElement)
-    {
-        throw std::runtime_error("[Level/Error] Can't find <level> root markup in the level !");
-    }
-
-    //Load the spawn position
-    tinyxml2::XMLElement* spawnPosElement = levelElement->FirstChildElement("spawn_position");
-    if(!spawnPosElement)
-    {
-        throw std::runtime_error("[Level/Error] Can't find <spawn_position> markup in the level !");
-    }
-    if(spawnPosElement->QueryFloatAttribute("x", &(m_spawnPosition.x)) != tinyxml2::XML_NO_ERROR || spawnPosElement->QueryFloatAttribute("y", &(m_spawnPosition.y)) != tinyxml2::XML_NO_ERROR)
-    {
-        throw std::runtime_error("[Level/Error] Can't find x and y in <spawn_position> markup in the level !");
-    }
-
-    //Load the players templates names
-    tinyxml2::XMLElement* playersElement = levelElement->FirstChildElement("players");
-    if(!playersElement)
-    {
-        throw std::runtime_error("[Level/Error] Can't find <players> markup in the level !");
-    }
-    for(tinyxml2::XMLElement* playerElem = playersElement->FirstChildElement("player");
-        playerElem != nullptr;
-        playerElem = playersElement->NextSiblingElement("player"))
-    {
-        const char* playerTemplate = playerElem->Attribute("entity_template");
-        if(!playerTemplate)
-        {
-            std::cout << "[Level/Warning] Invalid player template !" << std::endl;
-            continue;
-        }
-        m_playersTemplates.push_back(std::string(playerTemplate));
-    }
-
-    //First, load all the entity and register them to the SerializedEntityGetter
-    tinyxml2::XMLElement* objectsElement = levelElement->FirstChildElement("objects");
-    if(!objectsElement)
-    {
-        throw std::runtime_error("[Level/Error] Can't find <object> markup in the level !");
-    }
+    LevelLoader loader(path);
+    m_spawnPosition = loader.getSpawnPosition();
+    std::copy(
+        loader.getPlayersTemplatesBegin(),
+        loader.getPlayersTemplatesEnd(),
+        std::back_inserter(m_playersTemplates)
+    );
 
     SerializedEntityGetter entityGetter;
     std::vector<entityx::Entity> createdEntities;
 
-    for(tinyxml2::XMLElement* objectElem = objectsElement->FirstChildElement("object");
-        objectElem != nullptr;
-        objectElem = objectElem->NextSiblingElement("object"))
+    //Create all entities
+    for(auto it = loader.getEntitiesBegin(); it != loader.getEntitiesEnd(); ++it)
     {
         //Create the entity
         entityx::Entity newEntity = m_entityMgr.create();
         createdEntities.push_back(newEntity);
 
-        //Register it with its id (if it has a id attribute)
-        int newEntityId = -1;
-        auto error = objectElem->QueryIntAttribute("id", &newEntityId);
-        if(error == tinyxml2::XML_NO_ERROR)
-        {
-            entityGetter.registerEntity(newEntity, newEntityId);
-            m_nextId = std::max(m_nextId, newEntityId);
-        }
+        //Register the entity with its ID
+        entityGetter.registerEntity(newEntity, it->id);
     }
 
-    //Now that all entities are created and registered, iterate all of them to
-    //assign the components according to their template !
+    //Apply the templates to all the entities
     unsigned int i = 0;
-    for(tinyxml2::XMLElement* objectElem = objectsElement->FirstChildElement("object");
-        objectElem != nullptr;
-        objectElem = objectElem->NextSiblingElement("object"))
+    for(auto it = loader.getEntitiesBegin(); it != loader.getEntitiesEnd(); ++it)
     {
-        if(!objectElem->Attribute("template"))
-        {
-            //There's no template defined, remove the entity.
-            std::cout << "[Level/Warning] No template attribute defined for an <object> !" << std::endl;
-            createdEntities.erase(createdEntities.begin() + i);
-            continue;
-        }
-        std::string entityTemplateName(objectElem->Attribute("template"));
-
-        tinyxml2::XMLElement* entityParameters = objectElem->FirstChildElement("parameters");
-        if(!entityParameters)
-        {
-            //There's no template defined, remove the entity.
-            std::cout << "[Level/Warning] No <parameters> in <object> !" << std::endl;
-            createdEntities.erase(createdEntities.begin() + i);
-            continue;
-        }
-
-        m_luaState.getTemplate(entityTemplateName).initializeEntity(createdEntities[i], entityGetter, entityParameters);
-
+        m_luaState.getTemplate(it->templateName).initializeEntity(createdEntities[i], entityGetter, it->parametersElement);
         ++i;
     }
 
