@@ -10,6 +10,7 @@
 #include "BlockViewer/BlockViewerState.hpp"
 #include "Editor/LevelEditorState.hpp"
 #include "Level/LevelState.hpp"
+#include "Level/LevelLoadingState.hpp"
 #include "Settings/KeySettings.hpp"
 #include "State/StateEngine.hpp"
 #include "Tools/KeyStrings.hpp"
@@ -149,7 +150,7 @@ void MainMenuState::render(sf::RenderTarget& target)
         if(ImGui::Button("Play !"))
         {
             getStateEngine().pauseAndStartState
-                <LevelState, std::string, AllResourcesManagers&, SettingsManager&>(
+                <LevelLoadingState, std::string, AllResourcesManagers&, SettingsManager&>(
                 std::string(levelName), m_resourcesManager, m_settingsManager
             );
         }
