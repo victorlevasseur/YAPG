@@ -1,7 +1,10 @@
 #ifndef YAPG_GAME_LEVEL_LEVELLOADINGSTATE_H
 #define YAPG_GAME_LEVEL_LEVELLOADINGSTATE_H
 
+#include <memory>
+#include <mutex>
 #include <string>
+#include <thread>
 
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
@@ -10,6 +13,8 @@
 #include <SFML/Graphics/Text.hpp>
 
 #include "Async/AsyncExecutor.hpp"
+#include "Level/Level.hpp"
+#include "Lua/LuaState.hpp"
 #include "Resources/ResourcesManager.hpp"
 #include "Settings/SettingsManager.hpp"
 #include "State/State.hpp"
@@ -43,6 +48,10 @@ private:
 
     std::shared_ptr<sf::Font> m_font;
     sf::Text m_loadingText;
+
+    std::mutex m_loadedMutex;
+    std::unique_ptr<LuaState> m_loadedLuaState;
+    std::unique_ptr<Level> m_loadedLevel;
 };
 
 }

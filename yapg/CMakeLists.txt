@@ -61,7 +61,7 @@ if(DEFINED OS_LINUX)
 endif()
 
 #Linking
-set(EXTRA_LIBRARIES "")
+set(EXTRA_LIBRARIES pthread)
 if(OS_WINDOWS)
     set(EXTRA_LIBRARIES imm32)
 endif()
