@@ -22,12 +22,12 @@
 namespace yapg
 {
 
-LevelState::LevelState(StateEngine& stateEngine, std::string path, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager) :
+LevelState::LevelState(StateEngine& stateEngine, std::string path, std::unique_ptr<LuaState>&& luaState, std::unique_ptr<Level>&& level, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager) :
     State(stateEngine),
-    m_luaState(),
     m_path(path),
-    m_level(m_luaState),
-    m_systemMgr(m_level.getEntityManager(), m_level.getEventManager()),
+    m_luaState(std::move(luaState)),
+    m_level(std::move(level)),
+    m_systemMgr(m_level->getEntityManager(), m_level->getEventManager()),
     m_resourcesManager(resourcesManager),
     m_settingsManager(settingsManager),
     m_font(resourcesManager.getFonts().requestResource("assets/LiberationSans.ttf")),
@@ -49,15 +49,13 @@ LevelState::LevelState(StateEngine& stateEngine, std::string path, AllResourcesM
 
     m_systemMgr.configure();
 
-    m_level.LoadFromFile(path);
-
     //Load the players
     //TODO: Support multiple players creation
     std::cout << "Creating players..." << std::endl;
 
-    const EntityTemplate& playerTemplate = m_luaState.getTemplate(m_level.getPlayersTemplates()[0]);
+    const EntityTemplate& playerTemplate = m_luaState->getTemplate(m_level->getPlayersTemplates().at(0));
 
-    entityx::Entity playerEntity = m_level.getEntityManager().create();
+    entityx::Entity playerEntity = m_level->getEntityManager().create();
     playerTemplate.initializeEntity(playerEntity, SerializedEntityGetter());
 
     //Set x and y parameters according to spawn_position
@@ -66,11 +64,11 @@ LevelState::LevelState(StateEngine& stateEngine, std::string path, AllResourcesM
     const EntityTemplate::Parameter& xParameter = parameters.at("x");
     const EntityTemplate::Parameter& yParameter = parameters.at("y");
 
-    EntityHandle(playerEntity).setAttributeAsAny(xParameter.component, xParameter.attribute, m_level.getSpawnPosition().x);
-    EntityHandle(playerEntity).setAttributeAsAny(yParameter.component, yParameter.attribute, m_level.getSpawnPosition().y);
+    EntityHandle(playerEntity).setAttributeAsAny(xParameter.component, xParameter.attribute, m_level->getSpawnPosition().x);
+    EntityHandle(playerEntity).setAttributeAsAny(yParameter.component, yParameter.attribute, m_level->getSpawnPosition().y);
 
     if(!playerEntity.has_component<PlayerComponent>())
-        throw std::runtime_error(std::string("[Level/Error] Player entities must have the \"Player\" component declared in their template ! Not the case with \"") + m_level.getPlayersTemplates()[0] + std::string("\""));
+        throw std::runtime_error(std::string("[Level/Error] Player entities must have the \"Player\" component declared in their template ! Not the case with \"") + m_level->getPlayersTemplates()[0] + std::string("\""));
     playerEntity.component<PlayerComponent>()->playerNumber = 0;
 
     std::cout << "Players created." << std::endl;
@@ -85,7 +83,7 @@ LevelState::LevelState(StateEngine& stateEngine, std::string path, AllResourcesM
     m_systemMgr.update<EntityGridSystem>(0);
 
     //Put the current level instance into "current_level" lua global variable
-    m_luaState.getState().set("current_level", this);
+    m_luaState->getState().set("current_level", this);
 }
 
 void LevelState::processEvent(sf::Event event, sf::RenderTarget &target)
@@ -174,7 +172,7 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 
 EntityHandle LevelState::lua_createNewEntity(const std::string& templateName)
 {
-    return EntityHandle(m_level.createNewEntity(templateName));
+    return EntityHandle(m_level->createNewEntity(templateName));
 }
 
 void LevelState::updatePerfText()

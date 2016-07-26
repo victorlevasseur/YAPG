@@ -2,6 +2,7 @@
 #define YAPG_GAME_STATE_LEVELSTATE_H
 
 #include <chrono>
+#include <memory>
 #include <string>
 
 #include "entityx/entityx.h"
@@ -27,7 +28,7 @@ namespace yapg
 class LevelState : public State, public messaging::Emitter, public messaging::Receiver<messaging::AllPlayersFinishedMessage, messaging::AllPlayersLostMessage>
 {
 public:
-    LevelState(StateEngine& stateEngine, std::string path, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager);
+    LevelState(StateEngine& stateEngine, std::string path, std::unique_ptr<LuaState>&& luaState, std::unique_ptr<Level>&& level, AllResourcesManagers& resourcesManager, SettingsManager& settingsManager);
 
     virtual void processEvent(sf::Event event, sf::RenderTarget &target);
 
@@ -44,10 +45,9 @@ protected:
 private:
     EntityHandle lua_createNewEntity(const std::string& templateName);
 
-    LuaState m_luaState;
-
     std::string m_path;
-    Level m_level;
+    std::unique_ptr<LuaState> m_luaState;
+    std::unique_ptr<Level> m_level;
     entityx::SystemManager m_systemMgr;
 
     AllResourcesManagers& m_resourcesManager;

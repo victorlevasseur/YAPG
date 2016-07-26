@@ -6,7 +6,7 @@ template<class T, typename... Args>
 void StateEngine::stopAndStartState(Args&&... args, bool stopAll)
 {
     m_todoNextFrameState.release();
-    m_todoNextFrameState.reset(new T(*this, args...));
+    m_todoNextFrameState.reset(new T(*this, std::forward<Args>(args)...));
 
     m_todoNextFrame = [&]()
     {
@@ -33,7 +33,7 @@ template <class T, typename... Args>
 void StateEngine::pauseAndStartState(Args&&... args)
 {
     m_todoNextFrameState.release();
-    m_todoNextFrameState.reset(new T(*this, args...));
+    m_todoNextFrameState.reset(new T(*this, std::forward<Args>(args)...));
 
     m_todoNextFrame = [&]()
     {

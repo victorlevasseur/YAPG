@@ -4,7 +4,9 @@
 
 #include "Gui/imgui.h"
 
+#include "Level/Level.hpp"
 #include "Level/LevelState.hpp"
+#include "Lua/LuaState.hpp"
 #include "State/StateEngine.hpp"
 
 namespace yapg
@@ -33,9 +35,13 @@ void LevelLoadingState::render(sf::RenderTarget& target)
 
     target.draw(m_loadingText);
 
+    auto luaState = std::make_unique<LuaState>();
+    auto level = std::make_unique<Level>(*luaState);
+    level->loadFromFile(m_levelPath);
+
     getStateEngine().stopAndStartState
-    <LevelState, std::string, AllResourcesManagers&, SettingsManager&>(
-        std::string(m_levelPath), m_resourcesManager, m_settingsManager
+    <LevelState, const std::string&, decltype(luaState), decltype(level), AllResourcesManagers&, SettingsManager&>(
+        m_levelPath, std::move(luaState), std::move(level), m_resourcesManager, m_settingsManager
     );
 }
 

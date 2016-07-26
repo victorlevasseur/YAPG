@@ -25,8 +25,8 @@ public:
 
     Level(LuaState& luaState, LevelMode levelMode = LevelMode::PlayMode);
 
-    void LoadFromFile(const std::string& path);
-    void SaveToFile(const std::string& path);
+    void loadFromFile(const std::string& path);
+    void saveToFile(const std::string& path);
 
     sf::Vector2f getSpawnPosition() const { return m_spawnPosition; }
     void setSpawnPosition(sf::Vector2f spawnPosition) { m_spawnPosition = spawnPosition; }

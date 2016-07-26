@@ -4,7 +4,7 @@
 
 #include "Gui/imgui.h"
 
-#include "Level/LevelState.hpp"
+#include "Level/LevelLoadingState.hpp"
 #include "State/StateEngine.hpp"
 
 namespace yapg
@@ -42,7 +42,7 @@ void LevelFailureState::render(sf::RenderTarget& target)
         if(ImGui::Button("Try again"))
         {
             getStateEngine().stopAndStartState
-            <LevelState, const std::string&, AllResourcesManagers&, SettingsManager&>(
+            <LevelLoadingState, const std::string&, AllResourcesManagers&, SettingsManager&>(
                 m_levelPath, m_resourcesManager, m_settingsManager
             );
         }

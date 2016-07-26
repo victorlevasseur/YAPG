@@ -23,7 +23,7 @@ Level::Level(LuaState& luaState, LevelMode levelMode) :
 
 }
 
-void Level::LoadFromFile(const std::string& path)
+void Level::loadFromFile(const std::string& path)
 {
     for(entityx::Entity entity : m_entityMgr.entities_for_debugging())
         entity.destroy();
@@ -67,7 +67,7 @@ void Level::LoadFromFile(const std::string& path)
     //Note: the player's creation is done in LevelState.
 }
 
-void Level::SaveToFile(const std::string& path)
+void Level::saveToFile(const std::string& path)
 {
     if(m_levelMode == LevelMode::PlayMode)
     {

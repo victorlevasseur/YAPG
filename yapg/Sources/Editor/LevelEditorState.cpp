@@ -475,7 +475,7 @@ void LevelEditorState::initSystemManager()
 
 void LevelEditorState::newLevel()
 {
-    m_level.LoadFromFile("newlevel.xml");
+    m_level.loadFromFile("newlevel.xml");
     m_filepath = std::string();
 
     updateGuiFromLevel();
@@ -486,7 +486,7 @@ void LevelEditorState::openLevel()
     FileDialog fileDialog("Select a level to open...", FileDialog::Open, { { "XML levels", {"*.xml"} } });
     if(fileDialog.run())
     {
-        m_level.LoadFromFile(fileDialog.getFilename());
+        m_level.loadFromFile(fileDialog.getFilename());
         m_filepath = fileDialog.getFilename();
         updateGuiFromLevel();
     }
@@ -497,7 +497,7 @@ void LevelEditorState::saveLevel()
     if(m_filepath.empty())
         saveAsLevel();
     else
-        m_level.SaveToFile(m_filepath);
+        m_level.saveToFile(m_filepath);
 }
 
 void LevelEditorState::saveAsLevel()
@@ -505,7 +505,7 @@ void LevelEditorState::saveAsLevel()
     FileDialog fileDialog("Select where to save the level...", FileDialog::Save, { { "XML levels", {"*.xml"} } });
     if(fileDialog.run())
     {
-        m_level.SaveToFile(fileDialog.getFilename());
+        m_level.saveToFile(fileDialog.getFilename());
         m_filepath = fileDialog.getFilename();
     }
 }
