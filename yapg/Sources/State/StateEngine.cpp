@@ -1,5 +1,6 @@
 #include "State/StateEngine.hpp"
 
+#include <iostream>
 
 namespace yapg
 {
@@ -22,14 +23,14 @@ void StateEngine::stopStateAndUnpause()
         //If there is a top state, stop it
         if(m_states.size() >= 1)
         {
-            m_states.top()->onStop();
-            m_states.pop();
+            m_states.back()->onStop();
+            m_states.pop_back();
         }
 
         //If there's still a state remaining, unpause it
         if(m_states.size() > 0)
         {
-            m_states.top()->onUnpause();
+            m_states.back()->onUnpause();
         }
 
         notify();
@@ -39,7 +40,7 @@ void StateEngine::stopStateAndUnpause()
 State::NonOwningPtr StateEngine::getRunningState()
 {
     if(m_states.size() > 0)
-        return m_states.top().get();
+        return m_states.back().get();
     else
         return nullptr;
 }

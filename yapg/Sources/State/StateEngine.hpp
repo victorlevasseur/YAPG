@@ -1,7 +1,7 @@
 #ifndef YAPG_GAME_STATE_STATEENGINE_H
 #define YAPG_GAME_STATE_STATEENGINE_H
 
-#include <stack>
+#include <deque>
 
 #include "State/State.hpp"
 #include "Tools/Observable.hpp"
@@ -16,7 +16,7 @@ public:
     StateEngine();
 
     template <class T, typename... Args>
-    void stopAndStartState(Args&&... args, bool stopAll = false);
+    void stopAndStartState(Args&&... args);
 
     template <class T, typename... Args>
     void pauseAndStartState(Args&&... args);
@@ -33,7 +33,7 @@ public:
     void nextFrameInit();
 
 private:
-    std::stack<State::Ptr> m_states;
+    std::deque<State::Ptr> m_states;
 
     std::function<void()> m_todoNextFrame;
     std::unique_ptr<State> m_todoNextFrameState;
