@@ -48,6 +48,10 @@ private:
 
     std::shared_ptr<sf::Font> m_font;
     sf::Text m_loadingText;
+    sf::Text m_loadingStatusText;
+
+    std::mutex m_loadingStatusMutex;
+    std::string m_loadingStatusString;
 
     std::mutex m_loadedMutex;
     std::unique_ptr<LuaState> m_loadedLuaState;

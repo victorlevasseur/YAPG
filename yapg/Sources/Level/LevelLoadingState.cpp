@@ -21,6 +21,9 @@ LevelLoadingState::LevelLoadingState(StateEngine& stateEngine, const std::string
     m_settingsManager(settingsManager),
     m_font(m_resourcesManager.getFonts().requestResource("assets/LiberationSans.ttf")),
     m_loadingText("Loading...", *m_font, 70u),
+    m_loadingStatusText("", *m_font, 40u),
+    m_loadingStatusMutex(),
+    m_loadingStatusString(),
     m_loadedMutex(),
     m_loadedLuaState(nullptr),
     m_loadedLevel(nullptr)
@@ -32,9 +35,22 @@ LevelLoadingState::LevelLoadingState(StateEngine& stateEngine, const std::string
     auto loadingFunc = [&]() -> void
     {
         //Load the lua state and the level
+        m_loadingStatusMutex.lock();
+        m_loadingStatusString = "Loading lua...";
+        m_loadingStatusMutex.unlock();
+
         auto luaState = std::make_unique<LuaState>();
+
+        m_loadingStatusMutex.lock();
+        m_loadingStatusString = "Loading level...";
+        m_loadingStatusMutex.unlock();
+
         auto level = std::make_unique<Level>(*luaState);
         level->loadFromFile(m_levelPath);
+
+        m_loadingStatusMutex.lock();
+        m_loadingStatusString = "Starting...";
+        m_loadingStatusMutex.unlock();
 
         m_loadedMutex.lock();
 
@@ -57,7 +73,14 @@ void LevelLoadingState::render(sf::RenderTarget& target)
     target.clear(sf::Color(0, 0, 0));
 
     m_loadingText.setColor(sf::Color(255, 255, 255, 127.f + 127.f * std::sin(getTimeSinceStart().asSeconds() * 10.f)));
+
+    m_loadingStatusMutex.lock();
+    m_loadingStatusText.setString(m_loadingStatusString);
+    m_loadingStatusMutex.unlock();
+    m_loadingStatusText.setPosition(sf::Vector2f(512.f - m_loadingStatusText.getLocalBounds().width/2.f, 454.f - m_loadingStatusText.getLocalBounds().height/2.f));
+
     target.draw(m_loadingText);
+    target.draw(m_loadingStatusText);
 }
 
 void LevelLoadingState::doStart()
