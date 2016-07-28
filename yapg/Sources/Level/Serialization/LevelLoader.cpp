@@ -5,6 +5,20 @@
 namespace yapg
 {
 
+namespace
+{
+    std::pair<std::string, std::string> decomposeTemplateName(const std::string& name)
+    {
+        if(name.size() <= 1 && name.rfind(".") < name.size() - 1)
+            return std::make_pair(std::string(), std::string());
+
+        return std::make_pair(
+            name.substr(0, name.rfind(".") - 1),
+            name.substr(name.rfind(".") + 1, name.size() - 1)
+        );
+    }
+}
+
 LevelLoader::LevelLoader(const std::string& filepath) :
     m_levelDocument(),
     m_spawnPosition(),
@@ -85,6 +99,7 @@ LevelLoader::LevelLoader(const std::string& filepath) :
             continue;
         }
 
+        m_dependencies.insert(decomposeTemplateName(loadedEntity.templateName).first);
         m_entities.push_back(std::move(loadedEntity));
     }
 }

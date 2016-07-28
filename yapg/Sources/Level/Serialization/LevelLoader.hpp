@@ -1,6 +1,7 @@
 #ifndef YAPG_GAME_LEVEL_SERIALIZATION_LEVELLOADER_H
 #define YAPG_GAME_LEVEL_SERIALIZATION_LEVELLOADER_H
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -31,12 +32,17 @@ public:
     std::vector<SerializedEntity>::const_iterator getEntitiesBegin() const { return m_entities.cbegin(); }
     std::vector<SerializedEntity>::const_iterator getEntitiesEnd() const { return m_entities.cend(); }
 
+    std::set<std::string>::const_iterator getDependenciesBegin() const { return m_dependencies.cbegin(); }
+    std::set<std::string>::const_iterator getDependenciesEnd() const { return m_dependencies.cend(); }
+
 private:
     tinyxml2::XMLDocument m_levelDocument;
 
     sf::Vector2f m_spawnPosition;
     std::vector<std::string> m_playersTemplates;
     std::vector<SerializedEntity> m_entities;
+
+    std::set<std::string> m_dependencies;
 };
 
 }
