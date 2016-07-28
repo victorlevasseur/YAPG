@@ -8,6 +8,7 @@
 
 #include "Level/Level.hpp"
 #include "Level/LevelState.hpp"
+#include "Level/Serialization/LevelLoader.hpp"
 #include "Lua/LuaState.hpp"
 #include "State/StateEngine.hpp"
 
@@ -34,6 +35,12 @@ LevelLoadingState::LevelLoadingState(StateEngine& stateEngine, const std::string
     //Init the loading thread
     auto loadingFunc = [&]() -> void
     {
+        m_loadingStatusMutex.lock();
+        m_loadingStatusString = "Loading level...";
+        m_loadingStatusMutex.unlock();
+        
+        LevelLoader levelLoader(m_levelPath);
+
         //Load the lua state and the level
         m_loadingStatusMutex.lock();
         m_loadingStatusString = "Loading lua...";
@@ -42,11 +49,10 @@ LevelLoadingState::LevelLoadingState(StateEngine& stateEngine, const std::string
         auto luaState = std::make_unique<LuaState>();
 
         m_loadingStatusMutex.lock();
-        m_loadingStatusString = "Loading level...";
+        m_loadingStatusString = "Creating game entities...";
         m_loadingStatusMutex.unlock();
 
-        auto level = std::make_unique<Level>(*luaState);
-        level->loadFromFile(m_levelPath);
+        auto level = std::make_unique<Level>(*luaState, levelLoader);
 
         m_loadingStatusMutex.lock();
         m_loadingStatusString = "Starting...";

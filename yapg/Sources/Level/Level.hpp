@@ -11,21 +11,16 @@
 #include "Lua/EntityHandle.hpp"
 #include "Lua/LuaState.hpp"
 
+namespace yapg{ class LevelLoader; }
+
 namespace yapg
 {
 
 class Level
 {
 public:
-    enum class LevelMode
-    {
-        PlayMode,
-        EditMode
-    };
+    Level(LuaState& luaState, const LevelLoader& loader);
 
-    Level(LuaState& luaState, LevelMode levelMode = LevelMode::PlayMode);
-
-    void loadFromFile(const std::string& path);
     void saveToFile(const std::string& path);
 
     sf::Vector2f getSpawnPosition() const { return m_spawnPosition; }
@@ -52,8 +47,6 @@ private:
 
     sf::Vector2f m_spawnPosition;
     std::vector<std::string> m_playersTemplates;
-
-    LevelMode m_levelMode;
 
     int m_nextId;
 };

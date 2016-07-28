@@ -98,7 +98,7 @@ private:
 
     PropertiesManager m_propertiesManager;
 
-    Level m_level;
+    std::unique_ptr<Level> m_level;
     std::string m_filepath;
 
     std::unique_ptr<entityx::SystemManager> m_systemMgr;

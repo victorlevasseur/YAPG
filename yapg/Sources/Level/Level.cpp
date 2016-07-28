@@ -11,35 +11,14 @@
 namespace yapg
 {
 
-Level::Level(LuaState& luaState, LevelMode levelMode) :
+Level::Level(LuaState& luaState, const LevelLoader& loader) :
     m_luaState(luaState),
     m_eventMgr(),
     m_entityMgr(m_eventMgr),
-    m_spawnPosition(),
-    m_playersTemplates(),
-    m_levelMode(levelMode),
+    m_spawnPosition(loader.getSpawnPosition()),
+    m_playersTemplates(loader.getPlayersTemplatesBegin(), loader.getPlayersTemplatesEnd()),
     m_nextId(0)
 {
-
-}
-
-void Level::loadFromFile(const std::string& path)
-{
-    for(entityx::Entity entity : m_entityMgr.entities_for_debugging())
-        entity.destroy();
-    m_playersTemplates.clear();
-    m_nextId = 0;
-
-    std::cout << "Loading level \"" << path << "\"..." << std::endl;
-
-    LevelLoader loader(path);
-    m_spawnPosition = loader.getSpawnPosition();
-    std::copy(
-        loader.getPlayersTemplatesBegin(),
-        loader.getPlayersTemplatesEnd(),
-        std::back_inserter(m_playersTemplates)
-    );
-
     SerializedEntityGetter entityGetter;
     std::vector<entityx::Entity> createdEntities;
 
@@ -52,6 +31,7 @@ void Level::loadFromFile(const std::string& path)
 
         //Register the entity with its ID
         entityGetter.registerEntity(newEntity, it->id);
+        m_nextId = std::max(m_nextId, it->id);
     }
 
     //Apply the templates to all the entities
@@ -69,11 +49,6 @@ void Level::loadFromFile(const std::string& path)
 
 void Level::saveToFile(const std::string& path)
 {
-    if(m_levelMode == LevelMode::PlayMode)
-    {
-        throw std::runtime_error("[Level/Error] Can't save a level opened in play mode !");
-    }
-
     tinyxml2::XMLDocument levelDocument;
 
     tinyxml2::XMLElement* levelElement = levelDocument.NewElement("level");

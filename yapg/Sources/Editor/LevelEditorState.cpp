@@ -9,6 +9,7 @@
 #include "Common/EntityGridSystem.hpp"
 #include "Common/PositionComponent.hpp"
 #include "Editor/EntryPropertyWidget.hpp"
+#include "Level/Serialization/LevelLoader.hpp"
 #include "Lua/EntityHandle.hpp"
 #include "Template/EntityTemplate.hpp"
 #include "Template/TemplateComponent.hpp"
@@ -35,7 +36,7 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, AllResourcesManager
     m_playerTemplatesNames(),
     m_selectedPlayerTemplate(),
     m_propertiesManager(),
-    m_level(m_luaState, Level::LevelMode::EditMode),
+    m_level(std::make_unique<Level>(m_luaState, LevelLoader("newlevel.xml"))),
     m_filepath(),
     m_systemMgr(nullptr),
     m_isInserting(false),
@@ -144,7 +145,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
                     {
                         for(int j = std::min(0, m_insertionCount.y); j <= std::max(0, m_insertionCount.y); ++j)
                         {
-                            entityx::Entity newEntity = m_level.createNewEntity(m_templatesNames[m_selectedTemplate]);
+                            entityx::Entity newEntity = m_level->createNewEntity(m_templatesNames[m_selectedTemplate]);
 
                             try
                             {
@@ -238,7 +239,7 @@ void LevelEditorState::processEvent(sf::Event event, sf::RenderTarget &target)
             if(isMouseNotOnWidgets(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), target))
             {
                 sf::Vector2f mousePosition = target.mapPixelToCoords(sf::Vector2i(event.mouseButton.x, event.mouseButton.y), getLevelView());
-                m_level.setSpawnPosition(mousePosition);
+                m_level->setSpawnPosition(mousePosition);
             }
         }
     }
@@ -372,7 +373,7 @@ void LevelEditorState::render(sf::RenderTarget& target)
             m_playerTemplatesNames.size()
         ))
         {
-            m_level.getPlayersTemplates()[0] = (m_selectedPlayerTemplate != 0 ? m_playerTemplatesNames[m_selectedPlayerTemplate] : "");
+            m_level->getPlayersTemplates()[0] = (m_selectedPlayerTemplate != 0 ? m_playerTemplatesNames[m_selectedPlayerTemplate] : "");
         }
 
         ImGui::TextWrapped("To move the spawn, select \"Spawn config.\" in the \"Edition Mode\" window and click on the level.");
@@ -385,7 +386,7 @@ void LevelEditorState::render(sf::RenderTarget& target)
 
     //Draw the spawn position
     target.setView(m_systemMgr->system<RenderSystem>()->getView());
-    m_spawnSprite.setPosition(m_level.getSpawnPosition());
+    m_spawnSprite.setPosition(m_level->getSpawnPosition());
     target.draw(m_spawnSprite);
 
     //Draw the selection box (or insertion box)
@@ -462,7 +463,7 @@ void LevelEditorState::initGUI()
 
 void LevelEditorState::initSystemManager()
 {
-    m_systemMgr.reset(new entityx::SystemManager(m_level.getEntityManager(), m_level.getEventManager()));
+    m_systemMgr.reset(new entityx::SystemManager(m_level->getEntityManager(), m_level->getEventManager()));
 
     m_systemMgr->add<EntityGridSystem>();
 
@@ -475,9 +476,10 @@ void LevelEditorState::initSystemManager()
 
 void LevelEditorState::newLevel()
 {
-    m_level.loadFromFile("newlevel.xml");
+    m_level = std::make_unique<Level>(m_luaState, LevelLoader("newlevel.xml"));
     m_filepath = std::string();
 
+    initSystemManager();
     updateGuiFromLevel();
 }
 
@@ -486,8 +488,9 @@ void LevelEditorState::openLevel()
     FileDialog fileDialog("Select a level to open...", FileDialog::Open, { { "XML levels", {"*.xml"} } });
     if(fileDialog.run())
     {
-        m_level.loadFromFile(fileDialog.getFilename());
+        m_level = std::make_unique<Level>(m_luaState, LevelLoader(fileDialog.getFilename()));
         m_filepath = fileDialog.getFilename();
+        initSystemManager();
         updateGuiFromLevel();
     }
 }
@@ -497,7 +500,7 @@ void LevelEditorState::saveLevel()
     if(m_filepath.empty())
         saveAsLevel();
     else
-        m_level.saveToFile(m_filepath);
+        m_level->saveToFile(m_filepath);
 }
 
 void LevelEditorState::saveAsLevel()
@@ -505,7 +508,7 @@ void LevelEditorState::saveAsLevel()
     FileDialog fileDialog("Select where to save the level...", FileDialog::Save, { { "XML levels", {"*.xml"} } });
     if(fileDialog.run())
     {
-        m_level.saveToFile(fileDialog.getFilename());
+        m_level->saveToFile(fileDialog.getFilename());
         m_filepath = fileDialog.getFilename();
     }
 }
@@ -513,9 +516,9 @@ void LevelEditorState::saveAsLevel()
 void LevelEditorState::updateGuiFromLevel()
 {
     m_selectedPlayerTemplate = 0;
-    if(m_level.getPlayersTemplates().size() > 0)
+    if(m_level->getPlayersTemplates().size() > 0)
     {
-        auto it = std::find(m_playerTemplatesNames.cbegin(), m_playerTemplatesNames.cend(), m_level.getPlayersTemplates()[0]);
+        auto it = std::find(m_playerTemplatesNames.cbegin(), m_playerTemplatesNames.cend(), m_level->getPlayersTemplates()[0]);
         if(it != m_playerTemplatesNames.cend())
         {
             m_selectedPlayerTemplate = std::distance(m_playerTemplatesNames.cbegin(), it);
@@ -571,7 +574,7 @@ bool LevelEditorState::isMouseNotOnWidgets(sf::Vector2i mousePosition, sf::Rende
 entityx::Entity LevelEditorState::getFirstEntityUnderMouse(sf::Vector2i mousePosition, sf::RenderTarget& target)
 {
     entityx::ComponentHandle<PositionComponent> position;
-    for(entityx::Entity entity : m_level.getEntityManager().entities_with_components(position))
+    for(entityx::Entity entity : m_level->getEntityManager().entities_with_components(position))
     {
         if(isEntityUnderMouse(entity, mousePosition, target))
             return entity;
@@ -583,7 +586,7 @@ entityx::Entity LevelEditorState::getFirstEntityUnderMouse(sf::Vector2i mousePos
 entityx::Entity LevelEditorState::getFirstEntityUnderMouse(sf::Vector2f position)
 {
     entityx::ComponentHandle<PositionComponent> positionComponent;
-    for(entityx::Entity entity : m_level.getEntityManager().entities_with_components(positionComponent))
+    for(entityx::Entity entity : m_level->getEntityManager().entities_with_components(positionComponent))
     {
         if(isEntityUnderMouse(entity, position))
             return entity;
@@ -626,7 +629,7 @@ sf::Vector2f LevelEditorState::getInsertionPosition(sf::Vector2f position, float
     sf::Vector2f newPosition = position;
 
     entityx::ComponentHandle<PositionComponent> positionComponent;
-    for(entityx::Entity entity : m_level.getEntityManager().entities_with_components(positionComponent))
+    for(entityx::Entity entity : m_level->getEntityManager().entities_with_components(positionComponent))
     {
         if(ignore == entity)
             continue;
