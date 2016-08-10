@@ -18,6 +18,7 @@
 #include "NativeGui/TextBoxWindow.hpp"
 #include "Rendering/RenderSystem.hpp"
 #include "State/StateEngine.hpp"
+#include "Template/PackagesManager.hpp"
 
 namespace yapg
 {
@@ -59,6 +60,12 @@ LevelEditorState::LevelEditorState(StateEngine& stateEngine, AllResourcesManager
     m_propertiesManager.registerPropertyWidget<unsigned int, EntryPropertyWidget<unsigned int>>();
     m_propertiesManager.registerPropertyWidget<std::string, EntryPropertyWidget<std::string, true>>();
 
+    //Load all the local packages
+    auto localPackages = PackagesManager::get().getLocalPackages();
+    for(auto& localPackage : localPackages)
+        localPackage.loadTemplatesIntoLua(m_luaState);
+
+    //Various initializations
     initSystemManager();
     initGUI();
     updateTemplatesList();

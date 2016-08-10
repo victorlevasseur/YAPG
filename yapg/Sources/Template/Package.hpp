@@ -51,6 +51,9 @@ private:
     std::string m_friendlyName;
 };
 
+bool operator<(const Package& lhs, const Package& rhs);
+bool operator==(const Package& lhs, const Package& rhs);
+
 }
 
 #endif

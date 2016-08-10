@@ -13,7 +13,7 @@ namespace
             return std::make_pair(std::string(), std::string());
 
         return std::make_pair(
-            name.substr(0, name.rfind(".") - 1),
+            name.substr(0, name.rfind(".")),
             name.substr(name.rfind(".") + 1, name.size() - 1)
         );
     }

@@ -1,5 +1,6 @@
 #include "Level/LevelLoadingState.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -11,6 +12,7 @@
 #include "Level/Serialization/LevelLoader.hpp"
 #include "Lua/LuaState.hpp"
 #include "State/StateEngine.hpp"
+#include "Template/PackagesManager.hpp"
 
 namespace yapg
 {
@@ -38,7 +40,7 @@ LevelLoadingState::LevelLoadingState(StateEngine& stateEngine, const std::string
         m_loadingStatusMutex.lock();
         m_loadingStatusString = "Loading level...";
         m_loadingStatusMutex.unlock();
-        
+
         LevelLoader levelLoader(m_levelPath);
 
         //Load the lua state and the level
@@ -47,6 +49,25 @@ LevelLoadingState::LevelLoadingState(StateEngine& stateEngine, const std::string
         m_loadingStatusMutex.unlock();
 
         auto luaState = std::make_unique<LuaState>();
+
+        m_loadingStatusMutex.lock();
+        m_loadingStatusString = "Loading packages...";
+        m_loadingStatusMutex.unlock();
+
+        //Load the dependencies
+        std::for_each(
+            levelLoader.getDependenciesBegin(),
+            levelLoader.getDependenciesEnd(),
+            [&](const std::string& packageName)
+            {
+                m_loadingStatusMutex.lock();
+                m_loadingStatusString = "Loading " + packageName + "...";
+                m_loadingStatusMutex.unlock();
+
+                auto packagePromise = PackagesManager::get().getPackage(packageName);
+                packagePromise.get().loadTemplatesIntoLua(*luaState);
+            }
+        );
 
         m_loadingStatusMutex.lock();
         m_loadingStatusString = "Creating game entities...";

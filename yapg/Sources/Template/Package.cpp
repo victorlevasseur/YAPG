@@ -115,4 +115,14 @@ void Package::loadTemplatesIntoLua(LuaState& luaState) const
     }
 }
 
+bool operator==(const Package& lhs, const Package& rhs)
+{
+    return lhs.getName() == rhs.getName();
+}
+
+bool operator<(const Package& lhs, const Package& rhs)
+{
+    return lhs.getName() < rhs.getName();
+}
+
 }

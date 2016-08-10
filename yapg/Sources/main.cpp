@@ -12,6 +12,8 @@
 #include "Settings/SettingsManager.hpp"
 #include "State/State.hpp"
 #include "State/StateEngine.hpp"
+#include "Template/PackagesManager.hpp"
+#include "Tools/PathTools.hpp"
 #include "Window/WindowManager.hpp"
 
 namespace fs = boost::filesystem;
@@ -45,6 +47,9 @@ int main(int argc, char** argv)
 
     //Window manager
     yapg::WindowManager windowManager(stateEngine, "Yet Another Platformer Game");
+
+    //Package manager
+    yapg::PackagesManager::init({fs::absolute(".yapg/packages", yapg::getHomePath()), fs::path("packages")}, fs::absolute(".yapg/packages", yapg::getHomePath()));
 
     stateEngine.stopAndStartState
     <yapg::MainMenuState, yapg::AllResourcesManagers&, yapg::SettingsManager&>(

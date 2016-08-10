@@ -213,14 +213,7 @@ bool LuaState::hasTemplate(const std::string& name) const
 
 void LuaState::loadAllTemplates()
 {
-    //TODO: Package manager: the package manager will be created when the game starts and will be given to LuaState to load the necessary templates
 
-    //WORKAROUND: Two hard coded packages : com.victorlevasseur.yapg.default and com.victorlevasseur.yapg.kenney
-    Package defaultPackage(fs::path("packages/com.victorlevasseur.yapg.default"));
-    Package kenneyPackage(fs::path("packages/com.victorlevasseur.yapg.kenney"));
-
-    defaultPackage.loadTemplatesIntoLua(*this);
-    kenneyPackage.loadTemplatesIntoLua(*this);
 
     std::cout << "[Lua/Note] Entities templates loaded." << std::endl;
 }
