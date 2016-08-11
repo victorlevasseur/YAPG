@@ -79,6 +79,7 @@ std::shared_future<Package> PackagesManager::getPackage(const std::string& packa
 
     if(m_alreadyRequestedPackages.count(packageName) == 0)
     {
+        //The package is not downloading, so add the (down)loading task
         m_alreadyRequestedPackages[packageName] =
             std::async([&]() -> Package
             {

@@ -1,6 +1,7 @@
 #ifndef YAPG_GAME_LEVEL_LEVELLOADINGSTATE_H
 #define YAPG_GAME_LEVEL_LEVELLOADINGSTATE_H
 
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -41,6 +42,8 @@ protected:
     virtual void doUpdate(sf::Time dt, sf::RenderTarget& target);
 
 private:
+    void setError(const std::string& msg);
+
     std::string m_levelPath;
 
     AllResourcesManagers& m_resourcesManager;
@@ -56,6 +59,7 @@ private:
     std::mutex m_loadedMutex;
     std::unique_ptr<LuaState> m_loadedLuaState;
     std::unique_ptr<Level> m_loadedLevel;
+    std::atomic<bool> m_errored;
 };
 
 }
