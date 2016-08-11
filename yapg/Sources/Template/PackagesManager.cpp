@@ -36,7 +36,7 @@ Package PackagesManager::getLocalPackage(const std::string& packageName) const
     }
 
     //Not found locally!
-    throw Package::BadPackagePath(packageName + " is not avaible locally!");
+    throw Package::BadPackagePath(packageName + " is not available locally!");
 }
 
 std::set<Package> PackagesManager::getLocalPackages() const
@@ -92,7 +92,7 @@ std::shared_future<Package> PackagesManager::getPackage(const std::string& packa
                     catch(...) {} //Ignore the package exceptions
                 }
 
-                throw Package::BadPackagePath(packageName + " is not avaible locally!");
+                throw Package::BadPackagePath(packageName + " is not available locally!");
             })
             .share();
     }
