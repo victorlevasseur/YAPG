@@ -38,6 +38,8 @@ public:
 
     virtual void render(sf::RenderTarget &target) {};
 
+    virtual void onError(const std::exception& e);
+
 protected:
     virtual void doStart() {};
 

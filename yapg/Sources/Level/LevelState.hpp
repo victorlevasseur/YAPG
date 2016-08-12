@@ -34,6 +34,8 @@ public:
 
     virtual void render(sf::RenderTarget& target);
 
+    virtual void onError(const std::exception& e);
+
     virtual void receive(const messaging::AllPlayersFinishedMessage& message) override;
     virtual void receive(const messaging::AllPlayersLostMessage& message) override;
 

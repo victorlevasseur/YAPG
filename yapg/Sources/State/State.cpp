@@ -38,6 +38,11 @@ void State::update(sf::Time dt, sf::RenderTarget &target)
     doUpdate(dt, target);
 }
 
+void State::onError(const std::exception& e)
+{
+    throw e;
+}
+
 const StateEngine& State::getStateEngine() const
 {
     return m_stateEngine;

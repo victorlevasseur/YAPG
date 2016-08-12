@@ -7,6 +7,7 @@
 #include "Collision/CollisionSystem.hpp"
 #include "Common/EntityGridSystem.hpp"
 #include "Common/PositionComponent.hpp"
+#include "Error/ErrorState.hpp"
 #include "Health/HealthSystem.hpp"
 #include "Level/LevelFailureState.hpp"
 #include "Level/LevelSuccessState.hpp"
@@ -109,6 +110,14 @@ void LevelState::render(sf::RenderTarget& target)
     auto timeAfter = std::chrono::high_resolution_clock::now();
     m_lastRenderDuration = timeAfter - timeBefore;
     updatePerfText();
+}
+
+void LevelState::onError(const std::exception& e)
+{
+    getStateEngine().stopAndStartState
+        <ErrorState, std::string, bool, AllResourcesManagers&, SettingsManager&>(
+        std::string(e.what()), false, m_resourcesManager, m_settingsManager
+    );
 }
 
 void LevelState::receive(const messaging::AllPlayersFinishedMessage& message)

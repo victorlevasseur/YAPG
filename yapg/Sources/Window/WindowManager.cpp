@@ -45,41 +45,54 @@ void WindowManager::run()
             m_window.close();
         }
 
-        sf::Event event;
-        while (m_window.pollEvent(event))
+        try
         {
-            ImGui::SFML::ProcessEvent(event);
-
-            //Let the state process the event
-            if(m_engine.getRunningState())
-                m_engine.getRunningState()->processEvent(event, m_window);
-
-            if (event.type == sf::Event::Closed)
-                m_window.close();
-        }
-
-        elapsedTime += dtClock.restart();
-        ImGui::SFML::Update(elapsedTime - elapsedTime % sf::seconds(1.f/60.f)); //Update ImGui
-        //Fix the timestep so that the game logic is refreshed every 1/60s (60 fps)
-        while(elapsedTime >= sf::seconds(1.f/60.f))
-        {
-            if(m_engine.getRunningState())
+            sf::Event event;
+            while (m_window.pollEvent(event))
             {
-                m_engine.getRunningState()->update(sf::seconds(1.f/60.f), m_window);
+                ImGui::SFML::ProcessEvent(event);
+
+                //Let the state process the event
+                if(m_engine.getRunningState())
+                    m_engine.getRunningState()->processEvent(event, m_window);
+
+                if (event.type == sf::Event::Closed)
+                    m_window.close();
             }
 
-            elapsedTime -= sf::seconds(1.f/60.f);
+            elapsedTime += dtClock.restart();
+            ImGui::SFML::Update(elapsedTime - elapsedTime % sf::seconds(1.f/60.f)); //Update ImGui
+            //Fix the timestep so that the game logic is refreshed every 1/60s (60 fps)
+            while(elapsedTime >= sf::seconds(1.f/60.f))
+            {
+                if(m_engine.getRunningState())
+                {
+                    m_engine.getRunningState()->update(sf::seconds(1.f/60.f), m_window);
+                }
+
+                elapsedTime -= sf::seconds(1.f/60.f);
+            }
+
+            //Render the state
+            if(m_engine.getRunningState())
+                m_engine.getRunningState()->render(m_window);
+            else
+                m_window.clear(sf::Color::Black);
+
+            ImGui::Render();
+
+            m_window.display();
         }
+        catch(const std::exception& e)
+        {
+            std::cout << "[Error] Exception uncaught during the game:" << std::endl;
+            std::cout << e.what() << std::endl;
 
-        //Render the state
-        if(m_engine.getRunningState())
-            m_engine.getRunningState()->render(m_window);
-        else
-            m_window.clear(sf::Color::Black);
-
-        ImGui::Render();
-
-        m_window.display();
+            if(m_engine.getRunningState())
+                m_engine.getRunningState()->onError(e);
+            else
+                throw e;
+        }
     }
 }
 
