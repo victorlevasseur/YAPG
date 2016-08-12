@@ -268,10 +268,10 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         while(IsCollidingObstacle(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, PlatformComponent::Platform))
         {
             //Try to move the object on Y-axis to support slopes
-            polygonTransform.translate(0.f, -1-ceil(abs(requestedXMove)));
+            polygonTransform.translate(0.f, -1-ceil(std::fabs(requestedXMove)));
             if(!IsCollidingObstacle(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, PlatformComponent::Platform))
             {
-                requestedYMove += -1-ceil(abs(requestedXMove));
+                requestedYMove += -1-ceil(std::fabs(requestedXMove));
 
                 //Drop the object onto the obstacle
                 while(!IsCollidingObstacle(polygon, polygonTransform, potentialObstacles, NO_EXCEPTIONS, PlatformComponent::Platform))
@@ -373,7 +373,7 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
             }
 
             //Ignore micro movement to avoid the "shaking" effect
-            if(abs(requestedFall) < 1.f)
+            if(std::fabs(requestedFall) < 1.f)
             {
                 requestedYMove -= requestedFall;
                 polygonTransform.translate(0.f, -requestedFall);
@@ -412,7 +412,7 @@ void PlatformerSystem::update(entityx::EntityManager &es, entityx::EventManager 
         //Call the movement callbacks
         if(IsOnFloor(polygon, polygonTransform, potentialObstacles, overlappingJumpthrus))
         {
-            if(abs(position.x - oldX - requestedXFloorMove) > 0.1f)
+            if(std::fabs(position.x - oldX - requestedXFloorMove) > 0.1f)
                 platformer.movementStateCallbacks.setState(PlatformerComponent::Walking);
             else
                 platformer.movementStateCallbacks.setState(PlatformerComponent::Idle);

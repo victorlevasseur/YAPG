@@ -36,7 +36,7 @@ set(ENTITYX_STATIC_LIBRARY "${CMAKE_SOURCE_DIR}/libs/entityx/bin/libentityx.a")
 target_include_directories(yapg-game PUBLIC ${ENTITYX_INCLUDE_DIR})
 
 #SFML lib
-find_package(SFML 2.3 REQUIRED system window graphics audio)
+find_package(SFML 2 REQUIRED system window graphics audio)
 target_include_directories(yapg-game PUBLIC ${SFML_INCLUDE_DIR})
 
 #OpenGL
