@@ -6,8 +6,16 @@
 namespace yapg
 {
 
+StateGui::StateGui(State& state, tgui::Gui& gui) :
+    m_state(state),
+    m_gui(gui)
+{
+
+}
+
 State::State(StateEngine& stateEngine) :
-    m_stateEngine(stateEngine)
+    m_stateEngine(stateEngine),
+    m_stateGui(*this, m_stateEngine.getWindowManager().getGui())
 {
 
 }
@@ -54,14 +62,14 @@ StateEngine& State::getStateEngine()
     return m_stateEngine;
 }
 
-const tgui::Gui& State::getGui() const
+const StateGui& State::getGui() const
 {
-    return m_stateEngine.getWindowManager().getGui();
+    return m_stateGui;
 }
 
-tgui::Gui& State::getGui()
+StateGui& State::getGui()
 {
-    return m_stateEngine.getWindowManager().getGui();
+    return m_stateGui;
 }
 
 sf::Time State::getTimeSinceStart() const

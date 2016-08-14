@@ -18,7 +18,8 @@ WindowManager::WindowManager(StateEngine& engine, const sf::String& windowTitle)
     Observer(),
     m_window(sf::VideoMode(1024, 768), windowTitle),
     m_engine(engine),
-    m_gui(m_window)
+    m_gui(m_window),
+    m_guiTheme(std::make_shared<tgui::Theme>("assets/gui/Black.txt"))
 {
     m_engine.setWindowManager(this);
     m_engine.addObserver(*this);

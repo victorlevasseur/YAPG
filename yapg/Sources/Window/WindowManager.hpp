@@ -27,10 +27,14 @@ public:
     const tgui::Gui& getGui() const { return m_gui; }
     tgui::Gui& getGui() { return m_gui; }
 
+    tgui::Theme::Ptr getGuiTheme() { return m_guiTheme; }
+
 private:
     sf::RenderWindow m_window;
     StateEngine& m_engine;
+
     tgui::Gui m_gui;
+    tgui::Theme::Ptr m_guiTheme;
 };
 
 }
