@@ -2,6 +2,10 @@
 
 #include <iostream>
 
+#include <TGUI/TGUI.hpp>
+
+#include "Window/WindowManager.hpp"
+
 namespace yapg
 {
 

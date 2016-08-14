@@ -1,6 +1,7 @@
 #include "State/State.hpp"
 
 #include "State/StateEngine.hpp"
+#include "Window/WindowManager.hpp"
 
 namespace yapg
 {
@@ -51,6 +52,16 @@ const StateEngine& State::getStateEngine() const
 StateEngine& State::getStateEngine()
 {
     return m_stateEngine;
+}
+
+const tgui::Gui& State::getGui() const
+{
+    return m_stateEngine.getWindowManager().getGui();
+}
+
+tgui::Gui& State::getGui()
+{
+    return m_stateEngine.getWindowManager().getGui();
 }
 
 sf::Time State::getTimeSinceStart() const

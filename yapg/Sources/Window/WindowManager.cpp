@@ -11,15 +11,16 @@
 #include "State/State.hpp"
 #include "State/StateEngine.hpp"
 
-
 namespace yapg
 {
 
 WindowManager::WindowManager(StateEngine& engine, const sf::String& windowTitle) :
     Observer(),
     m_window(sf::VideoMode(1024, 768), windowTitle),
-    m_engine(engine)
+    m_engine(engine),
+    m_gui(m_window)
 {
+    m_engine.setWindowManager(this);
     m_engine.addObserver(*this);
 
     m_window.setFramerateLimit(60);
@@ -51,6 +52,7 @@ void WindowManager::run()
             while (m_window.pollEvent(event))
             {
                 ImGui::SFML::ProcessEvent(event);
+                m_gui.handleEvent(event);
 
                 //Let the state process the event
                 if(m_engine.getRunningState())
@@ -79,6 +81,7 @@ void WindowManager::run()
             else
                 m_window.clear(sf::Color::Black);
 
+            m_gui.draw();
             ImGui::Render();
 
             m_window.display();

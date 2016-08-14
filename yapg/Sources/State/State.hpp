@@ -7,6 +7,8 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
 
+#include <TGUI/TGUI.hpp>
+
 namespace yapg{ class StateEngine; }
 
 namespace yapg
@@ -53,6 +55,9 @@ protected:
 
     const StateEngine& getStateEngine() const;
     StateEngine& getStateEngine();
+
+    const tgui::Gui& getGui() const;
+    tgui::Gui& getGui();
 
     sf::Time getTimeSinceStart() const;
 

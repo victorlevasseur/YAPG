@@ -6,6 +6,7 @@
 #include "State/State.hpp"
 #include "Tools/Observable.hpp"
 
+namespace yapg{ class WindowManager; }
 
 namespace yapg
 {
@@ -32,11 +33,18 @@ public:
      */
     void nextFrameInit();
 
+    WindowManager& getWindowManager() { return *m_windowManager; }
+    const WindowManager& getWindowManager() const { return *m_windowManager; }
+
+    void setWindowManager(WindowManager* windowManager) { m_windowManager = windowManager; }
+
 private:
     std::deque<State::Ptr> m_states;
 
     std::function<void()> m_todoNextFrame;
     std::unique_ptr<State> m_todoNextFrameState;
+
+    WindowManager* m_windowManager;
 };
 
 }

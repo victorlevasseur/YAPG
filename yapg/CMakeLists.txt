@@ -51,6 +51,10 @@ target_include_directories(yapg-game PUBLIC ${LUA_INCLUDE_DIR})
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 target_include_directories(yapg-game PUBLIC ${Boost_INCLUDE_DIR})
 
+#TGUI
+find_package(TGUI REQUIRED)
+target_include_directories(yapg-game PUBLIC ${TGUI_INCLUDE_DIR})
+
 if(DEFINED OS_LINUX)
     # GTK3 on Linux (for NativeGui classes)
     find_package(PkgConfig REQUIRED)
@@ -67,7 +71,7 @@ if(OS_WINDOWS)
 endif()
 
 target_link_libraries(yapg-game PUBLIC
-    ${OPENGL_LIBRARIES} ${ENTITYX_STATIC_LIBRARY} ${SFML_LIBRARIES} ${LUA_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${GTK3_LIBRARIES} ${EXTRA_LIBRARIES}
+    ${OPENGL_LIBRARIES} ${ENTITYX_STATIC_LIBRARY} ${TGUI_LIBRARY} ${SFML_LIBRARIES} ${LUA_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${GTK3_LIBRARIES} ${EXTRA_LIBRARIES}
 )
 
 #Install the app

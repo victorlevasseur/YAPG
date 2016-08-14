@@ -4,6 +4,8 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/String.hpp>
 
+#include <TGUI/TGUI.hpp>
+
 #include "Tools/Observable.hpp"
 #include "Tools/Observer.hpp"
 
@@ -22,9 +24,13 @@ public:
 
     virtual void update(Observable& observable, void* value = nullptr);
 
+    const tgui::Gui& getGui() const { return m_gui; }
+    tgui::Gui& getGui() { return m_gui; }
+
 private:
     sf::RenderWindow m_window;
     StateEngine& m_engine;
+    tgui::Gui m_gui;
 };
 
 }
