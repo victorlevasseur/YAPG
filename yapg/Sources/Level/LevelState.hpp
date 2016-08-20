@@ -46,6 +46,7 @@ protected:
 
 private:
     EntityHandle lua_createNewEntity(const std::string& templateName);
+    std::vector<EntityHandle> lua_getEntities(const std::string& templateName);
 
     std::string m_path;
     std::unique_ptr<LuaState> m_luaState;

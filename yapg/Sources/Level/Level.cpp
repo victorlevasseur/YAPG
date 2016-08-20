@@ -134,6 +134,20 @@ entityx::Entity Level::createNewEntity(const std::string& templateName)
     return newEntity;
 }
 
+std::vector<entityx::Entity> Level::getEntities(const std::string& templateName)
+{
+    std::vector<entityx::Entity> entities;
+    m_entityMgr.each<TemplateComponent>([&](entityx::Entity entity, TemplateComponent& templateComponent)
+    {
+        if(templateComponent.templateName == templateName)
+        {
+            entities.push_back(entity);
+        }
+    });
+
+    return entities;
+}
+
 void Level::registerClass(LuaState& luaState)
 {
 

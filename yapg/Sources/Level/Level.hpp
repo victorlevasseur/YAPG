@@ -36,6 +36,7 @@ public:
     entityx::EntityManager& getEntityManager() { return m_entityMgr; }
 
     entityx::Entity createNewEntity(const std::string& templateName);
+    std::vector<entityx::Entity> getEntities(const std::string& templateName);
 
     static void registerClass(LuaState& luaState);
 

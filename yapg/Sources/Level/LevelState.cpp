@@ -154,7 +154,8 @@ void LevelState::registerClass(LuaState& luaState)
 {
     sol::constructors<> ctor;
     sol::usertype<LevelState> levelLuaClass(ctor,
-        "create_new_entity", &LevelState::lua_createNewEntity
+        "create_new_entity", &LevelState::lua_createNewEntity,
+        "get_entities", &LevelState::lua_getEntities
     );
     luaState.getState().set_usertype("level_state", levelLuaClass);
 }
@@ -182,6 +183,13 @@ void LevelState::doUpdate(sf::Time dt, sf::RenderTarget &target)
 EntityHandle LevelState::lua_createNewEntity(const std::string& templateName)
 {
     return EntityHandle(m_level->createNewEntity(templateName));
+}
+
+std::vector<EntityHandle> LevelState::lua_getEntities(const std::string& templateName)
+{
+    std::vector<entityx::Entity> entities = m_level->getEntities(templateName);
+    std::vector<EntityHandle> handles(entities.begin(), entities.end());
+    return handles;
 }
 
 void LevelState::updatePerfText()
