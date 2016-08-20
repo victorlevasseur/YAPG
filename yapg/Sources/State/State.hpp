@@ -9,22 +9,12 @@
 
 #include <TGUI/TGUI.hpp>
 
+#include "State/StateGui.hpp"
+
 namespace yapg{ class StateEngine; }
 
 namespace yapg
 {
-
-class State;
-
-class StateGui
-{
-public:
-    StateGui(State& state, tgui::Gui& gui);
-
-private:
-    State& m_state;
-    tgui::Gui& m_gui;
-};
 
 /**
  * The first parameter of State sub-classes must be a ref to StateEngine.

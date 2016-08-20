@@ -86,6 +86,55 @@ MainMenuState::MainMenuState(StateEngine& stateEngine, AllResourcesManagers& res
     m_solLogo.setPosition(sf::Vector2f(590.f, 600.f));
 
     updateKeysButtonsFromSettings();
+
+    //Update GUI
+    tgui::EditBox::Ptr levelTextBox = getGui().createWidget("EditBox");
+    getGui().add(levelTextBox, "levelTextBox");
+    levelTextBox->setPosition(200.f, 250.f);
+    levelTextBox->setSize(1024.f - 600.f, 48.f);
+    levelTextBox->setText("level.xml");
+
+    tgui::Button::Ptr playButton = getGui().createWidget("Button");
+    getGui().add(playButton, "playButton");
+    playButton->setText("Play");
+    playButton->setPosition(tgui::bindRight(levelTextBox), tgui::bindTop(levelTextBox));
+    playButton->setSize(184.f, tgui::bindSize(levelTextBox).y);
+    playButton->connect("pressed", [&]()
+    {
+        getStateEngine().pauseAndStartState
+            <LevelLoadingState, std::string, AllResourcesManagers&, SettingsManager&>(
+            getGui().get<tgui::EditBox>("levelTextBox")->getText().toAnsiString(), m_resourcesManager, m_settingsManager
+        );
+    });
+
+    tgui::Button::Ptr editorButton = getGui().createWidget("Button");
+    getGui().add(editorButton, "editorButton");
+    editorButton->setText("Level editor");
+    editorButton->setPosition(tgui::bindLeft(levelTextBox), tgui::bindBottom(levelTextBox));
+    editorButton->setSize((tgui::bindSize(levelTextBox).x + tgui::bindSize(playButton).x) / 3, 32.f);
+    editorButton->connect("pressed", [&]()
+    {
+        getStateEngine().pauseAndStartState
+            <LevelEditorState, AllResourcesManagers&, SettingsManager&>(
+            m_resourcesManager, m_settingsManager
+        );
+    });
+
+    tgui::Button::Ptr settingsButton = getGui().createWidget("Button");
+    getGui().add(settingsButton, "settingsButton");
+    settingsButton->setText("Settings...");
+    settingsButton->setPosition(tgui::bindLeft(levelTextBox) + (tgui::bindSize(levelTextBox).x + tgui::bindSize(playButton).x) / 3, tgui::bindBottom(levelTextBox));
+    settingsButton->setSize((tgui::bindSize(levelTextBox).x + tgui::bindSize(playButton).x) / 3, tgui::bindSize(editorButton).y);
+
+    tgui::Button::Ptr exitButton = getGui().createWidget("Button");
+    getGui().add(exitButton, "exitButton");
+    exitButton->setText("Exit");
+    exitButton->setPosition(tgui::bindLeft(levelTextBox) + 2 * (tgui::bindSize(levelTextBox).x + tgui::bindSize(playButton).x) / 3, tgui::bindBottom(levelTextBox));
+    exitButton->setSize((tgui::bindSize(levelTextBox).x + tgui::bindSize(playButton).x) / 3, tgui::bindSize(editorButton).y);
+    exitButton->connect("pressed", [&]()
+    {
+        getStateEngine().stopStateAndUnpause();
+    });
 }
 
 void MainMenuState::processEvent(sf::Event event, sf::RenderTarget &target)
@@ -140,7 +189,7 @@ void MainMenuState::processEvent(sf::Event event, sf::RenderTarget &target)
 void MainMenuState::render(sf::RenderTarget& target)
 {
     //ImGui interface
-    ImGui::SetNextWindowPosCenter();
+    /*ImGui::SetNextWindowPosCenter();
     ImGui::SetNextWindowSize(ImVec2(350, 200));
     ImGui::Begin("YAPG - Main menu");
         //Level selection
@@ -248,7 +297,7 @@ void MainMenuState::render(sf::RenderTarget& target)
         {
             getStateEngine().stopStateAndUnpause();
         }
-    ImGui::End();
+    ImGui::End();*/
 
     //Draw
     target.clear(sf::Color(140, 200, 255));

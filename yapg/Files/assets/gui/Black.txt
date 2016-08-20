@@ -1,8 +1,8 @@
 Button {
-    NormalImage     : "Black.png" Part( 0, 64, 45, 50) Middle(10, 0, 25, 50);
-    HoverImage      : "Black.png" Part(45, 64, 45, 50) Middle(10, 0, 25, 50);
-    DownImage       : "Black.png" Part(90, 64, 45, 50) Middle(10, 0, 25, 50);
-    TextColorNormal : rgb(190, 190, 190);
+    NormalImage     : "greenSheet.png" Part( 0, 0, 190, 49) Middle(6, 0, 178, 49);
+    HoverImage      : "greenSheet.png" Part( 0, 0, 190, 49) Middle(6, 0, 178, 49);
+    DownImage       : "greenSheet.png" Part( 0, 192, 190, 45) Middle(6, 49, 178, 45);
+    TextColorNormal : rgb(0, 0, 0);
     TextColorHover  : rgb(250, 250, 250);
     TextColorDown   : rgb(250, 250, 250);
 }
@@ -50,10 +50,10 @@ ComboBox {
 }
 
 EditBox {
-    NormalImage : "Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
-    HoverImage  : "Black.png" Part(0, 114, 60, 40) Middle(15, 0, 30, 40);
+    NormalImage : "greySheet.png" Part(0, 49, 190, 49) Middle(6, 49, 178, 49);
+    HoverImage  : "greySheet.png" Part(0, 49, 190, 49) Middle(6, 49, 178, 49);
 
-    TextColor                   : rgb(190, 190, 190);
+    TextColor                   : rgb(0, 0, 0);
     SelectedTextColor           : rgb(255, 255, 255);
     SelectedTextBackgroundColor : rgb( 10, 110, 255);
     DefaultTextColor            : rgb(120, 120, 120);
@@ -62,7 +62,7 @@ EditBox {
 }
 
 Label {
-    TextColor : (190, 190, 190);
+    TextColor : (0, 0, 0);
 }
 
 ListBox {

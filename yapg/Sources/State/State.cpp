@@ -6,16 +6,9 @@
 namespace yapg
 {
 
-StateGui::StateGui(State& state, tgui::Gui& gui) :
-    m_state(state),
-    m_gui(gui)
-{
-
-}
-
 State::State(StateEngine& stateEngine) :
     m_stateEngine(stateEngine),
-    m_stateGui(*this, m_stateEngine.getWindowManager().getGui())
+    m_stateGui(m_stateEngine.getWindowManager().getGui(), m_stateEngine.getWindowManager().getGuiTheme())
 {
 
 }
@@ -24,21 +17,25 @@ void State::onStart()
 {
     m_timeSinceStart = sf::Time();
     doStart();
+    m_stateGui.onStart();
 }
 
 void State::onStop()
 {
+    m_stateGui.onStop();
     doStop();
 }
 
 void State::onPause()
 {
+    m_stateGui.onPause();
     doPause();
 }
 
 void State::onUnpause()
 {
     doUnpause();
+    m_stateGui.onUnpause();
 }
 
 void State::update(sf::Time dt, sf::RenderTarget &target)
