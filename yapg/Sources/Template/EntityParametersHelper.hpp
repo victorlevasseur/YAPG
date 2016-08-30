@@ -34,6 +34,15 @@ public:
     EntityParametersHelper(EntityParametersHelper&&) = default;
     EntityParametersHelper& operator=(EntityParametersHelper&&) = default;
 
+    /**
+     * Load a parameter a lua object following the lua template syntax of the type of
+     * the parameter.
+     *
+     * Note: take a lua object containing the serialized representation of the value,
+     * not the runtime object!
+     */
+    void loadParameter(const std::string& name, const sol::object& object) const;
+
     boost::any getParameter(const std::string& name) const;
     void setParameter(const std::string& name, const boost::any& value) const;
     std::type_index getParameterType(const std::string& name) const;

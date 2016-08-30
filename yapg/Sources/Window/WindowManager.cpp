@@ -47,8 +47,8 @@ void WindowManager::run()
             m_window.close();
         }
 
-        try
-        {
+        /*try
+        {*/
             sf::Event event;
             while (m_window.pollEvent(event))
             {
@@ -86,8 +86,8 @@ void WindowManager::run()
             ImGui::Render();
 
             m_window.display();
-        }
-        catch(const std::exception& e)
+        //}
+        /*catch(const std::exception& e)
         {
             std::cout << "[Error] Exception uncaught during the game:" << std::endl;
             std::cout << e.what() << std::endl;
@@ -96,7 +96,7 @@ void WindowManager::run()
                 m_engine.getRunningState()->onError(e);
             else
                 throw e;
-        }
+        }*/
     }
 }
 

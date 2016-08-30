@@ -52,7 +52,8 @@ EntityTemplate::EntityTemplate(const sol::table& templateTable, const std::strin
                         Parameter::CustomDataFieldParameter,
                         "",
                         "",
-                        valueTable.get<std::string>("custom_data_field")
+                        valueTable.get<std::string>("custom_data_field"),
+                        valueTable.get<sol::object>("default_value")
                     }
                 );
             }
@@ -67,7 +68,8 @@ EntityTemplate::EntityTemplate(const sol::table& templateTable, const std::strin
                         Parameter::ComponentAttributeParameter,
                         valueTable.get<std::string>("component"),
                         valueTable.get<std::string>("attribute"),
-                        ""
+                        "",
+                        valueTable.get<sol::object>("default_value")
                     }
                 );
             }
@@ -122,6 +124,13 @@ void EntityTemplate::initializeEntity(entityx::Entity entity, const SerializedEn
         m_assetsPath,
         EntityParametersHelper(this, entity)
     );
+
+    //Load the parameter's default values
+    for(const auto& parameter : m_parameters)
+    {
+        if(parameter.second.defaultValue)
+            entity.component<TemplateComponent>()->parametersHelper.loadParameter(parameter.first, parameter.second.defaultValue);
+    }
 }
 
 void EntityTemplate::initializeEntity(entityx::Entity entity, const SerializedEntityGetter& entityGetter, const tinyxml2::XMLElement* parametersElement) const

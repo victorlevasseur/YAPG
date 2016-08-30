@@ -86,6 +86,11 @@ const Component* EntityHandle::getComponentPtr(const std::string& componentName)
     return componentsGettersConst.at(componentName)(this);
 }
 
+std::type_index EntityHandle::getComponentType(const std::string& componentName) const
+{
+    return componentsTypeIndex.at(componentName);
+}
+
 boost::any EntityHandle::getAttributeAsAny(const std::string& componentName, const std::string& attributeName) const
 {
     if(componentsTypeIndex.count(componentName) > 0 && hasComponent(componentName))

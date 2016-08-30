@@ -86,11 +86,15 @@ LuaState::LuaState(bool loadAllTemplates) :
         {
             const char* stringValue = xmlElement->GetText();
             if(stringValue)
-                *value = strcmp(stringValue, "true");
+                *value = (strcmp(stringValue, "true") == 0);
+            else
+                *value = false;
+
+            std::cout << *value << std::endl;
         })
         .setXmlSaveFunction([](const bool* value, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
-            xmlElement->SetText(*value);
+            xmlElement->SetText(*value ? "true" : "false");
         });
     declareAnyConvertibleType<bool>("bool");
 

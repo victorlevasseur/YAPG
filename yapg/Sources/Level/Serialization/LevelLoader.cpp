@@ -63,7 +63,9 @@ LevelLoader::LevelLoader(const std::string& filepath) :
             std::cout << "[Level/Warning] Invalid player template !" << std::endl;
             continue;
         }
+
         m_playersTemplates.push_back(std::string(playerTemplate));
+        m_dependencies.insert(decomposeTemplateName(std::string(playerTemplate)).first);
     }
 
     //First, load all the entity and register them to the SerializedEntityGetter

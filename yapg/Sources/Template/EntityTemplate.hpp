@@ -41,6 +41,8 @@ public:
 
         //Only for CustomDataFieldParameter
         std::string field;
+
+        sol::object defaultValue;
     };
 
     EntityTemplate(const sol::table& templateTable, const std::string& packageName, const std::string& assetsPath);
