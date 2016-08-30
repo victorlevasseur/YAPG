@@ -89,8 +89,6 @@ LuaState::LuaState(bool loadAllTemplates) :
                 *value = (strcmp(stringValue, "true") == 0);
             else
                 *value = false;
-
-            std::cout << *value << std::endl;
         })
         .setXmlSaveFunction([](const bool* value, tinyxml2::XMLElement* xmlElement, const SerializedEntityGetter& entityGetter)
         {
