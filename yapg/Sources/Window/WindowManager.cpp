@@ -47,7 +47,7 @@ void WindowManager::run()
             m_window.close();
         }
 
-        /*try
+        /*try TODO: Remove after debugging
         {*/
             sf::Event event;
             while (m_window.pollEvent(event))
